@@ -138,6 +138,12 @@
             	 id="org.eclipse.andmore.android.convert.adt.projects"
             	 name="%popupmenu.convert.adt.projects.command.name">
             </command>
+            <command
+            	 defaultHandler="org.eclipse.andmore.android.gradle.ConfigureAndroidFromGradle"
+            	 description="Configure Android project from Gradle project"
+            	 id="org.eclipse.andmore.android.configure.gradle"
+            	 name="Configure Android project">
+            </command>
          </extension>
          <extension
                point="org.eclipse.ui.menus">
@@ -269,6 +275,25 @@
 						             <test
 						                   property="org.eclipse.core.resources.projectNature"
 						                   value="com.android.ide.eclipse.adt.AndroidNature">
+						             </test>
+						         </adapt>
+					         </iterate>
+                       </visibleWhen>>
+                  </command>
+            </menuContribution>         
+            <menuContribution
+                  locationURI="popup:org.eclipse.ui.projectConfigure">
+                  <command
+                     commandId="org.eclipse.andmore.android.configure.gradle"
+                     label="Configure Android"
+                     style="push">
+                       <visibleWhen
+                             checkEnabled="false">  
+                             <iterate operator="and" ifEmpty="false">                           
+	                             <adapt type="org.eclipse.core.resources.IResource">
+						             <test
+						                   property="org.eclipse.core.resources.projectNature"
+						                   value="org.eclipse.buildship.core.gradleprojectnature">
 						             </test>
 						         </adapt>
 					         </iterate>

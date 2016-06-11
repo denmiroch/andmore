@@ -25,7 +25,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.andmore.base,
  org.eclipse.jdt.ui,
  org.apache.commons.net;bundle-version="1.4.1",
- org.apache.oro;bundle-version="2.0.8"
+ org.apache.oro;bundle-version="2.0.8",
+ org.eclipse.buildship.core;bundle-version="2.0.0",
+ com.gradleware.tooling.client;bundle-version="0.13.0",
+ com.gradleware.tooling.model;bundle-version="0.13.0",
+ com.gradleware.tooling.utils;bundle-version="0.13.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Localization: plugin
 Export-Package: 
@@ -41,6 +45,8 @@ Export-Package:
  org.eclipse.andmore.android.wizards.installapp,
  org.eclipse.andmore.android.wizards.monkey
 Bundle-ActivationPolicy: lazy
-Import-Package: org.eclipse.equinox.security.storage,
+Import-Package: com.gradleware.tooling.toolingclient;version="0.13.0",
+ com.gradleware.tooling.toolingmodel;version="0.13.0",
+ org.eclipse.equinox.security.storage,
  org.eclipse.ui.console
 Bundle-ClassPath: .
