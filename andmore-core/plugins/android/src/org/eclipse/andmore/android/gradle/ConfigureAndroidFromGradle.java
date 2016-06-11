@@ -3,12 +3,11 @@ package org.eclipse.andmore.android.gradle;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.eclipse.andmore.android.common.utilities.EclipseUtils;
-import org.eclipse.buildship.core.CorePlugin;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -21,15 +20,11 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-import com.android.builder.model.AndroidProject;
-import com.gradleware.tooling.toolingclient.ModelRequest;
-
 /**
  * 11 июн. 2016 г.
  *
  * @author denis.mirochnik
  */
-@SuppressWarnings("restriction")
 public class ConfigureAndroidFromGradle extends AbstractHandler {
 
     private static final class ConfigureAndroidFromGradleJob extends Job {
@@ -37,24 +32,21 @@ public class ConfigureAndroidFromGradle extends AbstractHandler {
         private final ArrayList<IProject> mProjects;
 
         public ConfigureAndroidFromGradleJob(ArrayList<IProject> projectList) {
-            super("Configure Android from Gradle");
+            super("Configure Gradroid");
             mProjects = projectList;
         }
 
         @Override
         protected IStatus run(IProgressMonitor monitor) {
-            monitor.beginTask("Configuring Android from Grale", 1);
+            monitor.beginTask("Configuring Gradroid", 1);
 
             for (IProject project : mProjects) {
 
-                ModelRequest<AndroidProject> modelRequest = CorePlugin.toolingClient()
-                        .newModelRequest(AndroidProject.class);
-
-                modelRequest.projectDir(project.getLocation().toFile());
-                AndroidProject androidProject = modelRequest.executeAndWait();
-
-                EclipseUtils.showInformationDialog(androidProject.getName(),
-                        androidProject.getModelVersion() + " " + androidProject.getCompileTarget());
+                try {
+                    Gradroid.get().configureProject(project, monitor);
+                } catch (CoreException e1) {
+                    // TODO log or smithng
+                }
 
                 monitor.worked(1);
             }

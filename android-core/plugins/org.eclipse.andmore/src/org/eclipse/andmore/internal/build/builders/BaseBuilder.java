@@ -16,13 +16,12 @@
 
 package org.eclipse.andmore.internal.build.builders;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.sdk.LoadStatus;
-import com.android.io.IAbstractFile;
-import com.android.io.StreamException;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.IAndroidTarget;
+import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.build.BuildHelper;
@@ -50,11 +49,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
 import org.xml.sax.SAXException;
 
-import java.util.ArrayList;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.sdk.LoadStatus;
+import com.android.io.IAbstractFile;
+import com.android.io.StreamException;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * Base builder for XML files. This class allows for basic XML parsing with
@@ -190,7 +191,7 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
      * @throws SAXException
      */
     protected final SAXParser getParser() throws ParserConfigurationException,
-            SAXException {
+    SAXException {
         return mParserFactory.newSAXParser();
     }
 
@@ -321,6 +322,10 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
             projectState = Sdk.getProjectState(javaProject.getProject());
         }
 
+        if (projectState == null) {
+            throw new AbortBuildException();
+        }
+
         // get the target for the project
         IAndroidTarget target = projectState.getTarget();
 
@@ -331,7 +336,7 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
         // check on the target data.
         if (sdk.checkAndLoadTargetData(target, javaProject) != LoadStatus.LOADED) {
             throw new AbortBuildException();
-       }
+        }
 
         mBuildToolInfo = projectState.getBuildToolInfo();
         if (mBuildToolInfo == null) {
@@ -358,7 +363,7 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
 
     protected void stopOnMarker(IProject project, String markerType, int depth,
             boolean checkSeverity)
-            throws AbortBuildException {
+                    throws AbortBuildException {
         try {
             IMarker[] markers = project.findMarkers(markerType, false /*includeSubtypes*/, depth);
 

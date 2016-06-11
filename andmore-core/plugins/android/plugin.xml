@@ -140,9 +140,9 @@
             </command>
             <command
             	 defaultHandler="org.eclipse.andmore.android.gradle.ConfigureAndroidFromGradle"
-            	 description="Configure Android project from Gradle project"
+            	 description="Configure Gradroid project from Gradle project"
             	 id="org.eclipse.andmore.android.configure.gradle"
-            	 name="Configure Android project">
+            	 name="Configure Gradroid">
             </command>
          </extension>
          <extension
@@ -285,7 +285,7 @@
                   locationURI="popup:org.eclipse.ui.projectConfigure">
                   <command
                      commandId="org.eclipse.andmore.android.configure.gradle"
-                     label="Configure Android"
+                     label="Configure Gradroid"
                      style="push">
                        <visibleWhen
                              checkEnabled="false">  
@@ -328,18 +328,6 @@
             name="%command.name.helponline">
       </command>
    </extension>
-  <extension
-        point="org.eclipse.ui.perspectiveExtensions">
-     <perspectiveExtension
-           targetID="org.eclipse.sequoyah.android.cdt.build.ui.perspective">
-        <newWizardShortcut
-              id="org.eclipse.andmore.android.wizards.newProjectWizard">
-        </newWizardShortcut>
-        <newWizardShortcut
-              id="org.eclipse.andmore.android.wizards.newWidgetProjectWizard">
-        </newWizardShortcut>
-     </perspectiveExtension>
-  </extension>
   <extension
         point="org.eclipse.ui.navigator.navigatorContent">
      <commonWizard
@@ -685,5 +673,16 @@
           </menu>
        </menuContribution>
     </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="org.eclipse.andmore.ddms.views.category"
+            class="org.eclipse.andmore.android.gradle.ui.VariantsView"
+            icon="icons/sample.gif"
+            id="org.eclipse.andmore.android.gradle.VariantsView"
+            name="Variants">
+      </view>
+   </extension>
   
 </plugin>
