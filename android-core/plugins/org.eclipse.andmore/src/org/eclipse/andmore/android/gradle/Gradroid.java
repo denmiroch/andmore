@@ -4,10 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.eclipse.andmore.android.AndroidPlugin;
-import org.eclipse.andmore.android.SdkUtils;
-import org.eclipse.andmore.internal.project.AndroidNature;
-import org.eclipse.andmore.internal.sdk.Sdk;
+import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.buildship.core.CorePlugin;
 import org.eclipse.buildship.core.configuration.GradleProjectNature;
 import org.eclipse.core.resources.IProject;
@@ -26,7 +23,6 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.android.builder.model.AndroidProject;
 import com.android.builder.model.Variant;
-import com.android.sdklib.IAndroidTarget;
 import com.gradleware.tooling.toolingclient.BuildLaunchRequest;
 import com.gradleware.tooling.toolingclient.LaunchableConfig;
 import com.gradleware.tooling.toolingclient.ModelRequest;
@@ -39,8 +35,11 @@ import com.gradleware.tooling.toolingclient.ModelRequest;
 @SuppressWarnings("restriction")
 public class Gradroid {
 
+    //TODO update on .gradle change
+    //TODO provide Total Update button
+
     public static final String BUILDSHIP_NATURE = GradleProjectNature.ID;
-    public static final String ANDMORE_NATURE = AndroidPlugin.Android_Nature;
+    public static final String ANDMORE_NATURE = AndmoreAndroidConstants.NATURE_DEFAULT;
 
     private static final Gradroid sInstance = new Gradroid();
     private static final Object LOCK = new Object();
@@ -63,8 +62,6 @@ public class Gradroid {
             monitor.beginTask("Setup Gradroid project", 1);
 
             Gradroid.get().loadAndroidModel(mProject, monitor);
-
-            // TODO execute get task? (or builder should do this?)
 
             monitor.worked(1);
             monitor.done();
@@ -139,13 +136,15 @@ public class Gradroid {
 
         AndroidProject androidProject = Gradroid.get().loadAndroidModel(project, monitor);
 
-//        String compileTarget = androidProject.getCompileTarget();
+        System.out.println(androidProject.getName());
 
-//        IAndroidTarget androidTarget = Sdk.getCurrent().getTargetFromHashString(compileTarget);
+        //        String compileTarget = androidProject.getCompileTarget();
 
-//        SdkUtils.associate(project, androidTarget);
+        //        IAndroidTarget androidTarget = Sdk.getCurrent().getTargetFromHashString(compileTarget);
 
-//        AndroidNature.setupProjectNatures(project, monitor, true);
+        //        SdkUtils.associate(project, androidTarget);
+
+        //        AndroidNature.setupProjectNatures(project, monitor, true);
 
         // TODO classpath containers and other things (builders?)
     }
@@ -160,10 +159,10 @@ public class Gradroid {
             }
         }
 
-        return reloadeAndroidModel(project, monitor);
+        return reloadAndroidModel(project, monitor);
     }
 
-    public AndroidProject reloadeAndroidModel(IProject project, IProgressMonitor monitor) {
+    public AndroidProject reloadAndroidModel(IProject project, IProgressMonitor monitor) {
         AndroidProject model = requestAndroidModel(project, monitor);
 
         synchronized (LOCK) {
@@ -181,6 +180,8 @@ public class Gradroid {
 
     private AndroidProject requestAndroidModel(IProject project, IProgressMonitor monitor) {
         monitor.beginTask("Requesting model", 1);
+
+        // TODO lock multiple requesting
 
         ModelRequest<AndroidProject> modelRequest = CorePlugin.toolingClient().newModelRequest(AndroidProject.class);
 

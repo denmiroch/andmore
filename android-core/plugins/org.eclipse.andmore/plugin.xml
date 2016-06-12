@@ -607,6 +607,12 @@
         </wizard>
     </extension>
     <extension point="org.eclipse.ui.commands">
+            <command
+            	 defaultHandler="org.eclipse.andmore.android.gradle.ConfigureAndroidFromGradle"
+            	 description="Configure Gradroid project from Gradle project"
+            	 id="org.eclipse.andmore.android.configure.gradle"
+            	 name="Configure Gradroid">
+            </command>
         <command
             name="Debug Android Application"
             description="Debug Android Application"
@@ -1321,4 +1327,40 @@
             contentTypeId="org.eclipse.andmore.binaryXml"
             class="org.eclipse.wst.sse.core.internal.filebuffers.BasicStructuredDocumentFactory" />
     </extension>
+    
+         <extension
+               point="org.eclipse.ui.menus">
+                <menuContribution
+                  locationURI="popup:org.eclipse.ui.projectConfigure">
+                  <command
+                     commandId="org.eclipse.andmore.android.configure.gradle"
+                     label="Configure Gradroid"
+                     style="push">
+                       <visibleWhen
+                             checkEnabled="false">  
+                             <iterate operator="and" ifEmpty="false">                           
+	                             <adapt type="org.eclipse.core.resources.IResource">
+						             <test
+						                   property="org.eclipse.core.resources.projectNature"
+						                   value="org.eclipse.buildship.core.gradleprojectnature">
+						             </test>
+						         </adapt>
+					         </iterate>
+                       </visibleWhen>>
+                  </command>
+            </menuContribution>         
+   </extension>
+    
+       <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="org.eclipse.andmore.ddms.views.category"
+            class="org.eclipse.andmore.android.gradle.ui.VariantsView"
+            icon="icons/sample.gif"
+            id="org.eclipse.andmore.android.gradle.VariantsView"
+            name="Variants">
+      </view>
+   </extension>
+    
 </plugin>
