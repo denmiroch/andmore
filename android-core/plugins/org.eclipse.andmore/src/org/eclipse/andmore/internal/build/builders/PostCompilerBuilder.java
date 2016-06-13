@@ -249,6 +249,8 @@ public class PostCompilerBuilder extends BaseBuilder {
 
                     PatternBasedDeltaVisitor dv = new PatternBasedDeltaVisitor(project, project, "POST:Main");
 
+                    //TODO GRADROID
+
                     ChangedFileSet manifestCfs = ChangedFileSetHelper.getMergedManifestCfs(project);
                     dv.addSet(manifestCfs);
 
@@ -279,6 +281,8 @@ public class PostCompilerBuilder extends BaseBuilder {
                         if (delta != null) {
                             PatternBasedDeltaVisitor visitor = new PatternBasedDeltaVisitor(project, libProject,
                                     "POST:Lib");
+
+                            //TODO GRADROID
 
                             ChangedFileSet libResCfs = ChangedFileSetHelper.getFullResCfs(libProject);
                             visitor.addSet(libResCfs);
@@ -360,13 +364,13 @@ public class PostCompilerBuilder extends BaseBuilder {
                 resOutputFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
                 if (mConvertToDex) { // in this case this means some class files changed and
-                                         // we need to update the jar file.
+                    // we need to update the jar file.
                     if (DEBUG_LOG) {
                         AndmoreAndroidPlugin.log(IStatus.INFO, "%s updating jar!", project.getName());
                     }
 
                     // resource to the AndroidManifest.xml file
-                    IFile manifestFile = project.getFile(SdkConstants.FN_ANDROID_MANIFEST_XML);
+                    IFile manifestFile = ProjectHelper.getManifest(project);
                     String appPackage = AndroidManifest.getPackage(new IFileWrapper(manifestFile));
 
                     IFolder javaOutputFolder = BaseProjectHelper.getJavaOutputFolder(project);
@@ -381,7 +385,7 @@ public class PostCompilerBuilder extends BaseBuilder {
                     // Also update the projects. The only way to force recompile them is to
                     // reset the library container.
                     List<ProjectState> parentProjects = projectState.getParentProjects();
-                    LibraryClasspathContainerInitializer.updateProject(parentProjects);
+                    LibraryClasspathContainerInitializer.updateProject(parentProjects); //TODO GRADROID
                 }
 
                 return allRefProjects;
@@ -470,7 +474,7 @@ public class PostCompilerBuilder extends BaseBuilder {
                 String osAndroidBinPath = androidBinLocation.toOSString();
 
                 // resource to the AndroidManifest.xml file
-                IFile manifestFile = androidOutputFolder.getFile(SdkConstants.FN_ANDROID_MANIFEST_XML);
+                IFile manifestFile = ProjectHelper.getManifest(project);
 
                 if (manifestFile == null || manifestFile.exists() == false) {
                     // mark project and exit
@@ -511,6 +515,7 @@ public class PostCompilerBuilder extends BaseBuilder {
                     removeMarkersFromContainer(project, AndmoreAndroidConstants.MARKER_AAPT_PACKAGE);
 
                     try {
+                        //TODO GRADROID
                         helper.packageResources(manifestFile, libProjects, null /*resfilter*/, 0 /*versionCode */,
                                 osAndroidBinPath, AndmoreAndroidConstants.FN_RESOURCES_AP_);
                     } catch (AaptExecException e) {

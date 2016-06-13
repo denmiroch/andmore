@@ -154,7 +154,7 @@ public class BuildHelper {
     public BuildHelper(@NonNull ProjectState projectState, @NonNull BuildToolInfo buildToolInfo,
             @NonNull AndroidPrintStream outStream, @NonNull AndroidPrintStream errStream, boolean forceJumbo,
             boolean disableDexMerger, boolean debugMode, boolean verbose, ResourceMarker resMarker)
-            throws CoreException {
+                    throws CoreException {
         mProjectState = projectState;
         mProject = projectState.getProject();
         mBuildToolInfo = buildToolInfo;
@@ -333,7 +333,7 @@ public class BuildHelper {
      */
     public void finalDebugPackage(String intermediateApk, List<File> dexFiles, String output,
             List<IProject> libProjects, ResourceMarker resMarker) throws ApkCreationException, KeytoolException,
-            AndroidLocationException, NativeLibInJarException, DuplicateFileException, CoreException {
+    AndroidLocationException, NativeLibInJarException, DuplicateFileException, CoreException {
 
         AndmoreAndroidPlugin adt = AndmoreAndroidPlugin.getDefault();
         if (adt == null) {
@@ -361,7 +361,7 @@ public class BuildHelper {
 
     /**
      * List a dex files in the bin directory.
-     * 
+     *
      * @param javaProject
      * @return
      */
@@ -404,7 +404,7 @@ public class BuildHelper {
      */
     public void finalPackage(String intermediateApk, List<File> dexFiles, String output, List<IProject> libProjects,
             PrivateKey key, X509Certificate certificate, ResourceMarker resMarker)
-            throws NativeLibInJarException, ApkCreationException, DuplicateFileException, CoreException {
+                    throws NativeLibInJarException, ApkCreationException, DuplicateFileException, CoreException {
 
         try {
             if (dexFiles.size() < 1) {
@@ -750,6 +750,8 @@ public class BuildHelper {
      */
     public void executeDx(IJavaProject javaProject, Collection<String> inputPaths, String osOutFilePath)
             throws CoreException, DexException {
+
+        //TODO GRADROID check this for modifications
 
         // get the dex wrapper
         Sdk sdk = Sdk.getCurrent();
@@ -1212,29 +1214,29 @@ public class BuildHelper {
         return GrabProcessOutput.grabProcessOutput(process, Wait.WAIT_FOR_READERS, // we really want to make sure we get all the output!
                 new IProcessOutput() {
 
-                    @SuppressWarnings("unused")
-                    @Override
-                    public void out(@Nullable String line) {
-                        if (line != null) {
-                            // If benchmarking always print the lines that
-                            // correspond to benchmarking info returned by ADT
-                            if (BENCHMARK_FLAG && line.startsWith("BENCHMARK:")) { //$NON-NLS-1$
-                                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.ALWAYS, project, line);
-                            } else {
-                                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project, line);
-                            }
-                        }
+            @SuppressWarnings("unused")
+            @Override
+            public void out(@Nullable String line) {
+                if (line != null) {
+                    // If benchmarking always print the lines that
+                    // correspond to benchmarking info returned by ADT
+                    if (BENCHMARK_FLAG && line.startsWith("BENCHMARK:")) { //$NON-NLS-1$
+                        AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.ALWAYS, project, line);
+                    } else {
+                        AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project, line);
                     }
+                }
+            }
 
-                    @Override
-                    public void err(@Nullable String line) {
-                        if (line != null) {
-                            stderr.add(line);
-                            if (BuildVerbosity.VERBOSE == AdtPrefs.getPrefs().getBuildVerbosity()) {
-                                AndmoreAndroidPlugin.printErrorToConsole(project, line);
-                            }
-                        }
+            @Override
+            public void err(@Nullable String line) {
+                if (line != null) {
+                    stderr.add(line);
+                    if (BuildVerbosity.VERBOSE == AdtPrefs.getPrefs().getBuildVerbosity()) {
+                        AndmoreAndroidPlugin.printErrorToConsole(project, line);
                     }
-                });
+                }
+            }
+        });
     }
 }
