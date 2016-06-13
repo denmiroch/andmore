@@ -20,26 +20,20 @@ import static com.android.SdkConstants.DOT_XML;
 import static com.android.SdkConstants.EXT_JAR;
 import static com.android.SdkConstants.FD_RES;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ddmlib.IDevice;
-import com.android.ide.common.rendering.LayoutLibrary;
-import com.android.ide.common.sdk.LoadStatus;
-import com.android.io.StreamException;
-import com.android.prefs.AndroidLocation.AndroidLocationException;
-import com.android.sdklib.AndroidVersion;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.SdkManager;
-import com.android.sdklib.devices.DeviceManager;
-import com.android.sdklib.internal.avd.AvdManager;
-import com.android.sdklib.internal.project.ProjectProperties;
-import com.android.sdklib.internal.project.ProjectProperties.PropertyType;
-import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
-import com.android.sdklib.repository.FullRevision;
-import com.android.utils.ILogger;
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -73,7 +67,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
@@ -87,20 +80,26 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ddmlib.IDevice;
+import com.android.ide.common.rendering.LayoutLibrary;
+import com.android.ide.common.sdk.LoadStatus;
+import com.android.io.StreamException;
+import com.android.prefs.AndroidLocation.AndroidLocationException;
+import com.android.sdklib.AndroidVersion;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.SdkManager;
+import com.android.sdklib.devices.DeviceManager;
+import com.android.sdklib.internal.avd.AvdManager;
+import com.android.sdklib.internal.project.ProjectProperties;
+import com.android.sdklib.internal.project.ProjectProperties.PropertyType;
+import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
+import com.android.sdklib.repository.FullRevision;
+import com.android.utils.ILogger;
+import com.google.common.collect.Maps;
 
 /**
  * Central point to load, manipulate and deal with the Android SDK. Only one SDK can be used
@@ -143,10 +142,10 @@ public final class Sdk  {
 
     /** Map associating an {@link IAndroidTarget} to an {@link AndroidTargetData} */
     private final HashMap<IAndroidTarget, AndroidTargetData> mTargetDataMap =
-        new HashMap<IAndroidTarget, AndroidTargetData>();
+            new HashMap<IAndroidTarget, AndroidTargetData>();
     /** Map associating an {@link IAndroidTarget} and its {@link TargetLoadBundle}. */
     private final HashMap<IAndroidTarget, TargetLoadBundle> mTargetDataStatusMap =
-        new HashMap<IAndroidTarget, TargetLoadBundle>();
+            new HashMap<IAndroidTarget, TargetLoadBundle>();
 
     /**
      * If true the target data will never load anymore. The only way to reload them is to
@@ -313,7 +312,7 @@ public final class Sdk  {
     /**
      * Returns the current {@link Sdk} object.
      */
-    @Nullable
+    @NonNull
     public static Sdk getCurrent() {
         synchronized (LOCK) {
             return sCurrentSdk;
@@ -600,8 +599,8 @@ public final class Sdk  {
                     state.setBuildToolInfo(buildToolsInfo);
                 } else {
                     markerMessage = String.format("Unable to resolve %s property value '%s'",
-                                        ProjectProperties.PROPERTY_BUILD_TOOLS,
-                                        buildToolInfoVersion);
+                            ProjectProperties.PROPERTY_BUILD_TOOLS,
+                            buildToolInfoVersion);
                 }
             } else {
                 // this is ok, we'll use the latest one automatically.
@@ -934,7 +933,7 @@ public final class Sdk  {
                 SdkConstants.OS_SDK_DOCS_FOLDER);
 
         mDeviceManager = DeviceManager.createInstance(manager.getLocalSdk().getLocation(),
-                                                      AndmoreAndroidPlugin.getDefault());
+                AndmoreAndroidPlugin.getDefault());
 
         // update whatever ProjectState is already present with new IAndroidTarget objects.
         synchronized (LOCK) {
@@ -1167,8 +1166,8 @@ public final class Sdk  {
                     protected IStatus run(IProgressMonitor monitor) {
                         try {
                             ProjectHelper.fixProjectClasspathEntries(
-                                    JavaCore.create(openedProject));
-                        } catch (JavaModelException e) {
+                                    JavaCore.create(openedProject), monitor, true);
+                        } catch (CoreException e) {
                             AndmoreAndroidPlugin.log(e, "error fixing classpath entries");
                             // Don't return e2.getStatus(); the job control will then produce
                             // a popup with this error, which isn't very interesting for the
@@ -1556,7 +1555,7 @@ public final class Sdk  {
             @Override
             public void run() {
                 HashSet<String> legacyIds =
-                    new HashSet<String>(Arrays.asList(CommonXmlEditor.LEGACY_EDITOR_IDS));
+                        new HashSet<String>(Arrays.asList(CommonXmlEditor.LEGACY_EDITOR_IDS));
 
                 for (IWorkbenchWindow win : PlatformUI.getWorkbench().getWorkbenchWindows()) {
                     for (IWorkbenchPage page : win.getPages()) {
@@ -1599,10 +1598,10 @@ public final class Sdk  {
                 boolean ok = page.closeEditor(part, true /*save*/);
 
                 AndmoreAndroidPlugin.log(IStatus.INFO,
-                    "Closed legacy editor ID %s for %s: %s", //$NON-NLS-1$
-                    id,
-                    file.getFullPath(),
-                    ok ? "Success" : "Failed");//$NON-NLS-1$ //$NON-NLS-2$
+                        "Closed legacy editor ID %s for %s: %s", //$NON-NLS-1$
+                        id,
+                        file.getFullPath(),
+                        ok ? "Success" : "Failed");//$NON-NLS-1$ //$NON-NLS-2$
 
                 if (ok) {
                     // Try to reopen it with the new ID
@@ -1610,8 +1609,8 @@ public final class Sdk  {
                         page.openEditor(input, CommonXmlEditor.ID);
                     } catch (PartInitException e) {
                         AndmoreAndroidPlugin.log(e,
-                            "Failed to reopen %s",          //$NON-NLS-1$
-                            file.getFullPath());
+                                "Failed to reopen %s",          //$NON-NLS-1$
+                                file.getFullPath());
                     }
                 }
             }

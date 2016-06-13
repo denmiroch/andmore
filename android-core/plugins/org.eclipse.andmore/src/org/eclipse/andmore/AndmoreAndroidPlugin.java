@@ -21,17 +21,23 @@ import static com.android.SdkConstants.PLATFORM_DARWIN;
 import static com.android.SdkConstants.PLATFORM_LINUX;
 import static com.android.SdkConstants.PLATFORM_WINDOWS;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.resources.ResourceFile;
-import com.android.ide.common.sdk.LoadStatus;
-import com.android.io.StreamException;
-import com.android.resources.ResourceFolderType;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.ILogger;
-import com.google.common.collect.Sets;
-import com.google.common.io.Closeables;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin.CheckSdkErrorHandler.Solution;
 import org.eclipse.andmore.ddms.DdmsPlugin;
@@ -48,9 +54,9 @@ import org.eclipse.andmore.internal.project.AndroidClasspathContainerInitializer
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
 import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor;
-import org.eclipse.andmore.internal.resources.manager.ResourceManager;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IFileListener;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IProjectListener;
+import org.eclipse.andmore.internal.resources.manager.ResourceManager;
 import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.andmore.internal.sdk.Sdk.ITargetChangeListener;
 import org.eclipse.andmore.internal.ui.EclipseUiHelper;
@@ -108,23 +114,17 @@ import org.eclipse.wb.internal.core.DesignerPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.resources.ResourceFile;
+import com.android.ide.common.sdk.LoadStatus;
+import com.android.io.StreamException;
+import com.android.resources.ResourceFolderType;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.ILogger;
+import com.google.common.collect.Sets;
+import com.google.common.io.Closeables;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -1274,8 +1274,8 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                             return;
                         }
 
-                        ICommandService cs = (ICommandService) wb.getService(ICommandService.class);
-                        IHandlerService is = (IHandlerService) wb.getService(IHandlerService.class);
+                        ICommandService cs = wb.getService(ICommandService.class);
+                        IHandlerService is = wb.getService(IHandlerService.class);
                         if (cs == null || is == null) {
                             return;
                         }

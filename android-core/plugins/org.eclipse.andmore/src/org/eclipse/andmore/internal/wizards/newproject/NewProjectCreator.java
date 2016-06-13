@@ -20,21 +20,24 @@ import static com.android.SdkConstants.FN_PROJECT_PROPERTIES;
 import static com.android.sdklib.internal.project.ProjectProperties.PROPERTY_LIBRARY;
 import static org.eclipse.core.resources.IResource.DEPTH_ZERO;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.res2.ValueXmlHelper;
-import com.android.ide.common.xml.ManifestData;
-import com.android.ide.common.xml.XmlFormatStyle;
-import com.android.io.StreamException;
-import com.android.resources.Density;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.formatting.EclipseXmlFormatPreferences;
 import org.eclipse.andmore.internal.editors.formatting.EclipseXmlPrettyPrinter;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
@@ -82,20 +85,17 @@ import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.res2.ValueXmlHelper;
+import com.android.ide.common.xml.ManifestData;
+import com.android.ide.common.xml.XmlFormatStyle;
+import com.android.io.StreamException;
+import com.android.resources.Density;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
 
 /**
  * The actual project creator invoked from the New Project Wizard
@@ -137,16 +137,16 @@ public class NewProjectCreator  {
     private static final String PH_TEST_INSTRUMENTATION = "TEST-INSTRUMENTATION";   //$NON-NLS-1$
 
     private static final String BIN_DIRECTORY =
-        SdkConstants.FD_OUTPUT + AndmoreAndroidConstants.WS_SEP;
+            SdkConstants.FD_OUTPUT + AndmoreAndroidConstants.WS_SEP;
     private static final String BIN_CLASSES_DIRECTORY =
-        SdkConstants.FD_OUTPUT + AndmoreAndroidConstants.WS_SEP +
-        SdkConstants.FD_CLASSES_OUTPUT + AndmoreAndroidConstants.WS_SEP;
+            SdkConstants.FD_OUTPUT + AndmoreAndroidConstants.WS_SEP +
+            SdkConstants.FD_CLASSES_OUTPUT + AndmoreAndroidConstants.WS_SEP;
     private static final String RES_DIRECTORY =
-        SdkConstants.FD_RESOURCES + AndmoreAndroidConstants.WS_SEP;
+            SdkConstants.FD_RESOURCES + AndmoreAndroidConstants.WS_SEP;
     private static final String ASSETS_DIRECTORY =
-        SdkConstants.FD_ASSETS + AndmoreAndroidConstants.WS_SEP;
+            SdkConstants.FD_ASSETS + AndmoreAndroidConstants.WS_SEP;
     private static final String DRAWABLE_DIRECTORY =
-        SdkConstants.FD_RES_DRAWABLE + AndmoreAndroidConstants.WS_SEP;
+            SdkConstants.FD_RES_DRAWABLE + AndmoreAndroidConstants.WS_SEP;
     private static final String DRAWABLE_XHDPI_DIRECTORY =
             SdkConstants.FD_RES_DRAWABLE + '-' + Density.XHIGH.getResourceValue() +
             AndmoreAndroidConstants.WS_SEP;
@@ -154,17 +154,17 @@ public class NewProjectCreator  {
             SdkConstants.FD_RES_DRAWABLE + '-' + Density.HIGH.getResourceValue() +
             AndmoreAndroidConstants.WS_SEP;
     private static final String DRAWABLE_MDPI_DIRECTORY =
-        SdkConstants.FD_RES_DRAWABLE + '-' + Density.MEDIUM.getResourceValue() +
-        AndmoreAndroidConstants.WS_SEP;
+            SdkConstants.FD_RES_DRAWABLE + '-' + Density.MEDIUM.getResourceValue() +
+            AndmoreAndroidConstants.WS_SEP;
     private static final String DRAWABLE_LDPI_DIRECTORY =
-        SdkConstants.FD_RES_DRAWABLE + '-' + Density.LOW.getResourceValue() +
-        AndmoreAndroidConstants.WS_SEP;
+            SdkConstants.FD_RES_DRAWABLE + '-' + Density.LOW.getResourceValue() +
+            AndmoreAndroidConstants.WS_SEP;
     private static final String LAYOUT_DIRECTORY =
-        SdkConstants.FD_RES_LAYOUT + AndmoreAndroidConstants.WS_SEP;
+            SdkConstants.FD_RES_LAYOUT + AndmoreAndroidConstants.WS_SEP;
     private static final String VALUES_DIRECTORY =
-        SdkConstants.FD_RES_VALUES + AndmoreAndroidConstants.WS_SEP;
+            SdkConstants.FD_RES_VALUES + AndmoreAndroidConstants.WS_SEP;
     private static final String GEN_SRC_DIRECTORY =
-        SdkConstants.FD_GEN_SOURCES + AndmoreAndroidConstants.WS_SEP;
+            SdkConstants.FD_GEN_SOURCES + AndmoreAndroidConstants.WS_SEP;
 
     private static final String TEMPLATES_DIRECTORY = "templates/"; //$NON-NLS-1$
     private static final String TEMPLATE_MANIFEST = TEMPLATES_DIRECTORY
@@ -260,10 +260,10 @@ public class NewProjectCreator  {
                 IProjectDescription description,
                 Map<String, Object> parameters,
                 HashMap<String, String> dictionary) {
-                    mProject = project;
-                    mDescription = description;
-                    mParameters = parameters;
-                    mDictionary = dictionary;
+            mProject = project;
+            mDescription = description;
+            mParameters = parameters;
+            mDictionary = dictionary;
         }
 
         public IProject getProject() {
@@ -591,7 +591,7 @@ public class NewProjectCreator  {
             ProjectInfo testData,
             List<ProjectInfo> importData,
             boolean isAndroidProject)
-                throws InvocationTargetException {
+                    throws InvocationTargetException {
         monitor.beginTask("Create Android Project", 100);
         try {
             IProject mainProject = null;
@@ -716,16 +716,18 @@ public class NewProjectCreator  {
             @Nullable Map<String, String> dictionary,
             @Nullable ProjectPopulator projectPopulator,
             boolean isAndroidProject)
-                throws CoreException, IOException, StreamException {
+                    throws CoreException, IOException, StreamException {
 
-    	
+
         // get the project target
         IAndroidTarget target = (IAndroidTarget) parameters.get(PARAM_SDK_TARGET);
         boolean legacy = isAndroidProject && target.getVersion().getApiLevel() < 4;
 
         // Create project and open it
         project.create(description, new SubProgressMonitor(monitor, 10));
-        if (monitor.isCanceled()) throw new OperationCanceledException();
+        if (monitor.isCanceled()) {
+            throw new OperationCanceledException();
+        }
 
         project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(monitor, 10));
 
@@ -739,11 +741,11 @@ public class NewProjectCreator  {
             sourceFolders = new String[] {
                     (String) parameters.get(PARAM_SRC_FOLDER),
                     GEN_SRC_DIRECTORY
-                };
+            };
         } else {
             sourceFolders = new String[] {
                     (String) parameters.get(PARAM_SRC_FOLDER)
-                };
+            };
         }
         addDefaultDirectories(project, AndmoreAndroidConstants.WS_ROOT, sourceFolders, monitor);
 
@@ -782,17 +784,17 @@ public class NewProjectCreator  {
             }
 
             // add the default proguard config
-//            File libFolder = new File((String) parameters.get(PARAM_SDK_TOOLS_DIR),
-//                    SdkConstants.FD_LIB);
+            //            File libFolder = new File((String) parameters.get(PARAM_SDK_TOOLS_DIR),
+            //                    SdkConstants.FD_LIB);
             File libFolder = new File(Sdk.getCurrent().getSdkFileLocation(),
                     SdkConstants.FD_TOOLS + File.separator + SdkConstants.FD_PROGUARD);
 
-//            addLocalFile(project,
-//                    new File(libFolder, SdkConstants.FN_PROJECT_PROGUARD_FILE),
-//                    // Write ProGuard config files with the extension .pro which
-//                    // is what is used in the ProGuard documentation and samples
-//                    SdkConstants.FN_PROJECT_PROGUARD_FILE,
-//                    monitor);
+            //            addLocalFile(project,
+            //                    new File(libFolder, SdkConstants.FN_PROJECT_PROGUARD_FILE),
+            //                    // Write ProGuard config files with the extension .pro which
+            //                    // is what is used in the ProGuard documentation and samples
+            //                    SdkConstants.FN_PROJECT_PROGUARD_FILE,
+            //                    monitor);
 
             // Set output location
             javaProject.setOutputLocation(project.getFolder(BIN_CLASSES_DIRECTORY).getFullPath(),
@@ -827,7 +829,7 @@ public class NewProjectCreator  {
                         new IClasspathAttribute[0], //extraAttributes
                         false //isExported
 
-                );
+                        );
                 ProjectHelper.addEntryToClasspath(javaProject, entry);
             }
         }
@@ -838,7 +840,7 @@ public class NewProjectCreator  {
 
         // Fix the project to make sure all properties are as expected.
         // Necessary for existing projects and good for new ones to.
-        ProjectHelper.fixProject(project);
+        ProjectHelper.fixProject(project, monitor, false);
 
         Boolean isLibraryProject = (Boolean) parameters.get(PARAM_IS_LIBRARY);
         if (isLibraryProject != null && isLibraryProject.booleanValue()
@@ -888,7 +890,7 @@ public class NewProjectCreator  {
             boolean isLibrary,
             @NonNull String projectLocation,
             @NonNull final IWorkingSet[] workingSets)
-                throws CoreException {
+                    throws CoreException {
         final NewProjectCreator creator = new NewProjectCreator(null, null);
 
         final Map<String, String> dictionary = null;
@@ -975,7 +977,7 @@ public class NewProjectCreator  {
      */
     private void addManifest(IProject project, Map<String, Object> parameters,
             Map<String, String> dictionary, IProgressMonitor monitor)
-            throws CoreException, IOException {
+                    throws CoreException, IOException {
 
         // get IFile to the manifest and check if it's not already there.
         IFile file = project.getFile(SdkConstants.FN_ANDROID_MANIFEST_XML);
@@ -1087,11 +1089,11 @@ public class NewProjectCreator  {
      */
     private void addStringDictionaryFile(IProject project,
             Map<String, String> strings, IProgressMonitor monitor)
-            throws CoreException, IOException {
+                    throws CoreException, IOException {
 
         // create the IFile object and check if the file doesn't already exist.
         IFile file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP
-                                     + VALUES_DIRECTORY + AndmoreAndroidConstants.WS_SEP + STRINGS_FILE);
+                + VALUES_DIRECTORY + AndmoreAndroidConstants.WS_SEP + STRINGS_FILE);
         if (!file.exists()) {
             // get the Strings.xml template
             String stringDefinitionTemplate = AndmoreAndroidPlugin.readEmbeddedTextFile(TEMPLATE_STRINGS);
@@ -1124,7 +1126,7 @@ public class NewProjectCreator  {
 
             // put the string nodes in the Strings.xml template
             stringDefinitionTemplate = stringDefinitionTemplate.replace(PH_STRINGS,
-                                                                        stringNodes.toString());
+                    stringNodes.toString());
 
             // reformat the file according to the user's formatting settings
             stringDefinitionTemplate = reformat(XmlFormatStyle.RESOURCE, stringDefinitionTemplate);
@@ -1307,9 +1309,9 @@ public class NewProjectCreator  {
         // Copy the sampleDir into the project directory recursively
         IFileSystem fileSystem = EFS.getLocalFileSystem();
         IFileStore sourceDir = new ReadWriteFileStore(
-                                        fileSystem.getStore(sampleDir.toURI()));
+                fileSystem.getStore(sampleDir.toURI()));
         IFileStore destDir   = new ReadWriteFileStore(
-                                        fileSystem.getStore(AdtUtils.getAbsolutePath(project)));
+                fileSystem.getStore(AdtUtils.getAbsolutePath(project)));
         sourceDir.copy(destDir, EFS.OVERWRITE, null);
     }
 
@@ -1422,8 +1424,12 @@ public class NewProjectCreator  {
         for (int i = n - 1; i >= 0; i--) {
             if (entries[i].equals(source)) {
                 IClasspathEntry[] newEntries = new IClasspathEntry[n - 1];
-                if (i > 0) System.arraycopy(entries, 0, newEntries, 0, i);
-                if (i < n - 1) System.arraycopy(entries, i + 1, newEntries, i, n - i - 1);
+                if (i > 0) {
+                    System.arraycopy(entries, 0, newEntries, 0, i);
+                }
+                if (i < n - 1) {
+                    System.arraycopy(entries, i + 1, newEntries, i, n - i - 1);
+                }
                 n--;
                 entries = newEntries;
             }
@@ -1444,7 +1450,7 @@ public class NewProjectCreator  {
      */
     private void copyFile(String resourceFilename, IFile destFile,
             Map<String, Object> parameters, IProgressMonitor monitor, boolean reformat)
-            throws CoreException, IOException {
+                    throws CoreException, IOException {
 
         // Read existing file.
         String template = AndmoreAndroidPlugin.readEmbeddedTextFile(
@@ -1491,9 +1497,9 @@ public class NewProjectCreator  {
                 Object value = entry.getValue();
                 if (value == null) {
                     AndmoreAndroidPlugin.log(IStatus.ERROR,
-                    "NPW replace parameters: null value for key '%s' in template '%s'",  //$NON-NLS-1$
-                    entry.getKey(),
-                    str);
+                            "NPW replace parameters: null value for key '%s' in template '%s'",  //$NON-NLS-1$
+                            entry.getKey(),
+                            str);
                 } else {
                     str = str.replaceAll(entry.getKey(), (String) value);
                 }
@@ -1517,7 +1523,7 @@ public class NewProjectCreator  {
             if (mWorkingSets.length > 0 && mProject != null
                     && mProject.exists()) {
                 PlatformUI.getWorkbench().getWorkingSetManager()
-                        .addToWorkingSets(mProject, mWorkingSets);
+                .addToWorkingSets(mProject, mWorkingSets);
             }
         }
     }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,15 +15,17 @@ package org.eclipse.andmore.internal.project;
 
 import static org.eclipse.andmore.AndmoreAndroidConstants.COMPILER_COMPLIANCE_PREFERRED;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.ide.common.xml.ManifestData;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.android.gradle.Gradroid;
 import org.eclipse.andmore.internal.build.builders.PostCompilerBuilder;
 import org.eclipse.andmore.internal.build.builders.PreCompilerBuilder;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
@@ -59,11 +58,18 @@ import org.eclipse.jdt.launching.IVMInstall2;
 import org.eclipse.jdt.launching.IVMInstallType;
 import org.eclipse.jdt.launching.JavaRuntime;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.builder.model.AndroidArtifact;
+import com.android.builder.model.AndroidProject;
+import com.android.builder.model.BuildTypeContainer;
+import com.android.builder.model.ProductFlavorContainer;
+import com.android.builder.model.SourceProvider;
+import com.android.builder.model.Variant;
+import com.android.ide.common.xml.ManifestData;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
 
 /**
  * Utility class to manipulate Project parameters/properties.
@@ -82,8 +88,7 @@ public final class ProjectHelper {
      * @param newEntry The new class path entry to add.
      * @return A new class path entries array.
      */
-    public static IClasspathEntry[] addEntryToClasspath(
-            IClasspathEntry[] entries, IClasspathEntry newEntry) {
+    public static IClasspathEntry[] addEntryToClasspath(IClasspathEntry[] entries, IClasspathEntry newEntry) {
         int n = entries.length;
         IClasspathEntry[] newEntries = new IClasspathEntry[n + 1];
         System.arraycopy(entries, 0, newEntries, 0, n);
@@ -103,11 +108,10 @@ public final class ProjectHelper {
      *
      * @see IClasspathEntry#getPath()
      */
-    public static IClasspathEntry[] replaceEntryInClasspath(
-            IClasspathEntry[] entries, IClasspathEntry newEntry) {
+    public static IClasspathEntry[] replaceEntryInClasspath(IClasspathEntry[] entries, IClasspathEntry newEntry) {
 
         IPath path = newEntry.getPath();
-        for (int i = 0, count = entries.length; i < count ; i++) {
+        for (int i = 0, count = entries.length; i < count; i++) {
             if (path.equals(entries[i].getPath())) {
                 entries[i] = newEntry;
                 return entries;
@@ -159,17 +163,15 @@ public final class ProjectHelper {
      * @param index The index to remove.
      * @return A new class path entries array.
      */
-    public static IClasspathEntry[] removeEntryFromClasspath(
-            IClasspathEntry[] entries, int index) {
+    public static IClasspathEntry[] removeEntryFromClasspath(IClasspathEntry[] entries, int index) {
         int n = entries.length;
-        IClasspathEntry[] newEntries = new IClasspathEntry[n-1];
+        IClasspathEntry[] newEntries = new IClasspathEntry[n - 1];
 
         // copy the entries before index
         System.arraycopy(entries, 0, newEntries, 0, index);
 
         // copy the entries after index
-        System.arraycopy(entries, index + 1, newEntries, index,
-                entries.length - index - 1);
+        System.arraycopy(entries, index + 1, newEntries, index, entries.length - index - 1);
 
         return newEntries;
     }
@@ -204,9 +206,8 @@ public final class ProjectHelper {
      * and IClasspathEntry.CPE_CONTAINER
      * @return the index of the found classpath entry or -1.
      */
-    public static int findClasspathEntryByPath(IClasspathEntry[] entries,
-            String entryPath, int entryKind) {
-        for (int i = 0 ; i < entries.length ; i++) {
+    public static int findClasspathEntryByPath(IClasspathEntry[] entries, String entryPath, int entryKind) {
+        for (int i = 0; i < entries.length; i++) {
             IClasspathEntry entry = entries[i];
 
             int kind = entry.getEntryKind();
@@ -217,6 +218,26 @@ public final class ProjectHelper {
 
                 String osPathString = path.toOSString();
                 if (osPathString.equals(entryPath)) {
+                    return i;
+                }
+            }
+        }
+
+        // not found, return bad index.
+        return -1;
+    }
+
+    public static int findClasspathEntryByPath(IClasspathEntry[] entries, IPath entryPath, int entryKind) {
+        for (int i = 0; i < entries.length; i++) {
+            IClasspathEntry entry = entries[i];
+
+            int kind = entry.getEntryKind();
+
+            if (kind == entryKind || entryKind == 0) {
+                // get the path
+                IPath path = entry.getPath();
+
+                if (path.equals(entryPath)) {
                     return i;
                 }
             }
@@ -238,12 +259,12 @@ public final class ProjectHelper {
      * @param startIndex Index where to start the search
      * @return the index of the found classpath entry or -1.
      */
-    public static int findClasspathEntryByName(IClasspathEntry[] entries,
-            String entryName, int entryKind, int startIndex) {
+    public static int findClasspathEntryByName(IClasspathEntry[] entries, String entryName, int entryKind,
+            int startIndex) {
         if (startIndex < 0) {
             startIndex = 0;
         }
-        for (int i = startIndex ; i < entries.length ; i++) {
+        for (int i = startIndex; i < entries.length; i++) {
             IClasspathEntry entry = entries[i];
 
             int kind = entry.getEntryKind();
@@ -251,7 +272,7 @@ public final class ProjectHelper {
             if (kind == entryKind || entryKind == 0) {
                 // get the path
                 IPath path = entry.getPath();
-                String name = path.segment(path.segmentCount()-1);
+                String name = path.segment(path.segmentCount() - 1);
 
                 if (name.equals(entryName)) {
                     return i;
@@ -264,7 +285,7 @@ public final class ProjectHelper {
     }
 
     public static boolean updateProject(IJavaProject project) {
-        return updateProjects(new IJavaProject[] { project});
+        return updateProjects(new IJavaProject[] { project });
     }
 
     /**
@@ -283,9 +304,9 @@ public final class ProjectHelper {
     /**
      * Fix the project. This checks the SDK location.
      * @param project The project to fix.
-     * @throws JavaModelException
+     * @throws CoreException
      */
-    public static void fixProject(IProject project) throws JavaModelException {
+    public static void fixProject(IProject project, IProgressMonitor monitor, boolean force) throws CoreException {
         if (AndmoreAndroidPlugin.getOsSdkFolder().length() == 0) {
             AndmoreAndroidPlugin.printToConsole(project, "Unknown SDK Location, project not fixed.");
             return;
@@ -293,7 +314,7 @@ public final class ProjectHelper {
 
         // get a java project
         IJavaProject javaProject = JavaCore.create(project);
-        fixProjectClasspathEntries(javaProject);
+        fixProjectClasspathEntries(javaProject, monitor, force);
     }
 
     /**
@@ -305,15 +326,76 @@ public final class ProjectHelper {
      * <li>The project references the AndroidClasspathContainer.
      * </ul>
      * @param javaProject The project to fix.
-     * @throws JavaModelException
+     * @param monitor
+     * @param force
+     * @throws CoreException
      */
-    public static void fixProjectClasspathEntries(IJavaProject javaProject)
-            throws JavaModelException {
+    public static void fixProjectClasspathEntries(IJavaProject javaProject, IProgressMonitor monitor, boolean force)
+            throws CoreException {
 
-        // get the project classpath
+        //TODO GRADROID configure gradle provided things
+
         IClasspathEntry[] entries = javaProject.getRawClasspath();
         IClasspathEntry[] oldEntries = entries;
         boolean forceRewriteOfCPE = false;
+
+        IProject project = javaProject.getProject();
+
+        if (Gradroid.get().isGradroidProject(project)) {
+            SourceProvider defaultSource;
+            SourceProvider buildTypeSource = null;
+            Collection<SourceProvider> flavorsSource = new ArrayList<SourceProvider>();
+
+            AndroidProject androidProject;
+            if (force) {
+                androidProject = Gradroid.get().reloadAndroidModel(project, monitor);
+            } else {
+                androidProject = Gradroid.get().loadAndroidModel(project, monitor);
+            }
+
+            Collection<BuildTypeContainer> buildTypes = androidProject.getBuildTypes();
+
+            defaultSource = androidProject.getDefaultConfig().getSourceProvider();
+            Collection<ProductFlavorContainer> flavors = androidProject.getProductFlavors();
+
+            Variant variant = Gradroid.get().getProjectVariant(project);
+
+            String buildTypeName = variant.getBuildType();
+            List<String> variantFlavors = variant.getProductFlavors();
+
+            AndroidArtifact mainArtifact = variant.getMainArtifact();
+
+            for (BuildTypeContainer buildTypeContainer : buildTypes) {
+                if (buildTypeContainer.getBuildType().getName().equals(buildTypeName)) {
+                    buildTypeSource = buildTypeContainer.getSourceProvider();
+                    break;
+                }
+            }
+
+            for (ProductFlavorContainer productFlavorContainer : flavors) {
+                for (String flavorName : variantFlavors) {
+                    if (productFlavorContainer.getProductFlavor().getName().equals(flavorName)) {
+                        flavorsSource.add(productFlavorContainer.getSourceProvider());
+                        break;
+                    }
+                }
+            }
+
+            SourceProvider variantSourceProvider = mainArtifact.getVariantSourceProvider();
+
+            entries = addSourceEntry(project, entries, defaultSource.getJavaDirectories());
+            for (SourceProvider sourceProvider : flavorsSource) {
+                entries = addSourceEntry(project, entries, sourceProvider.getJavaDirectories());
+            }
+            entries = addSourceEntry(project, entries, buildTypeSource.getJavaDirectories());
+            if (variantSourceProvider != null) {
+                entries = addSourceEntry(project, entries, variantSourceProvider.getJavaDirectories());
+            }
+            entries = addSourceEntry(project, entries, mainArtifact.getGeneratedSourceFolders());
+
+            forceRewriteOfCPE = true;
+        }
+        // get the project classpath
 
         // check if the JRE is set as library
         int jreIndex = ProjectHelper.findClasspathEntryByPath(entries, JavaRuntime.JRE_CONTAINER,
@@ -323,28 +405,16 @@ public final class ProjectHelper {
             entries = ProjectHelper.removeEntryFromClasspath(entries, jreIndex);
         }
 
-        // get the output folder
-        IPath outputFolder = javaProject.getOutputLocation();
-
         boolean foundFrameworkContainer = false;
         IClasspathEntry foundLibrariesContainer = null;
         IClasspathEntry foundDependenciesContainer = null;
 
-        for (int i = 0 ; i < entries.length ;) {
+        for (int i = 0; i < entries.length;) {
             // get the entry and kind
             IClasspathEntry entry = entries[i];
             int kind = entry.getEntryKind();
 
-            if (kind == IClasspathEntry.CPE_SOURCE) {
-                IPath path = entry.getPath();
-
-                if (path.equals(outputFolder)) {
-                    entries = ProjectHelper.removeEntryFromClasspath(entries, i);
-
-                    // continue, to skip the i++;
-                    continue;
-                }
-            } else if (kind == IClasspathEntry.CPE_CONTAINER) {
+            if (kind == IClasspathEntry.CPE_CONTAINER) {
                 String path = entry.getPath().toString();
                 if (AndmoreAndroidConstants.CONTAINER_FRAMEWORK.equals(path)) {
                     foundFrameworkContainer = true;
@@ -367,7 +437,6 @@ public final class ProjectHelper {
                     javaProject.getProject().getName());
         }
 
-
         // if the framework container is not there, we add it
         if (!foundFrameworkContainer) {
             // add the android container to the array
@@ -379,17 +448,14 @@ public final class ProjectHelper {
         if (foundLibrariesContainer == null) {
             // add the exported libraries android container to the array
             entries = ProjectHelper.addEntryToClasspath(entries,
-                    JavaCore.newContainerEntry(
-                            new Path(AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES), true));
+                    JavaCore.newContainerEntry(new Path(AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES), true));
         } else if (!m2eNature && !foundLibrariesContainer.isExported()) {
             // the container is present but it's not exported and since there's no m2e nature
             // we do want it to be exported.
             // keep all the other parameters the same.
             entries = ProjectHelper.replaceEntryInClasspath(entries,
-                    JavaCore.newContainerEntry(
-                            new Path(AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES),
-                            foundLibrariesContainer.getAccessRules(),
-                            foundLibrariesContainer.getExtraAttributes(),
+                    JavaCore.newContainerEntry(new Path(AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES),
+                            foundLibrariesContainer.getAccessRules(), foundLibrariesContainer.getExtraAttributes(),
                             true));
             forceRewriteOfCPE = true;
         }
@@ -398,30 +464,66 @@ public final class ProjectHelper {
         if (foundDependenciesContainer == null) {
             // add the android dependencies container to the array
             entries = ProjectHelper.addEntryToClasspath(entries,
-                    JavaCore.newContainerEntry(
-                            new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES), true));
+                    JavaCore.newContainerEntry(new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES), true));
         } else if (!m2eNature && !foundDependenciesContainer.isExported()) {
             // the container is present but it's not exported and since there's no m2e nature
             // we do want it to be exported.
             // keep all the other parameters the same.
             entries = ProjectHelper.replaceEntryInClasspath(entries,
-                    JavaCore.newContainerEntry(
-                            new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
+                    JavaCore.newContainerEntry(new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
                             foundDependenciesContainer.getAccessRules(),
-                            foundDependenciesContainer.getExtraAttributes(),
-                            true));
+                            foundDependenciesContainer.getExtraAttributes(), true));
             forceRewriteOfCPE = true;
         }
 
         // set the new list of entries to the project
         if (entries != oldEntries || forceRewriteOfCPE) {
-            javaProject.setRawClasspath(entries, new NullProgressMonitor());
+            javaProject.setRawClasspath(entries, monitor);
         }
 
         // If needed, check and fix compiler compliance and source compatibility
         ProjectHelper.checkAndFixCompilerCompliance(javaProject);
     }
 
+    private static IClasspathEntry[] addSourceEntry(IProject project, IClasspathEntry[] entries,
+            Collection<File> javaSources) {
+
+        IPath projectPath = new Path(project.getLocation().toFile().getAbsolutePath());
+
+        for (File file : javaSources) {
+
+            String path = file.getAbsolutePath();
+            IPath sourcePath = new Path(path);
+            sourcePath = sourcePath.makeRelativeTo(projectPath);
+
+            IFolder sourceFolder = project.getFolder(sourcePath);
+            IPath fullPath = sourceFolder.getFullPath();
+
+            int found = ProjectHelper.findClasspathEntryByPath(entries, fullPath,
+                    IClasspathEntry.CPE_SOURCE);
+
+            if (!sourceFolder.isAccessible()) {
+                if (found != -1) {
+                    entries = ProjectHelper.removeEntryFromClasspath(entries, found);
+                }
+                continue;
+            }
+
+            if (found == -1) {
+                entries = ProjectHelper.addEntryToClasspath(entries,
+                        JavaCore.newSourceEntry(fullPath));
+            }
+        }
+        return entries;
+    }
+
+    private static IResource getProjectResource(IProject project, File file) {
+        IPath projectPath = new Path(project.getLocation().toFile().getAbsolutePath());
+        String path = file.getAbsolutePath();
+        IPath sourcePath = new Path(path);
+        sourcePath = sourcePath.makeRelativeTo(projectPath);
+        return project.findMember(sourcePath);
+    }
 
     /**
      * Checks the project compiler compliance level is supported.
@@ -484,7 +586,6 @@ public final class ProjectHelper {
         return checkCompilerCompliance(javaProject);
     }
 
-
     /**
      * Checks, and fixes if needed, the compiler compliance level, and the source compatibility
      * level
@@ -510,17 +611,14 @@ public final class ProjectHelper {
         Pair<Integer, String> result = checkCompilerCompliance(javaProject);
         if (result.getFirst().intValue() != COMPILER_COMPLIANCE_OK) {
             // setup the preferred compiler compliance level.
-            javaProject.setOption(JavaCore.COMPILER_COMPLIANCE,
-                    AndmoreAndroidConstants.COMPILER_COMPLIANCE_PREFERRED);
-            javaProject.setOption(JavaCore.COMPILER_SOURCE,
-                    AndmoreAndroidConstants.COMPILER_COMPLIANCE_PREFERRED);
+            javaProject.setOption(JavaCore.COMPILER_COMPLIANCE, AndmoreAndroidConstants.COMPILER_COMPLIANCE_PREFERRED);
+            javaProject.setOption(JavaCore.COMPILER_SOURCE, AndmoreAndroidConstants.COMPILER_COMPLIANCE_PREFERRED);
             javaProject.setOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM,
                     AndmoreAndroidConstants.COMPILER_COMPLIANCE_PREFERRED);
 
             // clean the project to make sure we recompile
             try {
-                javaProject.getProject().build(IncrementalProjectBuilder.CLEAN_BUILD,
-                        new NullProgressMonitor());
+                javaProject.getProject().build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor());
             } catch (CoreException e) {
                 AndmoreAndroidPlugin.printErrorToConsole(javaProject.getProject(),
                         "Project compiler settings changed. Clean your project.");
@@ -539,11 +637,9 @@ public final class ProjectHelper {
      *             level
      */
     @SuppressWarnings("restriction") // JDT API for setting compliance options
-    public static void enforcePreferredCompilerCompliance(@NonNull IJavaProject javaProject)
-            throws CoreException {
+    public static void enforcePreferredCompilerCompliance(@NonNull IJavaProject javaProject) throws CoreException {
         String compliance = javaProject.getOption(JavaCore.COMPILER_COMPLIANCE, true);
-        if (compliance == null ||
-                JavaModelUtil.isVersionLessThan(compliance, COMPILER_COMPLIANCE_PREFERRED)) {
+        if (compliance == null || JavaModelUtil.isVersionLessThan(compliance, COMPILER_COMPLIANCE_PREFERRED)) {
             IVMInstallType[] types = JavaRuntime.getVMInstallTypes();
             for (int i = 0; i < types.length; i++) {
                 IVMInstallType type = types[i];
@@ -556,8 +652,7 @@ public final class ProjectHelper {
                         if (install2.getJavaVersion().startsWith(COMPILER_COMPLIANCE_PREFERRED)) {
                             Map<String, String> options = javaProject.getOptions(false);
                             JavaCore.setComplianceOptions(COMPILER_COMPLIANCE_PREFERRED, options);
-                            JavaModelUtil.setDefaultClassfileOptions(options,
-                                    COMPILER_COMPLIANCE_PREFERRED);
+                            JavaModelUtil.setDefaultClassfileOptions(options, COMPILER_COMPLIANCE_PREFERRED);
                             javaProject.setOptions(options);
                             return;
                         }
@@ -638,7 +733,7 @@ public final class ProjectHelper {
         // if the android nature is not the first one, we reorder them
         if (AndmoreAndroidConstants.NATURE_DEFAULT.equals(natures[0]) == false) {
             // look for the index
-            for (int i = 0 ; i < natures.length ; i++) {
+            for (int i = 0; i < natures.length; i++) {
                 if (AndmoreAndroidConstants.NATURE_DEFAULT.equals(natures[i])) {
                     // if we try to just reorder the array in one pass, this doesn't do
                     // anything. I guess JDT check that we are actually adding/removing nature.
@@ -669,7 +764,6 @@ public final class ProjectHelper {
             }
         }
     }
-
 
     /**
      * Removes a specific nature from a project.
@@ -703,8 +797,7 @@ public final class ProjectHelper {
      * @param includeReferencedProjects flag to also test the referenced projects.
      * @throws CoreException
      */
-    public static boolean hasError(IProject project, boolean includeReferencedProjects)
-    throws CoreException {
+    public static boolean hasError(IProject project, boolean includeReferencedProjects) throws CoreException {
         IMarker[] markers = project.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
         if (markers != null && markers.length > 0) {
             // the project has marker(s). even though they are "problem" we
@@ -739,8 +832,7 @@ public final class ProjectHelper {
      * @param value the value to save
      * @return true if the save succeeded.
      */
-    public static boolean saveStringProperty(IResource resource, String propertyName,
-            String value) {
+    public static boolean saveStringProperty(IResource resource, String propertyName, String value) {
         QualifiedName qname = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, propertyName);
 
         try {
@@ -776,8 +868,7 @@ public final class ProjectHelper {
      * @param value the value to save
      * @return true if the save succeeded.
      */
-    public static boolean saveBooleanProperty(IResource resource, String propertyName,
-            boolean value) {
+    public static boolean saveBooleanProperty(IResource resource, String propertyName, boolean value) {
         return saveStringProperty(resource, propertyName, Boolean.toString(value));
     }
 
@@ -788,8 +879,7 @@ public final class ProjectHelper {
      * @param defaultValue The default value to return if the property was not found.
      * @return the property value or the default value if the property was not found.
      */
-    public static boolean loadBooleanProperty(IResource resource, String propertyName,
-            boolean defaultValue) {
+    public static boolean loadBooleanProperty(IResource resource, String propertyName, boolean defaultValue) {
         String value = loadStringProperty(resource, propertyName);
         if (value != null) {
             return Boolean.parseBoolean(value);
@@ -815,8 +905,7 @@ public final class ProjectHelper {
      *      empty string is stored.
      * @return true if the save succeeded
      */
-    public static boolean saveResourceProperty(IResource resource, String propertyName,
-            IResource value) {
+    public static boolean saveResourceProperty(IResource resource, String propertyName, IResource value) {
         if (value != null) {
             IPath iPath = value.getFullPath();
             return saveStringProperty(resource, propertyName, iPath.toString());
@@ -861,7 +950,6 @@ public final class ProjectHelper {
 
         return list;
     }
-
 
     /**
      * Checks a Java project compiler level option against a list of supported versions.
@@ -923,8 +1011,7 @@ public final class ProjectHelper {
      * @return A list of Java projects for which javaProject depend on.
      * @throws JavaModelException
      */
-    public static List<IJavaProject> getAndroidProjectDependencies(IJavaProject javaProject)
-        throws JavaModelException {
+    public static List<IJavaProject> getAndroidProjectDependencies(IJavaProject javaProject) throws JavaModelException {
         String[] requiredProjectNames = javaProject.getRequiredProjectNames();
 
         // Go from java project name to JavaProject name
@@ -962,11 +1049,9 @@ public final class ProjectHelper {
 
         if (outputLocation == null) {
             AndmoreAndroidPlugin.printErrorToConsole(project,
-                    "Failed to get the output location of the project. Check build path properties"
-                    );
+                    "Failed to get the output location of the project. Check build path properties");
             return null;
         }
-
 
         // get the package path
         String packageName = project.getName() + SdkConstants.DOT_ANDROID_PACKAGE;
@@ -974,7 +1059,7 @@ public final class ProjectHelper {
 
         // check the package is present
         if (r instanceof IFile && r.exists()) {
-            return (IFile)r;
+            return (IFile) r;
         }
 
         String msg = String.format("Could not find %1$s!", packageName);
@@ -991,8 +1076,38 @@ public final class ProjectHelper {
      *         is missing.
      */
     public static IFile getManifest(IProject project) {
-        IResource r = project.findMember(AndmoreAndroidConstants.WS_SEP
-                + SdkConstants.FN_ANDROID_MANIFEST_XML);
+
+        //TODO GRADROID fix it
+
+        IResource r = null;
+
+        try {
+            if (Gradroid.get().isGradroidProject(project)) {
+                AndroidProject model = Gradroid.get().loadAndroidModel(project, new NullProgressMonitor());
+                Variant variant = Gradroid.get().getProjectVariant(project);
+
+                SourceProvider sourceProvider = variant.getMainArtifact().getVariantSourceProvider();
+
+                if (sourceProvider == null) {
+                    String buildTypeName = variant.getBuildType();
+                    Collection<BuildTypeContainer> buildTypes = model.getBuildTypes();
+
+                    for (BuildTypeContainer buildTypeContainer : buildTypes) {
+                        if (buildTypeContainer.getBuildType().getName().equals(buildTypeName)) {
+                            sourceProvider = buildTypeContainer.getSourceProvider();
+                            break;
+                        }
+                    }
+                }
+
+                File manifestFile = sourceProvider.getManifestFile();
+                r = getProjectResource(project, manifestFile);
+            } else {
+                r = project.findMember(AndmoreAndroidConstants.WS_SEP + SdkConstants.FN_ANDROID_MANIFEST_XML);
+            }
+        } catch (CoreException e) {}
+
+        //TODO GRADROID return manifest from gradle
 
         if (r == null || r.exists() == false || (r instanceof IFile) == false) {
             return null;
@@ -1009,8 +1124,7 @@ public final class ProjectHelper {
      * @throws CoreException
      */
     @SuppressWarnings("unchecked")
-    public static void compileInReleaseMode(IProject project, IProgressMonitor monitor)
-            throws CoreException {
+    public static void compileInReleaseMode(IProject project, IProgressMonitor monitor) throws CoreException {
         compileInReleaseMode(project, true /*includeDependencies*/, monitor);
     }
 
@@ -1023,8 +1137,7 @@ public final class ProjectHelper {
      * @throws CoreException
      */
     @SuppressWarnings("unchecked")
-    private static void compileInReleaseMode(IProject project, boolean includeDependencies,
-            IProgressMonitor monitor)
+    private static void compileInReleaseMode(IProject project, boolean includeDependencies, IProgressMonitor monitor)
             throws CoreException {
 
         if (includeDependencies) {
@@ -1036,7 +1149,7 @@ public final class ProjectHelper {
 
             // build dependencies in reverse order to prevent libraries being rebuilt
             // due to refresh of other libraries (they would be compiled in the wrong mode).
-            for (int i = libraries.size() - 1 ; i >= 0 ; i--) {
+            for (int i = libraries.size() - 1; i >= 0; i--) {
                 IProject lib = libraries.get(i);
                 compileInReleaseMode(lib, false /*includeDependencies*/, monitor);
 
@@ -1059,18 +1172,15 @@ public final class ProjectHelper {
                     newArgs.putAll(command.getArguments());
                 }
 
-                project.build(IncrementalProjectBuilder.FULL_BUILD,
-                        PreCompilerBuilder.ID, newArgs, monitor);
+                project.build(IncrementalProjectBuilder.FULL_BUILD, PreCompilerBuilder.ID, newArgs, monitor);
             } else if (PostCompilerBuilder.ID.equals(name)) {
                 if (includeDependencies == false) {
                     // this is a library, we need to build it!
-                    project.build(IncrementalProjectBuilder.FULL_BUILD, name,
-                            command.getArguments(), monitor);
+                    project.build(IncrementalProjectBuilder.FULL_BUILD, name, command.getArguments(), monitor);
                 }
             } else {
 
-                project.build(IncrementalProjectBuilder.FULL_BUILD, name,
-                        command.getArguments(), monitor);
+                project.build(IncrementalProjectBuilder.FULL_BUILD, name, command.getArguments(), monitor);
             }
         }
     }
@@ -1083,8 +1193,7 @@ public final class ProjectHelper {
      * @param monitor
      * @throws CoreException
      */
-    public static void buildWithDeps(IProject project, int kind, IProgressMonitor monitor)
-            throws CoreException {
+    public static void buildWithDeps(IProject project, int kind, IProgressMonitor monitor) throws CoreException {
         // Get list of projects that we depend on
         ProjectState projectState = Sdk.getProjectState(project);
 
@@ -1094,7 +1203,7 @@ public final class ProjectHelper {
 
         // build dependencies in reverse order to prevent libraries being rebuilt
         // due to refresh of other libraries (they would be compiled in the wrong mode).
-        for (int i = libraries.size() - 1 ; i >= 0 ; i--) {
+        for (int i = libraries.size() - 1; i >= 0; i--) {
             IProject lib = libraries.get(i);
             lib.build(kind, monitor);
             lib.refreshLocal(IResource.DEPTH_INFINITE, monitor);
@@ -1102,7 +1211,6 @@ public final class ProjectHelper {
 
         project.build(kind, monitor);
     }
-
 
     /**
      * Build project incrementally, including making the final packaging even if it is disabled
@@ -1112,13 +1220,11 @@ public final class ProjectHelper {
      * @param monitor A eclipse runtime progress monitor to be updated by the builders.
      * @throws CoreException
      */
-    public static void doFullIncrementalDebugBuild(IProject project, IProgressMonitor monitor)
-            throws CoreException {
+    public static void doFullIncrementalDebugBuild(IProject project, IProgressMonitor monitor) throws CoreException {
         // Get list of projects that we depend on
         List<IJavaProject> androidProjectList = new ArrayList<IJavaProject>();
         try {
-            androidProjectList = getAndroidProjectDependencies(
-                                    BaseProjectHelper.getJavaProject(project));
+            androidProjectList = getAndroidProjectDependencies(BaseProjectHelper.getJavaProject(project));
         } catch (JavaModelException e) {
             AndmoreAndroidPlugin.printErrorToConsole(project, e);
         }
@@ -1140,8 +1246,7 @@ public final class ProjectHelper {
 
             // call the post compiler manually, forcing FULL_BUILD otherwise Eclipse won't
             // call the builder since the delta is empty.
-            project.build(IncrementalProjectBuilder.FULL_BUILD,
-                          PostCompilerBuilder.ID, args, monitor);
+            project.build(IncrementalProjectBuilder.FULL_BUILD, PostCompilerBuilder.ID, args, monitor);
         }
 
         // because the post compiler builder does a delayed refresh due to

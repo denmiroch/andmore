@@ -390,7 +390,7 @@ public class ProjectCreationSupport {
 			javaProject
 					.setOutputLocation(project.getFolder(BIN_DIR).getFullPath(), new SubProgressMonitor(monitor, 40));
 			SdkUtils.associate(project, androidProject.getSdkTarget());
-			ProjectUtils.fixProject(project);
+			ProjectUtils.fixProject(project, monitor);
 		} catch (CoreException e) {
 			undoProjectCreation(project);
 			throw new InvocationTargetException(e);

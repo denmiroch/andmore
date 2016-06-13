@@ -16,6 +16,17 @@
 
 package org.eclipse.andmore.internal.resources.manager;
 
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.eclipse.andmore.internal.sdk.ProjectState;
+import org.eclipse.andmore.internal.sdk.Sdk;
+import org.eclipse.andmore.io.IFolderWrapper;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.android.ide.common.rendering.api.ResourceValue;
@@ -27,17 +38,6 @@ import com.android.ide.common.resources.configuration.FolderConfiguration;
 import com.android.io.IAbstractFolder;
 import com.android.resources.ResourceType;
 import com.android.util.Pair;
-
-import org.eclipse.andmore.internal.sdk.ProjectState;
-import org.eclipse.andmore.internal.sdk.Sdk;
-import org.eclipse.andmore.io.IFolderWrapper;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Represents the resources of a project.
@@ -69,6 +69,7 @@ public class ProjectResources extends ResourceRepository {
     private final IProject mProject;
 
     public static ProjectResources create(IProject project) {
+        //TODO GRADROID get proper res folder from gradle
         IFolder resFolder = project.getFolder(SdkConstants.FD_RESOURCES);
 
         return new ProjectResources(project, new IFolderWrapper(resFolder));
@@ -97,7 +98,7 @@ public class ProjectResources extends ResourceRepository {
         ensureInitialized();
 
         Map<ResourceType, Map<String, ResourceValue>> resultMap =
-            new EnumMap<ResourceType, Map<String, ResourceValue>>(ResourceType.class);
+                new EnumMap<ResourceType, Map<String, ResourceValue>>(ResourceType.class);
 
         // if the project contains libraries, we need to add the libraries resources here
         // so that they are accessible to the layout rendering.
@@ -125,7 +126,7 @@ public class ProjectResources extends ResourceRepository {
                         // we don't want to simply replace the whole map, but instead merge the
                         // content of any sub-map
                         for (Entry<ResourceType, Map<String, ResourceValue>> libEntry :
-                                libMap.entrySet()) {
+                            libMap.entrySet()) {
 
                             // get the map currently in the result map for this resource type
                             Map<String, ResourceValue> tempMap = resultMap.get(libEntry.getKey());

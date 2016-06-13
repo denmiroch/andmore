@@ -16,26 +16,25 @@
 
 package org.eclipse.andmore.internal.project;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.eclipse.andmore.mock.Mocks;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import junit.framework.TestCase;
-
 public class ProjectHelperTest {
 
     /** The old container id */
     private final static String OLD_CONTAINER_ID =
-        "org.eclipse.andmore.project.AndroidClasspathContainerInitializer"; //$NON-NLS-1$
+            "org.eclipse.andmore.project.AndroidClasspathContainerInitializer"; //$NON-NLS-1$
 
     /** The container id for the android framework jar file */
     private final static String CONTAINER_ID =
-        "org.eclipse.andmore.ANDROID_FRAMEWORK"; //$NON-NLS-1$
+            "org.eclipse.andmore.ANDROID_FRAMEWORK"; //$NON-NLS-1$
 
     @Test
     @Ignore
@@ -50,7 +49,7 @@ public class ProjectHelperTest {
                 },
                 new Path("Project/bin"));
 
-        ProjectHelper.fixProjectClasspathEntries(javaProject);
+        ProjectHelper.fixProjectClasspathEntries(javaProject, new NullProgressMonitor(), false);
 
         IClasspathEntry[] fixedEntries = javaProject.getRawClasspath();
         assertEquals(5, fixedEntries.length);

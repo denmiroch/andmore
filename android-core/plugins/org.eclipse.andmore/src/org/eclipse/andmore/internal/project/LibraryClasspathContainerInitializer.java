@@ -18,17 +18,23 @@ package org.eclipse.andmore.internal.project;
 
 import static org.eclipse.andmore.AndmoreAndroidConstants.CONTAINER_DEPENDENCIES;
 
-import com.android.SdkConstants;
-import com.android.ide.common.sdk.LoadStatus;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.build.JarListSanitizer;
-import com.android.sdklib.build.JarListSanitizer.DifferentLibException;
-import com.android.sdklib.build.JarListSanitizer.Sha1Exception;
-import com.android.sdklib.build.RenderScriptProcessor;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AndroidPrintStream;
+import org.eclipse.andmore.android.gradle.Gradroid;
 import org.eclipse.andmore.internal.sdk.ProjectState;
 import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.core.resources.IFile;
@@ -39,8 +45,12 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathContainer;
@@ -49,23 +59,51 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.builder.model.AndroidLibrary;
+import com.android.builder.model.Dependencies;
+import com.android.builder.model.JavaLibrary;
+import com.android.builder.model.Variant;
+import com.android.ide.common.sdk.LoadStatus;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.build.JarListSanitizer;
+import com.android.sdklib.build.RenderScriptProcessor;
 
 public class LibraryClasspathContainerInitializer extends BaseClasspathContainerInitializer {
 
     private final static String ATTR_SRC = "src"; //$NON-NLS-1$
     private final static String ATTR_DOC = "doc"; //$NON-NLS-1$
     private final static String DOT_PROPERTIES = ".properties"; //$NON-NLS-1$
+
+    private static class SetupDependenciesJob extends Job {
+
+        private IJavaProject mJavaProject;
+
+        public SetupDependenciesJob(IJavaProject javaProject) {
+            super("Setup dependencies");
+            mJavaProject = javaProject;
+        }
+
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+
+            IClasspathContainer dependencies = allocateGradleDependencyContainer(mJavaProject, monitor);
+
+            if (dependencies != null) {
+                try {
+                    JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
+                            new IJavaProject[] { mJavaProject }, new IClasspathContainer[] { dependencies },
+                            monitor);
+                } catch (JavaModelException e) {
+                    AndmoreAndroidPlugin.log(e, "");
+                }
+            }
+
+            return Status.OK_STATUS;
+        }
+    }
+
+    //TODO GRADROID configure dependencies from gradle
 
     public LibraryClasspathContainerInitializer() {
     }
@@ -76,7 +114,33 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
      * @return <code>true</code> if success, <code>false</code> otherwise.
      */
     public static boolean updateProjects(IJavaProject[] androidProjects) {
-        try {
+        for (IJavaProject javaProject : androidProjects) {
+            IProject project = javaProject.getProject();
+
+            try {
+                if (Gradroid.get().isGradroidProject(project)) {
+                    new SetupDependenciesJob(javaProject).schedule();
+                }
+                else {
+                    IClasspathContainer[] libraryContainers = new IClasspathContainer[1];
+                    IClasspathContainer[] dependencyContainers = new IClasspathContainer[1];
+
+                    libraryContainers[0] = allocateLibraryContainer(javaProject);
+                    dependencyContainers[0] = allocateDependencyContainer(javaProject);
+
+                    JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES),
+                            new IJavaProject[] { javaProject }, libraryContainers, new NullProgressMonitor());
+
+                    JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
+                            new IJavaProject[] { javaProject }, dependencyContainers, new NullProgressMonitor());
+                }
+            } catch (CoreException e) {
+            }
+        }
+
+        return true;
+
+        /*        try {
             // Allocate a new AndroidClasspathContainer, and associate it to the library
             // container id for each projects.
             int projectCount = androidProjects.length;
@@ -100,7 +164,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         } catch (JavaModelException e) {
             return false;
         }
-    }
+         */ }
 
     /**
      * Updates the {@link IJavaProject} objects with new library.
@@ -123,24 +187,77 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
     }
 
     @Override
-    public void initialize(IPath containerPath, IJavaProject project) throws CoreException {
-        if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES.equals(containerPath.toString())) {
-            IClasspathContainer libraries = allocateLibraryContainer(project);
-            if (libraries != null) {
-                JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES),
-                        new IJavaProject[] { project },
-                        new IClasspathContainer[] { libraries },
-                        new NullProgressMonitor());
-            }
+    public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException {
 
-        } else if(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES.equals(containerPath.toString())) {
-            IClasspathContainer dependencies = allocateDependencyContainer(project);
-            if (dependencies != null) {
-                JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
-                        new IJavaProject[] { project },
-                        new IClasspathContainer[] { dependencies },
-                        new NullProgressMonitor());
+        IProject project = javaProject.getProject();
+
+        if (Gradroid.get().isGradroidProject(project)) {
+            if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES.equals(containerPath.toString())) {
+            } else if (AndmoreAndroidConstants.CONTAINER_DEPENDENCIES.equals(containerPath.toString())) {
+                new SetupDependenciesJob(javaProject).schedule();
             }
+        }
+        else {
+            if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES.equals(containerPath.toString())) {
+                IClasspathContainer libraries = allocateLibraryContainer(javaProject);
+                if (libraries != null) {
+                    JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES),
+                            new IJavaProject[] { javaProject },
+                            new IClasspathContainer[] { libraries },
+                            new NullProgressMonitor());
+                }
+
+            } else if(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES.equals(containerPath.toString())) {
+                IClasspathContainer dependencies = allocateDependencyContainer(javaProject);
+                if (dependencies != null) {
+                    JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
+                            new IJavaProject[] { javaProject },
+                            new IClasspathContainer[] { dependencies },
+                            new NullProgressMonitor());
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private static IClasspathContainer allocateGradleDependencyContainer(IJavaProject javaProject,
+            IProgressMonitor monitor) {
+
+        IProject project = javaProject.getProject();
+
+        Gradroid.get().loadAndroidModel(project, monitor);
+        Variant variant = Gradroid.get().getProjectVariant(project);
+
+        Dependencies dependencies = variant.getMainArtifact().getDependencies();
+
+        Set<File> jars = new HashSet<File>();
+
+        processJavaLibraries(jars, dependencies.getJavaLibraries());
+        processAndroidLibraries(jars, dependencies.getLibraries());
+
+        System.out.println(project.getName() + "\n" + jars);
+
+        List<IClasspathEntry> entries = convertJarsToClasspathEntries(project, jars);
+
+        return allocateContainer(javaProject, entries, new Path(CONTAINER_DEPENDENCIES), "Android Dependencies");
+    }
+
+    private static void processAndroidLibraries(Set<File> jars, Collection<? extends AndroidLibrary> libraries) {
+        for (AndroidLibrary androidLibrary : libraries) {
+            jars.add(androidLibrary.getJarFile());
+
+            jars.addAll(androidLibrary.getLocalJars());
+
+            //TODO GRADROID check what  .getLocalJars() is
+
+            //            processJavaLibraries(jars, androidLibrary.getgetJavaDependencies());
+            processAndroidLibraries(jars, androidLibrary.getLibraryDependencies());
+        }
+    }
+
+    private static void processJavaLibraries(Set<File> jars, Collection<? extends JavaLibrary> javaLibraries) {
+        for (JavaLibrary javaLibrary : javaLibraries) {
+            jars.add(javaLibrary.getJarFile());
         }
     }
 
@@ -210,91 +327,78 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
         String errorMessage = null;
 
-        try {
-            List<File> sanitizedList = sanitizer.sanitize(jarFiles);
+        List<File> sanitizedList = new ArrayList<File>(jarFiles);
+        //            List<File> sanitizedList = sanitizer.sanitize(jarFiles);
 
-            for (File jarFile : sanitizedList) {
-                if (jarFile instanceof CPEFile) {
-                    CPEFile cpeFile = (CPEFile) jarFile;
-                    IClasspathEntry e = cpeFile.getClasspathEntry();
+        for (File jarFile : sanitizedList) {
+            if (jarFile instanceof CPEFile) {
+                CPEFile cpeFile = (CPEFile) jarFile;
+                IClasspathEntry e = cpeFile.getClasspathEntry();
 
-                    entries.add(JavaCore.newLibraryEntry(
-                            e.getPath(),
-                            e.getSourceAttachmentPath(),
-                            e.getSourceAttachmentRootPath(),
-                            e.getAccessRules(),
-                            e.getExtraAttributes(),
-                            true /*isExported*/));
-                } else {
-                    String jarPath = jarFile.getAbsolutePath();
+                entries.add(JavaCore.newLibraryEntry(e.getPath(), e.getSourceAttachmentPath(),
+                        e.getSourceAttachmentRootPath(), e.getAccessRules(), e.getExtraAttributes(),
+                        true /*isExported*/));
+            } else {
+                String jarPath = jarFile.getAbsolutePath();
 
-                    IPath sourceAttachmentPath = null;
-                    IClasspathAttribute javaDocAttribute = null;
+                IPath sourceAttachmentPath = null;
+                IClasspathAttribute javaDocAttribute = null;
 
-                    File jarProperties = new File(jarPath + DOT_PROPERTIES);
-                    if (jarProperties.isFile()) {
-                        Properties p = new Properties();
-                        InputStream is = null;
-                        try {
-                            p.load(is = new FileInputStream(jarProperties));
+                File jarProperties = new File(jarPath + DOT_PROPERTIES);
+                if (jarProperties.isFile()) {
+                    Properties p = new Properties();
+                    InputStream is = null;
+                    try {
+                        p.load(is = new FileInputStream(jarProperties));
 
-                            String value = p.getProperty(ATTR_SRC);
-                            if (value != null) {
-                                File srcPath = getFile(jarFile, value);
+                        String value = p.getProperty(ATTR_SRC);
+                        if (value != null) {
+                            File srcPath = getFile(jarFile, value);
 
-                                if (srcPath.exists()) {
-                                    sourceAttachmentPath = new Path(srcPath.getAbsolutePath());
-                                }
+                            if (srcPath.exists()) {
+                                sourceAttachmentPath = new Path(srcPath.getAbsolutePath());
                             }
+                        }
 
-                            value = p.getProperty(ATTR_DOC);
-                            if (value != null) {
-                                File docPath = getFile(jarFile, value);
-                                if (docPath.exists()) {
-                                    try {
-                                        javaDocAttribute = JavaCore.newClasspathAttribute(
-                                                IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME,
-                                                docPath.toURI().toURL().toString());
-                                    } catch (MalformedURLException e) {
-                                        AndmoreAndroidPlugin.log(e, "Failed to process 'doc' attribute for %s",
-                                                jarProperties.getAbsolutePath());
-                                    }
-                                }
-                            }
-
-                        } catch (FileNotFoundException e) {
-                            // shouldn't happen since we check upfront
-                        } catch (IOException e) {
-                            AndmoreAndroidPlugin.log(e, "Failed to read %s", jarProperties.getAbsolutePath());
-                        } finally {
-                            if (is != null) {
+                        value = p.getProperty(ATTR_DOC);
+                        if (value != null) {
+                            File docPath = getFile(jarFile, value);
+                            if (docPath.exists()) {
                                 try {
-                                    is.close();
-                                } catch (IOException e) {
-                                    // ignore
+                                    javaDocAttribute = JavaCore.newClasspathAttribute(
+                                            IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME,
+                                            docPath.toURI().toURL().toString());
+                                } catch (MalformedURLException e) {
+                                    AndmoreAndroidPlugin.log(e, "Failed to process 'doc' attribute for %s",
+                                            jarProperties.getAbsolutePath());
                                 }
                             }
                         }
-                    }
 
-                    if (javaDocAttribute != null) {
-                        entries.add(JavaCore.newLibraryEntry(new Path(jarPath),
-                                sourceAttachmentPath, null /*sourceAttachmentRootPath*/,
-                                new IAccessRule[0],
-                                new IClasspathAttribute[] { javaDocAttribute },
-                                true /*isExported*/));
-                    } else {
-                        entries.add(JavaCore.newLibraryEntry(new Path(jarPath),
-                                sourceAttachmentPath, null /*sourceAttachmentRootPath*/,
-                                true /*isExported*/));
+                    } catch (FileNotFoundException e) {
+                        // shouldn't happen since we check upfront
+                    } catch (IOException e) {
+                        AndmoreAndroidPlugin.log(e, "Failed to read %s", jarProperties.getAbsolutePath());
+                    } finally {
+                        if (is != null) {
+                            try {
+                                is.close();
+                            } catch (IOException e) {
+                                // ignore
+                            }
+                        }
                     }
                 }
+
+                if (javaDocAttribute != null) {
+                    entries.add(JavaCore.newLibraryEntry(new Path(jarPath), sourceAttachmentPath,
+                            null /*sourceAttachmentRootPath*/, new IAccessRule[0],
+                            new IClasspathAttribute[] { javaDocAttribute }, true /*isExported*/));
+                } else {
+                    entries.add(JavaCore.newLibraryEntry(new Path(jarPath), sourceAttachmentPath,
+                            null /*sourceAttachmentRootPath*/, true /*isExported*/));
+                }
             }
-        } catch (DifferentLibException e) {
-            errorMessage = e.getMessage();
-            AndmoreAndroidPlugin.printErrorToConsole(iProject, (Object[]) e.getDetails());
-        } catch (Sha1Exception e) {
-            errorMessage = e.getMessage();
         }
 
         processError(iProject, errorMessage, AndmoreAndroidConstants.MARKER_DEPENDENCY,
@@ -361,7 +465,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
                 if (outputFolder != null) { // can happen when closing/deleting a library)
                     IFile jarIFile = outputFolder.getFile(libProject.getName().toLowerCase() +
-                           SdkConstants.DOT_JAR);
+                            SdkConstants.DOT_JAR);
 
                     // get the source folder for the library project
                     List<IPath> srcs = BaseProjectHelper.getSourceClasspaths(libProject);

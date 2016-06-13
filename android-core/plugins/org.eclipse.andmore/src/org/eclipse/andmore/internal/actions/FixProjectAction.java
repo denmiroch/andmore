@@ -16,8 +16,9 @@
 
 package org.eclipse.andmore.internal.actions;
 
-import com.android.annotations.NonNull;
+import java.util.Iterator;
 
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.project.AndroidNature;
 import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.core.resources.IProject;
@@ -36,7 +37,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import java.util.Iterator;
+import com.android.annotations.NonNull;
 
 /**
  * Action to fix the project properties:
@@ -67,7 +68,7 @@ public class FixProjectAction implements IObjectActionDelegate {
                 if (element instanceof IProject) {
                     project = (IProject) element;
                 } else if (element instanceof IAdaptable) {
-                    project = (IProject) ((IAdaptable) element)
+                    project = ((IAdaptable) element)
                             .getAdapter(IProject.class);
                 }
                 if (project != null) {
@@ -96,6 +97,8 @@ public class FixProjectAction implements IObjectActionDelegate {
     public static Job createFixProjectJob(@NonNull final IProject project) {
         return new Job("Fix Project Properties") {
 
+            //TODO GRADROID make gradle things here too
+
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
@@ -103,7 +106,7 @@ public class FixProjectAction implements IObjectActionDelegate {
                         monitor.beginTask("Fix Project Properties", 6);
                     }
 
-                    ProjectHelper.fixProject(project);
+                    ProjectHelper.fixProject(project, monitor, true);
                     if (monitor != null) {
                         monitor.worked(1);
                     }
@@ -132,8 +135,10 @@ public class FixProjectAction implements IObjectActionDelegate {
 
                     return Status.OK_STATUS;
                 } catch (JavaModelException e) {
+                    AndmoreAndroidPlugin.log(e, "");
                     return e.getJavaModelStatus();
                 } catch (CoreException e) {
+                    AndmoreAndroidPlugin.log(e, "");
                     return e.getStatus();
                 } finally {
                     if (monitor != null) {

@@ -54,7 +54,8 @@ Require-Bundle: org.eclipse.andmore.base,
  com.gradleware.tooling.client;bundle-version="0.13.0",
  com.gradleware.tooling.model;bundle-version="0.13.0",
  com.gradleware.tooling.utils;bundle-version="0.13.0",
- org.eclipse.buildship.core;bundle-version="2.0.0"
+ org.eclipse.buildship.core;bundle-version="2.0.0",
+ org.eclipse.andmore.android.common;bundle-version="0.5.0"
 Bundle-ActivationPolicy: lazy
 Export-Package: com.android.build,
  com.android.builder.model,
@@ -140,7 +141,8 @@ Export-Package: com.android.build,
  org.eclipse.andmore.internal.wizards.templates;x-friends:="org.eclipse.andmore.integration.tests",
  org.eclipse.andmore.io;x-friends:="org.eclipse.andmore.integration.tests"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.android.tools.lint.detector.api,
+Import-Package: com.android.builder.model,
+ com.android.tools.lint.detector.api,
  com.ibm.icu.text,
  junit.framework,
  org.eclipse.core.variables

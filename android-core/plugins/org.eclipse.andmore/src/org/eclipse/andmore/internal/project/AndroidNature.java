@@ -17,9 +17,12 @@
 package org.eclipse.andmore.internal.project;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
+import org.eclipse.andmore.android.common.log.AndmoreLogger;
+import org.eclipse.andmore.android.gradle.Gradroid;
 import org.eclipse.andmore.internal.build.builders.PostCompilerBuilder;
 import org.eclipse.andmore.internal.build.builders.PreCompilerBuilder;
 import org.eclipse.andmore.internal.build.builders.ResourceManagerBuilder;
+import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -29,6 +32,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.JavaCore;
+
+import com.android.builder.model.AndroidProject;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * Project nature for the Android Projects.
@@ -56,6 +62,7 @@ public class AndroidNature implements IProjectNature {
      */
     @Override
     public void configure() throws CoreException {
+        //TODO GRADROID configure gradle specific things if needed
         configureResourceManagerBuilder(mProject);
         configurePreBuilder(mProject);
         configureApkBuilder(mProject);
@@ -123,9 +130,26 @@ public class AndroidNature implements IProjectNature {
      */
     public static synchronized void setupProjectNatures(IProject project,
             IProgressMonitor monitor, boolean addAndroidNature) throws CoreException {
-    	System.out.println("Adding Android natures, setupProjectNatures");
-        if (project == null || !project.isOpen()) return;
-        if (monitor == null) monitor = new NullProgressMonitor();
+        System.out.println("Adding Android natures, setupProjectNatures");
+        if (project == null || !project.isOpen()) {
+            return;
+        }
+        if (monitor == null) {
+            monitor = new NullProgressMonitor();
+        }
+
+        AndroidProject androidProject = Gradroid.get().loadAndroidModel(project, monitor);
+
+        if (androidProject != null) {
+            String compileTarget = androidProject.getCompileTarget();
+            IAndroidTarget androidTarget = Sdk.getCurrent().getTargetFromHashString(compileTarget);
+            try {
+                Sdk.getCurrent().initProject(project, androidTarget);
+            } catch (Exception e) {
+                AndmoreLogger.error(AndroidNature.class, "Error associating project " + project.getName() //$NON-NLS-1$
+                + " with target " + androidTarget.getName()); //$NON-NLS-1$
+            }
+        }
 
         // Add the natures. We need to add the Java nature first, so it adds its builder to the
         // project first. This way, when the android nature is added, we can control where to put

@@ -12,10 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * David Carver - bug 463598 - Re-add ADT Specific nature ids and container ids.
  * Kaloyan Raev - bug 471527 - Some wizards still open the Java perspective
- * 
+ *
  */
 
 package org.eclipse.andmore;
@@ -55,12 +55,14 @@ import com.android.SdkConstants;
  *
  */
 public class AndmoreAndroidConstants {
-    
+
+    //TODO GRADROID remove all fixed path constants (and eliminate use of such from SdkConstants)
+
     /**
      * The ID of the Android perspective.
      */
     public static final String PERSPECTIVE_ANDROID = "org.eclipse.andmore.android.perspective"; //$NON-NLS-1$
-    
+
     /**
      * The old Editors Plugin ID. It is still used in some places for compatibility.
      * Please do not use for new features.
@@ -69,24 +71,24 @@ public class AndmoreAndroidConstants {
 
     /** Nature of default Android projects */
     public final static String NATURE_DEFAULT = "org.eclipse.andmore.AndroidNature"; //$NON-NLS-1$
-    
+
     public final static String ADT_NATURE = "com.android.ide.eclipse.adt.AndroidNature"; //$NON-NLS-1$
 
     /** The container id for the android framework jar file */
     public final static String CONTAINER_FRAMEWORK =
-        "org.eclipse.andmore.ANDROID_FRAMEWORK"; //$NON-NLS-1$
-    
+            "org.eclipse.andmore.ANDROID_FRAMEWORK"; //$NON-NLS-1$
+
     /** The container id for the android framework jar file */
     public final static String ADT_CONTAINER_FRAMEWORK =
-        "com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"; //$NON-NLS-1$
+            "com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"; //$NON-NLS-1$
 
     /** The container id for the libraries */
     public final static String CONTAINER_PRIVATE_LIBRARIES = "org.eclipse.andmore.LIBRARIES"; //$NON-NLS-1$
-    
+
     public final static String ADT_CONTAINER_PRIVATE_LIBRARIES = "com.android.ide.eclipse.adt.LIBRARIES"; //$NON-NLS-1$
-    
+
     public final static String CONTAINER_DEPENDENCIES = "org.eclipse.andmore.DEPENDENCIES";
-    
+
     public final static String ADT_CONTAINER_DEPENDENCIES = "com.android.ide.eclipse.adt.DEPENDENCIES";
 
 
@@ -102,12 +104,12 @@ public class AndmoreAndroidConstants {
     public final static String FN_RESOURCES_AP_ = "resources.ap_"; //$NON-NLS-1$
 
     public final static String FN_TRACEVIEW =
-        (SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_WINDOWS) ?
-            "traceview.bat" : "traceview"; //$NON-NLS-1$ //$NON-NLS-2$
+            (SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_WINDOWS) ?
+                    "traceview.bat" : "traceview"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public final static String FN_HPROF_CONV =
-        (SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_WINDOWS) ?
-            "hprof-conv.exe" : "hprof-conv"; //$NON-NLS-1$ //$NON-NLS-2$
+            (SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_WINDOWS) ?
+                    "hprof-conv.exe" : "hprof-conv"; //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Absolute path of the workspace root, i.e. "/" */
     public final static String WS_ROOT = WS_SEP;
@@ -120,11 +122,11 @@ public class AndmoreAndroidConstants {
 
     /** Path of crunch cache folder relative to the output folder.<br> This is a workspace path. */
     public final static String WS_BIN_RELATIVE_CRUNCHCACHE = SdkConstants.FD_RESOURCES
-                                                                + WS_SEP + FD_CRUNCH;
+            + WS_SEP + FD_CRUNCH;
 
     /** Path of bc output folder relative to the output folder.<br> This is a workspace path. */
     public final static String WS_BIN_RELATIVE_BC = SdkConstants.FD_RESOURCES
-                                                        + WS_SEP + FD_BC;
+            + WS_SEP + FD_BC;
 
     /** Path of rs libs output folder relative to the output folder.<br> This is a workspace path. */
     public final static String WS_BIN_RELATIVE_RS_LIBS = SdkConstants.FD_RS_LIBS;
@@ -242,15 +244,15 @@ public class AndmoreAndroidConstants {
      * Preferred compiler level, i.e. "1.7".
      */
     public final static String COMPILER_COMPLIANCE_PREFERRED = JavaCore.VERSION_1_7;
-    
+
     /**
      * List of valid compiler level
      */
     public final static String[] COMPILER_COMPLIANCE = {
-        JavaCore.VERSION_1_5,
-        JavaCore.VERSION_1_6,
-        JavaCore.VERSION_1_7,
-        JavaCore.VERSION_1_8
+            JavaCore.VERSION_1_5,
+            JavaCore.VERSION_1_6,
+            JavaCore.VERSION_1_7,
+            JavaCore.VERSION_1_8
     };
 
     /** The base URL where to find the Android class & manifest documentation */
@@ -263,6 +265,6 @@ public class AndmoreAndroidConstants {
 
     public static final String DEX_OPTIONS_FORCEJUMBO = "dex.force.jumbo"; //$NON-NLS-1$
     public static final String DEX_OPTIONS_DISABLE_MERGER = "dex.disable.merger"; //$NON-NLS-1$
-    
+
     public static final String NEWLINE = System.getProperty("line.separator");
 }
