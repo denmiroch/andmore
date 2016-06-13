@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,14 +17,14 @@ import static com.android.SdkConstants.ATTR_IGNORE;
 import static com.android.SdkConstants.ATTR_TARGET_API;
 import static com.android.SdkConstants.DOT_XML;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.sdklib.SdkVersionInfo;
-import com.android.tools.lint.checks.ApiDetector;
-import com.google.common.collect.Lists;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.andmore.internal.editors.layout.gle2.DomUtilities;
@@ -42,11 +39,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.sdklib.SdkVersionInfo;
+import com.android.tools.lint.checks.ApiDetector;
+import com.google.common.collect.Lists;
 
 /**
  * Fix for adding {@code tools:ignore="id"} attributes in XML files.
@@ -63,14 +60,8 @@ class AddSuppressAttribute implements ICompletionProposal {
      */
     private final String mTargetApi;
 
-
-    private AddSuppressAttribute(
-            @NonNull AndroidXmlEditor editor,
-            @NonNull String id,
-            @NonNull IMarker marker,
-            @NonNull Element element,
-            @NonNull String description,
-            @Nullable String targetApi) {
+    private AddSuppressAttribute(@NonNull AndroidXmlEditor editor, @NonNull String id, @NonNull IMarker marker,
+            @NonNull Element element, @NonNull String description, @Nullable String targetApi) {
         mEditor = editor;
         mId = id;
         mMarker = marker;
@@ -115,8 +106,7 @@ class AddSuppressAttribute implements ICompletionProposal {
             attribute = ATTR_IGNORE;
             value = mId;
         }
-        AdtUtils.setToolsAttribute(mEditor, mElement, mDescription, attribute, value,
-                true /*reveal*/, true /*append*/);
+        AdtUtils.setToolsAttribute(mEditor, mElement, mDescription, attribute, value, true /*reveal*/, true /*append*/);
 
         try {
             // Remove the marker now that the suppress attribute has been added
@@ -137,9 +127,7 @@ class AddSuppressAttribute implements ICompletionProposal {
      * @return a list of fixes for this marker, possibly empty
      */
     @NonNull
-    public static List<AddSuppressAttribute> createFixes(
-            @NonNull AndroidXmlEditor editor,
-            @NonNull IMarker marker,
+    public static List<AddSuppressAttribute> createFixes(@NonNull AndroidXmlEditor editor, @NonNull IMarker marker,
             @NonNull String id) {
         // This only applies to XML files:
         String fileName = marker.getResource().getName();
@@ -177,8 +165,7 @@ class AddSuppressAttribute implements ICompletionProposal {
         fixes.add(new AddSuppressAttribute(editor, id, marker, element, desc, null));
 
         int api = -1;
-        if (id.equals(ApiDetector.UNSUPPORTED.getId())
-                || id.equals(ApiDetector.INLINED.getId())) {
+        if (id.equals(ApiDetector.UNSUPPORTED.getId()) || id.equals(ApiDetector.INLINED.getId())) {
             String message = marker.getAttribute(IMarker.MESSAGE, null);
             if (message != null) {
                 Pattern pattern = Pattern.compile("\\s(\\d+)\\s"); //$NON-NLS-1$
@@ -190,13 +177,11 @@ class AddSuppressAttribute implements ICompletionProposal {
                     if (buildCode != null) {
                         targetApi = buildCode.toLowerCase(Locale.US);
                         fixes.add(new AddSuppressAttribute(editor, id, marker, element,
-                                String.format("Add targetApi '%1$s\' to element", targetApi),
-                                targetApi));
+                                String.format("Add targetApi '%1$s\' to element", targetApi), targetApi));
                     }
                     targetApi = Integer.toString(api);
                     fixes.add(new AddSuppressAttribute(editor, id, marker, element,
-                            String.format("Add targetApi '%1$s\' to element", targetApi),
-                            targetApi));
+                            String.format("Add targetApi '%1$s\' to element", targetApi), targetApi));
                 }
             }
         }
@@ -214,9 +199,7 @@ class AddSuppressAttribute implements ICompletionProposal {
      * @return a fix for this marker, or null if unable
      */
     @Nullable
-    public static AddSuppressAttribute createFixForAll(
-            @NonNull AndroidXmlEditor editor,
-            @NonNull IMarker marker,
+    public static AddSuppressAttribute createFixForAll(@NonNull AndroidXmlEditor editor, @NonNull IMarker marker,
             @NonNull String id) {
         // This only applies to XML files:
         String fileName = marker.getResource().getName();

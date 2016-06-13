@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,13 +14,15 @@ package org.eclipse.andmore.internal.wizards.templates;
 
 import static org.eclipse.core.resources.IResource.DEPTH_INFINITE;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.VisibleForTesting;
-import com.android.assetstudiolib.GraphicGenerator;
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.actions.AddSupportJarAction;
 import org.eclipse.andmore.internal.assetstudio.AssetType;
 import org.eclipse.andmore.internal.assetstudio.ConfigureAssetSetPage;
@@ -47,41 +46,39 @@ import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IWorkbench;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.VisibleForTesting;
+import com.android.assetstudiolib.GraphicGenerator;
 
 /**
  * Wizard for creating new projects
  */
 public class NewProjectWizard extends TemplateWizard {
-    private static final String PARENT_ACTIVITY_CLASS = "parentActivityClass";  //$NON-NLS-1$
-    private static final String ACTIVITY_TITLE = "activityTitle";  //$NON-NLS-1$
-    static final String IS_LAUNCHER = "isLauncher";                //$NON-NLS-1$
-    static final String IS_NEW_PROJECT = "isNewProject";           //$NON-NLS-1$
-    static final String IS_LIBRARY_PROJECT = "isLibraryProject";   //$NON-NLS-1$
-    static final String ATTR_COPY_ICONS = "copyIcons";             //$NON-NLS-1$
-    static final String ATTR_TARGET_API = "targetApi";             //$NON-NLS-1$
-    static final String ATTR_MIN_API = "minApi";                   //$NON-NLS-1$
-    static final String ATTR_MIN_BUILD_API = "minBuildApi";        //$NON-NLS-1$
-    static final String ATTR_BUILD_API = "buildApi";               //$NON-NLS-1$
-    static final String ATTR_REVISION = "revision";                //$NON-NLS-1$
-    static final String ATTR_MIN_API_LEVEL = "minApiLevel";        //$NON-NLS-1$
-    static final String ATTR_PACKAGE_NAME = "packageName";         //$NON-NLS-1$
-    static final String ATTR_APP_TITLE = "appTitle";               //$NON-NLS-1$
-    static final String CATEGORY_PROJECTS = "projects";            //$NON-NLS-1$
-    static final String CATEGORY_ACTIVITIES = "activities";        //$NON-NLS-1$
-    static final String CATEGORY_OTHER = "other";                  //$NON-NLS-1$
-    static final String ATTR_APP_COMPAT = "appCompat";             //$NON-NLS-1$
+    private static final String PARENT_ACTIVITY_CLASS = "parentActivityClass"; //$NON-NLS-1$
+    private static final String ACTIVITY_TITLE = "activityTitle"; //$NON-NLS-1$
+    static final String IS_LAUNCHER = "isLauncher"; //$NON-NLS-1$
+    static final String IS_NEW_PROJECT = "isNewProject"; //$NON-NLS-1$
+    static final String IS_LIBRARY_PROJECT = "isLibraryProject"; //$NON-NLS-1$
+    static final String ATTR_COPY_ICONS = "copyIcons"; //$NON-NLS-1$
+    static final String ATTR_TARGET_API = "targetApi"; //$NON-NLS-1$
+    static final String ATTR_MIN_API = "minApi"; //$NON-NLS-1$
+    static final String ATTR_MIN_BUILD_API = "minBuildApi"; //$NON-NLS-1$
+    static final String ATTR_BUILD_API = "buildApi"; //$NON-NLS-1$
+    static final String ATTR_REVISION = "revision"; //$NON-NLS-1$
+    static final String ATTR_MIN_API_LEVEL = "minApiLevel"; //$NON-NLS-1$
+    static final String ATTR_PACKAGE_NAME = "packageName"; //$NON-NLS-1$
+    static final String ATTR_APP_TITLE = "appTitle"; //$NON-NLS-1$
+    static final String CATEGORY_PROJECTS = "projects"; //$NON-NLS-1$
+    static final String CATEGORY_ACTIVITIES = "activities"; //$NON-NLS-1$
+    static final String CATEGORY_OTHER = "other"; //$NON-NLS-1$
+    static final String ATTR_APP_COMPAT = "appCompat"; //$NON-NLS-1$
     /**
      * Reserved file name for the launcher icon, resolves to the xhdpi version
      *
      * @see CreateAssetSetWizardState#getImage
      */
-    public static final String DEFAULT_LAUNCHER_ICON = "launcher_icon";   //$NON-NLS-1$
+    public static final String DEFAULT_LAUNCHER_ICON = "launcher_icon"; //$NON-NLS-1$
 
     private NewProjectPage mMainPage;
     private ProjectContentsPage mContentsPage;
@@ -190,8 +187,7 @@ public class NewProjectWizard extends TemplateWizard {
 
         if (page == mTemplatePage) {
             TemplateMetadata template = mValues.activityValues.getTemplateHandler().getTemplate();
-            if (template != null
-                    && !InstallDependencyPage.isInstalled(template.getDependencies())) {
+            if (template != null && !InstallDependencyPage.isInstalled(template.getDependencies())) {
                 return getDependencyPage(template, true);
             }
         }
@@ -285,8 +281,7 @@ public class NewProjectWizard extends TemplateWizard {
     }
 
     @Override
-    protected boolean performFinish(final IProgressMonitor monitor)
-            throws InvocationTargetException {
+    protected boolean performFinish(final IProgressMonitor monitor) throws InvocationTargetException {
         try {
             IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
             String name = mValues.projectName;
@@ -302,16 +297,14 @@ public class NewProjectWizard extends TemplateWizard {
                 public void populate(IProject project) throws InvocationTargetException {
                     // Copy in the proguard file; templates don't provide this one.
                     // add the default proguard config
-                    File libFolder = new File(AndmoreAndroidPlugin.getOsSdkToolsFolder(),
-                            SdkConstants.FD_LIB);
+                    File libFolder = new File(AndmoreAndroidPlugin.getOsSdkToolsFolder(), SdkConstants.FD_LIB);
                     try {
                         assert project == mProject;
                         NewProjectCreator.addLocalFile(project,
                                 new File(libFolder, SdkConstants.FN_PROJECT_PROGUARD_FILE),
                                 // Write ProGuard config files with the extension .pro which
                                 // is what is used in the ProGuard documentation and samples
-                                SdkConstants.FN_PROJECT_PROGUARD_FILE,
-                                new NullProgressMonitor());
+                                SdkConstants.FN_PROJECT_PROGUARD_FILE, new NullProgressMonitor());
                     } catch (Exception e) {
                         AndmoreAndroidPlugin.log(e, null);
                     }
@@ -344,8 +337,7 @@ public class NewProjectWizard extends TemplateWizard {
 
                     // Render the embedded activity template template
                     if (mValues.createActivity) {
-                        final TemplateHandler activityTemplate =
-                                mValues.activityValues.getTemplateHandler();
+                        final TemplateHandler activityTemplate = mValues.activityValues.getTemplateHandler();
                         // We'll be merging in an activity template, but don't create
                         // *~ backup files of the merged files (such as the manifest file)
                         // in that case.
@@ -355,8 +347,8 @@ public class NewProjectWizard extends TemplateWizard {
                 }
             };
 
-            NewProjectCreator.create(monitor, mProject, mValues.target, projectPopulator,
-                    mValues.isLibrary, mValues.projectLocation, mValues.workingSets);
+            NewProjectCreator.create(monitor, mProject, mValues.target, projectPopulator, mValues.isLibrary,
+                    mValues.projectLocation, mValues.workingSets);
 
             // For new projects, ensure that we're actually using the preferred compliance,
             // not just the default one
@@ -397,8 +389,8 @@ public class NewProjectWizard extends TemplateWizard {
      * activity needs but that we don't need to ask about when creating a new
      * project
      */
-    private void generateActivity(TemplateHandler projectTemplate, IProject project,
-            IProgressMonitor monitor) throws InvocationTargetException {
+    private void generateActivity(TemplateHandler projectTemplate, IProject project, IProgressMonitor monitor)
+            throws InvocationTargetException {
         assert mValues.createActivity;
         NewTemplateWizardState activityValues = mValues.activityValues;
         Map<String, Object> parameters = activityValues.parameters;
@@ -418,8 +410,7 @@ public class NewProjectWizard extends TemplateWizard {
         if (!changes.isEmpty()) {
             monitor.beginTask("Creating template...", changes.size());
             try {
-                CompositeChange composite = new CompositeChange("",
-                        changes.toArray(new Change[changes.size()]));
+                CompositeChange composite = new CompositeChange("", changes.toArray(new Change[changes.size()]));
                 composite.perform(monitor);
             } catch (CoreException e) {
                 AndmoreAndroidPlugin.log(e, null);

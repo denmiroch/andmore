@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,22 +43,16 @@ import static com.android.xml.AndroidManifest.ATTRIBUTE_PACKAGE;
 import static com.android.xml.AndroidManifest.NODE_ACTIVITY;
 import static com.android.xml.AndroidManifest.NODE_SERVICE;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.resources.ResourceFile;
-import com.android.ide.common.resources.ResourceFolder;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.ide.common.resources.ResourceUrl;
-import com.android.ide.common.resources.configuration.FolderConfiguration;
-import com.android.io.FileWrapper;
-import com.android.io.IAbstractFile;
-import com.android.io.IAbstractFolder;
-import com.android.resources.ResourceFolderType;
-import com.android.resources.ResourceType;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xerces.xni.Augmentations;
@@ -70,8 +61,8 @@ import org.apache.xerces.xni.QName;
 import org.apache.xerces.xni.XMLAttributes;
 import org.apache.xerces.xni.XMLLocator;
 import org.apache.xerces.xni.XNIException;
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.gle2.GraphicalEditorPart;
 import org.eclipse.andmore.internal.editors.manifest.ManifestEditor;
@@ -152,16 +143,22 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.resources.ResourceFile;
+import com.android.ide.common.resources.ResourceFolder;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.ide.common.resources.ResourceUrl;
+import com.android.ide.common.resources.configuration.FolderConfiguration;
+import com.android.io.FileWrapper;
+import com.android.io.IAbstractFile;
+import com.android.io.IAbstractFolder;
+import com.android.resources.ResourceFolderType;
+import com.android.resources.ResourceType;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
 
 /**
  * Class containing hyperlink resolvers for XML and Java files to jump to associated
@@ -170,13 +167,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @SuppressWarnings("restriction")
 public class Hyperlinks {
-    private static final String CATEGORY = "category";                            //$NON-NLS-1$
-    private static final String ACTION = "action";                                //$NON-NLS-1$
-    private static final String PERMISSION = "permission";                        //$NON-NLS-1$
-    private static final String USES_PERMISSION = "uses-permission";              //$NON-NLS-1$
+    private static final String CATEGORY = "category"; //$NON-NLS-1$
+    private static final String ACTION = "action"; //$NON-NLS-1$
+    private static final String PERMISSION = "permission"; //$NON-NLS-1$
+    private static final String USES_PERMISSION = "uses-permission"; //$NON-NLS-1$
     private static final String CATEGORY_PKG_PREFIX = "android.intent.category."; //$NON-NLS-1$
-    private static final String ACTION_PKG_PREFIX = "android.intent.action.";     //$NON-NLS-1$
-    private static final String PERMISSION_PKG_PREFIX = "android.permission.";    //$NON-NLS-1$
+    private static final String ACTION_PKG_PREFIX = "android.intent.action."; //$NON-NLS-1$
+    private static final String PERMISSION_PKG_PREFIX = "android.permission."; //$NON-NLS-1$
 
     private Hyperlinks() {
         // Not instantiatable. This is a container class containing shared code
@@ -188,8 +185,7 @@ public class Hyperlinks {
      * Does not check for existence.
      */
     @VisibleForTesting
-	public
-    static boolean isViewClassName(String name) {
+    public static boolean isViewClassName(String name) {
         int length = name.length();
         if (length < 2 || name.indexOf('.') == -1) {
             return false;
@@ -239,8 +235,8 @@ public class Hyperlinks {
             return false;
         }
 
-        if (isClassAttribute(context) || isOnClickAttribute(context)
-                || isManifestName(context) || isStyleAttribute(context)) {
+        if (isClassAttribute(context) || isOnClickAttribute(context) || isManifestName(context)
+                || isStyleAttribute(context)) {
             return true;
         }
 
@@ -372,8 +368,7 @@ public class Hyperlinks {
         String attributeName = attribute.getLocalName();
         return ATTR_CLASS.equals(attributeName) && (VIEW.equals(tag) || VIEW_FRAGMENT.equals(tag))
                 || ATTR_NAME.equals(attributeName) && VIEW_FRAGMENT.equals(tag)
-                || (ATTR_CONTEXT.equals(attributeName)
-                        && TOOLS_URI.equals(attribute.getNamespaceURI()));
+                || (ATTR_CONTEXT.equals(attributeName) && TOOLS_URI.equals(attribute.getNamespaceURI()));
     }
 
     /** Returns true if this represents an onClick attribute specifying a method handler */
@@ -452,7 +447,7 @@ public class Hyperlinks {
             if (docs.exists()) {
                 String s = docs.toURI().toURL().toExternalForm();
                 if (!s.endsWith("/")) { //$NON-NLS-1$
-                    s += "/";           //$NON-NLS-1$
+                    s += "/"; //$NON-NLS-1$
                 }
                 return new URL(s + relative);
             }
@@ -472,8 +467,7 @@ public class Hyperlinks {
         // Is this an <activity> or <service> in an AndroidManifest.xml file? If so, jump to it
         String nodeName = node.getNodeName();
         if ((USES_PERMISSION.equals(nodeName) || PERMISSION.equals(nodeName))
-                && ATTRIBUTE_NAME.equals(attribute.getLocalName())
-                && ANDROID_URI.equals(attribute.getNamespaceURI())) {
+                && ATTRIBUTE_NAME.equals(attribute.getLocalName()) && ANDROID_URI.equals(attribute.getNamespaceURI())) {
             String value = attribute.getValue();
             if (value.startsWith(PERMISSION_PKG_PREFIX)) {
                 return true;
@@ -490,8 +484,7 @@ public class Hyperlinks {
 
         // Is this an <activity> or <service> in an AndroidManifest.xml file? If so, jump to it
         String nodeName = node.getNodeName();
-        if ((ACTION.equals(nodeName) || CATEGORY.equals(nodeName))
-                && ATTRIBUTE_NAME.equals(attribute.getLocalName())
+        if ((ACTION.equals(nodeName) || CATEGORY.equals(nodeName)) && ATTRIBUTE_NAME.equals(attribute.getLocalName())
                 && ANDROID_URI.equals(attribute.getNamespaceURI())) {
             String value = attribute.getValue();
             if (value.startsWith(ACTION_PKG_PREFIX) || value.startsWith(CATEGORY_PKG_PREFIX)) {
@@ -501,7 +494,6 @@ public class Hyperlinks {
 
         return false;
     }
-
 
     /**
      * Returns the fully qualified class name of an activity referenced by the given
@@ -651,10 +643,9 @@ public class Hyperlinks {
                 if (element instanceof IMethod) {
                     IMethod methodElement = (IMethod) element;
                     String[] parameterTypes = methodElement.getParameterTypes();
-                    if (parameterTypes != null
-                            && parameterTypes.length == 1
+                    if (parameterTypes != null && parameterTypes.length == 1
                             && ("Qandroid.view.View;".equals(parameterTypes[0]) //$NON-NLS-1$
-                                    || "QView;".equals(parameterTypes[0]))) {   //$NON-NLS-1$
+                                    || "QView;".equals(parameterTypes[0]))) { //$NON-NLS-1$
                         // Check that it's public
                         if (Flags.isPublic(methodElement.getFlags())) {
                             JavaUI.openInEditor(methodElement);
@@ -678,12 +669,10 @@ public class Hyperlinks {
                 scope = SearchEngine.createWorkspaceScope();
             }
 
-            SearchParticipant[] participants = new SearchParticipant[] {
-                SearchEngine.getDefaultSearchParticipant()
-            };
+            SearchParticipant[] participants = new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() };
             int matchRule = SearchPattern.R_PATTERN_MATCH | SearchPattern.R_CASE_SENSITIVE;
-            SearchPattern pattern = SearchPattern.createPattern("*." + method,
-                    IJavaSearchConstants.METHOD, IJavaSearchConstants.DECLARATIONS, matchRule);
+            SearchPattern pattern = SearchPattern.createPattern("*." + method, IJavaSearchConstants.METHOD,
+                    IJavaSearchConstants.DECLARATIONS, matchRule);
             SearchEngine engine = new SearchEngine();
             engine.search(pattern, participants, scope, requestor, new NullProgressMonitor());
 
@@ -717,8 +706,7 @@ public class Hyperlinks {
         IEditorPart editor = getEditor();
         if (editor != null) {
             LayoutEditorDelegate delegate = LayoutEditorDelegate.fromEditor(editor);
-            GraphicalEditorPart graphicalEditor =
-                delegate == null ? null : delegate.getGraphicalEditor();
+            GraphicalEditorPart graphicalEditor = delegate == null ? null : delegate.getGraphicalEditor();
 
             if (graphicalEditor != null) {
                 return graphicalEditor.getConfiguration();
@@ -901,8 +889,7 @@ public class Hyperlinks {
     }
 
     /** Parses the given file and locates a definition of the given resource */
-    private static Pair<IFile, IRegion> findValueInXml(
-            ResourceType type, String name, IFile file) {
+    private static Pair<IFile, IRegion> findValueInXml(ResourceType type, String name, IFile file) {
         IStructuredModel model = null;
         try {
             model = StructuredModelManager.getModelManager().getExistingModelForRead(file);
@@ -933,8 +920,8 @@ public class Hyperlinks {
     }
 
     /** Looks within an XML DOM document for the given resource name and returns it */
-    private static Pair<IFile, IRegion> findValueInDocument(
-            ResourceType type, String name, IFile file, Document document) {
+    private static Pair<IFile, IRegion> findValueInDocument(ResourceType type, String name, IFile file,
+            Document document) {
         String targetTag = getTagName(type);
         Element root = document.getDocumentElement();
         if (root.getTagName().equals(TAG_RESOURCES)) {
@@ -944,7 +931,7 @@ public class Hyperlinks {
                 for (int i = 0, n = topLevel.getLength(); i < n; i++) {
                     Node child = topLevel.item(i);
                     if (child.getNodeType() == Node.ELEMENT_NODE) {
-                        Element element = (Element)child;
+                        Element element = (Element) child;
                         String tagName = element.getTagName();
                         if (tagName.equals("declare-styleable")) {
                             NodeList children = element.getChildNodes();
@@ -963,12 +950,12 @@ public class Hyperlinks {
         return null;
     }
 
-    private static Pair<IFile, IRegion> findValueInChildren(String name, IFile file,
-            String targetTag, NodeList children) {
+    private static Pair<IFile, IRegion> findValueInChildren(String name, IFile file, String targetTag,
+            NodeList children) {
         for (int i = 0, n = children.getLength(); i < n; i++) {
             Node child = children.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element)child;
+                Element element = (Element) child;
                 String tagName = element.getTagName();
                 if (tagName.equals(targetTag)) {
                     String elementName = element.getAttribute(ATTR_NAME);
@@ -1022,20 +1009,18 @@ public class Hyperlinks {
     }
 
     /** Looks within an XML DOM document for the given resource name and returns it */
-    private static Pair<IFile, IRegion> findIdInDocument(String id, IFile file,
-            Document document) {
+    private static Pair<IFile, IRegion> findIdInDocument(String id, IFile file, Document document) {
         String targetAttribute = NEW_ID_PREFIX + id;
         Element root = document.getDocumentElement();
-        Pair<IFile, IRegion> result = findIdInElement(root, file, targetAttribute,
-                true /*requireId*/);
+        Pair<IFile, IRegion> result = findIdInElement(root, file, targetAttribute, true /*requireId*/);
         if (result == null) {
             result = findIdInElement(root, file, targetAttribute, false /*requireId*/);
         }
         return result;
     }
 
-    private static Pair<IFile, IRegion> findIdInElement(
-            Element root, IFile file, String targetAttribute, boolean requireIdAttribute) {
+    private static Pair<IFile, IRegion> findIdInElement(Element root, IFile file, String targetAttribute,
+            boolean requireIdAttribute) {
         NamedNodeMap attributes = root.getAttributes();
         for (int i = 0, n = attributes.getLength(); i < n; i++) {
             Node item = attributes.item(i);
@@ -1065,9 +1050,8 @@ public class Hyperlinks {
         for (int i = 0, n = children.getLength(); i < n; i++) {
             Node child = children.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element)child;
-                Pair<IFile, IRegion> result = findIdInElement(element, file, targetAttribute,
-                        requireIdAttribute);
+                Element element = (Element) child;
+                Pair<IFile, IRegion> result = findIdInElement(element, file, targetAttribute, requireIdAttribute);
                 if (result != null) {
                     return result;
                 }
@@ -1101,8 +1085,8 @@ public class Hyperlinks {
     }
 
     /** Looks within an XML DOM document for the given resource name and returns it */
-    private static Pair<File, Integer> findValueInDocument(ResourceType type, String name,
-            File file, OffsetTrackingParser parser, Document document) {
+    private static Pair<File, Integer> findValueInDocument(ResourceType type, String name, File file,
+            OffsetTrackingParser parser, Document document) {
         String targetTag = type.getName();
         if (type == ResourceType.ID) {
             // Ids are recorded in <item> tags instead of <id> tags
@@ -1118,8 +1102,8 @@ public class Hyperlinks {
         return result;
     }
 
-    private static Pair<File, Integer> findTag(String name, File file, OffsetTrackingParser parser,
-            Document document, String targetTag) {
+    private static Pair<File, Integer> findTag(String name, File file, OffsetTrackingParser parser, Document document,
+            String targetTag) {
         NodeList children = document.getElementsByTagName(targetTag);
         for (int i = 0, n = children.getLength(); i < n; i++) {
             Node child = children.item(i);
@@ -1148,8 +1132,7 @@ public class Hyperlinks {
             int index = value.indexOf('.', caret);
             if (index != -1) {
                 url = url.substring(0, index);
-                range = new Region(range.getOffset(),
-                        range.getLength() - (value.length() - index));
+                range = new Region(range.getOffset(), range.getLength() - (value.length() - index));
             }
         }
 
@@ -1186,7 +1169,7 @@ public class Hyperlinks {
      */
     @Nullable
     public static IHyperlink[] getResourceLinks(@Nullable IRegion range, @NonNull String url,
-            @Nullable IProject project,  @Nullable FolderConfiguration configuration) {
+            @Nullable IProject project, @Nullable FolderConfiguration configuration) {
         List<IHyperlink> links = new ArrayList<IHyperlink>();
 
         ResourceUrl resource = ResourceUrl.parse(url);
@@ -1205,8 +1188,7 @@ public class Hyperlinks {
         if (resources == null) {
             return null;
         }
-        List<ResourceFile> sourceFiles = resources.getSourceFiles(type, name,
-                null /*configuration*/);
+        List<ResourceFile> sourceFiles = resources.getSourceFiles(type, name, null /*configuration*/);
         if (sourceFiles == null) {
             ProjectState projectState = Sdk.getProjectState(project);
             if (projectState != null) {
@@ -1257,13 +1239,11 @@ public class Hyperlinks {
 
                 for (ResourceFile file : matches) {
                     String folderName = file.getFolder().getFolder().getName();
-                    String label = String.format("Open Declaration in %1$s/%2$s",
-                            folderName, getFileName(file));
+                    String label = String.format("Open Declaration in %1$s/%2$s", folderName, getFileName(file));
 
                     // Only search for resource type within the file if it's an
                     // XML file and it is a value resource
-                    ResourceLink link = new ResourceLink(label, range, file,
-                            valueResource ? type : null, name);
+                    ResourceLink link = new ResourceLink(label, range, file, valueResource ? type : null, name);
                     links.add(link);
                 }
             }
@@ -1289,7 +1269,7 @@ public class Hyperlinks {
     }
 
     /** Detector for finding Android references in XML files */
-   public static class XmlResolver extends AbstractHyperlinkDetector {
+    public static class XmlResolver extends AbstractHyperlinkDetector {
 
         @Override
         public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region,
@@ -1319,9 +1299,8 @@ public class Hyperlinks {
                     if (isStyleAttribute(context)) {
                         return getStyleLinks(context, range, attribute.getValue());
                     }
-                    if (attribute != null
-                            && (attribute.getValue().startsWith(PREFIX_RESOURCE_REF)
-                                    || attribute.getValue().startsWith(PREFIX_THEME_REF))) {
+                    if (attribute != null && (attribute.getValue().startsWith(PREFIX_RESOURCE_REF)
+                            || attribute.getValue().startsWith(PREFIX_THEME_REF))) {
                         // Instantly create links for resources since we can use the existing
                         // resolved maps for this and offer multiple choices for the user
                         String url = attribute.getValue();
@@ -1348,8 +1327,7 @@ public class Hyperlinks {
                     try {
                         IRegion lineInfo = document.getLineInformationOfOffset(caretOffset);
                         int lineStart = lineInfo.getOffset();
-                        int lineEnd = Math.min(lineStart + lineInfo.getLength(),
-                                innerOffset + inner.getLength());
+                        int lineEnd = Math.min(lineStart + lineInfo.getLength(), innerOffset + inner.getLength());
 
                         // Compute the resource URL
                         int urlStart = -1;
@@ -1388,9 +1366,7 @@ public class Hyperlinks {
             if (isLinkable) {
                 IHyperlink hyperlink = new DeferredResolutionLink(context, range);
                 if (hyperlink != null) {
-                    return new IHyperlink[] {
-                        hyperlink
-                    };
+                    return new IHyperlink[] { hyperlink };
                 }
             }
 
@@ -1412,30 +1388,32 @@ public class Hyperlinks {
             // Most of this is identical to the builtin JavaElementHyperlinkDetector --
             // everything down to the Android R filtering below
 
-            ITextEditor textEditor = (ITextEditor) getAdapter(ITextEditor.class);
-            if (region == null || !(textEditor instanceof JavaEditor))
+            ITextEditor textEditor = getAdapter(ITextEditor.class);
+            if (region == null || !(textEditor instanceof JavaEditor)) {
                 return null;
+            }
 
             IAction openAction = textEditor.getAction("OpenEditor"); //$NON-NLS-1$
-            if (!(openAction instanceof SelectionDispatchAction))
+            if (!(openAction instanceof SelectionDispatchAction)) {
                 return null;
+            }
 
             int offset = region.getOffset();
 
             IJavaElement input = EditorUtility.getEditorInputJavaElement(textEditor, false);
-            if (input == null)
+            if (input == null) {
                 return null;
+            }
 
             try {
-                IDocument document = textEditor.getDocumentProvider().getDocument(
-                        textEditor.getEditorInput());
+                IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
                 IRegion wordRegion = JavaWordFinder.findWord(document, offset);
-                if (wordRegion == null || wordRegion.getLength() == 0)
+                if (wordRegion == null || wordRegion.getLength() == 0) {
                     return null;
+                }
 
                 IJavaElement[] elements = null;
-                elements = ((ICodeAssist) input).codeSelect(wordRegion.getOffset(), wordRegion
-                        .getLength());
+                elements = ((ICodeAssist) input).codeSelect(wordRegion.getOffset(), wordRegion.getLength());
 
                 // Specific Android R class filtering:
                 if (elements.length > 0) {
@@ -1473,8 +1451,8 @@ public class Hyperlinks {
             }
         }
 
-        private IHyperlink[] createTypeLink(IJavaElement element, IJavaElement type,
-                IRegion wordRegion, boolean isFrameworkResource) {
+        private IHyperlink[] createTypeLink(IJavaElement element, IJavaElement type, IRegion wordRegion,
+                boolean isFrameworkResource) {
             String typeName = type.getElementName();
             // typeName will be "id", "layout", "string", etc
             if (isFrameworkResource) {
@@ -1520,7 +1498,7 @@ public class Hyperlinks {
 
         public DeferredResolutionLink(XmlContext xmlContext, IRegion mRegion) {
             super();
-            this.mXmlContext = xmlContext;
+            mXmlContext = xmlContext;
             this.mRegion = mRegion;
         }
 
@@ -1571,8 +1549,7 @@ public class Hyperlinks {
          * @param type the type of resource being linked to
          * @param name the name of the resource being linked to
          */
-        public ResourceLink(String linkText, IRegion linkRegion, ResourceFile file,
-                ResourceType type, String name) {
+        public ResourceLink(String linkText, IRegion linkRegion, ResourceFile file, ResourceType type, String name) {
             super();
             mLinkText = linkText;
             mLinkRegion = linkRegion;
@@ -1606,7 +1583,7 @@ public class Hyperlinks {
                 // inline (though they -can- be defined in the values folder above as well,
                 // in which case we will prefer that definition)
                 IProject project = getProject();
-                Pair<IFile,IRegion> def = findIdDefinition(project, mName);
+                Pair<IFile, IRegion> def = findIdDefinition(project, mName);
                 if (def != null) {
                     try {
                         AndmoreAndroidPlugin.openFile(def.getFirst(), def.getSecond());
@@ -1678,8 +1655,7 @@ public class Hyperlinks {
         private final ITextRegion mInnerRegion;
         private final int mInnerRegionOffset;
 
-        public XmlContext(Node node, Element element, Attr attribute,
-                IStructuredDocumentRegion outerRegion,
+        public XmlContext(Node node, Element element, Attr attribute, IStructuredDocumentRegion outerRegion,
                 ITextRegion innerRegion, int innerRegionOffset) {
             super();
             mNode = node;
@@ -1698,7 +1674,6 @@ public class Hyperlinks {
         public Node getNode() {
             return mNode;
         }
-
 
         /**
          * Gets the current node, may be null
@@ -1804,8 +1779,7 @@ public class Hyperlinks {
 
                         IStructuredDocument doc = model.getStructuredDocument();
                         IStructuredDocumentRegion region = doc.getRegionAtCharacterOffset(offset);
-                        if (region != null
-                                && DOMRegionContext.XML_TAG_NAME.equals(region.getType())) {
+                        if (region != null && DOMRegionContext.XML_TAG_NAME.equals(region.getType())) {
                             ITextRegion subRegion = region.getRegionAtCharacterOffset(offset);
                             if (subRegion == null) {
                                 return null;
@@ -1813,20 +1787,17 @@ public class Hyperlinks {
                             int regionStart = region.getStartOffset();
                             int subregionStart = subRegion.getStart();
                             int relativeOffset = offset - (regionStart + subregionStart);
-                            return new XmlContext(element, element, attribute, region, subRegion,
-                                    relativeOffset);
+                            return new XmlContext(element, element, attribute, region, subRegion, relativeOffset);
                         }
                     } else if (inode instanceof Node) {
                         IStructuredDocument doc = model.getStructuredDocument();
                         IStructuredDocumentRegion region = doc.getRegionAtCharacterOffset(offset);
-                        if (region != null
-                                && DOMRegionContext.XML_CONTENT.equals(region.getType())) {
+                        if (region != null && DOMRegionContext.XML_CONTENT.equals(region.getType())) {
                             ITextRegion subRegion = region.getRegionAtCharacterOffset(offset);
                             int regionStart = region.getStartOffset();
                             int subregionStart = subRegion.getStart();
                             int relativeOffset = offset - (regionStart + subregionStart);
-                            return new XmlContext((Node) inode, null, null, region, subRegion,
-                                    relativeOffset);
+                            return new XmlContext((Node) inode, null, null, region, subRegion, relativeOffset);
                         }
 
                     }
@@ -1849,13 +1820,12 @@ public class Hyperlinks {
 
         private static final String KEY_OFFSET = "offset"; //$NON-NLS-1$
 
-        private static final String KEY_NODE =
-            "http://apache.org/xml/properties/dom/current-element-node"; //$NON-NLS-1$
+        private static final String KEY_NODE = "http://apache.org/xml/properties/dom/current-element-node"; //$NON-NLS-1$
 
         private XMLLocator mLocator;
 
         public OffsetTrackingParser() throws SAXException {
-            this.setFeature("http://apache.org/xml/features/dom/defer-node-expansion",//$NON-NLS-1$
+            setFeature("http://apache.org/xml/features/dom/defer-node-expansion", //$NON-NLS-1$
                     false);
         }
 
@@ -1869,13 +1839,12 @@ public class Hyperlinks {
         }
 
         @Override
-        public void startElement(QName elementQName, XMLAttributes attrList, Augmentations augs)
-                throws XNIException {
+        public void startElement(QName elementQName, XMLAttributes attrList, Augmentations augs) throws XNIException {
             int offset = mLocator.getCharacterOffset();
             super.startElement(elementQName, attrList, augs);
 
             try {
-                Node node = (Node) this.getProperty(KEY_NODE);
+                Node node = (Node) getProperty(KEY_NODE);
                 if (node != null) {
                     node.setUserData(KEY_OFFSET, offset, null);
                 }
@@ -1885,8 +1854,8 @@ public class Hyperlinks {
         }
 
         @Override
-        public void startDocument(XMLLocator locator, String encoding,
-                NamespaceContext namespaceContext, Augmentations augs) throws XNIException {
+        public void startDocument(XMLLocator locator, String encoding, NamespaceContext namespaceContext,
+                Augmentations augs) throws XNIException {
             super.startDocument(locator, encoding, namespaceContext, augs);
             mLocator = locator;
         }

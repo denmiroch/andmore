@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,16 +13,16 @@
 
 package org.eclipse.andmore.internal.ui;
 
-import com.android.ide.common.resources.ResourceFile;
-import com.android.ide.common.resources.ResourceItem;
-import com.android.resources.ResourceType;
-
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+
+import com.android.ide.common.resources.ResourceFile;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.resources.ResourceType;
 
 /**
  * Label provider for the Resource Explorer TreeView.
@@ -54,8 +51,8 @@ public class ResourceLabelProvider implements ILabelProvider, ITableLabelProvide
     private Image mWarningImage;
 
     public ResourceLabelProvider() {
-        mWarningImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
-                ISharedImages.IMG_OBJS_WARN_TSK).createImage();
+        mWarningImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK)
+                .createImage();
     }
 
     /**
@@ -99,7 +96,7 @@ public class ResourceLabelProvider implements ILabelProvider, ITableLabelProvide
     public Image getColumnImage(Object element, int columnIndex) {
         if (columnIndex == 1) {
             if (element instanceof ResourceItem) {
-                ResourceItem item = (ResourceItem)element;
+                ResourceItem item = (ResourceItem) element;
                 if (item.hasDefault() == false) {
                     return mWarningImage;
                 }
@@ -113,16 +110,16 @@ public class ResourceLabelProvider implements ILabelProvider, ITableLabelProvide
         switch (columnIndex) {
             case 0:
                 if (element instanceof ResourceType) {
-                    return ((ResourceType)element).getDisplayName();
+                    return ((ResourceType) element).getDisplayName();
                 } else if (element instanceof ResourceItem) {
-                    return ((ResourceItem)element).getName();
+                    return ((ResourceItem) element).getName();
                 } else if (element instanceof ResourceFile) {
-                    return ((ResourceFile)element).getFolder().getConfiguration().toDisplayString();
+                    return ((ResourceFile) element).getFolder().getConfiguration().toDisplayString();
                 }
                 break;
             case 1:
                 if (element instanceof ResourceItem) {
-                    ResourceItem item = (ResourceItem)element;
+                    ResourceItem item = (ResourceItem) element;
                     if (item.isDeclaredInline()) {
                         return "Declared inline";
                     } else {

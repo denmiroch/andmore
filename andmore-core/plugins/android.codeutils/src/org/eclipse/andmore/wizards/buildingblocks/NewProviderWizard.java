@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,128 +37,130 @@ import org.eclipse.ui.PartInitException;
  * Class that implements the Content Provider Wizard.
  */
 public class NewProviderWizard extends NewBuildingBlocksWizard {
-	private static final String WIZBAN_ICON = "icons/wizban/new_provider_wiz.png";
+    private static final String WIZBAN_ICON = "icons/wizban/new_provider_wiz.png";
 
-	private ContentProvider contentProvider = new ContentProvider();
+    private ContentProvider contentProvider = new ContentProvider();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
-	 */
-	@Override
-	public boolean performFinish() {
-		boolean saved = false;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.wizard.Wizard#performFinish()
+     */
+    @Override
+    public boolean performFinish() {
+        boolean saved = false;
 
-		try {
-			DoSave doSave = new DoSave();
+        try {
+            DoSave doSave = new DoSave();
 
-			getContainer().run(false, false, doSave);
+            getContainer().run(false, false, doSave);
 
-			if (doSave.exception != null) {
-				throw doSave.exception;
-			} else {
-				saved = doSave.saved;
-			}
-		} catch (AndroidException e) {
-			IStatus status = new Status(IStatus.ERROR, CodeUtilsActivator.PLUGIN_ID, e.getLocalizedMessage());
-			EclipseUtils.showErrorDialog(CodeUtilsNLS.UI_GenericErrorDialogTitle,
-					CodeUtilsNLS.ERR_BuildingBlockCreation_ErrorMessage, status);
-		} catch (InvocationTargetException e) {
-			IStatus status = new Status(IStatus.ERROR, CodeUtilsActivator.PLUGIN_ID, e.getLocalizedMessage());
-			EclipseUtils.showErrorDialog(CodeUtilsNLS.UI_GenericErrorDialogTitle,
-					CodeUtilsNLS.ERR_BuildingBlockCreation_ErrorMessage, status);
-		} catch (InterruptedException e) {
-			IStatus status = new Status(IStatus.ERROR, CodeUtilsActivator.PLUGIN_ID, e.getLocalizedMessage());
-			EclipseUtils.showErrorDialog(CodeUtilsNLS.UI_GenericErrorDialogTitle,
-					CodeUtilsNLS.ERR_BuildingBlockCreation_ErrorMessage, status);
-		}
+            if (doSave.exception != null) {
+                throw doSave.exception;
+            } else {
+                saved = doSave.saved;
+            }
+        } catch (AndroidException e) {
+            IStatus status = new Status(IStatus.ERROR, CodeUtilsActivator.PLUGIN_ID, e.getLocalizedMessage());
+            EclipseUtils.showErrorDialog(CodeUtilsNLS.UI_GenericErrorDialogTitle,
+                    CodeUtilsNLS.ERR_BuildingBlockCreation_ErrorMessage, status);
+        } catch (InvocationTargetException e) {
+            IStatus status = new Status(IStatus.ERROR, CodeUtilsActivator.PLUGIN_ID, e.getLocalizedMessage());
+            EclipseUtils.showErrorDialog(CodeUtilsNLS.UI_GenericErrorDialogTitle,
+                    CodeUtilsNLS.ERR_BuildingBlockCreation_ErrorMessage, status);
+        } catch (InterruptedException e) {
+            IStatus status = new Status(IStatus.ERROR, CodeUtilsActivator.PLUGIN_ID, e.getLocalizedMessage());
+            EclipseUtils.showErrorDialog(CodeUtilsNLS.UI_GenericErrorDialogTitle,
+                    CodeUtilsNLS.ERR_BuildingBlockCreation_ErrorMessage, status);
+        }
 
-		if (saved) {
-			ICompilationUnit javaFile = getBuildingBlock().getPackageFragment().getCompilationUnit(
-					getBuildingBlock().getName() + ".java");
+        if (saved) {
+            ICompilationUnit javaFile = getBuildingBlock().getPackageFragment()
+                    .getCompilationUnit(getBuildingBlock().getName() + ".java");
 
-			if ((javaFile != null) && javaFile.exists()) {
-				try {
-					JavaUI.openInEditor(javaFile);
-				} catch (PartInitException e) {
-					// Do nothing
-					AndmoreLogger.error(NewProviderWizard.class, "Could not open the content provider "
-							+ getBuildingBlock().getName() + " on an editor.", e);
-				} catch (JavaModelException e) {
-					// Do nothing
-					AndmoreLogger.error(NewProviderWizard.class, "Could not open the content provider "
-							+ getBuildingBlock().getName() + " on an editor.", e);
-				}
-			}
-		}
+            if ((javaFile != null) && javaFile.exists()) {
+                try {
+                    JavaUI.openInEditor(javaFile);
+                } catch (PartInitException e) {
+                    // Do nothing
+                    AndmoreLogger.error(NewProviderWizard.class,
+                            "Could not open the content provider " + getBuildingBlock().getName() + " on an editor.",
+                            e);
+                } catch (JavaModelException e) {
+                    // Do nothing
+                    AndmoreLogger.error(NewProviderWizard.class,
+                            "Could not open the content provider " + getBuildingBlock().getName() + " on an editor.",
+                            e);
+                }
+            }
+        }
 
-		if (saved) {
-			// Collecting usage data for statistical purposes
-			try {
-				AndmoreLogger.collectUsageData(UsageDataConstants.WHAT_BUILDINGBLOCK_PROVIDER,
-						UsageDataConstants.KIND_BUILDINGBLOCK, UsageDataConstants.DESCRIPTION_DEFAULT,
-						CodeUtilsActivator.PLUGIN_ID, CodeUtilsActivator.getDefault().getBundle().getVersion()
-								.toString());
-			} catch (Throwable e) {
-				// Do nothing, but error on the log should never prevent app
-				// from working
-			}
-		}
-		return saved;
-	}
+        if (saved) {
+            // Collecting usage data for statistical purposes
+            try {
+                AndmoreLogger.collectUsageData(UsageDataConstants.WHAT_BUILDINGBLOCK_PROVIDER,
+                        UsageDataConstants.KIND_BUILDINGBLOCK, UsageDataConstants.DESCRIPTION_DEFAULT,
+                        CodeUtilsActivator.PLUGIN_ID,
+                        CodeUtilsActivator.getDefault().getBundle().getVersion().toString());
+            } catch (Throwable e) {
+                // Do nothing, but error on the log should never prevent app
+                // from working
+            }
+        }
+        return saved;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench,
-	 * org.eclipse.jface.viewers.IStructuredSelection)
-	 */
-	@Override
-	public void init(IWorkbench arg0, IStructuredSelection selection) {
-		setWindowTitle(CodeUtilsNLS.UI_NewProviderWizard_WizardTitle);
-		setNeedsProgressMonitor(true);
-		setDefaultPageImageDescriptor(CodeUtilsActivator.getImageDescriptor(WIZBAN_ICON));
-		contentProvider.configure(selection);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench,
+     * org.eclipse.jface.viewers.IStructuredSelection)
+     */
+    @Override
+    public void init(IWorkbench arg0, IStructuredSelection selection) {
+        setWindowTitle(CodeUtilsNLS.UI_NewProviderWizard_WizardTitle);
+        setNeedsProgressMonitor(true);
+        setDefaultPageImageDescriptor(CodeUtilsActivator.getImageDescriptor(WIZBAN_ICON));
+        contentProvider.configure(selection);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.wizard.Wizard#addPages()
-	 */
-	@Override
-	public void addPages() {
-		addPage(new NewProviderMainPage(contentProvider));
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.wizard.Wizard#addPages()
+     */
+    @Override
+    public void addPages() {
+        addPage(new NewProviderMainPage(contentProvider));
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.andmore.android.wizards.buildingblocks.NewBuildingBlocksWizard
-	 * #getBuildingBlock()
-	 */
-	@Override
-	protected BuildingBlockModel getBuildingBlock() {
-		return contentProvider;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.andmore.android.wizards.buildingblocks.NewBuildingBlocksWizard
+     * #getBuildingBlock()
+     */
+    @Override
+    protected BuildingBlockModel getBuildingBlock() {
+        return contentProvider;
+    }
 
-	/*
-	 * IRunnableWithProgress object to create the content provider
-	 */
-	private class DoSave implements IRunnableWithProgress {
-		AndroidException exception = null;
+    /*
+     * IRunnableWithProgress object to create the content provider
+     */
+    private class DoSave implements IRunnableWithProgress {
+        AndroidException exception = null;
 
-		boolean saved = false;
+        boolean saved = false;
 
-		@Override
-		public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-			try {
-				saved = getBuildingBlock().save(getContainer(), monitor);
-			} catch (AndroidException e) {
-				exception = e;
-			}
-		}
-	}
+        @Override
+        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+            try {
+                saved = getBuildingBlock().save(getContainer(), monitor);
+            } catch (AndroidException e) {
+                exception = e;
+            }
+        }
+    }
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,43 +19,43 @@ package org.eclipse.andmore.android.model.resources.types;
  * </resources>
  */
 public class ResourcesNode extends AbstractResourceNode {
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.andmore.android.model.resources.AbstractResourceNode#
-	 * canAddChildNode
-	 * (org.eclipse.andmore.android.model.resources.AbstractResourceNode)
-	 */
-	@Override
-	protected boolean canAddChildNode(AbstractResourceNode node) {
-		NodeType nodeType = node.getNodeType();
-		boolean canAdd = (nodeType == NodeType.String) || (nodeType == NodeType.Color) || (nodeType == NodeType.Dimen)
-				|| (nodeType == NodeType.Drawable);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.andmore.android.model.resources.AbstractResourceNode#
+     * canAddChildNode
+     * (org.eclipse.andmore.android.model.resources.AbstractResourceNode)
+     */
+    @Override
+    protected boolean canAddChildNode(AbstractResourceNode node) {
+        NodeType nodeType = node.getNodeType();
+        boolean canAdd = (nodeType == NodeType.String) || (nodeType == NodeType.Color) || (nodeType == NodeType.Dimen)
+                || (nodeType == NodeType.Drawable);
 
-		return canAdd;
-	}
+        return canAdd;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.andmore.android.model.resources.AbstractResourceNode#getNodeType
-	 * ()
-	 */
-	@Override
-	public NodeType getNodeType() {
-		return NodeType.Resources;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.andmore.android.model.resources.AbstractResourceNode#getNodeType
+     * ()
+     */
+    @Override
+    public NodeType getNodeType() {
+        return NodeType.Resources;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.andmore.android.model.resources.AbstractResourceNode#
-	 * isAttributeValid(java.lang.String)
-	 */
-	@Override
-	protected boolean isAttributeValid(String attributeName) {
-		return false;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.andmore.android.model.resources.AbstractResourceNode#
+     * isAttributeValid(java.lang.String)
+     */
+    @Override
+    protected boolean isAttributeValid(String attributeName) {
+        return false;
+    }
 
 }

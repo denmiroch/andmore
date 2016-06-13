@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,8 +47,7 @@ public class Locale {
      * @return a locale with the given language and region
      */
     @NonNull
-    public static Locale create(
-            @NonNull LocaleQualifier locale) {
+    public static Locale create(@NonNull LocaleQualifier locale) {
         return new Locale(locale);
     }
 
@@ -64,9 +60,9 @@ public class Locale {
     public Image getFlagImage() {
         Image image = null;
         if (locale.hasFakeValue()) {
-        	return FlagManager.getGlobeIcon();
+            return FlagManager.getGlobeIcon();
         }
-        
+
         FlagManager icons = FlagManager.get();
         image = icons.getFlag(locale.getLanguage(), locale.getRegion());
         if (image == null) {
@@ -82,7 +78,7 @@ public class Locale {
      * @return true if this locale specifies a specific language
      */
     public boolean hasLanguage() {
-    	return locale.hasLanguage();
+        return locale.hasLanguage();
     }
 
     /**
@@ -91,7 +87,7 @@ public class Locale {
      * @return true if this locale specifies a region
      */
     public boolean hasRegion() {
-    	return locale.hasRegion();
+        return locale.hasRegion();
     }
 
     @Override
@@ -104,22 +100,25 @@ public class Locale {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Locale other = (Locale) obj;
-        if (this.locale == null) {
-        	return other.locale == null;
         }
-        return this.locale.equals(other.locale);
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Locale other = (Locale) obj;
+        if (locale == null) {
+            return other.locale == null;
+        }
+        return locale.equals(other.locale);
     }
 
     @Override
     public String toString() {
-    	return locale.getValue();
+        return locale.getValue();
     }
 
     /**
@@ -129,6 +128,6 @@ public class Locale {
     public String toLocaleId() {
         // Return lang-reg only if both lang and reg are present. Else return
         // lang.
-    	return locale.getValue();
+        return locale.getValue();
     }
 }

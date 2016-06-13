@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +13,8 @@
 
 package org.eclipse.andmore.internal.preferences;
 
-
-import com.android.annotations.NonNull;
-import com.android.ide.common.xml.XmlAttributeSortOrder;
-import com.android.prefs.AndroidLocation.AndroidLocationException;
-import com.android.sdklib.internal.build.DebugKeyProvider;
-import com.android.sdklib.internal.build.DebugKeyProvider.KeytoolException;
-import com.android.sdkstats.DdmsPreferenceStore;
+import java.io.File;
+import java.util.Locale;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -31,17 +23,23 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
-import java.io.File;
-import java.util.Locale;
+import com.android.annotations.NonNull;
+import com.android.ide.common.xml.XmlAttributeSortOrder;
+import com.android.prefs.AndroidLocation.AndroidLocationException;
+import com.android.sdklib.internal.build.DebugKeyProvider;
+import com.android.sdklib.internal.build.DebugKeyProvider.KeytoolException;
+import com.android.sdkstats.DdmsPreferenceStore;
 
 public final class AdtPrefs extends AbstractPreferenceInitializer {
     public final static String PREFS_SDK_DIR = AndmoreAndroidPlugin.PLUGIN_ID + ".sdk"; //$NON-NLS-1$
 
     public final static String PREFS_BUILD_RES_AUTO_REFRESH = AndmoreAndroidPlugin.PLUGIN_ID + ".resAutoRefresh"; //$NON-NLS-1$
 
-    public final static String PREFS_BUILD_FORCE_ERROR_ON_NATIVELIB_IN_JAR = AndmoreAndroidPlugin.PLUGIN_ID + ".forceErrorNativeLibInJar"; //$NON-NLS-1$
+    public final static String PREFS_BUILD_FORCE_ERROR_ON_NATIVELIB_IN_JAR = AndmoreAndroidPlugin.PLUGIN_ID
+            + ".forceErrorNativeLibInJar"; //$NON-NLS-1$
 
-    public final static String PREFS_BUILD_SKIP_POST_COMPILE_ON_FILE_SAVE = AndmoreAndroidPlugin.PLUGIN_ID + ".skipPostCompileOnFileSave"; //$NON-NLS-1$
+    public final static String PREFS_BUILD_SKIP_POST_COMPILE_ON_FILE_SAVE = AndmoreAndroidPlugin.PLUGIN_ID
+            + ".skipPostCompileOnFileSave"; //$NON-NLS-1$
 
     public final static String PREFS_BUILD_VERBOSITY = AndmoreAndroidPlugin.PLUGIN_ID + ".buildVerbosity"; //$NON-NLS-1$
 
@@ -169,7 +167,7 @@ public final class AdtPrefs extends AbstractPreferenceInitializer {
             // Note: this is a hack that does not change the preferences, so if the user
             // looks at Window > Preferences > Android, the path will be the preferences
             // one and not the overridden one.
-            String override = System.getenv("ADT_TEST_SDK_PATH");   //$NON-NLS-1$
+            String override = System.getenv("ADT_TEST_SDK_PATH"); //$NON-NLS-1$
             if (override != null && override.length() > 0 && new File(override).isDirectory()) {
                 mOsSdkLocation = override;
             }
@@ -193,13 +191,11 @@ public final class AdtPrefs extends AbstractPreferenceInitializer {
         }
 
         if (property == null || PREFS_BUILD_FORCE_ERROR_ON_NATIVELIB_IN_JAR.equals(property)) {
-            mBuildForceErrorOnNativeLibInJar =
-                    mStore.getBoolean(PREFS_BUILD_FORCE_ERROR_ON_NATIVELIB_IN_JAR);
+            mBuildForceErrorOnNativeLibInJar = mStore.getBoolean(PREFS_BUILD_FORCE_ERROR_ON_NATIVELIB_IN_JAR);
         }
 
         if (property == null || PREFS_BUILD_SKIP_POST_COMPILE_ON_FILE_SAVE.equals(property)) {
-            mBuildSkipPostCompileOnFileSave =
-                mStore.getBoolean(PREFS_BUILD_SKIP_POST_COMPILE_ON_FILE_SAVE);
+            mBuildSkipPostCompileOnFileSave = mStore.getBoolean(PREFS_BUILD_SKIP_POST_COMPILE_ON_FILE_SAVE);
         }
 
         if (property == null || PREFS_MONITOR_DENSITY.equals(property)) {
@@ -437,7 +433,6 @@ public final class AdtPrefs extends AbstractPreferenceInitializer {
         // the same resource except for one of them.
     }
 
-
     public boolean getBuildForceErrorOnNativeLibInJar() {
         return mBuildForceErrorOnNativeLibInJar;
     }
@@ -525,8 +520,7 @@ public final class AdtPrefs extends AbstractPreferenceInitializer {
         //store.setDefault(PREFS_SKIP_LINT_LIBS, false);
 
         try {
-            store.setDefault(PREFS_DEFAULT_DEBUG_KEYSTORE,
-                    DebugKeyProvider.getDefaultKeyStoreOsPath());
+            store.setDefault(PREFS_DEFAULT_DEBUG_KEYSTORE, DebugKeyProvider.getDefaultKeyStoreOsPath());
         } catch (KeytoolException e) {
             AndmoreAndroidPlugin.log(e, "Get default debug keystore path failed"); //$NON-NLS-1$
         } catch (AndroidLocationException e) {

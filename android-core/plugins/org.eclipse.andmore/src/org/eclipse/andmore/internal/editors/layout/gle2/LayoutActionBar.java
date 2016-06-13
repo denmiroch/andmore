@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,16 +15,10 @@ package org.eclipse.andmore.internal.editors.layout.gle2;
 import static com.android.SdkConstants.ANDROID_URI;
 import static com.android.SdkConstants.ATTR_ID;
 
-import com.android.annotations.NonNull;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.RuleAction;
-import com.android.ide.common.api.RuleAction.Choices;
-import com.android.ide.common.api.RuleAction.Separator;
-import com.android.ide.common.api.RuleAction.Toggle;
-import com.android.sdklib.devices.Device;
-import com.android.sdklib.devices.Screen;
-import com.android.sdkuilib.internal.widgets.ResolutionChooserDialog;
-import com.google.common.base.Strings;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.andmore.common.layout.BaseViewRule;
 import org.eclipse.andmore.internal.editors.IconFactory;
@@ -60,10 +51,16 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.RuleAction;
+import com.android.ide.common.api.RuleAction.Choices;
+import com.android.ide.common.api.RuleAction.Separator;
+import com.android.ide.common.api.RuleAction.Toggle;
+import com.android.sdklib.devices.Device;
+import com.android.sdklib.devices.Screen;
+import com.android.sdkuilib.internal.widgets.ResolutionChooserDialog;
+import com.google.common.base.Strings;
 
 /**
  * Toolbar shown at the top of the layout editor, which adds a number of context-sensitive
@@ -183,8 +180,7 @@ public class LayoutActionBar extends Composite {
     }
 
     /** Update the toolbar widgets */
-    private void updateToolbar(final List<RuleAction> actions, final int labelIndex,
-            final String label) {
+    private void updateToolbar(final List<RuleAction> actions, final int labelIndex, final String label) {
         if (mLayoutToolBar == null || mLayoutToolBar.isDisposed()) {
             return;
         }
@@ -335,8 +331,7 @@ public class LayoutActionBar extends Composite {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 Toggle toggle = (Toggle) button.getData();
-                toggle.getCallback().action(toggle, getSelectedNodes(),
-                        toggle.getId(), button.getSelection());
+                toggle.getCallback().action(toggle, getSelectedNodes(), toggle.getId(), button.getSelection());
                 updateSelection();
             }
         });
@@ -346,8 +341,7 @@ public class LayoutActionBar extends Composite {
     }
 
     private List<INode> getSelectedNodes() {
-        List<SelectionItem> selections =
-                mEditor.getCanvasControl().getSelectionManager().getSelections();
+        List<SelectionItem> selections = mEditor.getCanvasControl().getSelectionManager().getSelections();
         List<INode> nodes = new ArrayList<INode>(selections.size());
         for (SelectionItem item : selections) {
             nodes.add(item.getNode());
@@ -355,7 +349,6 @@ public class LayoutActionBar extends Composite {
 
         return nodes;
     }
-
 
     private void addPlainAction(RuleAction menuAction) {
         final ToolItem button = new ToolItem(mLayoutToolBar, SWT.PUSH);
@@ -374,8 +367,7 @@ public class LayoutActionBar extends Composite {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 RuleAction menuAction = (RuleAction) button.getData();
-                menuAction.getCallback().action(menuAction, getSelectedNodes(), menuAction.getId(),
-                        false);
+                menuAction.getCallback().action(menuAction, getSelectedNodes(), menuAction.getId(), false);
                 updateSelection();
             }
         });
@@ -620,16 +612,36 @@ public class LayoutActionBar extends Composite {
             if (markerCount > 0) {
                 String iconName = "";
                 switch (markerCount) {
-                    case 1: iconName = "lint1"; break;  //$NON-NLS-1$
-                    case 2: iconName = "lint2"; break;  //$NON-NLS-1$
-                    case 3: iconName = "lint3"; break;  //$NON-NLS-1$
-                    case 4: iconName = "lint4"; break;  //$NON-NLS-1$
-                    case 5: iconName = "lint5"; break;  //$NON-NLS-1$
-                    case 6: iconName = "lint6"; break;  //$NON-NLS-1$
-                    case 7: iconName = "lint7"; break;  //$NON-NLS-1$
-                    case 8: iconName = "lint8"; break;  //$NON-NLS-1$
-                    case 9: iconName = "lint9"; break;  //$NON-NLS-1$
-                    default: iconName = "lint9p"; break;//$NON-NLS-1$
+                    case 1:
+                        iconName = "lint1"; //$NON-NLS-1$
+                        break;
+                    case 2:
+                        iconName = "lint2"; //$NON-NLS-1$
+                        break;
+                    case 3:
+                        iconName = "lint3"; //$NON-NLS-1$
+                        break;
+                    case 4:
+                        iconName = "lint4"; //$NON-NLS-1$
+                        break;
+                    case 5:
+                        iconName = "lint5"; //$NON-NLS-1$
+                        break;
+                    case 6:
+                        iconName = "lint6"; //$NON-NLS-1$
+                        break;
+                    case 7:
+                        iconName = "lint7"; //$NON-NLS-1$
+                        break;
+                    case 8:
+                        iconName = "lint8"; //$NON-NLS-1$
+                        break;
+                    case 9:
+                        iconName = "lint9"; //$NON-NLS-1$
+                        break;
+                    default:
+                        iconName = "lint9p"; //$NON-NLS-1$
+                        break;
                 }
                 mLintButton.setImage(IconFactory.getInstance().getIcon(iconName));
             }
@@ -675,7 +687,7 @@ public class LayoutActionBar extends Composite {
         // If you zoom out 10 times and then back in 10 times, small rounding errors mean
         // that you end up with a scale=1.0000000000000004. In the cases, when you get close
         // to 1.0, just make the zoom an exact 1.0.
-        if (Math.abs(s-1.0) < 0.0001) {
+        if (Math.abs(s - 1.0) < 0.0001) {
             s = 1.0;
         }
 

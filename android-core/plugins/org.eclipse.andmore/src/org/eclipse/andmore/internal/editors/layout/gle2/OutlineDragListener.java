@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +11,8 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.editors.layout.gle2;
+
+import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.dnd.DND;
@@ -23,8 +22,6 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-
-import java.util.ArrayList;
 
 /** Drag listener for the outline page */
 /* package */ class OutlineDragListener implements DragSourceListener {
@@ -77,12 +74,10 @@ import java.util.ArrayList;
         if (e.doit) {
             mDragElements = SelectionItem.getAsElements(mDragSelection);
             GlobalCanvasDragInfo.getInstance().startDrag(mDragElements,
-                    mDragSelection.toArray(new SelectionItem[imageCount]),
-                    canvas, new Runnable() {
+                    mDragSelection.toArray(new SelectionItem[imageCount]), canvas, new Runnable() {
                         @Override
                         public void run() {
-                            canvas.getClipboardSupport().deleteSelection("Remove",
-                                    mDragSelection);
+                            canvas.getClipboardSupport().deleteSelection("Remove", mDragSelection);
                         }
                     });
             return;

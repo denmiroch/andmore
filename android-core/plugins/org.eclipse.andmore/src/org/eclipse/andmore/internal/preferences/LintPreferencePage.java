@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,18 +12,16 @@
  */
 package org.eclipse.andmore.internal.preferences;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import com.android.annotations.NonNull;
-import com.android.tools.lint.client.api.Configuration;
-import com.android.tools.lint.client.api.IssueRegistry;
-import com.android.tools.lint.detector.api.Category;
-import com.android.tools.lint.detector.api.Issue;
-import com.android.tools.lint.detector.api.Project;
-import com.android.tools.lint.detector.api.Severity;
-import com.android.tools.lint.detector.api.TextFormat;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.lint.EclipseLintClient;
 import org.eclipse.andmore.internal.lint.EclipseLintRunner;
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
@@ -75,19 +70,19 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.dialogs.PropertyPage;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.tools.lint.client.api.Configuration;
+import com.android.tools.lint.client.api.IssueRegistry;
+import com.android.tools.lint.detector.api.Category;
+import com.android.tools.lint.detector.api.Issue;
+import com.android.tools.lint.detector.api.Project;
+import com.android.tools.lint.detector.api.Severity;
+import com.android.tools.lint.detector.api.TextFormat;
 
 /** Preference page for configuring Lint preferences */
-public class LintPreferencePage extends PropertyPage implements IWorkbenchPreferencePage,
-        SelectionListener, ControlListener, ModifyListener {
-    private static final String ID =
-            "org.eclipse.andmore.common.preferences.LintPreferencePage"; //$NON-NLS-1$
+public class LintPreferencePage extends PropertyPage
+        implements IWorkbenchPreferencePage, SelectionListener, ControlListener, ModifyListener {
+    private static final String ID = "org.eclipse.andmore.common.preferences.LintPreferencePage"; //$NON-NLS-1$
     private static final int ID_COLUMN_WIDTH = 150;
 
     private EclipseLintClient mClient;
@@ -95,7 +90,7 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
     private Configuration mConfiguration;
     private IProject mProject;
     private Map<Issue, Severity> mSeverities = new HashMap<Issue, Severity>();
-    private Map<Issue, Severity> mInitialSeverities = Collections.<Issue, Severity>emptyMap();
+    private Map<Issue, Severity> mInitialSeverities = Collections.<Issue, Severity> emptyMap();
     private boolean mIgnoreEvent;
 
     private Tree mTree;
@@ -122,7 +117,7 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
     public Control createContents(Composite parent) {
         IAdaptable resource = getElement();
         if (resource != null) {
-            mProject = (IProject) resource.getAdapter(IProject.class);
+            mProject = resource.getAdapter(IProject.class);
         }
 
         Composite container = new Composite(parent, SWT.NULL);
@@ -130,8 +125,7 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
 
         if (mProject != null) {
             Label projectLabel = new Label(container, SWT.CHECK);
-            projectLabel.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false, 1,
-                    1));
+            projectLabel.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false, 1, 1));
             projectLabel.setText("Project-specific configuration:");
 
             mWorkspaceLink = new Link(container, SWT.NONE);
@@ -140,14 +134,12 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
             mWorkspaceLink.addSelectionListener(this);
         } else {
             mCheckFileCheckbox = new Button(container, SWT.CHECK);
-            mCheckFileCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false,
-                    2, 1));
+            mCheckFileCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
             mCheckFileCheckbox.setSelection(true);
             mCheckFileCheckbox.setText("When saving files, check for errors");
 
             mCheckExportCheckbox = new Button(container, SWT.CHECK);
-            mCheckExportCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false,
-                    2, 1));
+            mCheckExportCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
             mCheckExportCheckbox.setSelection(true);
             mCheckExportCheckbox.setText("Run full error check when exporting app and abort if fatal errors are found");
 
@@ -160,8 +152,8 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
         }
 
         mRegistry = EclipseLintClient.getRegistry();
-        mClient = new EclipseLintClient(mRegistry,
-                mProject != null ? Collections.singletonList(mProject) : null, null, false);
+        mClient = new EclipseLintClient(mRegistry, mProject != null ? Collections.singletonList(mProject) : null, null,
+                false);
         Project project = null;
         if (mProject != null) {
             File dir = AdtUtils.getAbsolutePath(mProject).toFile();
@@ -218,8 +210,7 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
         mTreeViewer.setContentProvider(new ContentProvider());
         mTreeViewer.setLabelProvider(new LabelProvider());
 
-        mDetailsText = new Text(container, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP |SWT.V_SCROLL
-                | SWT.MULTI);
+        mDetailsText = new Text(container, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
         GridData gdText = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 2);
         gdText.heightHint = 80;
         mDetailsText.setLayoutData(gdText);
@@ -228,9 +219,7 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
         severityLabel.setText("Severity:");
 
         mSeverityCombo = new Combo(container, SWT.READ_ONLY);
-        mSeverityCombo.setItems(new String[] {
-                "(Default)", "Fatal", "Error", "Warning", "Information", "Ignore"
-        });
+        mSeverityCombo.setItems(new String[] { "(Default)", "Fatal", "Error", "Warning", "Information", "Ignore" });
         GridData gdSeverityCombo = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
         gdSeverityCombo.widthHint = 90;
         mSeverityCombo.setLayoutData(gdSeverityCombo);
@@ -363,15 +352,10 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
 
         if (!mInitialSeverities.equals(mSeverities)) {
             // Ask user whether we should re-run the rules.
-            MessageDialog dialog = new MessageDialog(
-                    null, "Lint Settings Have Changed", null,
-                    "The list of enabled checks has changed. Would you like to run lint now " +
-                            "to update the results?",
-                    MessageDialog.QUESTION,
-                    new String[] {
-                            "Yes", "No"
-                    },
-                    0); // yes is the default
+            MessageDialog dialog = new MessageDialog(null, "Lint Settings Have Changed", null,
+                    "The list of enabled checks has changed. Would you like to run lint now "
+                            + "to update the results?",
+                    MessageDialog.QUESTION, new String[] { "Yes", "No" }, 0); // yes is the default
             int result = dialog.open();
             if (result == 0) {
                 // Run lint on all the open Android projects
@@ -384,8 +368,7 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
                     }
                 }
 
-                EclipseLintRunner.startLint(androidProjects, null,  null, false /*fatalOnly*/,
-                        true /*show*/);
+                EclipseLintRunner.startLint(androidProjects, null, null, false /*fatalOnly*/, true /*show*/);
             }
         }
     }
@@ -477,8 +460,7 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
                 }
             }
         } else if (source == mWorkspaceLink) {
-            int result = PreferencesUtil.createPreferenceDialogOn(getShell(), ID,
-                    new String[] { ID }, null).open();
+            int result = PreferencesUtil.createPreferenceDialogOn(getShell(), ID, new String[] { ID }, null).open();
             if (result == Window.OK) {
                 loadSettings(true);
             }
@@ -548,8 +530,7 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
     // ---- Implements ControlListener ----
 
     @Override
-    public void controlMoved(ControlEvent e) {
-    }
+    public void controlMoved(ControlEvent e) {}
 
     @Override
     public void controlResized(ControlEvent e) {
@@ -565,8 +546,8 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
 
     private boolean filterMatches(@NonNull String filter, @NonNull Issue issue) {
         return (filter.startsWith("~") //$NON-NLS-1$
-                        && mConfiguration.getSeverity(issue).getDescription()
-                            .toLowerCase(Locale.US).startsWith(filter.substring(1)))
+                && mConfiguration.getSeverity(issue).getDescription().toLowerCase(Locale.US)
+                        .startsWith(filter.substring(1)))
                 || issue.getCategory().getName().toLowerCase(Locale.US).startsWith(filter)
                 || issue.getCategory().getFullName().toLowerCase(Locale.US).startsWith(filter)
                 || issue.getId().toLowerCase(Locale.US).contains(filter)
@@ -593,7 +574,7 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
             List<Issue> list = mCategoryToIssues.get(parentElement);
             if (list == null) {
                 return new Object[0];
-            }  else {
+            } else {
                 return list.toArray();
             }
         }
@@ -604,8 +585,7 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
         }
 
         @Override
-        public void inputChanged(final Viewer viewer, final Object oldInput,
-                final Object newInput) {
+        public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
             mCategoryToIssues = null;
 
             String filter = mSearch.isDisposed() ? "" : mSearch.getText().trim();
@@ -654,12 +634,10 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
     private class LabelProvider implements ITableLabelProvider, IColorProvider {
 
         @Override
-        public void addListener(ILabelProviderListener listener) {
-        }
+        public void addListener(ILabelProviderListener listener) {}
 
         @Override
-        public void dispose() {
-        }
+        public void dispose() {}
 
         @Override
         public boolean isLabelProperty(Object element, String property) {
@@ -667,8 +645,7 @@ public class LintPreferencePage extends PropertyPage implements IWorkbenchPrefer
         }
 
         @Override
-        public void removeListener(ILabelProviderListener listener) {
-        }
+        public void removeListener(ILabelProviderListener listener) {}
 
         @Override
         public Image getColumnImage(Object element, int columnIndex) {

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,9 +11,6 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.wizards.newxmlfile;
-
-import com.android.SdkConstants;
-import com.android.ide.common.resources.configuration.ResourceQualifier;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.internal.ui.ConfigurationSelector;
@@ -36,6 +30,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import com.android.SdkConstants;
+import com.android.ide.common.resources.configuration.ResourceQualifier;
 
 /**
  * Second page of the {@link NewXmlFileWizard}.
@@ -139,9 +136,9 @@ public class ChooseConfigurationPage extends WizardPage {
         // This is a custom path, we need to sanitize it.
         // First it should start with "/res/". Then we need to make sure there are no
         // relative paths, things like "../" or "./" or even "//".
-        wsFolderPath = wsFolderPath.replaceAll("/+\\.\\./+|/+\\./+|//+|\\\\+|^/+", "/");  //$NON-NLS-1$ //$NON-NLS-2$
-        wsFolderPath = wsFolderPath.replaceAll("^\\.\\./+|^\\./+", "");                   //$NON-NLS-1$ //$NON-NLS-2$
-        wsFolderPath = wsFolderPath.replaceAll("/+\\.\\.$|/+\\.$|/+$", "");               //$NON-NLS-1$ //$NON-NLS-2$
+        wsFolderPath = wsFolderPath.replaceAll("/+\\.\\./+|/+\\./+|//+|\\\\+|^/+", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+        wsFolderPath = wsFolderPath.replaceAll("^\\.\\./+|^\\./+", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        wsFolderPath = wsFolderPath.replaceAll("/+\\.\\.$|/+\\.$|/+$", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
         // We get "res/foo" from selections relative to the project when we want a "/res/foo" path.
         if (wsFolderPath.startsWith(RES_FOLDER_REL)) {
@@ -243,8 +240,7 @@ public class ChooseConfigurationPage extends WizardPage {
             if (state == ConfigurationState.INVALID_CONFIG) {
                 ResourceQualifier qual = mConfigSelector.getInvalidQualifier();
                 if (qual != null) {
-                    error =
-                      String.format("The qualifier '%1$s' is invalid in the folder configuration.",
+                    error = String.format("The qualifier '%1$s' is invalid in the folder configuration.",
                             qual.getName());
                 }
             } else if (state == ConfigurationState.REGION_WITHOUT_LANGUAGE) {

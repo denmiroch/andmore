@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,11 +13,8 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.ide.common.api.DropFeedback;
-import com.android.ide.common.api.Rect;
-import com.android.ide.common.api.ResizePolicy;
-import com.android.ide.common.api.SegmentType;
-import com.android.utils.Pair;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.andmore.internal.editors.layout.gle2.SelectionHandle.Position;
 import org.eclipse.andmore.internal.editors.layout.gre.NodeProxy;
@@ -28,8 +22,11 @@ import org.eclipse.andmore.internal.editors.layout.gre.RulesEngine;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.GC;
 
-import java.util.Collections;
-import java.util.List;
+import com.android.ide.common.api.DropFeedback;
+import com.android.ide.common.api.Rect;
+import com.android.ide.common.api.ResizePolicy;
+import com.android.ide.common.api.SegmentType;
+import com.android.utils.Pair;
 
 /**
  * A {@link ResizeGesture} is a gesture for resizing a selected widget. It is initiated
@@ -83,8 +80,8 @@ public class ResizeGesture extends Gesture {
         CanvasViewInfo parentInfo = viewHierarchy.findViewInfoFor(mParentNode);
         Object childView = childInfo != null ? childInfo.getViewObject() : null;
         Object parentView = parentInfo != null ? parentInfo.getViewObject() : null;
-        mFeedback = rulesEngine.callOnResizeBegin(mChildNode, mParentNode, newBounds,
-                mHorizontalEdge, mVerticalEdge, childView, parentView);
+        mFeedback = rulesEngine.callOnResizeBegin(mChildNode, mParentNode, newBounds, mHorizontalEdge, mVerticalEdge,
+                childView, parentView);
         update(pos);
         mCanvas.getGestureManager().updateMessage(mFeedback);
     }
@@ -109,8 +106,7 @@ public class ResizeGesture extends Gesture {
         RulesEngine rulesEngine = mCanvas.getRulesEngine();
         Rect newBounds = getNewBounds(pos);
         int modifierMask = mCanvas.getGestureManager().getRuleModifierMask();
-        rulesEngine.callOnResizeUpdate(mFeedback, mChildNode, mParentNode, newBounds,
-                modifierMask);
+        rulesEngine.callOnResizeUpdate(mFeedback, mChildNode, mParentNode, newBounds, modifierMask);
         mCanvas.getGestureManager().updateMessage(mFeedback);
     }
 
@@ -233,7 +229,8 @@ public class ResizeGesture extends Gesture {
             case TOP_MIDDLE:
             case TOP_RIGHT:
                 return SegmentType.TOP;
-            default: assert false : handle.getPosition();
+            default:
+                assert false : handle.getPosition();
         }
         return null;
     }
@@ -251,11 +248,11 @@ public class ResizeGesture extends Gesture {
             case RIGHT_MIDDLE:
             case BOTTOM_RIGHT:
                 return SegmentType.RIGHT;
-            default: assert false : handle.getPosition();
+            default:
+                assert false : handle.getPosition();
         }
         return null;
     }
-
 
     @Override
     public List<Overlay> createOverlays() {

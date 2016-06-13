@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,15 +13,15 @@
 
 package org.eclipse.andmore.internal.launch;
 
-import com.android.ddmlib.AdbCommandRejectedException;
-import com.android.ddmlib.IDevice;
-import com.android.ddmlib.ShellCommandUnresponsiveException;
-import com.android.ddmlib.TimeoutException;
-
 import java.io.IOException;
 import java.util.Collection;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
+
+import com.android.ddmlib.AdbCommandRejectedException;
+import com.android.ddmlib.IDevice;
+import com.android.ddmlib.ShellCommandUnresponsiveException;
+import com.android.ddmlib.TimeoutException;
 
 /**
  * Launches the given activity
@@ -47,16 +44,15 @@ public class ActivityLaunchAction implements IAndroidLaunchAction {
 
     public boolean doLaunchAction(DelayedLaunchInfo info, IDevice device) {
         String command = "am start" //$NON-NLS-1$
-            + (info.isDebugMode() ? " -D" //$NON-NLS-1$
-                    : "") //$NON-NLS-1$
-            + " -n " //$NON-NLS-1$
-            + info.getPackageName() + "/" //$NON-NLS-1$
-            + mActivity.replaceAll("\\$", "\\\\\\$") //$NON-NLS-1$ //$NON-NLS-2$
-            + " -a android.intent.action.MAIN"  //$NON-NLS-1$
-            + " -c android.intent.category.LAUNCHER";
+                + (info.isDebugMode() ? " -D" //$NON-NLS-1$
+                        : "") //$NON-NLS-1$
+                + " -n " //$NON-NLS-1$
+                + info.getPackageName() + "/" //$NON-NLS-1$
+                + mActivity.replaceAll("\\$", "\\\\\\$") //$NON-NLS-1$ //$NON-NLS-2$
+                + " -a android.intent.action.MAIN" //$NON-NLS-1$
+                + " -c android.intent.category.LAUNCHER";
         try {
-            String msg = String.format("Starting activity %1$s on device %2$s", mActivity,
-                    device);
+            String msg = String.format("Starting activity %1$s on device %2$s", mActivity, device);
             AndmoreAndroidPlugin.printToConsole(info.getProject(), msg);
 
             // In debug mode, we need to add the info to the list of application monitoring
@@ -78,13 +74,12 @@ public class ActivityLaunchAction implements IAndroidLaunchAction {
             AndmoreAndroidPlugin.printErrorToConsole(info.getProject(), "Launch error: timeout");
             return false;
         } catch (AdbCommandRejectedException e) {
-            AndmoreAndroidPlugin.printErrorToConsole(info.getProject(), String.format(
-                    "Launch error: adb rejected command: %1$s", e.getMessage()));
+            AndmoreAndroidPlugin.printErrorToConsole(info.getProject(),
+                    String.format("Launch error: adb rejected command: %1$s", e.getMessage()));
             return false;
         } catch (ShellCommandUnresponsiveException e) {
             // we didn't get the output but that's ok, just log it
-            AndmoreAndroidPlugin.log(e, "No command output when running: '%1$s' on device %2$s", command,
-                    device);
+            AndmoreAndroidPlugin.log(e, "No command output when running: '%1$s' on device %2$s", command, device);
         } catch (IOException e) {
             // something went wrong trying to launch the app.
             // lets stop the Launch
@@ -120,6 +115,6 @@ public class ActivityLaunchAction implements IAndroidLaunchAction {
      */
     @Override
     public String getLaunchDescription() {
-       return String.format("%1$s activity launch", mActivity);
+        return String.format("%1$s activity launch", mActivity);
     }
 }

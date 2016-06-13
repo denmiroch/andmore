@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +13,12 @@
 
 package org.eclipse.andmore.internal.editors.layout.gre;
 
-import com.android.ide.common.api.IViewRule;
-import com.android.sdklib.internal.project.ProjectProperties;
-import com.android.utils.Pair;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.sdk.ProjectState;
@@ -28,12 +28,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
+import com.android.ide.common.api.IViewRule;
+import com.android.sdklib.internal.project.ProjectProperties;
+import com.android.utils.Pair;
 
 /**
  * The {@link RuleLoader} is responsible for loading (and unloading)
@@ -45,8 +42,7 @@ public class RuleLoader {
      * Qualified name for the per-project non-persistent property storing the
      * {@link RuleLoader} for this project
      */
-    private final static QualifiedName RULE_LOADER = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID,
-            "ruleloader"); //$NON-NLS-1$
+    private final static QualifiedName RULE_LOADER = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "ruleloader"); //$NON-NLS-1$
 
     private final IProject mProject;
     private ClassLoader mUserClassLoader;
@@ -107,8 +103,7 @@ public class RuleLoader {
         // to get updated view rule jars
         projectProperties.reload();
 
-        String path = projectProperties.getProperty(
-                ProjectProperties.PROPERTY_RULES_PATH);
+        String path = projectProperties.getProperty(ProjectProperties.PROPERTY_RULES_PATH);
 
         if (path != null && path.length() > 0) {
 
@@ -133,16 +128,14 @@ public class RuleLoader {
 
                         mUserJarTimeStamps.add(Pair.of(pathFile, pathFile.lastModified()));
                     } catch (MalformedURLException e) {
-                        AndmoreAndroidPlugin.log(IStatus.WARNING,
-                                "Invalid URL: %1$s", //$NON-NLS-1$
+                        AndmoreAndroidPlugin.log(IStatus.WARNING, "Invalid URL: %1$s", //$NON-NLS-1$
                                 e.toString());
                     }
                 }
             }
 
             if (urls.size() > 0) {
-                return new URLClassLoader(urls.toArray(new URL[urls.size()]),
-                        RulesEngine.class.getClassLoader());
+                return new URLClassLoader(urls.toArray(new URL[urls.size()]), RulesEngine.class.getClassLoader());
             }
         }
 

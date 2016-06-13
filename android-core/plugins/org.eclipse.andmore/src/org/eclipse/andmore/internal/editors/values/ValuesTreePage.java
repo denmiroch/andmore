@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.editors.values;
-
-import com.android.ide.common.resources.ResourceFolder;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.IPageImageProvider;
@@ -35,6 +30,8 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.part.FileEditorInput;
 
+import com.android.ide.common.resources.ResourceFolder;
+
 /**
  * Page for instrumentation settings, part of the AndroidManifest form editor.
  */
@@ -46,7 +43,7 @@ public final class ValuesTreePage extends FormPage implements IPageImageProvider
     CommonXmlEditor mEditor;
 
     public ValuesTreePage(CommonXmlEditor editor) {
-        super(editor, PAGE_ID, "Resources");  // tab's label, keep it short
+        super(editor, PAGE_ID, "Resources"); // tab's label, keep it short
         mEditor = editor;
     }
 
@@ -64,7 +61,7 @@ public final class ValuesTreePage extends FormPage implements IPageImageProvider
             }
         }
 
-        return IconFactory.getInstance().getIcon("editor_page_design");  //$NON-NLS-1$
+        return IconFactory.getInstance().getIcon("editor_page_design"); //$NON-NLS-1$
     }
 
     /**
@@ -80,7 +77,7 @@ public final class ValuesTreePage extends FormPage implements IPageImageProvider
         String configText = null;
         IEditorInput input = mEditor.getEditorInput();
         if (input instanceof FileEditorInput) {
-            FileEditorInput fileInput = (FileEditorInput)input;
+            FileEditorInput fileInput = (FileEditorInput) input;
             IFile iFile = fileInput.getFile();
 
             ResourceFolder resFolder = ResourceManager.getInstance().getResourceFolder(iFile);
@@ -98,10 +95,8 @@ public final class ValuesTreePage extends FormPage implements IPageImageProvider
         form.setImage(AndmoreAndroidPlugin.getAndroidLogo());
 
         UiElementNode resources = mEditor.getUiRootNode();
-        UiTreeBlock block = new UiTreeBlock(mEditor, resources,
-                true /* autoCreateRoot */,
-                null /* no element filters */,
-                "Resources Elements",
+        UiTreeBlock block = new UiTreeBlock(mEditor, resources, true /* autoCreateRoot */,
+                null /* no element filters */, "Resources Elements",
                 "List of all resources elements in this XML file.");
         block.createContent(managedForm);
     }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,20 +13,14 @@
 
 package org.eclipse.andmore.internal.actions;
 
-import com.android.SdkConstants;
-import com.android.annotations.Nullable;
-import com.android.sdklib.SdkManager;
-import com.android.sdklib.internal.project.ProjectProperties;
-import com.android.sdklib.internal.project.ProjectProperties.PropertyType;
-import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
-import com.android.sdklib.io.FileOp;
-import com.android.sdkuilib.internal.repository.ui.AdtUpdateDialog;
-import com.android.utils.NullLogger;
-import com.android.utils.Pair;
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
 
+import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.sdk.AdtConsoleSdkLog;
 import org.eclipse.andmore.internal.sdk.ProjectState;
 import org.eclipse.andmore.internal.sdk.Sdk;
@@ -62,10 +53,16 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
+import com.android.SdkConstants;
+import com.android.annotations.Nullable;
+import com.android.sdklib.SdkManager;
+import com.android.sdklib.internal.project.ProjectProperties;
+import com.android.sdklib.internal.project.ProjectProperties.PropertyType;
+import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
+import com.android.sdklib.io.FileOp;
+import com.android.sdkuilib.internal.repository.ui.AdtUpdateDialog;
+import com.android.utils.NullLogger;
+import com.android.utils.Pair;
 
 /**
  * An action to add the android-support-v4.jar support library
@@ -79,43 +76,40 @@ import java.util.Map;
 public class AddSupportJarAction implements IObjectActionDelegate {
 
     /** The vendor ID of the support library. */
-    private static final String VENDOR_ID = "android";                             //$NON-NLS-1$
+    private static final String VENDOR_ID = "android"; //$NON-NLS-1$
     /** The path ID of the support library. */
-    private static final String SUPPORT_ID = "support";                            //$NON-NLS-1$
+    private static final String SUPPORT_ID = "support"; //$NON-NLS-1$
     /** The path ID of the compatibility library (which was its id for releases 1-3). */
-    private static final String COMPATIBILITY_ID = "compatibility";                //$NON-NLS-1$
-    private static final String FD_GRIDLAYOUT = "gridlayout";                      //$NON-NLS-1$
-    private static final String FD_V7 = "v7";                                      //$NON-NLS-1$
-    private static final String FD_V4 = "v4";                                      //$NON-NLS-1$
-    private static final String FD_V13 = "v13";                                    //$NON-NLS-1$
-    private static final String FD_APPCOMPAT = "appcompat";                        //$NON-NLS-1$
-    private static final String FD_LIBS = "libs";                                  //$NON-NLS-1$
+    private static final String COMPATIBILITY_ID = "compatibility"; //$NON-NLS-1$
+    private static final String FD_GRIDLAYOUT = "gridlayout"; //$NON-NLS-1$
+    private static final String FD_V7 = "v7"; //$NON-NLS-1$
+    private static final String FD_V4 = "v4"; //$NON-NLS-1$
+    private static final String FD_V13 = "v13"; //$NON-NLS-1$
+    private static final String FD_APPCOMPAT = "appcompat"; //$NON-NLS-1$
+    private static final String FD_LIBS = "libs"; //$NON-NLS-1$
     private static final String ANDROID_SUPPORT_V4_JAR = "android-support-v4.jar"; //$NON-NLS-1$
     private static final String ANDROID_SUPPORT_V13_JAR = "android-support-v13.jar";//$NON-NLS-1$
     private static final String APPCOMPAT_V7_JAR = "android-support-v7-appcompat.jar";//$NON-NLS-1$
-    private static final String APP_COMPAT_LIB_NAME = "appcompat_v7";               //$NON-NLS-1$
+    private static final String APP_COMPAT_LIB_NAME = "appcompat_v7"; //$NON-NLS-1$
     private ISelection mSelection;
 
     /**
      * @see IObjectActionDelegate#setActivePart(IAction, IWorkbenchPart)
      */
     @Override
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-    }
+    public void setActivePart(IAction action, IWorkbenchPart targetPart) {}
 
     @Override
     public void run(IAction action) {
         if (mSelection instanceof IStructuredSelection) {
 
-            for (Iterator<?> it = ((IStructuredSelection) mSelection).iterator();
-                    it.hasNext();) {
+            for (Iterator<?> it = ((IStructuredSelection) mSelection).iterator(); it.hasNext();) {
                 Object element = it.next();
                 IProject project = null;
                 if (element instanceof IProject) {
                     project = (IProject) element;
                 } else if (element instanceof IAdaptable) {
-                    project = (IProject) ((IAdaptable) element)
-                            .getAdapter(IProject.class);
+                    project = ((IAdaptable) element).getAdapter(IProject.class);
                 }
                 if (project != null) {
                     install(project);
@@ -166,8 +160,7 @@ public class AddSupportJarAction implements IObjectActionDelegate {
 
         final Sdk sdk = Sdk.getCurrent();
         if (sdk == null) {
-            AndmoreAndroidPlugin.printErrorToConsole(
-                    AddSupportJarAction.class.getSimpleName(),   // tag
+            AndmoreAndroidPlugin.printErrorToConsole(AddSupportJarAction.class.getSimpleName(), // tag
                     "Error: Android SDK is not loaded yet."); //$NON-NLS-1$
             return null;
         }
@@ -189,9 +182,7 @@ public class AddSupportJarAction implements IObjectActionDelegate {
         // First call the package manager to make sure the package is installed
         // and get the installation path of the library.
 
-        AdtUpdateDialog window = new AdtUpdateDialog(
-                AndmoreAndroidPlugin.getShell(),
-                new AdtConsoleSdkLog(),
+        AdtUpdateDialog window = new AdtUpdateDialog(AndmoreAndroidPlugin.getShell(), new AdtConsoleSdkLog(),
                 sdkLocation);
 
         Pair<Boolean, File> result = window.installExtraPackage(VENDOR_ID, SUPPORT_ID);
@@ -212,8 +203,7 @@ public class AddSupportJarAction implements IObjectActionDelegate {
         final File jarPath = new File(path, ANDROID_SUPPORT_V4_JAR);
 
         if (!jarPath.isFile()) {
-            AndmoreAndroidPlugin.printErrorToConsole("Android Support Jar not found:",
-                    jarPath.getAbsolutePath());
+            AndmoreAndroidPlugin.printErrorToConsole("Android Support Jar not found:", jarPath.getAbsolutePath());
             return null;
         }
 
@@ -284,8 +274,7 @@ public class AddSupportJarAction implements IObjectActionDelegate {
             }
 
             // Create workspace copy of the project and add library dependency
-            IProject libraryProject = createLibraryProject(libraryPath, project,
-                    "gridlayout_v7", waitForFinish); //$NON-NLS-1$
+            IProject libraryProject = createLibraryProject(libraryPath, project, "gridlayout_v7", waitForFinish); //$NON-NLS-1$
             if (libraryProject != null) {
                 return addLibraryDependency(libraryProject, project, waitForFinish);
             }
@@ -347,9 +336,8 @@ public class AddSupportJarAction implements IObjectActionDelegate {
             IWorkspaceRoot root = workspace.getRoot();
             IProject libraryProject = root.getProject(APP_COMPAT_LIB_NAME);
             if (!libraryProject.exists()) {
-            	// Create workspace copy of the project and add library dependency
-            	libraryProject = createLibraryProject(libraryPath, project,
-            			APP_COMPAT_LIB_NAME, waitForFinish);
+                // Create workspace copy of the project and add library dependency
+                libraryProject = createLibraryProject(libraryPath, project, APP_COMPAT_LIB_NAME, waitForFinish);
             }
             if (libraryProject != null) {
                 return addLibraryDependency(libraryProject, project, waitForFinish);
@@ -374,9 +362,7 @@ public class AddSupportJarAction implements IObjectActionDelegate {
             Integer version = versions.get(VENDOR_ID + '/' + SUPPORT_ID);
             if (version != null) {
                 File supportPath = new File(sdkLocation,
-                        SdkConstants.FD_EXTRAS + File.separator
-                        + VENDOR_ID + File.separator
-                        + SUPPORT_ID);
+                        SdkConstants.FD_EXTRAS + File.separator + VENDOR_ID + File.separator + SUPPORT_ID);
                 return supportPath;
             }
 
@@ -386,9 +372,7 @@ public class AddSupportJarAction implements IObjectActionDelegate {
             version = versions.get(VENDOR_ID + '/' + COMPATIBILITY_ID);
             if (version != null) {
                 File supportPath = new File(sdkLocation,
-                        SdkConstants.FD_EXTRAS + File.separator
-                        + VENDOR_ID + File.separator
-                        + COMPATIBILITY_ID);
+                        SdkConstants.FD_EXTRAS + File.separator + VENDOR_ID + File.separator + COMPATIBILITY_ID);
                 return supportPath;
             }
         }
@@ -442,11 +426,8 @@ public class AddSupportJarAction implements IObjectActionDelegate {
      * @param waitForFinish whether the operation should finish before this method returns
      * @return a library project, or null if it fails for some reason
      */
-    private static IProject createLibraryProject(
-            final File libraryPath,
-            final IProject project,
-            final String libraryName,
-            boolean waitForFinish) {
+    private static IProject createLibraryProject(final File libraryPath, final IProject project,
+            final String libraryName, boolean waitForFinish) {
 
         // Install a new library into the workspace. This is a copy rather than
         // a reference to the support library version such that modifications
@@ -458,8 +439,7 @@ public class AddSupportJarAction implements IObjectActionDelegate {
             IWorkspace workspace = ResourcesPlugin.getWorkspace();
             IWorkspaceRoot root = workspace.getRoot();
 
-            String name = AdtUtils.getUniqueProjectName(
-                    libraryName, "_"); //$NON-NLS-1$
+            String name = AdtUtils.getUniqueProjectName(libraryName, "_"); //$NON-NLS-1$
             newProject = root.getProject(name);
             IProjectDescription description = workspace.newProjectDescription(name);
             String[] natures = new String[] { AndmoreAndroidConstants.NATURE_DEFAULT, JavaCore.NATURE_ID };
@@ -479,9 +459,8 @@ public class AddSupportJarAction implements IObjectActionDelegate {
             ProjectState state = Sdk.getProjectState(project);
             String target = state.getProperties().getProperty(ProjectProperties.PROPERTY_TARGET);
             if (target != null && target.length() > 0) {
-                ProjectProperties properties = ProjectProperties.load(
-                        destDir.toLocalFile(EFS.NONE, new NullProgressMonitor()).getPath(),
-                        PropertyType.PROJECT);
+                ProjectProperties properties = ProjectProperties
+                        .load(destDir.toLocalFile(EFS.NONE, new NullProgressMonitor()).getPath(), PropertyType.PROJECT);
                 ProjectPropertiesWorkingCopy copy = properties.makeWorkingCopy();
                 copy.setProperty(ProjectProperties.PROPERTY_TARGET, target);
                 try {
@@ -509,9 +488,7 @@ public class AddSupportJarAction implements IObjectActionDelegate {
      *            finish
      * @return true if the operation succeeded
      */
-    public static boolean addLibraryDependency(
-            final IProject libraryProject,
-            final IProject dependentProject,
+    public static boolean addLibraryDependency(final IProject libraryProject, final IProject dependentProject,
             boolean waitForFinish) {
 
         // Now add library dependency
@@ -526,16 +503,14 @@ public class AddSupportJarAction implements IObjectActionDelegate {
 
                     // TODO: Add library project to the project.properties file!
                     ProjectState state = Sdk.getProjectState(dependentProject);
-                    ProjectPropertiesWorkingCopy mPropertiesWorkingCopy =
-                            state.getProperties().makeWorkingCopy();
+                    ProjectPropertiesWorkingCopy mPropertiesWorkingCopy = state.getProperties().makeWorkingCopy();
 
                     // Get the highest version number of the libraries; there cannot be any
                     // gaps so we will assign the next library the next number
                     int nextVersion = 1;
                     for (String property : mPropertiesWorkingCopy.keySet()) {
                         if (property.startsWith(ProjectProperties.PROPERTY_LIB_REF)) {
-                            String s = property.substring(
-                                    ProjectProperties.PROPERTY_LIB_REF.length());
+                            String s = property.substring(ProjectProperties.PROPERTY_LIB_REF.length());
                             int version = Integer.parseInt(s);
                             if (version >= nextVersion) {
                                 nextVersion = version + 1;
@@ -543,20 +518,16 @@ public class AddSupportJarAction implements IObjectActionDelegate {
                         }
                     }
 
-                    IPath relativePath = libraryProject.getLocation().makeRelativeTo(
-                            dependentProject.getLocation());
+                    IPath relativePath = libraryProject.getLocation().makeRelativeTo(dependentProject.getLocation());
 
-                    mPropertiesWorkingCopy.setProperty(
-                            ProjectProperties.PROPERTY_LIB_REF + nextVersion,
+                    mPropertiesWorkingCopy.setProperty(ProjectProperties.PROPERTY_LIB_REF + nextVersion,
                             relativePath.toString());
                     try {
                         mPropertiesWorkingCopy.save();
-                        IResource projectProp = dependentProject.findMember(
-                                SdkConstants.FN_PROJECT_PROPERTIES);
+                        IResource projectProp = dependentProject.findMember(SdkConstants.FN_PROJECT_PROPERTIES);
                         projectProp.refreshLocal(IResource.DEPTH_ZERO, new NullProgressMonitor());
                     } catch (Exception e) {
-                        String msg = String.format(
-                                "Failed to save %1$s for project %2$s",
+                        String msg = String.format("Failed to save %1$s for project %2$s",
                                 SdkConstants.FN_PROJECT_PROPERTIES, dependentProject.getName());
                         AndmoreAndroidPlugin.log(e, msg);
                     }
@@ -570,8 +541,7 @@ public class AddSupportJarAction implements IObjectActionDelegate {
 
                     return Status.OK_STATUS;
                 } catch (Exception e) {
-                    return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, IStatus.ERROR,
-                            "Failed", e); //$NON-NLS-1$
+                    return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, IStatus.ERROR, "Failed", e); //$NON-NLS-1$
                 } finally {
                     if (monitor != null) {
                         monitor.done();
@@ -593,9 +563,7 @@ public class AddSupportJarAction implements IObjectActionDelegate {
         return true;
     }
 
-    private static IResource copyJarIntoProject(
-            IProject project,
-            File jarPath) throws IOException, CoreException {
+    private static IResource copyJarIntoProject(IProject project, File jarPath) throws IOException, CoreException {
         IFolder resFolder = project.getFolder(SdkConstants.FD_NATIVE_LIBS);
         if (!resFolder.exists()) {
             resFolder.create(IResource.FORCE, true /*local*/, null);

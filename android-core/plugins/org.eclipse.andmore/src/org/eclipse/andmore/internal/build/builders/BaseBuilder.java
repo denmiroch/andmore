@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,8 +60,8 @@ import com.android.sdklib.IAndroidTarget;
  */
 public abstract class BaseBuilder extends IncrementalProjectBuilder {
 
-    protected static final boolean DEBUG_LOG = "1".equals(              //$NON-NLS-1$
-            System.getenv("ANDROID_BUILD_DEBUG"));                      //$NON-NLS-1$
+    protected static final boolean DEBUG_LOG = "1".equals( //$NON-NLS-1$
+            System.getenv("ANDROID_BUILD_DEBUG")); //$NON-NLS-1$
 
     /** SAX Parser factory. */
     private SAXParserFactory mParserFactory;
@@ -101,8 +98,7 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
          * @param pathSegments The segments of the current path
          * @return The segments of the source folder, or null if no match was found
          */
-        protected static String[] findMatchingSourceFolder(ArrayList<IPath> sourceFolders,
-                String[] pathSegments) {
+        protected static String[] findMatchingSourceFolder(ArrayList<IPath> sourceFolders, String[] pathSegments) {
 
             for (IPath p : sourceFolders) {
                 // check if we are inside one of those source class path
@@ -115,7 +111,7 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
                 boolean valid = true;
                 int segmentCount = pathSegments.length;
 
-                for (int i = 0 ; i < segmentCount; i++) {
+                for (int i = 0; i < segmentCount; i++) {
                     String s1 = pathSegments[i];
                     String s2 = srcSegments[i];
 
@@ -168,7 +164,7 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
 
         // first make sure this is an xml file
         if (resource instanceof IFile) {
-            IFile file = (IFile)resource;
+            IFile file = (IFile) resource;
 
             // remove previous markers
             removeMarkersFromResource(file, AndmoreAndroidConstants.MARKER_XML);
@@ -178,8 +174,7 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
             try {
                 // parse
                 getParser().parse(file.getContents(), reporter);
-            } catch (Exception e1) {
-            }
+            } catch (Exception e1) {}
         }
     }
 
@@ -190,8 +185,7 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
      * @throws ParserConfigurationException
      * @throws SAXException
      */
-    protected final SAXParser getParser() throws ParserConfigurationException,
-    SAXException {
+    protected final SAXParser getParser() throws ParserConfigurationException, SAXException {
         return mParserFactory.newSAXParser();
     }
 
@@ -250,12 +244,10 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
      * @return the process return code.
      * @throws InterruptedException
      */
-    protected final int grabProcessOutput(final Process process,
-            final ArrayList<String> stdErr) throws InterruptedException {
+    protected final int grabProcessOutput(final Process process, final ArrayList<String> stdErr)
+            throws InterruptedException {
         return BuildHelper.grabProcessOutput(getProject(), process, stdErr);
     }
-
-
 
     /**
      * Saves a String property into the persistent storage of the project.
@@ -267,7 +259,6 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
         IProject project = getProject();
         return ProjectHelper.saveStringProperty(project, propertyName, value);
     }
-
 
     /**
      * Loads a String property from the persistent storage of the project.
@@ -309,8 +300,8 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
      * @param projectState the project state, optional. will be queried if null.
      * @throws CoreException
      */
-    protected void abortOnBadSetup(@NonNull IJavaProject javaProject,
-            @Nullable ProjectState projectState) throws AbortBuildException, CoreException {
+    protected void abortOnBadSetup(@NonNull IJavaProject javaProject, @Nullable ProjectState projectState)
+            throws AbortBuildException, CoreException {
         IProject iProject = javaProject.getProject();
         // check if we have finished loading the project target.
         Sdk sdk = Sdk.getCurrent();
@@ -348,22 +339,17 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
                 throw new AbortBuildException();
             } else {
                 AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, iProject,
-                        String.format("Using default Build Tools revision %s",
-                                mBuildToolInfo.getRevision())
-                        );
+                        String.format("Using default Build Tools revision %s", mBuildToolInfo.getRevision()));
             }
         }
 
         // abort if there are TARGET or ADT type markers
-        stopOnMarker(iProject, AndmoreAndroidConstants.MARKER_TARGET, IResource.DEPTH_ZERO,
-                false /*checkSeverity*/);
-        stopOnMarker(iProject, AndmoreAndroidConstants.MARKER_ADT, IResource.DEPTH_ZERO,
-                false /*checkSeverity*/);
+        stopOnMarker(iProject, AndmoreAndroidConstants.MARKER_TARGET, IResource.DEPTH_ZERO, false /*checkSeverity*/);
+        stopOnMarker(iProject, AndmoreAndroidConstants.MARKER_ADT, IResource.DEPTH_ZERO, false /*checkSeverity*/);
     }
 
-    protected void stopOnMarker(IProject project, String markerType, int depth,
-            boolean checkSeverity)
-                    throws AbortBuildException {
+    protected void stopOnMarker(IProject project, String markerType, int depth, boolean checkSeverity)
+            throws AbortBuildException {
         try {
             IMarker[] markers = project.findMarkers(markerType, false /*includeSubtypes*/, depth);
 
@@ -410,14 +396,12 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
             if (e.getError() == StreamException.Error.OUTOFSYNC) {
                 msg = String.format("Out of sync file: %s", file.getOsLocation());
             } else {
-                msg = String.format("Error reading file %s. Read log for details",
-                        file.getOsLocation());
+                msg = String.format("Error reading file %s. Read log for details", file.getOsLocation());
             }
         }
 
         AndmoreAndroidPlugin.logAndPrintError(e, getProject().getName(), msg);
-        BaseProjectHelper.markResource(target, AndmoreAndroidConstants.MARKER_ADT, msg,
-                IMarker.SEVERITY_ERROR);
+        BaseProjectHelper.markResource(target, AndmoreAndroidConstants.MARKER_ADT, msg, IMarker.SEVERITY_ERROR);
     }
 
     /**
@@ -440,8 +424,7 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
      * @throws CoreException
      *
      */
-    protected void removeDerivedResources(IResource rootResource, IProgressMonitor monitor)
-            throws CoreException {
+    protected void removeDerivedResources(IResource rootResource, IProgressMonitor monitor) throws CoreException {
         removeDerivedResources(rootResource, false, monitor);
     }
 
@@ -453,12 +436,12 @@ public abstract class BaseBuilder extends IncrementalProjectBuilder {
      * @param monitor a progress monitor.
      * @throws CoreException
      */
-    private void removeDerivedResources(IResource rootResource, boolean deleteRoot,
-            IProgressMonitor monitor) throws CoreException {
+    private void removeDerivedResources(IResource rootResource, boolean deleteRoot, IProgressMonitor monitor)
+            throws CoreException {
         if (rootResource.exists()) {
             // if it's a folder, delete derived member.
             if (rootResource.getType() == IResource.FOLDER) {
-                IFolder folder = (IFolder)rootResource;
+                IFolder folder = (IFolder) rootResource;
                 IResource[] members = folder.members();
                 boolean wasNotEmpty = members.length > 0;
                 for (IResource member : members) {

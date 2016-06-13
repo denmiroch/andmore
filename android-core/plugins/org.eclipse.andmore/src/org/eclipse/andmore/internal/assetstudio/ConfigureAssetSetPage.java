@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -101,8 +98,7 @@ import com.android.utils.Pair;
  * to create a specific asset type, in which case we skip page 1. On this page the user
  * gets to configure the parameters of the asset, and see a preview.
  */
-public class ConfigureAssetSetPage extends WizardPage implements SelectionListener,
-        ModifyListener {
+public class ConfigureAssetSetPage extends WizardPage implements SelectionListener, ModifyListener {
     private final CreateAssetSetWizardState mValues;
 
     private static final int PREVIEW_AREA_WIDTH = 144;
@@ -386,8 +382,7 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
         mFgButton.addSelectionListener(this);
 
         configurationScrollArea.setContent(mConfigurationArea);
-        configurationScrollArea.setMinSize(mConfigurationArea.computeSize(SWT.DEFAULT,
-                SWT.DEFAULT));
+        configurationScrollArea.setMinSize(mConfigurationArea.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
         Label previewLabel = new Label(container, SWT.NONE);
         previewLabel.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
@@ -430,8 +425,7 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
             showGroup(type.needsShape(), mShapeLabel, mShapeComposite);
             showGroup(type.needsTheme(), mThemeLabel, mThemeComposite);
             showGroup(type.needsColors(), mBgColorLabel, mBgButton);
-            showGroup(type.needsColors() && mValues.sourceType != SourceType.IMAGE,
-                    mFgColorLabel, mFgButton);
+            showGroup(type.needsColors() && mValues.sourceType != SourceType.IMAGE, mFgColorLabel, mFgButton);
 
             Composite parent = mScalingLabel.getParent();
             parent.pack();
@@ -528,8 +522,7 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
                 setShape(mValues.shape);
                 mNoShapeRadio.setEnabled(mValues.type != AssetType.NOTIFICATION);
 
-                if (mValues.sourceType == SourceType.CLIPART
-                        && mValues.clipartName != null) {
+                if (mValues.sourceType == SourceType.CLIPART && mValues.clipartName != null) {
                     updateClipartPreview();
                 }
 
@@ -570,8 +563,7 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
     private void updateTrimOptions() {
         // Trimming and padding is not available for clipart images; padding etc is
         // predefined to work well with action bar icons
-        if (mValues.sourceType == SourceType.CLIPART
-                && mValues.type == AssetType.ACTIONBAR) {
+        if (mValues.sourceType == SourceType.CLIPART && mValues.type == AssetType.ACTIONBAR) {
             mTrimCheckBox.setEnabled(false);
             mPaddingSlider.setEnabled(false);
             mValues.trim = false;
@@ -611,8 +603,8 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
         setPageComplete(error == null);
         if (error != null) {
             setMessage(error, IMessageProvider.ERROR);
-        //} else if (warning != null) {
-        //    setMessage(warning, IMessageProvider.WARNING);
+            //} else if (warning != null) {
+            //    setMessage(warning, IMessageProvider.WARNING);
         } else {
             setErrorMessage(null);
             setMessage(null);
@@ -734,10 +726,8 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
         }
 
         if (source == mChooseClipart) {
-            MessageDialog dialog = new MessageDialog(mChooseClipart.getShell(),
-                    "Choose Clip Art",
-                    null, "Choose Clip Art Image:", MessageDialog.NONE,
-                    new String[] { "Close" }, 0) {
+            MessageDialog dialog = new MessageDialog(mChooseClipart.getShell(), "Choose Clip Art", null,
+                    "Choose Clip Art Image:", MessageDialog.NONE, new String[] { "Close" }, 0) {
                 @Override
                 protected Control createCustomArea(Composite parent) {
                     // Outer form which just establishes a width for the inner form which
@@ -779,8 +769,7 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
                             BufferedImage icon = GraphicGenerator.getClipartIcon(name);
                             if (icon != null) {
                                 Image swtImage = SwtUtils.convertToSwt(display, icon, true, -1);
-                                ImageControl img = new ImageControl(chooserForm,
-                                        SWT.NONE, swtImage);
+                                ImageControl img = new ImageControl(chooserForm, SWT.NONE, swtImage);
                                 img.setData(name);
                                 img.setHoverColor(hoverColor);
                                 img.addMouseListener(clickListener);
@@ -825,8 +814,7 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
             FontDialog dialog = new FontDialog(mFontButton.getShell());
             FontData[] fontList;
             if (mFontButton.getData() == null) {
-                fontList = mFontButton.getDisplay().getFontList(
-                        mValues.getTextFont().getFontName(), true /*scalable*/);
+                fontList = mFontButton.getDisplay().getFontList(mValues.getTextFont().getFontName(), true /*scalable*/);
             } else {
                 fontList = mFontButton.getFont().getFontData();
             }
@@ -876,14 +864,11 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
         }
         if (mClipartPreviewPanel.getChildren().length == 0) {
             try {
-                BufferedImage icon = GraphicGenerator.getClipartIcon(
-                        mValues.clipartName);
+                BufferedImage icon = GraphicGenerator.getClipartIcon(mValues.clipartName);
                 if (icon != null) {
                     Display display = mClipartForm.getDisplay();
-                    Image swtImage = SwtUtils.convertToSwt(display, icon,
-                            true, -1);
-                    new ImageControl(mClipartPreviewPanel,
-                            SWT.NONE, swtImage);
+                    Image swtImage = SwtUtils.convertToSwt(display, icon, true, -1);
+                    new ImageControl(mClipartPreviewPanel, SWT.NONE, swtImage);
                 }
             } catch (IOException e1) {
                 AndmoreAndroidPlugin.log(e1, null);
@@ -970,8 +955,7 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
             return;
         }
 
-        Map<String, Map<String, BufferedImage>> map = generateImages(mValues,
-                true /*previewOnly*/, this);
+        Map<String, Map<String, BufferedImage>> map = generateImages(mValues, true /*previewOnly*/, this);
         for (Entry<String, Map<String, BufferedImage>> categoryEntry : map.entrySet()) {
             String category = categoryEntry.getKey();
             if (category.length() > 0) {
@@ -984,7 +968,7 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
             }
 
             Map<String, BufferedImage> images = categoryEntry.getValue();
-            for (Entry<String, BufferedImage> entry :  images.entrySet()) {
+            for (Entry<String, BufferedImage> entry : images.entrySet()) {
                 BufferedImage image = entry.getValue();
                 Image swtImage = SwtUtils.convertToSwt(display, image, true, -1);
                 if (swtImage != null) {
@@ -1005,13 +989,10 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
      * @param page if non null, a wizard page to write error messages to
      * @return a map of image objects
      */
-    public static Map<String, Map<String, BufferedImage>> generateImages(
-            @NonNull CreateAssetSetWizardState mValues,
-            boolean previewOnly,
-            @Nullable WizardPage page) {
+    public static Map<String, Map<String, BufferedImage>> generateImages(@NonNull CreateAssetSetWizardState mValues,
+            boolean previewOnly, @Nullable WizardPage page) {
         // Map of ids to images: Preserve insertion order (the densities)
-        Map<String, Map<String, BufferedImage>> categoryMap =
-                new LinkedHashMap<String, Map<String, BufferedImage>>();
+        Map<String, Map<String, BufferedImage>> categoryMap = new LinkedHashMap<String, Map<String, BufferedImage>>();
 
         AssetType type = mValues.type;
         boolean trim = mValues.trim;
@@ -1115,8 +1096,7 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
         switch (type) {
             case LAUNCHER: {
                 generator = new LauncherIconGenerator();
-                LauncherIconGenerator.LauncherOptions launcherOptions =
-                        new LauncherIconGenerator.LauncherOptions();
+                LauncherIconGenerator.LauncherOptions launcherOptions = new LauncherIconGenerator.LauncherOptions();
                 launcherOptions.shape = mValues.shape;
                 launcherOptions.crop = mValues.crop;
                 launcherOptions.style = GraphicGenerator.Style.SIMPLE;
@@ -1136,11 +1116,9 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
                 break;
             case ACTIONBAR: {
                 generator = new ActionBarIconGenerator();
-                ActionBarIconGenerator.ActionBarOptions actionBarOptions =
-                        new ActionBarIconGenerator.ActionBarOptions();
-                actionBarOptions.theme = mValues.holoDark
-                        ? ActionBarIconGenerator.Theme.HOLO_DARK
-                                : ActionBarIconGenerator.Theme.HOLO_LIGHT;
+                ActionBarIconGenerator.ActionBarOptions actionBarOptions = new ActionBarIconGenerator.ActionBarOptions();
+                actionBarOptions.theme = mValues.holoDark ? ActionBarIconGenerator.Theme.HOLO_DARK
+                        : ActionBarIconGenerator.Theme.HOLO_LIGHT;
                 actionBarOptions.sourceIsClipart = (mValues.sourceType == SourceType.CLIPART);
 
                 options = actionBarOptions;
@@ -1187,13 +1165,10 @@ public class ConfigureAssetSetPage extends WizardPage implements SelectionListen
      *            in preview mode
      * @param page a wizard page to write error messages to, or null
      */
-    public static void generateIcons(final IProject newProject,
-            @NonNull CreateAssetSetWizardState values,
-            boolean previewOnly,
-            @Nullable WizardPage page) {
+    public static void generateIcons(final IProject newProject, @NonNull CreateAssetSetWizardState values,
+            boolean previewOnly, @Nullable WizardPage page) {
         // Generate the custom icons
-        Map<String, Map<String, BufferedImage>> categories = generateImages(values,
-                false /*previewOnly*/, page);
+        Map<String, Map<String, BufferedImage>> categories = generateImages(values, false /*previewOnly*/, page);
         for (Map<String, BufferedImage> previews : categories.values()) {
             for (Map.Entry<String, BufferedImage> entry : previews.entrySet()) {
                 String relativePath = entry.getKey();

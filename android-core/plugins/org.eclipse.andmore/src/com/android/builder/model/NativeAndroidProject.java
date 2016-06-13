@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2015 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,28 +13,28 @@
 
 package com.android.builder.model;
 
-import com.android.annotations.NonNull;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;
+
+import com.android.annotations.NonNull;
 
 /**
  * Entry point for the model of the Android native support.
  */
 public interface NativeAndroidProject {
-   String BUILD_SYSTEM_UNKNOWN = "unknown";
-   String BUILD_SYSTEM_GRADLE = "gradle";
-   String BUILD_SYSTEM_CMAKE = "cmake";
-   String BUILD_SYSTEM_NDK_BUILD = "ndk-build";
+    String BUILD_SYSTEM_UNKNOWN = "unknown";
+    String BUILD_SYSTEM_GRADLE = "gradle";
+    String BUILD_SYSTEM_CMAKE = "cmake";
+    String BUILD_SYSTEM_NDK_BUILD = "ndk-build";
 
-   /**
+    /**
     * Returns the model version. This is a string in the format X.Y.Z
     */
-   @NonNull
-   String getModelVersion();
+    @NonNull
+    String getModelVersion();
 
-   /**
+    /**
     * Returns the model api version.
     * <p>
     * This is different from {@link #getModelVersion()} in a way that new model
@@ -48,49 +45,49 @@ public interface NativeAndroidProject {
     * Every new model version is assumed to return an 'api version' value which
     * is equal or greater than the value used by the previous model version.
     */
-   int getApiVersion();
+    int getApiVersion();
 
-   /**
+    /**
     * Returns the name of the module.
     */
-   @NonNull
-   String getName();
+    @NonNull
+    String getName();
 
-   /**
+    /**
     * Returns a collection of files that affects the build.
     */
-   @NonNull
-   Collection<File> getBuildFiles();
+    @NonNull
+    Collection<File> getBuildFiles();
 
-   /**
+    /**
     * Returns a collection of native artifacts.
     */
-   @NonNull
-   Collection<NativeArtifact> getArtifacts();
+    @NonNull
+    Collection<NativeArtifact> getArtifacts();
 
-   /**
+    /**
     * Returns a collection of toolchains.
     */
-   @NonNull
-   Collection<NativeToolchain> getToolChains();
+    @NonNull
+    Collection<NativeToolchain> getToolChains();
 
-   /**
+    /**
     * Returns a collection of all compile settings.
     */
-   @NonNull
-   Collection<NativeSettings> getSettings();
+    @NonNull
+    Collection<NativeSettings> getSettings();
 
-   /**
+    /**
     * Return a map of file extension to each file type.
     *
     * The key is the file extension, the value is either "c" or "c++".
     */
-   @NonNull
-   Map<String, String> getFileExtensions();
+    @NonNull
+    Map<String, String> getFileExtensions();
 
     /**
      * Return the names of build systems used to create the native artifacts.
      */
-   @NonNull
-   Collection<String> getBuildSystems();
+    @NonNull
+    Collection<String> getBuildSystems();
 }

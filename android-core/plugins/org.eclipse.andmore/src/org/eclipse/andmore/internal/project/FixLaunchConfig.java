@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,8 @@
  */
 
 package org.eclipse.andmore.internal.project;
+
+import java.util.ArrayList;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.launch.LaunchConfigDelegate;
@@ -26,8 +25,6 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
-
-import java.util.ArrayList;
 
 /**
  * Class to fix the launch configuration of a project if the java package
@@ -72,8 +69,7 @@ public class FixLaunchConfig extends Thread {
 
         if (mDisplayPrompt) {
             // ask the user if he really wants to fix the launch config
-            boolean res = AndmoreAndroidPlugin.displayPrompt(
-                    "Launch Configuration Update",
+            boolean res = AndmoreAndroidPlugin.displayPrompt("Launch Configuration Update",
                     "The package definition in the manifest changed.\nDo you want to update your Launch Configuration(s)?");
 
             if (res == false) {
@@ -92,8 +88,7 @@ public class FixLaunchConfig extends Thread {
                 ILaunchConfigurationWorkingCopy copy = config.getWorkingCopy();
 
                 // get the attributes for the activity
-                String activity = config.getAttribute(LaunchConfigDelegate.ATTR_ACTIVITY,
-                        ""); //$NON-NLS-1$
+                String activity = config.getAttribute(LaunchConfigDelegate.ATTR_ACTIVITY, ""); //$NON-NLS-1$
 
                 // manifests can define activities that are not in the defined package,
                 // so we need to make sure the activity is inside the old package.
@@ -109,8 +104,7 @@ public class FixLaunchConfig extends Thread {
                 }
             } catch (CoreException e) {
                 // couldn't get the working copy. we output the error in the console
-                String msg = String.format("Failed to modify %1$s: %2$s", projectName,
-                        e.getMessage());
+                String msg = String.format("Failed to modify %1$s: %2$s", projectName, e.getMessage());
                 AndmoreAndroidPlugin.printErrorToConsole(mProject, msg);
             }
         }
@@ -129,8 +123,8 @@ public class FixLaunchConfig extends Thread {
         ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 
         // now get the config type for our particular android type.
-        ILaunchConfigurationType configType = manager.
-                getLaunchConfigurationType(LaunchConfigDelegate.ANDROID_LAUNCH_TYPE_ID);
+        ILaunchConfigurationType configType = manager
+                .getLaunchConfigurationType(LaunchConfigDelegate.ANDROID_LAUNCH_TYPE_ID);
 
         // create a temp list to hold all the valid configs
         ArrayList<ILaunchConfiguration> list = new ArrayList<ILaunchConfiguration>();
@@ -139,14 +133,11 @@ public class FixLaunchConfig extends Thread {
             ILaunchConfiguration[] configs = manager.getLaunchConfigurations(configType);
 
             for (ILaunchConfiguration config : configs) {
-                if (config.getAttribute(
-                        IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
-                        "").equals(projectName)) {  //$NON-NLS-1$
+                if (config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, "").equals(projectName)) { //$NON-NLS-1$
                     list.add(config);
                 }
             }
-        } catch (CoreException e) {
-        }
+        } catch (CoreException e) {}
 
         return list.toArray(new ILaunchConfiguration[list.size()]);
 

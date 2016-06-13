@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,8 @@
  */
 
 package org.eclipse.andmore.internal.wizards.export;
+
+import java.io.File;
 
 import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.andmore.internal.wizards.export.ExportWizard.ExportWizardPage;
@@ -32,8 +31,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-
-import java.io.File;
 
 /**
  * Keystore selection page. This page allows to choose to create a new keystore or use an
@@ -84,22 +81,22 @@ final class KeystoreSelectionPage extends ExportWizardPage {
         final Button browseButton = new Button(composite, SWT.PUSH);
         browseButton.setText("Browse...");
         browseButton.addSelectionListener(new SelectionAdapter() {
-           @Override
-           public void widgetSelected(SelectionEvent e) {
-               FileDialog fileDialog;
-               if (mUseExistingKeystore.getSelection()) {
-                   fileDialog = new FileDialog(browseButton.getShell(),SWT.OPEN);
-                   fileDialog.setText("Load Keystore");
-               } else {
-                   fileDialog = new FileDialog(browseButton.getShell(),SWT.SAVE);
-                   fileDialog.setText("Select Keystore Name");
-               }
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                FileDialog fileDialog;
+                if (mUseExistingKeystore.getSelection()) {
+                    fileDialog = new FileDialog(browseButton.getShell(), SWT.OPEN);
+                    fileDialog.setText("Load Keystore");
+                } else {
+                    fileDialog = new FileDialog(browseButton.getShell(), SWT.SAVE);
+                    fileDialog.setText("Select Keystore Name");
+                }
 
-               String fileName = fileDialog.open();
-               if (fileName != null) {
-                   mKeystore.setText(fileName);
-               }
-           }
+                String fileName = fileDialog.open();
+                if (fileName != null) {
+                    mKeystore.setText(fileName);
+                }
+            }
         });
 
         new Label(composite, SWT.NONE).setText("Password:");
@@ -124,13 +121,13 @@ final class KeystoreSelectionPage extends ExportWizardPage {
         setControl(composite);
 
         mUseExistingKeystore.addSelectionListener(new SelectionAdapter() {
-           @Override
-           public void widgetSelected(SelectionEvent e) {
-               boolean createStore = !mUseExistingKeystore.getSelection();
-               mKeystorePassword2.setEnabled(createStore);
-               mConfirmLabel.setEnabled(createStore);
-               mWizard.setKeystoreCreationMode(createStore);
-               onChange();
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean createStore = !mUseExistingKeystore.getSelection();
+                mKeystorePassword2.setEnabled(createStore);
+                mConfirmLabel.setEnabled(createStore);
+                mWizard.setKeystoreCreationMode(createStore);
+                onChange();
             }
         });
 
@@ -177,8 +174,7 @@ final class KeystoreSelectionPage extends ExportWizardPage {
             // disable onChange for now. we'll call it once at the end.
             mDisableOnChange = true;
 
-            String keystore = ProjectHelper.loadStringProperty(project,
-                    ExportWizard.PROPERTY_KEYSTORE);
+            String keystore = ProjectHelper.loadStringProperty(project, ExportWizard.PROPERTY_KEYSTORE);
             if (keystore != null) {
                 mKeystore.setText(keystore);
             }

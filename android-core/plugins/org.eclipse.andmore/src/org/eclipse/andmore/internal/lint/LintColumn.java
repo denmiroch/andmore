@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,9 +12,8 @@
  */
 package org.eclipse.andmore.internal.lint;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.tools.lint.detector.api.Issue;
+import java.io.File;
+import java.util.Comparator;
 
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.andmore.internal.editors.layout.gle2.SwtUtils;
@@ -33,8 +29,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import java.io.File;
-import java.util.Comparator;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.tools.lint.detector.api.Issue;
 
 /** A column shown in the {@link LintList} */
 abstract class LintColumn implements Comparator<IMarker> {
@@ -58,8 +55,7 @@ abstract class LintColumn implements Comparator<IMarker> {
      * @return the number of pixels that this column should show by default
      */
     public int getPreferredWidth() {
-        return getPreferredCharWidth() * SwtUtils.getAverageCharWidth(mList.getDisplay(),
-                mList.getTree().getFont());
+        return getPreferredCharWidth() * SwtUtils.getAverageCharWidth(mList.getDisplay(), mList.getTree().getFont());
     }
 
     /**
@@ -169,8 +165,7 @@ abstract class LintColumn implements Comparator<IMarker> {
 
             int count = mList.getCount(marker);
             if (count > 1) {
-                styledString.append(String.format(" (%2$d items)", message, count),
-                        StyledString.COUNTER_STYLER);
+                styledString.append(String.format(" (%2$d items)", message, count), StyledString.COUNTER_STYLER);
             }
 
             return styledString;
@@ -183,7 +178,7 @@ abstract class LintColumn implements Comparator<IMarker> {
             switch (severity) {
                 case IMarker.SEVERITY_ERROR:
                     if (LintFix.hasFix(EclipseLintClient.getId(marker))) {
-                        return IconFactory.getInstance().getIcon("quickfix_error");   //$NON-NLS-1$
+                        return IconFactory.getInstance().getIcon("quickfix_error"); //$NON-NLS-1$
                     }
                     return sharedImages.getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
                 case IMarker.SEVERITY_WARNING:
@@ -202,8 +197,7 @@ abstract class LintColumn implements Comparator<IMarker> {
         public Font getFont(@NonNull IMarker marker) {
             int severity = marker.getAttribute(IMarker.SEVERITY, 0);
             if (severity == IMarker.SEVERITY_ERROR) {
-                return JFaceResources.getFontRegistry().getBold(
-                        JFaceResources.DEFAULT_FONT);
+                return JFaceResources.getFontRegistry().getBold(JFaceResources.DEFAULT_FONT);
             }
 
             return null;
@@ -222,8 +216,7 @@ abstract class LintColumn implements Comparator<IMarker> {
             String id1 = EclipseLintClient.getId(marker1);
             String id2 = EclipseLintClient.getId(marker2);
             if (id1 == null || id2 == null) {
-                return marker1.getResource().getName().compareTo(
-                        marker2.getResource().getName());
+                return marker1.getResource().getName().compareTo(marker2.getResource().getName());
             }
             Issue issue1 = mList.getIssue(id1);
             Issue issue2 = mList.getIssue(id2);
@@ -232,8 +225,7 @@ abstract class LintColumn implements Comparator<IMarker> {
                 // which is no longer available but which left a persistent marker behind
                 return id1.compareTo(id2);
             }
-            int delta = mList.getSeverity(issue1).ordinal() -
-                    mList.getSeverity(issue2).ordinal();
+            int delta = mList.getSeverity(issue1).ordinal() - mList.getSeverity(issue2).ordinal();
             if (delta != 0) {
                 return delta;
             }
@@ -265,8 +257,7 @@ abstract class LintColumn implements Comparator<IMarker> {
                 return delta;
             }
 
-            return marker1.getAttribute(IMarker.LINE_NUMBER, 0)
-                    - marker2.getAttribute(IMarker.LINE_NUMBER, 0);
+            return marker1.getAttribute(IMarker.LINE_NUMBER, 0) - marker2.getAttribute(IMarker.LINE_NUMBER, 0);
         }
     }
 
@@ -339,8 +330,7 @@ abstract class LintColumn implements Comparator<IMarker> {
 
                 if (!(resource.getParent() instanceof IProject)) {
                     styledString.append(" in ");
-                    styledString.append(resource.getParent().getName(),
-                            StyledString.DECORATIONS_STYLER);
+                    styledString.append(resource.getParent().getName(), StyledString.DECORATIONS_STYLER);
                 }
 
                 styledString.append(String.format(" (%1$s)", resource.getProject().getName()),
@@ -367,8 +357,7 @@ abstract class LintColumn implements Comparator<IMarker> {
                 return delta;
             }
 
-            return marker1.getAttribute(IMarker.LINE_NUMBER, 0)
-                    - marker2.getAttribute(IMarker.LINE_NUMBER, 0);
+            return marker1.getAttribute(IMarker.LINE_NUMBER, 0) - marker2.getAttribute(IMarker.LINE_NUMBER, 0);
         }
     }
 
@@ -471,6 +460,7 @@ abstract class LintColumn implements Comparator<IMarker> {
 
             return -1;
         }
+
         @Override
         public int compare(IMarker marker1, IMarker marker2) {
             return getLine(marker1) - getLine(marker2);

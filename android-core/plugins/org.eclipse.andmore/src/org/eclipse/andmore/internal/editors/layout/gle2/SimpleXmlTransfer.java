@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +13,13 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
+import java.io.UnsupportedEncodingException;
+
 import org.eclipse.andmore.internal.editors.descriptors.ElementDescriptor;
 import org.eclipse.andmore.internal.editors.layout.descriptors.ViewElementDescriptor;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
-
-import java.io.UnsupportedEncodingException;
 
 /**
  * A d'n'd {@link Transfer} class that can transfer a <em>simplified</em> XML fragment
@@ -61,7 +59,7 @@ final class SimpleXmlTransfer extends ByteArrayTransfer {
 
     // Reference: http://www.eclipse.org/articles/Article-SWT-DND/DND-in-SWT.html
 
-    private static final String TYPE_NAME = "android.ADT.simple.xml.transfer.1";    //$NON-NLS-1$
+    private static final String TYPE_NAME = "android.ADT.simple.xml.transfer.1"; //$NON-NLS-1$
     private static final int TYPE_ID = registerType(TYPE_NAME);
     private static final SimpleXmlTransfer sInstance = new SimpleXmlTransfer();
 
@@ -121,7 +119,7 @@ final class SimpleXmlTransfer extends ByteArrayTransfer {
             String data = sb.toString();
 
             try {
-                byte[] buf = data.getBytes("UTF-8");  //$NON-NLS-1$
+                byte[] buf = data.getBytes("UTF-8"); //$NON-NLS-1$
                 super.javaToNative(buf, transferData);
             } catch (UnsupportedEncodingException e) {
                 // unlikely; ignore

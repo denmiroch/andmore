@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,7 @@
 
 package org.eclipse.andmore.internal.preferences;
 
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdkstats.DdmsPreferenceStore;
-import com.android.sdkstats.SdkStatsService;
-import com.android.sdkuilib.internal.widgets.SdkTargetSelector;
+import java.io.File;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AndmoreAndroidPlugin.CheckSdkErrorHandler;
@@ -33,12 +27,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import java.io.File;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdkstats.DdmsPreferenceStore;
+import com.android.sdkuilib.internal.widgets.SdkTargetSelector;
 
 /**
  * This class represents a preference page that is contributed to the
@@ -51,8 +46,7 @@ import java.io.File;
  * preferences can be accessed directly via the preference store.
  */
 
-public class AndroidPreferencePage extends FieldEditorPreferencePage implements
-        IWorkbenchPreferencePage {
+public class AndroidPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     private SdkDirectoryFieldEditor mDirectoryField;
 
@@ -82,8 +76,7 @@ public class AndroidPreferencePage extends FieldEditorPreferencePage implements
      * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
     @Override
-    public void init(IWorkbench workbench) {
-    }
+    public void init(IWorkbench workbench) {}
 
     @Override
     public void dispose() {
@@ -128,35 +121,32 @@ public class AndroidPreferencePage extends FieldEditorPreferencePage implements
 
             if (fileName.indexOf(',') >= 0 || fileName.indexOf(';') >= 0) {
                 setErrorMessage(Messages.AndroidPreferencePage_ERROR_Reserved_Char);
-                return false;  // Apply/OK must be disabled
+                return false; // Apply/OK must be disabled
             }
 
             File file = new File(fileName);
             if (!file.isDirectory()) {
-                setErrorMessage(JFaceResources.getString(
-                    "DirectoryFieldEditor.errorMessage")); //$NON-NLS-1$
+                setErrorMessage(JFaceResources.getString("DirectoryFieldEditor.errorMessage")); //$NON-NLS-1$
                 return false;
             }
 
             boolean ok = AndmoreAndroidPlugin.getDefault().checkSdkLocationAndId(fileName,
                     new AndmoreAndroidPlugin.CheckSdkErrorHandler() {
-                @Override
-                public boolean handleError(
-                        CheckSdkErrorHandler.Solution solution,
-                        String message) {
-                    setErrorMessage(message.replaceAll("\n", " ")); //$NON-NLS-1$ //$NON-NLS-2$
-                    return false;  // Apply/OK must be disabled
-                }
+                        @Override
+                        public boolean handleError(CheckSdkErrorHandler.Solution solution, String message) {
+                            setErrorMessage(message.replaceAll("\n", " ")); //$NON-NLS-1$ //$NON-NLS-2$
+                            return false; // Apply/OK must be disabled
+                        }
 
-                @Override
-                public boolean handleWarning(
-                        CheckSdkErrorHandler.Solution solution,
-                        String message) {
-                    showMessage(message.replaceAll("\n", " ")); //$NON-NLS-1$ //$NON-NLS-2$
-                    return true;  // Apply/OK must be enabled
-                }
-            });
-            if (ok) clearMessage();
+                        @Override
+                        public boolean handleWarning(CheckSdkErrorHandler.Solution solution, String message) {
+                            showMessage(message.replaceAll("\n", " ")); //$NON-NLS-1$ //$NON-NLS-2$
+                            return true; // Apply/OK must be enabled
+                        }
+                    });
+            if (ok) {
+                clearMessage();
+            }
             return ok;
         }
 
@@ -198,9 +188,7 @@ public class AndroidPreferencePage extends FieldEditorPreferencePage implements
                 Sdk sdk = Sdk.getCurrent();
                 IAndroidTarget[] targets = sdk != null ? sdk.getTargets() : null;
 
-                mTargetSelector = new SdkTargetSelector(parent,
-                        targets,
-                        false /*allowSelection*/);
+                mTargetSelector = new SdkTargetSelector(parent, targets, false /*allowSelection*/);
                 gd = (GridData) mTargetSelector.getLayoutData();
                 gd.horizontalSpan = numColumns;
 

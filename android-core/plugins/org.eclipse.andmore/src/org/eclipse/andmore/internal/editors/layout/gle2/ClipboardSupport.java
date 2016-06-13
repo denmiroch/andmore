@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,9 +16,10 @@ import static com.android.SdkConstants.ANDROID_NS_NAME;
 import static com.android.SdkConstants.NS_RESOURCES;
 import static com.android.SdkConstants.XMLNS_URI;
 
-import com.android.ide.common.api.IDragElement;
-import com.android.ide.common.api.IDragElement.IDragAttribute;
-import com.android.ide.common.api.INode;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.descriptors.DescriptorsUtils;
@@ -40,10 +38,9 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.widgets.Composite;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.android.ide.common.api.IDragElement;
+import com.android.ide.common.api.IDragElement.IDragAttribute;
+import com.android.ide.common.api.INode;
 
 /**
  * The {@link ClipboardSupport} class manages the native clipboard, providing operations
@@ -108,23 +105,15 @@ public class ClipboardSupport {
 
         if (selection.isEmpty()) {
             if (message != null) {
-                mClipboard.setContents(
-                        new Object[] { message },
-                        new Transfer[] { TextTransfer.getInstance() }
-                );
+                mClipboard.setContents(new Object[] { message }, new Transfer[] { TextTransfer.getInstance() });
             }
             return;
         }
 
-        Object[] data = new Object[] {
-                SelectionItem.getAsElements(selection),
-                message != null ? message : SelectionItem.getAsText(mCanvas, selection)
-        };
+        Object[] data = new Object[] { SelectionItem.getAsElements(selection),
+                message != null ? message : SelectionItem.getAsText(mCanvas, selection) };
 
-        Transfer[] types = new Transfer[] {
-                SimpleXmlTransfer.getInstance(),
-                TextTransfer.getInstance()
-        };
+        Transfer[] types = new Transfer[] { SimpleXmlTransfer.getInstance(), TextTransfer.getInstance() };
 
         mClipboard.setContents(data, types);
     }
@@ -191,13 +180,9 @@ public class ClipboardSupport {
         }
         boolean multiple = mCanvas.getSelectionManager().hasMultiSelection();
         if (title == null) {
-            title = String.format(
-                        multiple ? "%1$s elements" : "%1$s element",
-                        verb);
+            title = String.format(multiple ? "%1$s elements" : "%1$s element", verb);
         } else {
-            title = String.format(
-                        multiple ? "%1$s elements from %2$s" : "%1$s element from %2$s",
-                        verb, title);
+            title = String.format(multiple ? "%1$s elements from %2$s" : "%1$s element from %2$s", verb, title);
         }
 
         // Implementation note: we don't clear the internal selection after removing
@@ -208,8 +193,7 @@ public class ClipboardSupport {
             @Override
             public void run() {
                 // Segment the deleted nodes into clusters of siblings
-                Map<NodeProxy, List<INode>> clusters =
-                        new HashMap<NodeProxy, List<INode>>();
+                Map<NodeProxy, List<INode>> clusters = new HashMap<NodeProxy, List<INode>>();
                 for (SelectionItem cs : selection) {
                     NodeProxy node = cs.getNode();
                     if (node == null) {
@@ -340,16 +324,11 @@ public class ClipboardSupport {
                 UiElementNode uiNew = uiDoc.appendNewUiChild(viewDesc);
 
                 // A root node requires the Android XMLNS
-                uiNew.setAttributeValue(ANDROID_NS_NAME, XMLNS_URI, NS_RESOURCES,
-                        true /*override*/);
+                uiNew.setAttributeValue(ANDROID_NS_NAME, XMLNS_URI, NS_RESOURCES, true /*override*/);
 
                 // Copy all the attributes from the pasted element
                 for (IDragAttribute attr : pastedElement.getAttributes()) {
-                    uiNew.setAttributeValue(
-                            attr.getName(),
-                            attr.getUri(),
-                            attr.getValue(),
-                            true /*override*/);
+                    uiNew.setAttributeValue(attr.getName(), attr.getUri(), attr.getValue(), true /*override*/);
                 }
 
                 // Adjust the attributes, adding the default layout_width/height
@@ -367,8 +346,7 @@ public class ClipboardSupport {
 
             private void addChild(UiElementNode uiParent, IDragElement childElement) {
                 String childFqcn = childElement.getFqcn();
-                final ViewElementDescriptor childDesc =
-                    delegate.getFqcnViewDescriptor(childFqcn);
+                final ViewElementDescriptor childDesc = delegate.getFqcnViewDescriptor(childFqcn);
                 if (childDesc == null) {
                     // TODO this could happen if pasting a custom view
                     debugPrintf("Failed to paste element, unknown FQCN %1$s", childFqcn);
@@ -379,18 +357,13 @@ public class ClipboardSupport {
 
                 // Copy all the attributes from the pasted element
                 for (IDragAttribute attr : childElement.getAttributes()) {
-                    uiChild.setAttributeValue(
-                            attr.getName(),
-                            attr.getUri(),
-                            attr.getValue(),
-                            true /*override*/);
+                    uiChild.setAttributeValue(attr.getName(), attr.getUri(), attr.getValue(), true /*override*/);
                 }
 
                 // Adjust the attributes, adding the default layout_width/height
                 // only if they are not present (the original element should have
                 // them though.)
-                DescriptorsUtils.setDefaultLayoutAttributes(
-                        uiChild, false /*updateLayout*/);
+                DescriptorsUtils.setDefaultLayoutAttributes(uiChild, false /*updateLayout*/);
 
                 uiChild.createXmlNode();
 
@@ -423,7 +396,9 @@ public class ClipboardSupport {
     }
 
     private void debugPrintf(String message, Object... params) {
-        if (DEBUG) AndmoreAndroidPlugin.printToConsole("Clipboard", String.format(message, params));
+        if (DEBUG) {
+            AndmoreAndroidPlugin.printToConsole("Clipboard", String.format(message, params));
+        }
     }
 
 }

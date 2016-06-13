@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,16 +13,10 @@
 
 package org.eclipse.andmore.internal.launch.junit.runtime;
 
-import com.android.ddmlib.AdbCommandRejectedException;
-import com.android.ddmlib.IDevice;
-import com.android.ddmlib.ShellCommandUnresponsiveException;
-import com.android.ddmlib.TimeoutException;
-import com.android.ddmlib.testrunner.IRemoteAndroidTestRunner.TestSize;
-import com.android.ddmlib.testrunner.ITestRunListener;
-import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
-import com.android.ddmlib.testrunner.TestIdentifier;
-
-import junit.framework.TestFailure;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.launch.LaunchMessages;
@@ -40,10 +31,14 @@ import org.eclipse.jdt.internal.junit.runner.RemoteTestRunner;
 import org.eclipse.jdt.internal.junit.runner.TestExecution;
 import org.eclipse.jdt.internal.junit.runner.TestReferenceFailure;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.android.ddmlib.AdbCommandRejectedException;
+import com.android.ddmlib.IDevice;
+import com.android.ddmlib.ShellCommandUnresponsiveException;
+import com.android.ddmlib.TimeoutException;
+import com.android.ddmlib.testrunner.IRemoteAndroidTestRunner.TestSize;
+import com.android.ddmlib.testrunner.ITestRunListener;
+import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
+import com.android.ddmlib.testrunner.TestIdentifier;
 
 /**
  * Supports Eclipse JUnit execution of Android tests.
@@ -116,12 +111,11 @@ public class RemoteAdtTestRunner extends RemoteTestRunner {
         mExecution = execution;
 
         List<IDevice> devices = new ArrayList<IDevice>(mLaunchInfo.getDevices());
-        List<RemoteAndroidTestRunner> runners =
-                new ArrayList<RemoteAndroidTestRunner>(devices.size());
+        List<RemoteAndroidTestRunner> runners = new ArrayList<RemoteAndroidTestRunner>(devices.size());
 
         for (IDevice device : devices) {
-            RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(
-                    mLaunchInfo.getAppPackage(), mLaunchInfo.getRunner(), device);
+            RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(mLaunchInfo.getAppPackage(),
+                    mLaunchInfo.getRunner(), device);
 
             if (mLaunchInfo.getTestClass() != null) {
                 if (mLaunchInfo.getTestMethod() != null) {
@@ -144,8 +138,7 @@ public class RemoteAdtTestRunner extends RemoteTestRunner {
         }
 
         // Launch all test info collector jobs
-        List<TestTreeCollectorJob> collectorJobs =
-                new ArrayList<TestTreeCollectorJob>(devices.size());
+        List<TestTreeCollectorJob> collectorJobs = new ArrayList<TestTreeCollectorJob>(devices.size());
         List<TestCollector> perDeviceCollectors = new ArrayList<TestCollector>(devices.size());
         for (int i = 0; i < devices.size(); i++) {
             RemoteAndroidTestRunner runner = runners.get(i);
@@ -153,9 +146,8 @@ public class RemoteAdtTestRunner extends RemoteTestRunner {
             TestCollector collector = new TestCollector(deviceName);
             perDeviceCollectors.add(collector);
 
-            TestTreeCollectorJob job = new TestTreeCollectorJob(
-                    "Test Tree Collector for " + deviceName,
-                    runner, mLaunchInfo.isDebugMode(), collector);
+            TestTreeCollectorJob job = new TestTreeCollectorJob("Test Tree Collector for " + deviceName, runner,
+                    mLaunchInfo.isDebugMode(), collector);
             job.setPriority(Job.INTERACTIVE);
             job.schedule();
 
@@ -191,20 +183,17 @@ public class RemoteAdtTestRunner extends RemoteTestRunner {
         notifyTestRunStarted(totalTests);
         sendTestTrees(perDeviceCollectors);
 
-        List<TestRunnerJob> instrumentationRunnerJobs =
-                new ArrayList<TestRunnerJob>(devices.size());
+        List<TestRunnerJob> instrumentationRunnerJobs = new ArrayList<TestRunnerJob>(devices.size());
 
-        TestResultsNotifier notifier = new TestResultsNotifier(mExecution.getListener(),
-                devices.size());
+        TestResultsNotifier notifier = new TestResultsNotifier(mExecution.getListener(), devices.size());
 
         // Spawn all instrumentation runner jobs
         for (int i = 0; i < devices.size(); i++) {
             RemoteAndroidTestRunner runner = runners.get(i);
             String deviceName = devices.get(i).getName();
             TestRunListener testRunListener = new TestRunListener(deviceName, notifier);
-            InstrumentationRunJob job = new InstrumentationRunJob(
-                    "Test Tree Collector for " + deviceName,
-                    runner, mLaunchInfo.isDebugMode(), testRunListener);
+            InstrumentationRunJob job = new InstrumentationRunJob("Test Tree Collector for " + deviceName, runner,
+                    mLaunchInfo.isDebugMode(), testRunListener);
             job.setPriority(Job.INTERACTIVE);
             job.schedule();
 
@@ -240,8 +229,7 @@ public class RemoteAdtTestRunner extends RemoteTestRunner {
         private RemoteAndroidTestRunner mRunner;
         private boolean mIsDebug;
 
-        public TestRunnerJob(String name, RemoteAndroidTestRunner runner,
-                boolean isDebug, ITestRunListener listener) {
+        public TestRunnerJob(String name, RemoteAndroidTestRunner runner, boolean isDebug, ITestRunListener listener) {
             super(name);
 
             mRunner = runner;
@@ -256,23 +244,16 @@ public class RemoteAdtTestRunner extends RemoteTestRunner {
                 mRunner.run(mListener);
             } catch (TimeoutException e) {
                 return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                        LaunchMessages.RemoteAdtTestRunner_RunTimeoutException,
-                        e);
+                        LaunchMessages.RemoteAdtTestRunner_RunTimeoutException, e);
             } catch (IOException e) {
                 return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                        String.format(LaunchMessages.RemoteAdtTestRunner_RunIOException_s,
-                                e.getMessage()),
-                        e);
+                        String.format(LaunchMessages.RemoteAdtTestRunner_RunIOException_s, e.getMessage()), e);
             } catch (AdbCommandRejectedException e) {
-                return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                        String.format(
-                                LaunchMessages.RemoteAdtTestRunner_RunAdbCommandRejectedException_s,
-                                e.getMessage()),
-                        e);
+                return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, String.format(
+                        LaunchMessages.RemoteAdtTestRunner_RunAdbCommandRejectedException_s, e.getMessage()), e);
             } catch (ShellCommandUnresponsiveException e) {
                 return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                        LaunchMessages.RemoteAdtTestRunner_RunTimeoutException,
-                        e);
+                        LaunchMessages.RemoteAdtTestRunner_RunTimeoutException, e);
             }
 
             return Status.OK_STATUS;
@@ -449,14 +430,13 @@ public class RemoteAdtTestRunner extends RemoteTestRunner {
             mNotifier.testEnded(new TestCaseReference(mDeviceName, test));
         }
 
-		@Override
-		public void testFailed(TestIdentifier test, String trace) {
+        @Override
+        public void testFailed(TestIdentifier test, String trace) {
             String statusString = MessageIds.TEST_FAILED;
-            TestReferenceFailure failure =
-                new TestReferenceFailure(new TestCaseReference(mDeviceName, test),
-                        statusString, trace, null);
+            TestReferenceFailure failure = new TestReferenceFailure(new TestCaseReference(mDeviceName, test),
+                    statusString, trace, null);
             mNotifier.testFailed(failure);
-		}
+        }
 
         @Override
         public synchronized void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
@@ -488,17 +468,17 @@ public class RemoteAdtTestRunner extends RemoteTestRunner {
             mNotifier.testStarted(testId);
         }
 
-		@Override
-	    public void testAssumptionFailure(TestIdentifier test, String trace) {
-			// TODO Auto-generated method stub
-			
-		}
+        @Override
+        public void testAssumptionFailure(TestIdentifier test, String trace) {
+            // TODO Auto-generated method stub
 
-		@Override
-		public void testIgnored(TestIdentifier test) {
-			// TODO Auto-generated method stub
-			
-		}
+        }
+
+        @Override
+        public void testIgnored(TestIdentifier test) {
+            // TODO Auto-generated method stub
+
+        }
     }
 
     /** Override parent to get extra logs. */
@@ -519,8 +499,7 @@ public class RemoteAdtTestRunner extends RemoteTestRunner {
             AndmoreAndroidPlugin.logAndPrintError(exception, mLaunchInfo.getProject().getName(),
                     "Test launch failed: %s", message);
         } else {
-            AndmoreAndroidPlugin.printErrorToConsole(mLaunchInfo.getProject(), "Test launch failed: %s",
-                    message);
+            AndmoreAndroidPlugin.printErrorToConsole(mLaunchInfo.getProject(), "Test launch failed: %s", message);
         }
     }
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,18 +16,18 @@ package org.eclipse.andmore.internal.ui;
 import static com.android.SdkConstants.ANDROID_PREFIX;
 import static com.android.SdkConstants.PREFIX_RESOURCE_REF;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.rendering.api.ResourceValue;
-import com.android.ide.common.resources.ResourceItem;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.ide.common.resources.ResourceResolver;
-import com.android.resources.ResourceType;
-import com.android.utils.Pair;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.assetstudio.OpenCreateAssetSetWizardAction;
 import org.eclipse.andmore.internal.editors.layout.gle2.GraphicalEditorPart;
 import org.eclipse.andmore.internal.editors.layout.properties.PropertyFactory;
@@ -75,15 +72,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.AbstractElementListSelectionDialog;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.rendering.api.ResourceValue;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.ide.common.resources.ResourceResolver;
+import com.android.resources.ResourceType;
+import com.android.utils.Pair;
+import com.google.common.collect.Maps;
 
 /**
  * A dialog to let the user select a resource based on a resource type.
@@ -146,11 +143,8 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
      * @param frameworkResources The Framework resource repository
      * @param parent the parent shell
      */
-    private ResourceChooser(
-            @NonNull IProject project,
-            @NonNull ResourceType type,
-            @NonNull List<ResourceRepository> projectResources,
-            @Nullable ResourceRepository frameworkResources,
+    private ResourceChooser(@NonNull IProject project, @NonNull ResourceType type,
+            @NonNull List<ResourceRepository> projectResources, @Nullable ResourceRepository frameworkResources,
             @NonNull Shell parent) {
         super(parent, new ResourceLabelProvider());
         mProject = project;
@@ -159,15 +153,12 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
         mProjectResources = projectResources;
         mFrameworkResources = frameworkResources;
 
-        mProjectResourcePattern = Pattern.compile(
-                PREFIX_RESOURCE_REF + mResourceType.getName() + "/(.+)"); //$NON-NLS-1$
+        mProjectResourcePattern = Pattern.compile(PREFIX_RESOURCE_REF + mResourceType.getName() + "/(.+)"); //$NON-NLS-1$
 
-        mSystemResourcePattern = Pattern.compile(
-                ANDROID_PREFIX + mResourceType.getName() + "/(.+)"); //$NON-NLS-1$
+        mSystemResourcePattern = Pattern.compile(ANDROID_PREFIX + mResourceType.getName() + "/(.+)"); //$NON-NLS-1$
 
         setTitle("Resource Chooser");
-        setMessage(String.format("Choose a %1$s resource",
-                mResourceType.getDisplayName().toLowerCase(Locale.US)));
+        setMessage(String.format("Choose a %1$s resource", mResourceType.getDisplayName().toLowerCase(Locale.US)));
     }
 
     /**
@@ -178,9 +169,7 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
      * @return a new {@link ResourceChooser}
      */
     @NonNull
-    public static ResourceChooser create(
-            @NonNull GraphicalEditorPart editor,
-            @NonNull ResourceType type) {
+    public static ResourceChooser create(@NonNull GraphicalEditorPart editor, @NonNull ResourceType type) {
         IProject project = editor.getProject();
         Shell parent = editor.getCanvasControl().getShell();
         AndroidTargetData targetData = editor.getEditorDelegate().getEditor().getTargetData();
@@ -211,11 +200,8 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
      * @return a new {@link ResourceChooser}
      */
     @NonNull
-    public static ResourceChooser create(
-            @NonNull IProject project,
-            @NonNull ResourceType type,
-            @Nullable AndroidTargetData targetData,
-            @NonNull Shell parent) {
+    public static ResourceChooser create(@NonNull IProject project, @NonNull ResourceType type,
+            @Nullable AndroidTargetData targetData, @NonNull Shell parent) {
         ResourceManager manager = ResourceManager.getInstance();
 
         List<ResourceRepository> projectResources = new ArrayList<ResourceRepository>();
@@ -233,8 +219,7 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
             }
         }
 
-        ResourceRepository frameworkResources =
-                targetData != null ? targetData.getFrameworkResources() : null;
+        ResourceRepository frameworkResources = targetData != null ? targetData.getFrameworkResources() : null;
         return new ResourceChooser(project, type, projectResources, frameworkResources, parent);
     }
 
@@ -377,7 +362,7 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
 
         Object[] elements = getSelectedElements();
         if (elements.length == 1 && elements[0] instanceof ResourceItem) {
-            ResourceItem item = (ResourceItem)elements[0];
+            ResourceItem item = (ResourceItem) elements[0];
 
             mCurrentResource = item.getXmlString(mResourceType, mSystemButton.getSelection());
 
@@ -389,7 +374,7 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
 
     @Override
     protected Control createDialogArea(Composite parent) {
-        Composite top = (Composite)super.createDialogArea(parent);
+        Composite top = (Composite) super.createDialogArea(parent);
 
         createMessageArea(top);
 
@@ -477,8 +462,7 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
                     selectAddedItem(newName);
                 } else if (mResourceType == ResourceType.DRAWABLE) {
                     // Special case: Use the "Create Icon Set" wizard
-                    OpenCreateAssetSetWizardAction action =
-                            new OpenCreateAssetSetWizardAction(mProject);
+                    OpenCreateAssetSetWizardAction action = new OpenCreateAssetSetWizardAction(mProject);
                     action.run();
                     List<IResource> files = action.getCreatedFiles();
                     if (files != null && files.size() > 0) {
@@ -598,7 +582,7 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
         if (mInputValidator != null) {
             Object[] elements = getSelectedElements();
             if (elements.length == 1 && elements[0] instanceof ResourceItem) {
-                ResourceItem item = (ResourceItem)elements[0];
+                ResourceItem item = (ResourceItem) elements[0];
                 String current = item.getXmlString(mResourceType, mSystemButton.getSelection());
                 String error = mInputValidator.isValid(current);
                 IStatus status;
@@ -646,13 +630,10 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
             return null;
         }
 
-        ResourceNameValidator validator = ResourceNameValidator.create(true /*allowXmlExtension*/,
-                mProject, mResourceType);
-        InputDialog d = new InputDialog(
-                AndmoreAndroidPlugin.getShell(),
-                "Enter name",  // title
-                "Enter name",
-                "", //$NON-NLS-1$
+        ResourceNameValidator validator = ResourceNameValidator.create(true /*allowXmlExtension*/, mProject,
+                mResourceType);
+        InputDialog d = new InputDialog(AndmoreAndroidPlugin.getShell(), "Enter name", // title
+                "Enter name", "", //$NON-NLS-2$
                 validator);
         if (d.open() == Window.OK) {
             String name = d.getValue().trim();
@@ -660,8 +641,7 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
                 return null;
             }
 
-            Pair<IFile, IRegion> resource = ResourceHelper.createResource(mProject, type, name,
-                    null);
+            Pair<IFile, IRegion> resource = ResourceHelper.createResource(mProject, type, name, null);
             if (resource != null) {
                 return name;
             }
@@ -669,7 +649,6 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
 
         return null;
     }
-
 
     @Nullable
     private String createNewValue(ResourceType type) {
@@ -698,14 +677,12 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
     }
 
     private String createNewString() {
-        ExtractStringRefactoring ref = new ExtractStringRefactoring(
-                mProject, true /*enforceNew*/);
+        ExtractStringRefactoring ref = new ExtractStringRefactoring(mProject, true /*enforceNew*/);
         RefactoringWizard wizard = new ExtractStringWizard(ref, mProject);
         RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
         try {
             IWorkbench w = PlatformUI.getWorkbench();
-            if (op.run(w.getDisplay().getActiveShell(), wizard.getDefaultPageTitle()) ==
-                    IDialogConstants.OK_ID) {
+            if (op.run(w.getDisplay().getActiveShell(), wizard.getDefaultPageTitle()) == IDialogConstants.OK_ID) {
                 return ref.getXmlStringId();
             }
         } catch (InterruptedException ex) {
@@ -817,18 +794,18 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
 
     @Override
     public void modifyText(ModifyEvent e) {
-       if (e.getSource() == mEditValueText && mResourceResolver != null) {
-           mCurrentResource = mEditValueText.getText();
+        if (e.getSource() == mEditValueText && mResourceResolver != null) {
+            mCurrentResource = mEditValueText.getText();
 
-           if (mCurrentResource.startsWith(PREFIX_RESOURCE_REF)) {
-               if (mProjectResourcePattern.matcher(mCurrentResource).matches() ||
-                       mSystemResourcePattern.matcher(mCurrentResource).matches()) {
-                   updateResolvedLabel();
-               }
-           } else {
-               updateResolvedLabel();
-           }
-       }
+            if (mCurrentResource.startsWith(PREFIX_RESOURCE_REF)) {
+                if (mProjectResourcePattern.matcher(mCurrentResource).matches()
+                        || mSystemResourcePattern.matcher(mCurrentResource).matches()) {
+                    updateResolvedLabel();
+                }
+            } else {
+                updateResolvedLabel();
+            }
+        }
     }
 
     /** Dialog asking for a Name/Value pair */
@@ -853,7 +830,6 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
             // Wide enough to accommodate the error label
             gridData.widthHint = 500;
             container.setLayoutData(gridData);
-
 
             Label nameLabel = new Label(container, SWT.NONE);
             nameLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -935,12 +911,9 @@ public class ResourceChooser extends AbstractElementListSelectionDialog implemen
      * @return the chosen resource, null if cancelled and "" if value should be
      *         cleared
      */
-    public static String chooseResource(
-            @NonNull GraphicalEditorPart graphicalEditor,
-            @NonNull ResourceType type,
+    public static String chooseResource(@NonNull GraphicalEditorPart graphicalEditor, @NonNull ResourceType type,
             String currentValue, IInputValidator validator) {
-        ResourceChooser chooser = create(graphicalEditor, type).
-                setCurrentResource(currentValue);
+        ResourceChooser chooser = create(graphicalEditor, type).setCurrentResource(currentValue);
         if (validator != null) {
             // Ensure wide enough to accommodate validator error message
             chooser.setSize(85, 10);

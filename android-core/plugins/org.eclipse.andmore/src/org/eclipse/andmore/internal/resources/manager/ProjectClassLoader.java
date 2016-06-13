@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,15 @@
 
 package org.eclipse.andmore.internal.resources.manager;
 
-import com.android.SdkConstants;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.build.BuildHelper;
@@ -38,15 +43,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
+import com.android.SdkConstants;
 
 /**
  * ClassLoader able to load class from output of an Eclipse project.
@@ -91,8 +88,7 @@ public final class ProjectClassLoader extends ClassLoader {
             if (projectState != null) {
 
                 List<IProject> libProjects = projectState.getFullLibraryProjects();
-                List<IJavaProject> referencedJavaProjects = BuildHelper.getJavaProjects(
-                        libProjects);
+                List<IJavaProject> referencedJavaProjects = BuildHelper.getJavaProjects(libProjects);
 
                 for (IJavaProject javaProject : referencedJavaProjects) {
                     clazz = loadFromProject(javaProject, name);
@@ -138,7 +134,7 @@ public final class ProjectClassLoader extends ClassLoader {
 
             // load the content of the file and create the class.
             FileInputStream fis = new FileInputStream(classFile);
-            byte[] data = new byte[(int)classFile.length()];
+            byte[] data = new byte[(int) classFile.length()];
             int read = 0;
             try {
                 read = fis.read(data);
@@ -179,8 +175,8 @@ public final class ProjectClassLoader extends ClassLoader {
         ClassWriter classWriter = new ClassWriter(0);
         ClassVisitor classVisitor = new ClassVisitor(Opcodes.ASM4, classWriter) {
             @Override
-            public void visit(int version, int access, String name, String signature,
-                    String superName, String[] interfaces) {
+            public void visit(int version, int access, String name, String signature, String superName,
+                    String[] interfaces) {
                 if (version > maxVersion) {
                     version = maxVersion;
                 }
@@ -204,8 +200,7 @@ public final class ProjectClassLoader extends ClassLoader {
      * @param index the offset at which to start looking into segments.
      * @throws FileNotFoundException
      */
-    private File getFile(File parent, String[] segments, int index)
-            throws FileNotFoundException {
+    private File getFile(File parent, String[] segments, int index) throws FileNotFoundException {
         // reached the end with no match?
         if (index == segments.length) {
             throw new FileNotFoundException();
@@ -236,12 +231,12 @@ public final class ProjectClassLoader extends ClassLoader {
             for (File file : files) {
                 if (file.isDirectory()) {
                     if (toMatch.equals(file.getName())) {
-                        return getFile(file, segments, index+1);
+                        return getFile(file, segments, index + 1);
                     }
                 } else if (file.getName().startsWith(toMatch)) {
                     if (innerClassName == null) {
                         StringBuilder sb = new StringBuilder(segments[index]);
-                        for (int i = index + 1 ; i < segments.length ; i++) {
+                        for (int i = index + 1; i < segments.length; i++) {
                             sb.append('$');
                             sb.append(segments[i]);
                         }
@@ -299,8 +294,8 @@ public final class ProjectClassLoader extends ClassLoader {
         IClasspathEntry[] classpaths = javaProject.readRawClasspath();
         if (classpaths != null) {
             for (IClasspathEntry e : classpaths) {
-                if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY ||
-                        e.getEntryKind() == IClasspathEntry.CPE_VARIABLE) {
+                if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY
+                        || e.getEntryKind() == IClasspathEntry.CPE_VARIABLE) {
                     // if this is a classpath variable reference, we resolve it.
                     if (e.getEntryKind() == IClasspathEntry.CPE_VARIABLE) {
                         e = JavaCore.getResolvedClasspathEntry(e);
@@ -310,12 +305,10 @@ public final class ProjectClassLoader extends ClassLoader {
                 } else if (e.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
                     // get the container.
                     try {
-                        IClasspathContainer container = JavaCore.getClasspathContainer(
-                                e.getPath(), javaProject);
+                        IClasspathContainer container = JavaCore.getClasspathContainer(e.getPath(), javaProject);
                         // ignore the system and default_system types as they represent
                         // libraries that are part of the runtime.
-                        if (container != null &&
-                                container.getKind() == IClasspathContainer.K_APPLICATION) {
+                        if (container != null && container.getKind() == IClasspathContainer.K_APPLICATION) {
                             IClasspathEntry[] entries = container.getClasspathEntries();
                             for (IClasspathEntry entry : entries) {
                                 // TODO: Xav -- is this necessary?
@@ -328,8 +321,7 @@ public final class ProjectClassLoader extends ClassLoader {
                         }
                     } catch (JavaModelException jme) {
                         // can't resolve the container? ignore it.
-                        AndmoreAndroidPlugin.log(jme, "Failed to resolve ClasspathContainer: %s",
-                                e.getPath());
+                        AndmoreAndroidPlugin.log(jme, "Failed to resolve ClasspathContainer: %s", e.getPath());
                     }
                 }
             }
@@ -346,12 +338,10 @@ public final class ProjectClassLoader extends ClassLoader {
         if (SdkConstants.EXT_JAR.equalsIgnoreCase(path.getFileExtension())) {
             boolean local = false;
             IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
-            if (resource != null && resource.exists() &&
-                    resource.getType() == IResource.FILE) {
+            if (resource != null && resource.exists() && resource.getType() == IResource.FILE) {
                 local = true;
                 try {
-                    oslibraryList.add(new File(resource.getLocation().toOSString())
-                            .toURI().toURL());
+                    oslibraryList.add(new File(resource.getLocation().toOSString()).toURI().toURL());
                 } catch (MalformedURLException mue) {
                     // pass
                 }

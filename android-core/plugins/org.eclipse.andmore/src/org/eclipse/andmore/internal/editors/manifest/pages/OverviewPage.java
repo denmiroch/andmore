@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,9 @@
  */
 
 package org.eclipse.andmore.internal.editors.manifest.pages;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.IPageImageProvider;
@@ -32,10 +32,6 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-
 
 /**
  * Page for overview settings, part of the AndroidManifest form editor.
@@ -59,13 +55,13 @@ public final class OverviewPage extends FormPage implements IPageImageProvider {
     private UiTreeBlock mTreeBlock;
 
     public OverviewPage(ManifestEditor editor) {
-        super(editor, PAGE_ID, "Manifest");  // tab's label, user visible, keep it short
+        super(editor, PAGE_ID, "Manifest"); // tab's label, user visible, keep it short
         mEditor = editor;
     }
 
     @Override
     public Image getPageImage() {
-        return IconFactory.getInstance().getIcon("editor_page_design");  //$NON-NLS-1$
+        return IconFactory.getInstance().getIcon("editor_page_design"); //$NON-NLS-1$
     }
 
     /**
@@ -103,11 +99,8 @@ public final class OverviewPage extends FormPage implements IPageImageProvider {
 
     private void newManifestExtrasPart(IManagedForm managedForm) {
         UiElementNode manifest = mEditor.getUiRootNode();
-        mTreeBlock = new UiTreeBlock(mEditor, manifest,
-                true /* autoCreateRoot */,
-                computeManifestExtraFilters(),
-                "Manifest Extras",
-                "Extra manifest elements");
+        mTreeBlock = new UiTreeBlock(mEditor, manifest, true /* autoCreateRoot */, computeManifestExtraFilters(),
+                "Manifest Extras", "Extra manifest elements");
         mTreeBlock.createContent(managedForm);
     }
 
@@ -125,9 +118,7 @@ public final class OverviewPage extends FormPage implements IPageImageProvider {
 
         if (mTreeBlock != null) {
             UiElementNode manifest = mEditor.getUiRootNode();
-            mTreeBlock.changeRootAndDescriptors(manifest,
-                    computeManifestExtraFilters(),
-                    true /* refresh */);
+            mTreeBlock.changeRootAndDescriptors(manifest, computeManifestExtraFilters(), true /* refresh */);
         }
     }
 

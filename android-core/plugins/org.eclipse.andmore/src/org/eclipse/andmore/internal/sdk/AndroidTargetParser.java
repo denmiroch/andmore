@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,20 @@
 
 package org.eclipse.andmore.internal.sdk;
 
-import com.android.SdkConstants;
-import com.android.ide.common.rendering.LayoutLibrary;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.sdklib.IAndroidTarget;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.management.InvalidAttributeValueException;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.common.resources.platform.AttrsXmlParser;
@@ -39,20 +46,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.management.InvalidAttributeValueException;
+import com.android.SdkConstants;
+import com.android.ide.common.rendering.LayoutLibrary;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * Parser for the platform data in an SDK.
@@ -86,15 +83,13 @@ public final class AndroidTargetParser {
     public IStatus run(IProgressMonitor monitor) {
         try {
             SubMonitor progress = SubMonitor.convert(monitor,
-                    String.format("Parsing SDK %1$s", mAndroidTarget.getName()),
-                    16);
+                    String.format("Parsing SDK %1$s", mAndroidTarget.getName()), 16);
 
             AndroidTargetData targetData = new AndroidTargetData(mAndroidTarget);
 
             // parse the rest of the data.
 
-            AndroidJarLoader classLoader =
-                new AndroidJarLoader(mAndroidTarget.getPath(IAndroidTarget.ANDROID_JAR));
+            AndroidJarLoader classLoader = new AndroidJarLoader(mAndroidTarget.getPath(IAndroidTarget.ANDROID_JAR));
 
             preload(classLoader, progress.newChild(40, SubMonitor.SUPPRESS_NONE));
 
@@ -117,8 +112,7 @@ public final class AndroidTargetParser {
             ArrayList<String> broadcast_actions = new ArrayList<String>();
             ArrayList<String> service_actions = new ArrayList<String>();
             ArrayList<String> categories = new ArrayList<String>();
-            collectIntentFilterActionsAndCategories(activity_actions, broadcast_actions,
-                    service_actions, categories);
+            collectIntentFilterActionsAndCategories(activity_actions, broadcast_actions, service_actions, categories);
             progress.worked(1);
 
             if (progress.isCanceled()) {
@@ -127,18 +121,15 @@ public final class AndroidTargetParser {
 
             // gather the attribute definition
             progress.subTask("Attributes definitions");
-            AttrsXmlParser attrsXmlParser = new AttrsXmlParser(
-                    mAndroidTarget.getPath(IAndroidTarget.ATTRIBUTES),
-                    AndmoreAndroidPlugin.getDefault(),
-                    1000);
+            AttrsXmlParser attrsXmlParser = new AttrsXmlParser(mAndroidTarget.getPath(IAndroidTarget.ATTRIBUTES),
+                    AndmoreAndroidPlugin.getDefault(), 1000);
             attrsXmlParser.preload();
 
             progress.worked(1);
 
             progress.subTask("Manifest definitions");
             AttrsXmlParser attrsManifestXmlParser = new AttrsXmlParser(
-                    mAndroidTarget.getPath(IAndroidTarget.MANIFEST_ATTRIBUTES),
-                    attrsXmlParser,
+                    mAndroidTarget.getPath(IAndroidTarget.MANIFEST_ATTRIBUTES), attrsXmlParser,
                     AndmoreAndroidPlugin.getDefault(), 1100);
             attrsManifestXmlParser.preload();
             progress.worked(1);
@@ -148,37 +139,30 @@ public final class AndroidTargetParser {
 
             // collect the layout/widgets classes
             progress.subTask("Widgets and layouts");
-            collectLayoutClasses(classLoader, attrsXmlParser, mainList, groupList,
-                    progress.newChild(1));
+            collectLayoutClasses(classLoader, attrsXmlParser, mainList, groupList, progress.newChild(1));
 
             if (progress.isCanceled()) {
                 return Status.CANCEL_STATUS;
             }
 
-            ViewClassInfo[] layoutViewsInfo = mainList.toArray(
-                    new ViewClassInfo[mainList.size()]);
-            ViewClassInfo[] layoutGroupsInfo = groupList.toArray(
-                    new ViewClassInfo[groupList.size()]);
+            ViewClassInfo[] layoutViewsInfo = mainList.toArray(new ViewClassInfo[mainList.size()]);
+            ViewClassInfo[] layoutGroupsInfo = groupList.toArray(new ViewClassInfo[groupList.size()]);
             mainList.clear();
             groupList.clear();
 
             // collect the preferences classes.
-            collectPreferenceClasses(classLoader, attrsXmlParser, mainList, groupList,
-                    progress.newChild(1));
+            collectPreferenceClasses(classLoader, attrsXmlParser, mainList, groupList, progress.newChild(1));
 
             if (progress.isCanceled()) {
                 return Status.CANCEL_STATUS;
             }
 
             ViewClassInfo[] preferencesInfo = mainList.toArray(new ViewClassInfo[mainList.size()]);
-            ViewClassInfo[] preferenceGroupsInfo = groupList.toArray(
-                    new ViewClassInfo[groupList.size()]);
+            ViewClassInfo[] preferenceGroupsInfo = groupList.toArray(new ViewClassInfo[groupList.size()]);
 
             Map<String, DeclareStyleableInfo> xmlMenuMap = collectMenuDefinitions(attrsXmlParser);
-            Map<String, DeclareStyleableInfo> xmlSearchableMap = collectSearchableDefinitions(
-                    attrsXmlParser);
-            Map<String, DeclareStyleableInfo> manifestMap = collectManifestDefinitions(
-                                                                            attrsManifestXmlParser);
+            Map<String, DeclareStyleableInfo> xmlSearchableMap = collectSearchableDefinitions(attrsXmlParser);
+            Map<String, DeclareStyleableInfo> manifestMap = collectManifestDefinitions(attrsManifestXmlParser);
             Map<String, Map<String, Integer>> enumValueMap = attrsXmlParser.getEnumFlagValues();
 
             Map<String, DeclareStyleableInfo> xmlAppWidgetMap = null;
@@ -218,10 +202,7 @@ public final class AndroidTargetParser {
             }
 
             OtherXmlDescriptors otherXmlDescriptors = new OtherXmlDescriptors();
-            otherXmlDescriptors.updateDescriptors(
-                    xmlSearchableMap,
-                    xmlAppWidgetMap,
-                    preferencesInfo,
+            otherXmlDescriptors.updateDescriptors(xmlSearchableMap, xmlAppWidgetMap, preferencesInfo,
                     preferenceGroupsInfo);
             progress.worked(1);
 
@@ -259,38 +240,24 @@ public final class AndroidTargetParser {
             progress.worked(1);
 
             // load the framework resources.
-            ResourceRepository frameworkResources =
-                    ResourceManager.getInstance().loadFrameworkResources(mAndroidTarget);
+            ResourceRepository frameworkResources = ResourceManager.getInstance()
+                    .loadFrameworkResources(mAndroidTarget);
             progress.worked(1);
 
             // now load the layout lib bridge
-            LayoutLibrary layoutBridge =  LayoutLibrary.load(
-                    mAndroidTarget.getPath(IAndroidTarget.LAYOUT_LIB),
-                    AndmoreAndroidPlugin.getDefault(),
-                    "ADT plug-in");
+            LayoutLibrary layoutBridge = LayoutLibrary.load(mAndroidTarget.getPath(IAndroidTarget.LAYOUT_LIB),
+                    AndmoreAndroidPlugin.getDefault(), "ADT plug-in");
 
             progress.worked(1);
 
             // and finally create the PlatformData with all that we loaded.
-            targetData.setExtraData(
-                    manifestDescriptors,
-                    layoutDescriptors,
-                    menuDescriptors,
-                    otherXmlDescriptors,
-                    drawableDescriptors,
-                    animatorDescriptors,
-                    animDescriptors,
-                    colorDescriptors,
-                    enumValueMap,
-                    permissionValues,
-                    activity_actions.toArray(new String[activity_actions.size()]),
+            targetData.setExtraData(manifestDescriptors, layoutDescriptors, menuDescriptors, otherXmlDescriptors,
+                    drawableDescriptors, animatorDescriptors, animDescriptors, colorDescriptors, enumValueMap,
+                    permissionValues, activity_actions.toArray(new String[activity_actions.size()]),
                     broadcast_actions.toArray(new String[broadcast_actions.size()]),
                     service_actions.toArray(new String[service_actions.size()]),
-                    categories.toArray(new String[categories.size()]),
-                    mAndroidTarget.getPlatformLibraries(),
-                    mAndroidTarget.getOptionalLibraries(),
-                    frameworkResources,
-                    layoutBridge);
+                    categories.toArray(new String[categories.size()]), mAndroidTarget.getPlatformLibraries(),
+                    mAndroidTarget.getOptionalLibraries(), frameworkResources, layoutBridge);
 
             targetData.setAttributeMap(attrsXmlParser.getAttributeMap());
 
@@ -314,8 +281,8 @@ public final class AndroidTargetParser {
      */
     private void preload(AndroidJarLoader classLoader, IProgressMonitor monitor) {
         try {
-            classLoader.preLoadClasses("" /* all classes */,        //$NON-NLS-1$
-                    mAndroidTarget.getName(),                       // monitor task label
+            classLoader.preLoadClasses("" /* all classes */, //$NON-NLS-1$
+                    mAndroidTarget.getName(), // monitor task label
                     monitor);
         } catch (InvalidAttributeValueException e) {
             AndmoreAndroidPlugin.log(e, "Problem preloading classes"); //$NON-NLS-1$
@@ -332,8 +299,7 @@ public final class AndroidTargetParser {
      */
     private String[] collectPermissions(AndroidJarLoader classLoader) {
         try {
-            Class<?> permissionClass =
-                classLoader.loadClass(SdkConstants.CLASS_MANIFEST_PERMISSION);
+            Class<?> permissionClass = classLoader.loadClass(SdkConstants.CLASS_MANIFEST_PERMISSION);
 
             if (permissionClass != null) {
                 ArrayList<String> list = new ArrayList<String>();
@@ -342,12 +308,11 @@ public final class AndroidTargetParser {
 
                 for (Field f : fields) {
                     int modifiers = f.getModifiers();
-                    if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) &&
-                            Modifier.isPublic(modifiers)) {
+                    if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && Modifier.isPublic(modifiers)) {
                         try {
                             Object value = f.get(null);
                             if (value instanceof String) {
-                                list.add((String)value);
+                                list.add((String) value);
                             }
                         } catch (IllegalArgumentException e) {
                             // since we provide null this should not happen
@@ -355,7 +320,7 @@ public final class AndroidTargetParser {
                             // if the field is inaccessible we ignore it.
                         } catch (NullPointerException npe) {
                             // looks like this is not a static field. we can ignore.
-                        } catch (ExceptionInInitializerError  eiie) {
+                        } catch (ExceptionInInitializerError eiie) {
                             // lets just ignore the field again
                         }
                     }
@@ -364,10 +329,8 @@ public final class AndroidTargetParser {
                 return list.toArray(new String[list.size()]);
             }
         } catch (ClassNotFoundException e) {
-            AndmoreAndroidPlugin.logAndPrintError(e, TAG,
-                    "Collect permissions failed, class %1$s not found in %2$s", //$NON-NLS-1$
-                    SdkConstants.CLASS_MANIFEST_PERMISSION,
-                    mAndroidTarget.getPath(IAndroidTarget.ANDROID_JAR));
+            AndmoreAndroidPlugin.logAndPrintError(e, TAG, "Collect permissions failed, class %1$s not found in %2$s", //$NON-NLS-1$
+                    SdkConstants.CLASS_MANIFEST_PERMISSION, mAndroidTarget.getPath(IAndroidTarget.ANDROID_JAR));
         }
 
         return new String[0];
@@ -383,16 +346,11 @@ public final class AndroidTargetParser {
      * @param categories the list which will receive the category values.
      */
     private void collectIntentFilterActionsAndCategories(ArrayList<String> activityActions,
-            ArrayList<String> broadcastActions,
-            ArrayList<String> serviceActions, ArrayList<String> categories)  {
-        collectValues(mAndroidTarget.getPath(IAndroidTarget.ACTIONS_ACTIVITY),
-                activityActions);
-        collectValues(mAndroidTarget.getPath(IAndroidTarget.ACTIONS_BROADCAST),
-                broadcastActions);
-        collectValues(mAndroidTarget.getPath(IAndroidTarget.ACTIONS_SERVICE),
-                serviceActions);
-        collectValues(mAndroidTarget.getPath(IAndroidTarget.CATEGORIES),
-                categories);
+            ArrayList<String> broadcastActions, ArrayList<String> serviceActions, ArrayList<String> categories) {
+        collectValues(mAndroidTarget.getPath(IAndroidTarget.ACTIONS_ACTIVITY), activityActions);
+        collectValues(mAndroidTarget.getPath(IAndroidTarget.ACTIONS_BROADCAST), broadcastActions);
+        collectValues(mAndroidTarget.getPath(IAndroidTarget.ACTIONS_SERVICE), serviceActions);
+        collectValues(mAndroidTarget.getPath(IAndroidTarget.CATEGORIES), categories);
     }
 
     /**
@@ -446,15 +404,11 @@ public final class AndroidTargetParser {
      * @param groupList the Collection to receive the group list of {@link ViewClassInfo}.
      * @param monitor A progress monitor. Can be null. Caller is responsible for calling done.
      */
-    private void collectLayoutClasses(AndroidJarLoader classLoader,
-            AttrsXmlParser attrsXmlParser,
-            Collection<ViewClassInfo> mainList,
-            Collection<ViewClassInfo> groupList,
-            IProgressMonitor monitor) {
+    private void collectLayoutClasses(AndroidJarLoader classLoader, AttrsXmlParser attrsXmlParser,
+            Collection<ViewClassInfo> mainList, Collection<ViewClassInfo> groupList, IProgressMonitor monitor) {
         LayoutParamsParser ldp = null;
         try {
-            WidgetClassLoader loader = new WidgetClassLoader(
-                    mAndroidTarget.getPath(IAndroidTarget.WIDGETS));
+            WidgetClassLoader loader = new WidgetClassLoader(mAndroidTarget.getPath(IAndroidTarget.WIDGETS));
             if (loader.parseWidgetList(monitor)) {
                 ldp = new LayoutParamsParser(loader, attrsXmlParser);
             }
@@ -488,9 +442,8 @@ public final class AndroidTargetParser {
      * @param groupList the Collection to receive the group list of {@link ViewClassInfo}.
      * @param monitor A progress monitor. Can be null. Caller is responsible for calling done.
      */
-    private void collectPreferenceClasses(AndroidJarLoader classLoader,
-            AttrsXmlParser attrsXmlParser, Collection<ViewClassInfo> mainList,
-            Collection<ViewClassInfo> groupList, IProgressMonitor monitor) {
+    private void collectPreferenceClasses(AndroidJarLoader classLoader, AttrsXmlParser attrsXmlParser,
+            Collection<ViewClassInfo> mainList, Collection<ViewClassInfo> groupList, IProgressMonitor monitor) {
         LayoutParamsParser ldp = new LayoutParamsParser(classLoader, attrsXmlParser);
 
         try {
@@ -504,10 +457,8 @@ public final class AndroidTargetParser {
                 groupList.addAll(groups);
             }
         } catch (NoClassDefFoundError e) {
-            AndmoreAndroidPlugin.logAndPrintError(e, TAG,
-                    "Collect preferences failed, class %1$s not found in %2$s",
-                    e.getMessage(),
-                    classLoader.getSource());
+            AndmoreAndroidPlugin.logAndPrintError(e, TAG, "Collect preferences failed, class %1$s not found in %2$s",
+                    e.getMessage(), classLoader.getSource());
         } catch (Throwable e) {
             AndmoreAndroidPlugin.log(e, "Android Framework Parser: failed to collect preference classes"); //$NON-NLS-1$
             AndmoreAndroidPlugin.printErrorToConsole("Android Framework Parser",
@@ -520,22 +471,20 @@ public final class AndroidTargetParser {
      *
      * @param attrsXmlParser The parser of the attrs.xml file
      */
-    private Map<String, DeclareStyleableInfo> collectMenuDefinitions(
-            AttrsXmlParser attrsXmlParser) {
+    private Map<String, DeclareStyleableInfo> collectMenuDefinitions(AttrsXmlParser attrsXmlParser) {
         Map<String, DeclareStyleableInfo> map = attrsXmlParser.getDeclareStyleableList();
         Map<String, DeclareStyleableInfo> map2 = new HashMap<String, DeclareStyleableInfo>();
-        for (String key : new String[] { "Menu",        //$NON-NLS-1$
-                                         "MenuItem",        //$NON-NLS-1$
-                                         "MenuGroup" }) {   //$NON-NLS-1$
+        for (String key : new String[] { "Menu", //$NON-NLS-1$
+                "MenuItem", //$NON-NLS-1$
+                "MenuGroup" }) { //$NON-NLS-1$
             if (map.containsKey(key)) {
                 map2.put(key, map.get(key));
             } else {
-                AndmoreAndroidPlugin.log(IStatus.WARNING,
-                        "Menu declare-styleable %1$s not found in file %2$s", //$NON-NLS-1$
+                AndmoreAndroidPlugin.log(IStatus.WARNING, "Menu declare-styleable %1$s not found in file %2$s", //$NON-NLS-1$
                         key, attrsXmlParser.getOsAttrsXmlPath());
                 AndmoreAndroidPlugin.printErrorToConsole("Android Framework Parser",
                         String.format("Menu declare-styleable %1$s not found in file %2$s", //$NON-NLS-1$
-                        key, attrsXmlParser.getOsAttrsXmlPath()));
+                                key, attrsXmlParser.getOsAttrsXmlPath()));
             }
         }
 
@@ -547,21 +496,19 @@ public final class AndroidTargetParser {
      *
      * @param attrsXmlParser The parser of the attrs.xml file
      */
-    private Map<String, DeclareStyleableInfo> collectSearchableDefinitions(
-            AttrsXmlParser attrsXmlParser) {
+    private Map<String, DeclareStyleableInfo> collectSearchableDefinitions(AttrsXmlParser attrsXmlParser) {
         Map<String, DeclareStyleableInfo> map = attrsXmlParser.getDeclareStyleableList();
         Map<String, DeclareStyleableInfo> map2 = new HashMap<String, DeclareStyleableInfo>();
-        for (String key : new String[] { "Searchable",              //$NON-NLS-1$
-                                         "SearchableActionKey" }) { //$NON-NLS-1$
+        for (String key : new String[] { "Searchable", //$NON-NLS-1$
+                "SearchableActionKey" }) { //$NON-NLS-1$
             if (map.containsKey(key)) {
                 map2.put(key, map.get(key));
             } else {
-                AndmoreAndroidPlugin.log(IStatus.WARNING,
-                        "Searchable declare-styleable %1$s not found in file %2$s", //$NON-NLS-1$
+                AndmoreAndroidPlugin.log(IStatus.WARNING, "Searchable declare-styleable %1$s not found in file %2$s", //$NON-NLS-1$
                         key, attrsXmlParser.getOsAttrsXmlPath());
                 AndmoreAndroidPlugin.printErrorToConsole("Android Framework Parser",
                         String.format("Searchable declare-styleable %1$s not found in file %2$s", //$NON-NLS-1$
-                        key, attrsXmlParser.getOsAttrsXmlPath()));
+                                key, attrsXmlParser.getOsAttrsXmlPath()));
             }
         }
 
@@ -573,20 +520,18 @@ public final class AndroidTargetParser {
      *
      * @param attrsXmlParser The parser of the attrs.xml file
      */
-    private Map<String, DeclareStyleableInfo> collectAppWidgetDefinitions(
-            AttrsXmlParser attrsXmlParser) {
+    private Map<String, DeclareStyleableInfo> collectAppWidgetDefinitions(AttrsXmlParser attrsXmlParser) {
         Map<String, DeclareStyleableInfo> map = attrsXmlParser.getDeclareStyleableList();
         Map<String, DeclareStyleableInfo> map2 = new HashMap<String, DeclareStyleableInfo>();
-        for (String key : new String[] { "AppWidgetProviderInfo" }) {  //$NON-NLS-1$
+        for (String key : new String[] { "AppWidgetProviderInfo" }) { //$NON-NLS-1$
             if (map.containsKey(key)) {
                 map2.put(key, map.get(key));
             } else {
-                AndmoreAndroidPlugin.log(IStatus.WARNING,
-                        "AppWidget declare-styleable %1$s not found in file %2$s", //$NON-NLS-1$
+                AndmoreAndroidPlugin.log(IStatus.WARNING, "AppWidget declare-styleable %1$s not found in file %2$s", //$NON-NLS-1$
                         key, attrsXmlParser.getOsAttrsXmlPath());
                 AndmoreAndroidPlugin.printErrorToConsole("Android Framework Parser",
                         String.format("AppWidget declare-styleable %1$s not found in file %2$s", //$NON-NLS-1$
-                        key, attrsXmlParser.getOsAttrsXmlPath()));
+                                key, attrsXmlParser.getOsAttrsXmlPath()));
             }
         }
 
@@ -596,8 +541,7 @@ public final class AndroidTargetParser {
     /**
      * Collects all manifest definition information from the attrs_manifest.xml and returns it.
      */
-    private Map<String, DeclareStyleableInfo> collectManifestDefinitions(
-            AttrsXmlParser attrsXmlParser) {
+    private Map<String, DeclareStyleableInfo> collectManifestDefinitions(AttrsXmlParser attrsXmlParser) {
 
         return attrsXmlParser.getDeclareStyleableList();
     }

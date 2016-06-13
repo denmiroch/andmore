@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +11,16 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.lint;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.internal.preferences.AdtPrefs;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
@@ -24,16 +31,6 @@ import com.android.tools.lint.detector.api.Issue;
 import com.android.tools.lint.detector.api.Location;
 import com.android.tools.lint.detector.api.Severity;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.internal.preferences.AdtPrefs;
-import org.eclipse.jface.preference.IPreferenceStore;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /** Global (non-project-specific) configuration for Lint in Eclipse */
 class GlobalLintConfiguration extends Configuration {
     private static final GlobalLintConfiguration sInstance = new GlobalLintConfiguration();
@@ -41,8 +38,7 @@ class GlobalLintConfiguration extends Configuration {
     private Map<Issue, Severity> mSeverities;
     private boolean mBulkEditing;
 
-    private GlobalLintConfiguration() {
-    }
+    private GlobalLintConfiguration() {}
 
     /**
      * Obtain a reference to the singleton
@@ -95,12 +91,10 @@ class GlobalLintConfiguration extends Configuration {
     }
 
     @Override
-    public void ignore(@NonNull Context context, @NonNull Issue issue,
-            @Nullable Location location, @NonNull String message) {
-        throw new UnsupportedOperationException(
-                "Can't ignore() in global configurations"); //$NON-NLS-1$
+    public void ignore(@NonNull Context context, @NonNull Issue issue, @Nullable Location location,
+            @NonNull String message) {
+        throw new UnsupportedOperationException("Can't ignore() in global configurations"); //$NON-NLS-1$
     }
-
 
     @Override
     public void setSeverity(@NonNull Issue issue, @Nullable Severity severity) {

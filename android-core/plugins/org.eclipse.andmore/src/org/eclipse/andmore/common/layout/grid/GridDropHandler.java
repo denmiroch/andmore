@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,15 +26,6 @@ import static org.eclipse.andmore.common.layout.GridLayoutRule.MAX_CELL_DIFFEREN
 import static org.eclipse.andmore.common.layout.GridLayoutRule.SHORT_GAP_DP;
 import static org.eclipse.andmore.common.layout.grid.GridModel.UNDEFINED;
 
-import com.android.ide.common.api.DropFeedback;
-import com.android.ide.common.api.IDragElement;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.IViewMetadata;
-import com.android.ide.common.api.Margins;
-import com.android.ide.common.api.Point;
-import com.android.ide.common.api.Rect;
-import com.android.ide.common.api.SegmentType;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,6 +36,15 @@ import org.eclipse.andmore.common.layout.BaseLayoutRule;
 import org.eclipse.andmore.common.layout.GravityHelper;
 import org.eclipse.andmore.common.layout.GridLayoutRule;
 import org.eclipse.andmore.internal.editors.layout.gre.ViewMetadataRepository;
+
+import com.android.ide.common.api.DropFeedback;
+import com.android.ide.common.api.IDragElement;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.IViewMetadata;
+import com.android.ide.common.api.Margins;
+import com.android.ide.common.api.Point;
+import com.android.ide.common.api.Rect;
+import com.android.ide.common.api.SegmentType;
 
 /**
  * The {@link GridDropHandler} handles drag and drop operations into and within a
@@ -129,24 +126,21 @@ public class GridDropHandler {
 
             // Fallback: Split existing cell. Also do snap-to-grid.
             if (GridLayoutRule.sSnapToGrid) {
-                x1 = ((x1 - MARGIN_SIZE - bounds.x) / GRID_SIZE) * GRID_SIZE
-                        + MARGIN_SIZE + bounds.x;
-                y1 = ((y1 - MARGIN_SIZE - bounds.y) / GRID_SIZE) * GRID_SIZE
-                        + MARGIN_SIZE + bounds.y;
+                x1 = ((x1 - MARGIN_SIZE - bounds.x) / GRID_SIZE) * GRID_SIZE + MARGIN_SIZE + bounds.x;
+                y1 = ((y1 - MARGIN_SIZE - bounds.y) / GRID_SIZE) * GRID_SIZE + MARGIN_SIZE + bounds.y;
                 x2 = x1 + w;
                 y2 = y1 + h;
             }
 
-
             if (columnMatches.size() == 0 && x1 >= bounds.x) {
                 // Split the current cell since we have no matches
                 // TODO: Decide whether it should be gravity left or right...
-                columnMatches.add(new GridMatch(SegmentType.LEFT, 0, x1, mGrid.getColumn(x1),
-                        true /* createCell */, UNDEFINED));
+                columnMatches.add(
+                        new GridMatch(SegmentType.LEFT, 0, x1, mGrid.getColumn(x1), true /* createCell */, UNDEFINED));
             }
             if (rowMatches.size() == 0 && y1 >= bounds.y) {
-                rowMatches.add(new GridMatch(SegmentType.TOP, 0, y1, mGrid.getRow(y1),
-                        true /* createCell */, UNDEFINED));
+                rowMatches
+                        .add(new GridMatch(SegmentType.TOP, 0, y1, mGrid.getRow(y1), true /* createCell */, UNDEFINED));
             }
 
             // Pick best matches
@@ -209,8 +203,7 @@ public class GridDropHandler {
             SegmentType horizontalType = SegmentType.LEFT;
             SegmentType verticalType = SegmentType.TOP;
             int minDistance = 10; // Don't center or right/bottom align in tiny cells
-            if (!createColumn && leftDistance > minDistance
-                    && dragBounds != null && dragBounds.w < cellWidth - 10) {
+            if (!createColumn && leftDistance > minDistance && dragBounds != null && dragBounds.w < cellWidth - 10) {
                 if (rightDistance < leftDistance) {
                     horizontalType = SegmentType.RIGHT;
                 }
@@ -220,8 +213,7 @@ public class GridDropHandler {
                     horizontalType = SegmentType.CENTER_HORIZONTAL;
                 }
             }
-            if (!createRow && topDistance > minDistance
-                    && dragBounds != null && dragBounds.h < cellHeight - 10) {
+            if (!createRow && topDistance > minDistance && dragBounds != null && dragBounds.h < cellHeight - 10) {
                 if (bottomDistance < topDistance) {
                     verticalType = SegmentType.BOTTOM;
                 }
@@ -242,15 +234,12 @@ public class GridDropHandler {
                 description.append('\n');
             }
             if (mColumnMatch.createCell && mColumnMatch.cellIndex < mGrid.actualColumnCount) {
-                description.append(String.format("Shift column %1$d right",
-                        mColumnMatch.cellIndex + 1));
+                description.append(String.format("Shift column %1$d right", mColumnMatch.cellIndex + 1));
                 description.append('\n');
             }
-            description.append(String.format("Insert into cell (%1$s,%2$s)",
-                    rowString, columnString));
+            description.append(String.format("Insert into cell (%1$s,%2$s)", rowString, columnString));
             description.append('\n');
-            description.append(String.format("Align %1$s, %2$s",
-                    horizontalType.name().toLowerCase(Locale.US),
+            description.append(String.format("Align %1$s, %2$s", horizontalType.name().toLowerCase(Locale.US),
                     verticalType.name().toLowerCase(Locale.US)));
             feedback.tooltip = description.toString();
         }
@@ -264,8 +253,7 @@ public class GridDropHandler {
         int columnX = mGrid.getColumnX(column);
         int distance = abs(columnX - x1);
         if (distance <= max) {
-            columnMatches.add(new GridMatch(SegmentType.LEFT, distance, columnX, column,
-                    false, UNDEFINED));
+            columnMatches.add(new GridMatch(SegmentType.LEFT, distance, columnX, column, false, UNDEFINED));
         }
     }
 
@@ -280,8 +268,8 @@ public class GridDropHandler {
         if (rightDistance < max) {
             int columnX = mGrid.getColumnX(columnRight);
             if (columnX > mGrid.layout.getBounds().x) {
-                columnMatches.add(new GridMatch(SegmentType.RIGHT, rightDistance, columnX,
-                        columnRight, false, UNDEFINED));
+                columnMatches
+                        .add(new GridMatch(SegmentType.RIGHT, rightDistance, columnX, columnRight, false, UNDEFINED));
             }
         }
     }
@@ -289,8 +277,8 @@ public class GridDropHandler {
     /**
      * Adds a horizontal match with the center axis of the GridLayout
      */
-    private void addCenterColumnMatch(Rect bounds, int x1, int y1, int x2, int y2,
-            List<GridMatch> columnMatches, int max) {
+    private void addCenterColumnMatch(Rect bounds, int x1, int y1, int x2, int y2, List<GridMatch> columnMatches,
+            int max) {
         Collection<INode> intersectsRow = mGrid.getIntersectsRow(y1, y2);
         if (intersectsRow.size() == 0) {
             // Offer centering on this row since there isn't anything there
@@ -298,8 +286,8 @@ public class GridDropHandler {
             int distance = abs((x1 + x2) / 2 - matchedLine);
             if (distance <= 2 * max) {
                 boolean createCell = false; // always just put in column 0
-                columnMatches.add(new GridMatch(SegmentType.CENTER_HORIZONTAL, distance,
-                        matchedLine, 0 /* column */, createCell, UNDEFINED));
+                columnMatches.add(new GridMatch(SegmentType.CENTER_HORIZONTAL, distance, matchedLine, 0 /* column */,
+                        createCell, UNDEFINED));
             }
         }
     }
@@ -310,8 +298,7 @@ public class GridDropHandler {
     private void addTopMatch(int y1, List<GridMatch> rowMatches, int max, int row, int rowY) {
         int distance = mGrid.getRowDistance(row, y1);
         if (distance <= max) {
-            rowMatches.add(new GridMatch(SegmentType.TOP, distance, rowY, row, false,
-                    UNDEFINED));
+            rowMatches.add(new GridMatch(SegmentType.TOP, distance, rowY, row, false, UNDEFINED));
         }
     }
 
@@ -324,8 +311,7 @@ public class GridDropHandler {
         if (distance < max) {
             int rowY = mGrid.getRowY(rowBottom);
             if (rowY > mGrid.layout.getBounds().y) {
-                rowMatches.add(new GridMatch(SegmentType.BOTTOM, distance, rowY,
-                        rowBottom, false, UNDEFINED));
+                rowMatches.add(new GridMatch(SegmentType.BOTTOM, distance, rowY, rowBottom, false, UNDEFINED));
             }
         }
     }
@@ -333,16 +319,14 @@ public class GridDropHandler {
     /**
      * Adds a baseline match, if applicable.
      */
-    private void addBaselineMatch(int dragBaseline, int y1, List<GridMatch> rowMatches, int max,
-            int row, int rowY) {
+    private void addBaselineMatch(int dragBaseline, int y1, List<GridMatch> rowMatches, int max, int row, int rowY) {
         int dragBaselineY = y1 + dragBaseline;
         int rowBaseline = mGrid.getBaseline(row);
         if (rowBaseline != -1) {
             int rowBaselineY = rowY + rowBaseline;
             int distance = abs(dragBaselineY - rowBaselineY);
             if (distance < max) {
-                rowMatches.add(new GridMatch(SegmentType.BASELINE, distance, rowBaselineY, row,
-                        false, UNDEFINED));
+                rowMatches.add(new GridMatch(SegmentType.BASELINE, distance, rowBaselineY, row, false, UNDEFINED));
             }
         }
     }
@@ -351,15 +335,13 @@ public class GridDropHandler {
      * Computes a horizontal "gap" match - a preferred distance from the nearest edge,
      * including margin edges
      */
-    private void addColumnGapMatch(Rect bounds, int x1, int x2, List<GridMatch> columnMatches,
-            int max) {
+    private void addColumnGapMatch(Rect bounds, int x1, int x2, List<GridMatch> columnMatches, int max) {
         if (x1 < bounds.x + MARGIN_SIZE + max) {
             int matchedLine = bounds.x + MARGIN_SIZE;
             int distance = abs(matchedLine - x1);
             if (distance <= max) {
                 boolean createCell = mGrid.getColumnX(mGrid.getColumn(matchedLine)) != matchedLine;
-                columnMatches.add(new GridMatch(SegmentType.LEFT, distance, matchedLine,
-                        0, createCell, MARGIN_SIZE));
+                columnMatches.add(new GridMatch(SegmentType.LEFT, distance, matchedLine, 0, createCell, MARGIN_SIZE));
             }
         } else if (x2 > bounds.x2() - MARGIN_SIZE - max) {
             int matchedLine = bounds.x2() - MARGIN_SIZE;
@@ -377,8 +359,8 @@ public class GridDropHandler {
             int distance = abs(matchedLine - x1);
             if (distance <= max) {
                 boolean createCell = mGrid.getColumnX(mGrid.getColumn(matchedLine)) != matchedLine;
-                columnMatches.add(new GridMatch(SegmentType.LEFT, distance, matchedLine,
-                        columnRight, createCell, SHORT_GAP_DP));
+                columnMatches.add(
+                        new GridMatch(SegmentType.LEFT, distance, matchedLine, columnRight, createCell, SHORT_GAP_DP));
             }
 
             // Add a column directly adjacent (no gap)
@@ -403,8 +385,7 @@ public class GridDropHandler {
 
             if (distance <= max) {
                 boolean createCell = mGrid.getColumnX(mGrid.getColumn(matchedLine)) != matchedLine;
-                columnMatches.add(new GridMatch(SegmentType.LEFT, distance, matchedLine,
-                        columnRight, createCell, 0));
+                columnMatches.add(new GridMatch(SegmentType.LEFT, distance, matchedLine, columnRight, createCell, 0));
             }
         }
     }
@@ -419,8 +400,7 @@ public class GridDropHandler {
             int distance = abs(matchedLine - y1);
             if (distance <= max) {
                 boolean createCell = mGrid.getRowY(mGrid.getRow(matchedLine)) != matchedLine;
-                rowMatches.add(new GridMatch(SegmentType.TOP, distance, matchedLine,
-                        0, createCell, MARGIN_SIZE));
+                rowMatches.add(new GridMatch(SegmentType.TOP, distance, matchedLine, 0, createCell, MARGIN_SIZE));
             }
         } else if (y2 > bounds.y2() - MARGIN_SIZE - max) {
             int matchedLine = bounds.y2() - MARGIN_SIZE;
@@ -438,8 +418,8 @@ public class GridDropHandler {
             int distance = abs(matchedLine - y1);
             if (distance <= max) {
                 boolean createCell = mGrid.getRowY(mGrid.getRow(matchedLine)) != matchedLine;
-                rowMatches.add(new GridMatch(SegmentType.TOP, distance, matchedLine,
-                        rowBottom, createCell, SHORT_GAP_DP));
+                rowMatches.add(
+                        new GridMatch(SegmentType.TOP, distance, matchedLine, rowBottom, createCell, SHORT_GAP_DP));
             }
 
             // Add a row directly adjacent (no gap)
@@ -450,8 +430,7 @@ public class GridDropHandler {
             distance += 2; // See explanation in addColumnGapMatch
             if (distance <= max) {
                 boolean createCell = mGrid.getRowY(mGrid.getRow(matchedLine)) != matchedLine;
-                rowMatches.add(new GridMatch(SegmentType.TOP, distance, matchedLine,
-                        rowBottom, createCell, 0));
+                rowMatches.add(new GridMatch(SegmentType.TOP, distance, matchedLine, rowBottom, createCell, 0));
             }
 
         }
@@ -529,7 +508,6 @@ public class GridDropHandler {
             // row or column then the row or column weight should be moved to the right or
             // bottom half!
 
-
             //int columnX = mGrid.getColumnX(column);
             //int rowY = mGrid.getRowY(row);
 
@@ -580,15 +558,15 @@ public class GridDropHandler {
 
         // If the item almost fits into the row (at most N % bigger) then just enlarge
         // the row; don't add a rowspan since that will defeat baseline alignment etc
-        if (!mRowMatch.createCell && bounds.h <= MAX_CELL_DIFFERENCE * mGrid.getRowHeight(
-                mRowMatch.type == SegmentType.BOTTOM ? endRow : row, 1)) {
+        if (!mRowMatch.createCell && bounds.h <= MAX_CELL_DIFFERENCE
+                * mGrid.getRowHeight(mRowMatch.type == SegmentType.BOTTOM ? endRow : row, 1)) {
             if (mRowMatch.type == SegmentType.BOTTOM) {
                 row += rowSpan - 1;
             }
             rowSpan = 1;
         }
-        if (!mColumnMatch.createCell && bounds.w <= MAX_CELL_DIFFERENCE * mGrid.getColumnWidth(
-                mColumnMatch.type == SegmentType.RIGHT ? endColumn : column, 1)) {
+        if (!mColumnMatch.createCell && bounds.w <= MAX_CELL_DIFFERENCE
+                * mGrid.getColumnWidth(mColumnMatch.type == SegmentType.RIGHT ? endColumn : column, 1)) {
             if (mColumnMatch.type == SegmentType.RIGHT) {
                 column += columnSpan - 1;
             }
@@ -770,8 +748,7 @@ public class GridDropHandler {
 
         int column = mColumnMatch.cellIndex;
         if (mColumnMatch.createCell) {
-            mGrid.addColumn(column,
-                    newChild, UNDEFINED, false, UNDEFINED, UNDEFINED);
+            mGrid.addColumn(column, newChild, UNDEFINED, false, UNDEFINED, UNDEFINED);
         }
         int row = mRowMatch.cellIndex;
         if (mRowMatch.createCell) {

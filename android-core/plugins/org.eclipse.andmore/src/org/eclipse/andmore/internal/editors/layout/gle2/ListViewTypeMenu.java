@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,11 +17,6 @@ import static org.eclipse.andmore.internal.editors.layout.gle2.LayoutMetadata.KE
 import static org.eclipse.andmore.internal.editors.layout.gle2.LayoutMetadata.KEY_LV_HEADER;
 import static org.eclipse.andmore.internal.editors.layout.gle2.LayoutMetadata.KEY_LV_ITEM;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.rendering.api.Capability;
-import com.android.resources.ResourceType;
-
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.uimodel.UiViewElementNode;
 import org.eclipse.andmore.internal.resources.CyclicDependencyValidator;
@@ -37,6 +29,11 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Menu;
 import org.w3c.dom.Node;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.rendering.api.Capability;
+import com.android.resources.ResourceType;
 
 /**
  * "Preview List Content" context menu which lists available data types and layouts
@@ -58,8 +55,7 @@ public class ListViewTypeMenu extends SubmenuAction {
      * @param isSpinner whether the menu is for a spinner rather than a list
      */
     public ListViewTypeMenu(LayoutCanvas canvas, boolean isGrid, boolean isSpinner) {
-        super(isGrid ? "Preview Grid Content" : isSpinner ? "Preview Spinner Layout"
-                : "Preview List Content");
+        super(isGrid ? "Preview Grid Content" : isSpinner ? "Preview Spinner Layout" : "Preview List Content");
         mCanvas = canvas;
         mGrid = isGrid;
         mSpinner = isSpinner;
@@ -81,40 +77,32 @@ public class ListViewTypeMenu extends SubmenuAction {
             }
 
             if (mSpinner) {
-                action = new SetListTypeAction("Spinner Item",
-                        "simple_spinner_item", selected); //$NON-NLS-1$
+                action = new SetListTypeAction("Spinner Item", "simple_spinner_item", selected); //$NON-NLS-2$
                 new ActionContributionItem(action).fill(menu, -1);
-                action = new SetListTypeAction("Spinner Dropdown Item",
-                        "simple_spinner_dropdown_item", selected); //$NON-NLS-1$
+                action = new SetListTypeAction("Spinner Dropdown Item", "simple_spinner_dropdown_item", selected); //$NON-NLS-2$
                 new ActionContributionItem(action).fill(menu, -1);
                 return;
             }
 
-            action = new SetListTypeAction("Simple List Item",
-                    "simple_list_item_1", selected); //$NON-NLS-1$
+            action = new SetListTypeAction("Simple List Item", "simple_list_item_1", selected); //$NON-NLS-2$
             new ActionContributionItem(action).fill(menu, -1);
-            action = new SetListTypeAction("Simple 2-Line List Item",
-                    "simple_list_item_2", //$NON-NLS-1$
+            action = new SetListTypeAction("Simple 2-Line List Item", "simple_list_item_2", //$NON-NLS-2$
                     selected);
             new ActionContributionItem(action).fill(menu, -1);
-            action = new SetListTypeAction("Checked List Item",
-                    "simple_list_item_checked", //$NON-NLS-1$
+            action = new SetListTypeAction("Checked List Item", "simple_list_item_checked", //$NON-NLS-2$
                     selected);
             new ActionContributionItem(action).fill(menu, -1);
-            action = new SetListTypeAction("Single Choice List Item",
-                    "simple_list_item_single_choice", //$NON-NLS-1$
+            action = new SetListTypeAction("Single Choice List Item", "simple_list_item_single_choice", //$NON-NLS-2$
                     selected);
             new ActionContributionItem(action).fill(menu, -1);
-            action = new SetListTypeAction("Multiple Choice List Item",
-                    "simple_list_item_multiple_choice", //$NON-NLS-1$
+            action = new SetListTypeAction("Multiple Choice List Item", "simple_list_item_multiple_choice", //$NON-NLS-2$
                     selected);
             if (!mGrid) {
                 new Separator().fill(menu, -1);
-                action = new SetListTypeAction("Simple Expandable List Item",
-                        "simple_expandable_list_item_1", selected); //$NON-NLS-1$
+                action = new SetListTypeAction("Simple Expandable List Item", "simple_expandable_list_item_1", //$NON-NLS-2$
+                        selected);
                 new ActionContributionItem(action).fill(menu, -1);
-                action = new SetListTypeAction("Simple 2-Line Expandable List Item",
-                        "simple_expandable_list_item_2", //$NON-NLS-1$
+                action = new SetListTypeAction("Simple 2-Line Expandable List Item", "simple_expandable_list_item_2", //$NON-NLS-2$
                         selected);
                 new ActionContributionItem(action).fill(menu, -1);
 
@@ -126,8 +114,7 @@ public class ListViewTypeMenu extends SubmenuAction {
             }
         } else {
             // Should we just hide the menu item instead?
-            addDisabledMessageItem(
-                    "Not supported for this SDK version; try changing the Render Target");
+            addDisabledMessageItem("Not supported for this SDK version; try changing the Render Target");
         }
     }
 
@@ -169,9 +156,8 @@ public class ListViewTypeMenu extends SubmenuAction {
             IFile file = delegate.getEditor().getInputFile();
             GraphicalEditorPart editor = delegate.getGraphicalEditor();
             ResourceChooser dlg = ResourceChooser.create(editor, ResourceType.LAYOUT)
-                .setInputValidator(CyclicDependencyValidator.create(file))
-                .setInitialSize(85, 10)
-                .setCurrentResource(getSelectedLayout());
+                    .setInputValidator(CyclicDependencyValidator.create(file)).setInitialSize(85, 10)
+                    .setCurrentResource(getSelectedLayout());
             int result = dlg.open();
             if (result == ResourceChooser.CLEAR_RETURN_CODE) {
                 setNewType(mType, null);

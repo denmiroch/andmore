@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,7 +88,7 @@ public class ProjectChooserHelper {
         @Override
         public boolean accept(IProject project) {
             ProjectState state = Sdk.getProjectState(project);
-            if (state != null ) {
+            if (state != null) {
                 return state.isLibrary();
             }
 
@@ -126,10 +123,8 @@ public class ProjectChooserHelper {
      * @return the project chosen by the user in the dialog, or null if the dialog was canceled.
      */
     public IJavaProject chooseJavaProject(String projectName, String message) {
-        ILabelProvider labelProvider = new JavaElementLabelProvider(
-                JavaElementLabelProvider.SHOW_DEFAULT);
-        ElementListSelectionDialog dialog = new ElementListSelectionDialog(
-                mParentShell, labelProvider);
+        ILabelProvider labelProvider = new JavaElementLabelProvider(JavaElementLabelProvider.SHOW_DEFAULT);
+        ElementListSelectionDialog dialog = new ElementListSelectionDialog(mParentShell, labelProvider);
         dialog.setTitle("Project Selection");
         if (message == null) {
             message = "Please select a project";
@@ -221,8 +216,7 @@ public class ProjectChooserHelper {
          * @param initialProject the initial project to select, or null (which
          *            will show a "Please Choose Project..." label instead.)
          */
-        public ProjectCombo(ProjectChooserHelper helper, Composite parent,
-                IProject initialProject) {
+        public ProjectCombo(ProjectChooserHelper helper, Composite parent, IProject initialProject) {
             super(parent, SWT.BORDER | SWT.FLAT | SWT.READ_ONLY);
             mProject = initialProject;
 
@@ -230,8 +224,7 @@ public class ProjectChooserHelper {
             String[] items = new String[mAvailableProjects.length + 1];
             items[0] = "--- Choose Project ---";
 
-            ILabelProvider labelProvider = new JavaElementLabelProvider(
-                    JavaElementLabelProvider.SHOW_DEFAULT);
+            ILabelProvider labelProvider = new JavaElementLabelProvider(JavaElementLabelProvider.SHOW_DEFAULT);
             int selectionIndex = 0;
             for (int i = 0, n = mAvailableProjects.length; i < n; i++) {
                 IProject project = mAvailableProjects[i].getProject();
@@ -281,8 +274,7 @@ public class ProjectChooserHelper {
         @Override
         public void widgetSelected(SelectionEvent e) {
             int selectionIndex = getSelectionIndex();
-            if (selectionIndex > 0 && mAvailableProjects != null
-                    && selectionIndex <= mAvailableProjects.length) {
+            if (selectionIndex > 0 && mAvailableProjects != null && selectionIndex <= mAvailableProjects.length) {
                 // selection index 0 is "Choose Project", all other projects are offset
                 // by 1 from the selection index
                 mProject = mAvailableProjects[selectionIndex - 1].getProject();
@@ -292,8 +284,7 @@ public class ProjectChooserHelper {
         }
 
         @Override
-        public void widgetDefaultSelected(SelectionEvent e) {
-        }
+        public void widgetDefaultSelected(SelectionEvent e) {}
 
         @Override
         protected void checkSubclass() {

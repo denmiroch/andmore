@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,9 +11,6 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.wizards.newproject;
-
-import com.android.ide.common.xml.ManifestData;
-import com.android.sdklib.IAndroidTarget;
 
 import org.eclipse.andmore.internal.project.AndroidManifestHelper;
 import org.eclipse.andmore.internal.project.ProjectChooserHelper;
@@ -39,6 +33,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.FilteredList;
+
+import com.android.ide.common.xml.ManifestData;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * Page shown when creating a test project which lets you choose between testing
@@ -85,10 +82,8 @@ class TestTargetPage extends WizardPage implements SelectionListener {
         mExistingRadioButton.setText("An existing Android project:");
         mExistingRadioButton.addSelectionListener(this);
 
-        ILabelProvider labelProvider = new JavaElementLabelProvider(
-                JavaElementLabelProvider.SHOW_DEFAULT);
-        mProjectList = new FilteredList(container,
-                SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE, labelProvider,
+        ILabelProvider labelProvider = new JavaElementLabelProvider(JavaElementLabelProvider.SHOW_DEFAULT);
+        mProjectList = new FilteredList(container, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE, labelProvider,
                 true /*ignoreCase*/, false /*allowDuplicates*/, true /* matchEmptyString*/);
         mProjectList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
         mProjectList.addSelectionListener(this);
@@ -180,24 +175,20 @@ class TestTargetPage extends WizardPage implements SelectionListener {
 
     private IProject getSelectedProject() {
         Object[] selection = mProjectList.getSelection();
-        IProject project = selection != null && selection.length == 1
-            ? ((IJavaProject) selection[0]).getProject() : null;
+        IProject project = selection != null && selection.length == 1 ? ((IJavaProject) selection[0]).getProject()
+                : null;
         return project;
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 
     private void setExistingProject(IProject project) {
         mValues.testedProject = project;
 
         // Try to update the application, package, sdk target and minSdkVersion accordingly
-        if (project != null &&
-                (!mValues.applicationNameModifiedByUser ||
-                 !mValues.packageNameModifiedByUser     ||
-                 !mValues.targetModifiedByUser          ||
-                 !mValues.minSdkModifiedByUser)) {
+        if (project != null && (!mValues.applicationNameModifiedByUser || !mValues.packageNameModifiedByUser
+                || !mValues.targetModifiedByUser || !mValues.minSdkModifiedByUser)) {
             ManifestData manifestData = AndroidManifestHelper.parseForData(project);
             if (manifestData != null) {
                 String appName = String.format("%1$sTest", project.getName());
@@ -209,7 +200,7 @@ class TestTargetPage extends WizardPage implements SelectionListener {
                 }
 
                 if (packageName == null) {
-                    packageName = "";  //$NON-NLS-1$
+                    packageName = ""; //$NON-NLS-1$
                 }
                 mLastExistingPackageName = packageName;
 
@@ -222,7 +213,7 @@ class TestTargetPage extends WizardPage implements SelectionListener {
                 }
 
                 if (!mValues.packageNameModifiedByUser) {
-                    packageName += ".test";  //$NON-NLS-1$
+                    packageName += ".test"; //$NON-NLS-1$
                     mValues.packageName = packageName;
                 }
 

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,9 +15,7 @@ package org.eclipse.andmore.internal.editors.layout.properties;
 import static com.android.SdkConstants.ATTR_LAYOUT_MARGIN;
 import static com.android.SdkConstants.ATTR_LAYOUT_RESOURCE_PREFIX;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.IAttributeInfo;
+import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.common.CommonXmlEditor;
@@ -42,7 +37,9 @@ import org.eclipse.wb.internal.core.model.property.table.PropertyTooltipTextProv
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.IAttributeInfo;
 
 /**
  * An Android XML property
@@ -53,10 +50,7 @@ class XmlProperty extends Property {
     private UiViewElementNode mNode;
     private Property mParent;
 
-    XmlProperty(
-            @NonNull PropertyEditor editor,
-            @NonNull PropertyFactory factory,
-            @NonNull UiViewElementNode node,
+    XmlProperty(@NonNull PropertyEditor editor, @NonNull PropertyFactory factory, @NonNull UiViewElementNode node,
             @NonNull AttributeDescriptor descriptor) {
         super(editor);
         mFactory = factory;
@@ -92,8 +86,7 @@ class XmlProperty extends Property {
         int nameLength = name.length();
 
         if (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)) {
-            if (name.startsWith(ATTR_LAYOUT_MARGIN)
-                    && nameLength > ATTR_LAYOUT_MARGIN.length()) {
+            if (name.startsWith(ATTR_LAYOUT_MARGIN) && nameLength > ATTR_LAYOUT_MARGIN.length()) {
                 name = name.substring(ATTR_LAYOUT_MARGIN.length());
             } else {
                 name = name.substring(ATTR_LAYOUT_RESOURCE_PREFIX.length());
@@ -110,8 +103,7 @@ class XmlProperty extends Property {
             if (name.startsWith(parentTitle)) {
                 int parentTitleLength = parentTitle.length();
                 if (parentTitleLength < nameLength) {
-                    if (nameLength > parentTitleLength &&
-                            Character.isWhitespace(name.charAt(parentTitleLength))) {
+                    if (nameLength > parentTitleLength && Character.isWhitespace(name.charAt(parentTitleLength))) {
                         parentTitleLength++;
                     }
                     name = name.substring(parentTitleLength);
@@ -147,14 +139,14 @@ class XmlProperty extends Property {
         } else if (adapter == ILabelProvider.class) {
             return adapter.cast(new LabelProvider() {
                 @Override
-              public Image getImage(Object element) {
-                  return AndmoreAndroidPlugin.getAndroidLogo();
-              }
+                public Image getImage(Object element) {
+                    return AndmoreAndroidPlugin.getAndroidLogo();
+                }
 
-              @Override
-              public String getText(Object element) {
-                  return ((IContentProposal) element).getLabel();
-              }
+                @Override
+                public String getText(Object element) {
+                    return ((IContentProposal) element).getLabel();
+                }
             });
         }
         return super.getAdapter(adapter);
@@ -229,13 +221,10 @@ class XmlProperty extends Property {
         }
         final String attribute = mDescriptor.getXmlLocalName();
         final String xmlValue = value != null && value != UNKNOWN_VALUE ? value.toString() : null;
-        editor.wrapUndoEditXmlModel(
-                String.format("Set \"%1$s\" to \"%2$s\"", attribute, xmlValue),
-                new Runnable() {
+        editor.wrapUndoEditXmlModel(String.format("Set \"%1$s\" to \"%2$s\"", attribute, xmlValue), new Runnable() {
             @Override
             public void run() {
-                mNode.setAttributeValue(attribute,
-                        mDescriptor.getNamespaceUri(), xmlValue, true /*override*/);
+                mNode.setAttributeValue(attribute, mDescriptor.getNamespaceUri(), xmlValue, true /*override*/);
                 mNode.commitDirtyAttributesToXml();
             }
         });

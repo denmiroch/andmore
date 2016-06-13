@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,14 +21,12 @@ import static com.android.SdkConstants.LAYOUT_RESOURCE_PREFIX;
 import static com.android.SdkConstants.TOOLS_URI;
 import static com.android.SdkConstants.VALUE_AUTO_FIT;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.rendering.api.AdapterBinding;
-import com.android.ide.common.rendering.api.DataBindingItem;
-import com.android.ide.common.rendering.api.ResourceReference;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.layout.ProjectCallback;
 import org.eclipse.andmore.internal.editors.layout.uimodel.UiViewElementNode;
@@ -49,9 +44,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xmlpull.v1.XmlPullParser;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.rendering.api.AdapterBinding;
+import com.android.ide.common.rendering.api.DataBindingItem;
+import com.android.ide.common.rendering.api.ResourceReference;
 
 /**
  * Design-time metadata lookup for layouts, such as fragment and AdapterView bindings.
@@ -67,19 +64,18 @@ public class LayoutMetadata {
     /** The string to start metadata comments with */
     private static final String COMMENT_PROLOGUE = " Preview: ";
     /** The property key, included in comments, which references a list item layout */
-    public static final String KEY_LV_ITEM = "listitem";        //$NON-NLS-1$
+    public static final String KEY_LV_ITEM = "listitem"; //$NON-NLS-1$
     /** The property key, included in comments, which references a list header layout */
-    public static final String KEY_LV_HEADER = "listheader";    //$NON-NLS-1$
+    public static final String KEY_LV_HEADER = "listheader"; //$NON-NLS-1$
     /** The property key, included in comments, which references a list footer layout */
-    public static final String KEY_LV_FOOTER = "listfooter";    //$NON-NLS-1$
+    public static final String KEY_LV_FOOTER = "listfooter"; //$NON-NLS-1$
     /** The property key, included in comments, which references a fragment layout to show */
-    public static final String KEY_FRAGMENT_LAYOUT = "layout";        //$NON-NLS-1$
+    public static final String KEY_FRAGMENT_LAYOUT = "layout"; //$NON-NLS-1$
     // NOTE: If you add additional keys related to resources, make sure you update the
     // ResourceRenameParticipant
 
     /** Utility class, do not create instances */
-    private LayoutMetadata() {
-    }
+    private LayoutMetadata() {}
 
     /**
      * Returns the given property specified in the <b>current</b> element being
@@ -125,8 +121,7 @@ public class LayoutMetadata {
                     }
                     node.removeChild(commentNode);
                     Node first = node.getFirstChild();
-                    if (first != null && first.getNextSibling() == null
-                            && first.getNodeType() == Node.TEXT_NODE) {
+                    if (first != null && first.getNextSibling() == null && first.getNodeType() == Node.TEXT_NODE) {
                         if (first.getNodeValue().trim().length() == 0) {
                             node.removeChild(first);
                         }
@@ -144,9 +139,7 @@ public class LayoutMetadata {
      * @return the value stored with the given node and name, or null
      */
     @Nullable
-    public static String getProperty(
-            @NonNull Node node,
-            @NonNull String name) {
+    public static String getProperty(@NonNull Node node, @NonNull String name) {
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             Element element = (Element) node;
             String value = element.getAttributeNS(TOOLS_URI, name);
@@ -169,19 +162,15 @@ public class LayoutMetadata {
      * @param name the name of the property to set
      * @param value the value to store for the given node and name, or null to remove it
      */
-    public static void setProperty(
-            @NonNull final AndroidXmlEditor editor,
-            @NonNull final Node node,
-            @NonNull final String name,
-            @Nullable final String value) {
+    public static void setProperty(@NonNull final AndroidXmlEditor editor, @NonNull final Node node,
+            @NonNull final String name, @Nullable final String value) {
         // Clear out the old metadata
         clearLegacyComment(node);
 
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             final Element element = (Element) node;
             final String undoLabel = "Bind View";
-            AdtUtils.setToolsAttribute(editor, element, undoLabel, name, value,
-                    false /*reveal*/, false /*append*/);
+            AdtUtils.setToolsAttribute(editor, element, undoLabel, name, value, false /*reveal*/, false /*append*/);
 
             // Also apply the same layout to any corresponding elements in other configurations
             // of this layout.
@@ -203,8 +192,7 @@ public class LayoutMetadata {
                                 // If the corresponding file is open in the IDE, use the
                                 // editor version instead
                                 if (!AdtPrefs.getPrefs().isSharedLayoutEditor()) {
-                                    if (setPropertyInEditor(undoLabel, variation, element, name,
-                                            value)) {
+                                    if (setPropertyInEditor(undoLabel, variation, element, name, value)) {
                                         return Status.OK_STATUS;
                                     }
                                 }
@@ -230,14 +218,9 @@ public class LayoutMetadata {
         }
     }
 
-    private static boolean setPropertyInEditor(
-            @NonNull String undoLabel,
-            @NonNull IFile variation,
-            @NonNull final Element equivalentElement,
-            @NonNull final String name,
-            @Nullable final String value) {
-        Collection<IEditorPart> editors =
-                AdtUtils.findEditorsFor(variation, false /*restore*/);
+    private static boolean setPropertyInEditor(@NonNull String undoLabel, @NonNull IFile variation,
+            @NonNull final Element equivalentElement, @NonNull final String name, @Nullable final String value) {
+        Collection<IEditorPart> editors = AdtUtils.findEditorsFor(variation, false /*restore*/);
         for (IEditorPart part : editors) {
             AndroidXmlEditor editor = AdtUtils.getXmlEditor(part);
             if (editor != null) {
@@ -245,8 +228,8 @@ public class LayoutMetadata {
                 if (doc != null) {
                     Element element = DomUtilities.findCorresponding(equivalentElement, doc);
                     if (element != null) {
-                        AdtUtils.setToolsAttribute(editor, element, undoLabel, name,
-                                value, false /*reveal*/, false /*append*/);
+                        AdtUtils.setToolsAttribute(editor, element, undoLabel, name, value, false /*reveal*/,
+                                false /*append*/);
                         if (part instanceof GraphicalEditorPart) {
                             GraphicalEditorPart g = (GraphicalEditorPart) part;
                             g.recomputeLayout();
@@ -261,18 +244,13 @@ public class LayoutMetadata {
         return false;
     }
 
-    private static boolean setPropertyInFile(
-            @NonNull String undoLabel,
-            @NonNull IFile variation,
-            @NonNull final Element element,
-            @NonNull final String name,
-            @Nullable final String value) {
+    private static boolean setPropertyInFile(@NonNull String undoLabel, @NonNull IFile variation,
+            @NonNull final Element element, @NonNull final String name, @Nullable final String value) {
         Document doc = DomUtilities.getDocument(variation);
         if (doc != null && element.getOwnerDocument() != doc) {
             Element other = DomUtilities.findCorresponding(element, doc);
             if (other != null) {
-                AdtUtils.setToolsAttribute(variation, other, undoLabel,
-                        name, value, false);
+                AdtUtils.setToolsAttribute(variation, other, undoLabel, name, value, false);
 
                 return true;
             }
@@ -301,9 +279,7 @@ public class LayoutMetadata {
      * @return a binding, or null
      */
     @Nullable
-    public static AdapterBinding getNodeBinding(
-            @Nullable Object viewObject,
-            @NonNull Map<String, String> map) {
+    public static AdapterBinding getNodeBinding(@Nullable Object viewObject, @NonNull Map<String, String> map) {
         String header = map.get(KEY_LV_HEADER);
         String footer = map.get(KEY_LV_FOOTER);
         String layout = map.get(KEY_LV_ITEM);
@@ -324,9 +300,7 @@ public class LayoutMetadata {
      * @return a binding, or null
      */
     @Nullable
-    public static AdapterBinding getNodeBinding(
-            @Nullable Object viewObject,
-            @NonNull UiViewElementNode uiNode) {
+    public static AdapterBinding getNodeBinding(@Nullable Object viewObject, @NonNull UiViewElementNode uiNode) {
         Node xmlNode = uiNode.getXmlNode();
 
         String header = getProperty(xmlNode, KEY_LV_HEADER);
@@ -340,8 +314,7 @@ public class LayoutMetadata {
                 Element element = (Element) xmlNode;
                 String columns = element.getAttributeNS(ANDROID_URI, ATTR_NUM_COLUMNS);
                 int multiplier = 2;
-                if (columns != null && columns.length() > 0 &&
-                        !columns.equals(VALUE_AUTO_FIT)) {
+                if (columns != null && columns.length() > 0 && !columns.equals(VALUE_AUTO_FIT)) {
                     try {
                         int c = Integer.parseInt(columns);
                         if (c >= 1 && c <= 10) {
@@ -361,21 +334,19 @@ public class LayoutMetadata {
         return null;
     }
 
-    private static AdapterBinding getNodeBinding(Object viewObject,
-            String header, String footer, String layout, int count) {
+    private static AdapterBinding getNodeBinding(Object viewObject, String header, String footer, String layout,
+            int count) {
         if (layout != null || header != null || footer != null) {
             AdapterBinding binding = new AdapterBinding(count);
 
             if (header != null) {
                 boolean isFramework = header.startsWith(ANDROID_LAYOUT_RESOURCE_PREFIX);
-                binding.addHeader(new ResourceReference(stripLayoutPrefix(header),
-                        isFramework));
+                binding.addHeader(new ResourceReference(stripLayoutPrefix(header), isFramework));
             }
 
             if (footer != null) {
                 boolean isFramework = footer.startsWith(ANDROID_LAYOUT_RESOURCE_PREFIX);
-                binding.addFooter(new ResourceReference(stripLayoutPrefix(footer),
-                        isFramework));
+                binding.addFooter(new ResourceReference(stripLayoutPrefix(footer), isFramework));
             }
 
             if (layout != null) {
@@ -391,19 +362,13 @@ public class LayoutMetadata {
                 String listFqcn = ProjectCallback.getListAdapterViewFqcn(viewObject.getClass());
                 if (listFqcn != null) {
                     if (listFqcn.endsWith(EXPANDABLE_LIST_VIEW)) {
-                        binding.addItem(
-                                new DataBindingItem(DEFAULT_EXPANDABLE_LIST_ITEM,
-                                true /* isFramework */, 1));
+                        binding.addItem(new DataBindingItem(DEFAULT_EXPANDABLE_LIST_ITEM, true /* isFramework */, 1));
                     } else {
-                        binding.addItem(
-                                new DataBindingItem(DEFAULT_LIST_ITEM,
-                                true /* isFramework */, 1));
+                        binding.addItem(new DataBindingItem(DEFAULT_LIST_ITEM, true /* isFramework */, 1));
                     }
                 }
             } else {
-                binding.addItem(
-                        new DataBindingItem(DEFAULT_LIST_ITEM,
-                        true /* isFramework */, 1));
+                binding.addItem(new DataBindingItem(DEFAULT_LIST_ITEM, true /* isFramework */, 1));
             }
             return binding;
         }

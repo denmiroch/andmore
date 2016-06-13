@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,9 +45,8 @@ public class UiElementPart extends ManifestSectionPart {
     /** Table that contains all the attributes */
     private Composite mTable;
 
-    public UiElementPart(Composite body, FormToolkit toolkit, ManifestEditor editor,
-            UiElementNode uiElementNode, String sectionTitle, String sectionDescription,
-            int extra_style) {
+    public UiElementPart(Composite body, FormToolkit toolkit, ManifestEditor editor, UiElementNode uiElementNode,
+            String sectionTitle, String sectionDescription, int extra_style) {
         super(body, toolkit, extra_style, sectionDescription != null);
         mEditor = editor;
         mUiElementNode = uiElementNode;
@@ -186,8 +182,7 @@ public class UiElementPart extends ManifestSectionPart {
 
         if (inserted == 0) {
             createLabel(table, managedForm.getToolkit(),
-                    "No attributes to display, waiting for SDK to finish loading...",
-                    null /* tooltip */ );
+                    "No attributes to display, waiting for SDK to finish loading...", null /* tooltip */ );
         }
     }
 
@@ -221,10 +216,8 @@ public class UiElementPart extends ManifestSectionPart {
             } else {
                 // The XML has an extra attribute which wasn't declared in
                 // AndroidManifestDescriptors. This is not a problem, we just ignore it.
-                AndmoreAndroidPlugin.log(IStatus.WARNING,
-                        "Attribute %1$s not declared in node %2$s, ignored.", //$NON-NLS-1$
-                        attr_desc.getXmlLocalName(),
-                        uiNode.getDescriptor().getXmlName());
+                AndmoreAndroidPlugin.log(IStatus.WARNING, "Attribute %1$s not declared in node %2$s, ignored.", //$NON-NLS-1$
+                        attr_desc.getXmlLocalName(), uiNode.getDescriptor().getXmlName());
             }
         }
         return attr_desc_list.length;

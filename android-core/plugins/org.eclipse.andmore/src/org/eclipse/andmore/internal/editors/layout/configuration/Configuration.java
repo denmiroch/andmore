@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,45 +67,44 @@ import com.google.common.base.Objects;
  */
 public class Configuration {
     /** The {@link FolderConfiguration} in change flags or override flags */
-    public static final int CFG_FOLDER       = 1 << 0;
+    public static final int CFG_FOLDER = 1 << 0;
     /** The {@link Device} in change flags or override flags */
-    public static final int CFG_DEVICE       = 1 << 1;
+    public static final int CFG_DEVICE = 1 << 1;
     /** The {@link State} in change flags or override flags */
     public static final int CFG_DEVICE_STATE = 1 << 2;
     /** The theme in change flags or override flags */
-    public static final int CFG_THEME        = 1 << 3;
+    public static final int CFG_THEME = 1 << 3;
     /** The locale in change flags or override flags */
-    public static final int CFG_LOCALE       = 1 << 4;
+    public static final int CFG_LOCALE = 1 << 4;
     /** The rendering {@link IAndroidTarget} in change flags or override flags */
-    public static final int CFG_TARGET       = 1 << 5;
+    public static final int CFG_TARGET = 1 << 5;
     /** The {@link NightMode} in change flags or override flags */
-    public static final int CFG_NIGHT_MODE   = 1 << 6;
+    public static final int CFG_NIGHT_MODE = 1 << 6;
     /** The {@link UiMode} in change flags or override flags */
-    public static final int CFG_UI_MODE      = 1 << 7;
+    public static final int CFG_UI_MODE = 1 << 7;
     /** The {@link UiMode} in change flags or override flags */
-    public static final int CFG_ACTIVITY     = 1 << 8;
+    public static final int CFG_ACTIVITY = 1 << 8;
 
     /** References all attributes */
     public static final int MASK_ALL = 0xFFFF;
 
     /** Attributes which affect which best-layout-file selection */
-    public static final int MASK_FILE_ATTRS =
-            CFG_DEVICE|CFG_DEVICE_STATE|CFG_LOCALE|CFG_TARGET|CFG_NIGHT_MODE|CFG_UI_MODE;
+    public static final int MASK_FILE_ATTRS = CFG_DEVICE | CFG_DEVICE_STATE | CFG_LOCALE | CFG_TARGET | CFG_NIGHT_MODE
+            | CFG_UI_MODE;
 
     /** Attributes which affect rendering appearance */
-    public static final int MASK_RENDERING = MASK_FILE_ATTRS|CFG_THEME;
+    public static final int MASK_RENDERING = MASK_FILE_ATTRS | CFG_THEME;
 
     /**
      * Setting name for project-wide setting controlling rendering target and locale which
      * is shared for all files
      */
-    public final static QualifiedName NAME_RENDER_STATE =
-        new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "render");          //$NON-NLS-1$
+    public final static QualifiedName NAME_RENDER_STATE = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "render"); //$NON-NLS-1$
 
-    private final static String MARKER_FRAMEWORK = "-";            //$NON-NLS-1$
-    private final static String MARKER_PROJECT = "+";              //$NON-NLS-1$
-    private final static String SEP = ":";                         //$NON-NLS-1$
-    private final static String SEP_LOCALE = "-";                  //$NON-NLS-1$
+    private final static String MARKER_FRAMEWORK = "-"; //$NON-NLS-1$
+    private final static String MARKER_PROJECT = "+"; //$NON-NLS-1$
+    private final static String SEP = ":"; //$NON-NLS-1$
+    private final static String SEP_LOCALE = "-"; //$NON-NLS-1$
 
     @NonNull
     protected ConfigurationChooser mConfigChooser;
@@ -211,14 +207,11 @@ public class Configuration {
      * @return a suitable configuration
      */
     @NonNull
-    public static Configuration create(
-            @NonNull Configuration base,
-            @NonNull IFile file) {
+    public static Configuration create(@NonNull Configuration base, @NonNull IFile file) {
         Configuration configuration = copy(base);
         ConfigurationChooser chooser = base.getChooser();
         ProjectResources resources = chooser.getResources();
-        ConfigurationMatcher matcher = new ConfigurationMatcher(chooser, configuration, file,
-                resources, false);
+        ConfigurationMatcher matcher = new ConfigurationMatcher(chooser, configuration, file, resources, false);
 
         ResourceFolder resFolder = ResourceManager.getInstance().getResourceFolder(file);
         configuration.mEditedConfig = new FolderConfiguration();
@@ -358,8 +351,7 @@ public class Configuration {
     public boolean isProjectTheme() {
         String theme = getTheme();
         if (theme != null) {
-            assert theme.startsWith(STYLE_RESOURCE_PREFIX)
-                || theme.startsWith(ANDROID_STYLE_RESOURCE_PREFIX);
+            assert theme.startsWith(STYLE_RESOURCE_PREFIX) || theme.startsWith(ANDROID_STYLE_RESOURCE_PREFIX);
 
             return ResourceHelper.isProjectStyle(theme);
         }
@@ -566,8 +558,7 @@ public class Configuration {
 
         if (!locale.hasLanguage()) {
             // Avoid getting the layout library if the locale doesn't have any language.
-            mFullConfig.setLayoutDirectionQualifier(
-                    new LayoutDirectionQualifier(LayoutDirection.LTR));
+            mFullConfig.setLayoutDirectionQualifier(new LayoutDirectionQualifier(LayoutDirection.LTR));
         } else {
             Sdk currentSdk = Sdk.getCurrent();
             if (currentSdk != null) {
@@ -576,11 +567,9 @@ public class Configuration {
                     LayoutLibrary layoutLib = targetData.getLayoutLibrary();
                     if (layoutLib != null) {
                         if (layoutLib.isRtl(locale.toLocaleId())) {
-                            mFullConfig.setLayoutDirectionQualifier(
-                                    new LayoutDirectionQualifier(LayoutDirection.RTL));
+                            mFullConfig.setLayoutDirectionQualifier(new LayoutDirectionQualifier(LayoutDirection.RTL));
                         } else {
-                            mFullConfig.setLayoutDirectionQualifier(
-                                    new LayoutDirectionQualifier(LayoutDirection.LTR));
+                            mFullConfig.setLayoutDirectionQualifier(new LayoutDirectionQualifier(LayoutDirection.LTR));
                         }
                     }
                 }
@@ -631,7 +620,7 @@ public class Configuration {
             Locale locale = getLocale();
             if (isLocaleSpecificLayout() && locale != null) {
                 // locale[0]/[1] can be null sometimes when starting Eclipse
-            	sb.append(locale.locale.getValue());
+                sb.append(locale.locale.getValue());
             }
             sb.append(SEP);
             // Need to escape the theme: if we write the full theme style, then
@@ -725,8 +714,7 @@ public class Configuration {
                 return;
             }
             ResourceRepository frameworkRes = mConfigChooser.getClient().getFrameworkResources();
-            if (frameworkRes != null
-                    && frameworkRes.hasResourceItem(ANDROID_STYLE_RESOURCE_PREFIX + mTheme)) {
+            if (frameworkRes != null && frameworkRes.hasResourceItem(ANDROID_STYLE_RESOURCE_PREFIX + mTheme)) {
                 mTheme = ANDROID_STYLE_RESOURCE_PREFIX + mTheme;
             } else {
                 mTheme = STYLE_RESOURCE_PREFIX + mTheme;
@@ -761,27 +749,24 @@ public class Configuration {
                     if (config != null) {
                         // Load locale. Note that this can get overwritten by the
                         // project-wide settings read below.
-                    	String locales[] = values[2].split(SEP_LOCALE);
-                    	if (locales[0].length() > 0) {
-                    		String language = locales[0];
-                    		String region = null;
-                    		if (locales.length > 1 && locales[1].length() > 0) {
-                    			region = locales[1];
-                    		}
-                    		mLocale = Locale.create(new LocaleQualifier(null, language, region, null));
-                    	}
-                    	else {
-                    		mLocale = Locale.ANY;
-                    	}
+                        String locales[] = values[2].split(SEP_LOCALE);
+                        if (locales[0].length() > 0) {
+                            String language = locales[0];
+                            String region = null;
+                            if (locales.length > 1 && locales[1].length() > 0) {
+                                region = locales[1];
+                            }
+                            mLocale = Locale.create(new LocaleQualifier(null, language, region, null));
+                        } else {
+                            mLocale = Locale.ANY;
+                        }
 
                         // Decode the theme name: See {@link #getData}
                         mTheme = values[3];
                         if (mTheme.startsWith(MARKER_FRAMEWORK)) {
-                            mTheme = ANDROID_STYLE_RESOURCE_PREFIX
-                                    + mTheme.substring(MARKER_FRAMEWORK.length());
+                            mTheme = ANDROID_STYLE_RESOURCE_PREFIX + mTheme.substring(MARKER_FRAMEWORK.length());
                         } else if (mTheme.startsWith(MARKER_PROJECT)) {
-                            mTheme = STYLE_RESOURCE_PREFIX
-                                    + mTheme.substring(MARKER_PROJECT.length());
+                            mTheme = STYLE_RESOURCE_PREFIX + mTheme.substring(MARKER_PROJECT.length());
                         } else {
                             checkThemePrefix();
                         }
@@ -845,18 +830,18 @@ public class Configuration {
 
                 String[] values = data.split(SEP);
                 if (values.length == 2) {
-                	String locales[] = values[0].split(SEP_LOCALE);
+                    String locales[] = values[0].split(SEP_LOCALE);
                     if (locales[0].length() != 0) {
-                    	String language = locales[0];
-                    	String region = null;
-                    	if (locales.length > 1 && locales[1].length() != 0) {
-                    		region = locales[1];
-                    	}
-                    	locale = Locale.create(new LocaleQualifier(null, language, region, null));
+                        String language = locales[0];
+                        String region = null;
+                        if (locales.length > 1 && locales[1].length() != 0) {
+                            region = locales[1];
+                        }
+                        locale = Locale.create(new LocaleQualifier(null, language, region, null));
                     }
-                	if (values[0].length() > 0) {
-                		locale = Locale.create(new LocaleQualifier(values[0]));
-                	}
+                    if (values[0].length() > 0) {
+                        locale = Locale.create(new LocaleQualifier(values[0]));
+                    }
 
                     if (AdtPrefs.getPrefs().isAutoPickRenderTarget()) {
                         target = ConfigurationMatcher.findDefaultRenderTarget(chooser);
@@ -874,8 +859,7 @@ public class Configuration {
                             if (version.getCodename() != null && targetList != null) {
                                 int targetApiLevel = version.getApiLevel() + 1;
                                 for (IAndroidTarget t : targetList) {
-                                    if (t.getVersion().getApiLevel() == targetApiLevel
-                                            && t.isPlatform()) {
+                                    if (t.getVersion().getApiLevel() == targetApiLevel && t.isPlatform()) {
                                         target = t;
                                         break;
                                     }
@@ -913,7 +897,7 @@ public class Configuration {
             Locale locale = getLocale();
             if (locale != null) {
                 // locale[0]/[1] can be null sometimes when starting Eclipse
-            	sb.append(locale.locale.getValue());
+                sb.append(locale.locale.getValue());
             }
             sb.append(SEP);
             IAndroidTarget target = getTarget();
@@ -938,7 +922,7 @@ public class Configuration {
      */
     @NonNull
     public static String targetToString(@NonNull IAndroidTarget target) {
-        return target.getFullName().replace(SEP, "");  //$NON-NLS-1$
+        return target.getFullName().replace(SEP, ""); //$NON-NLS-1$
     }
 
     /**
@@ -952,9 +936,7 @@ public class Configuration {
      * @return an {@link IAndroidTarget} that matches the given id, or null
      */
     @Nullable
-    public static IAndroidTarget stringToTarget(
-            @NonNull ConfigurationChooser chooser,
-            @NonNull String id) {
+    public static IAndroidTarget stringToTarget(@NonNull ConfigurationChooser chooser, @NonNull String id) {
         List<IAndroidTarget> targetList = chooser.getTargetList();
         if (targetList != null && targetList.size() > 0) {
             for (IAndroidTarget target : targetList) {
@@ -976,8 +958,7 @@ public class Configuration {
      * @return an {@link IAndroidTarget} that matches the given id, or null
      */
     @Nullable
-    public static IAndroidTarget stringToTarget(
-            @NonNull String id) {
+    public static IAndroidTarget stringToTarget(@NonNull String id) {
         Sdk currentSdk = Sdk.getCurrent();
         if (currentSdk != null) {
             IAndroidTarget[] targets = currentSdk.getTargets();
@@ -1073,9 +1054,8 @@ public class Configuration {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this.getClass())
-                .add("display", getDisplayName())                 //$NON-NLS-1$
-                .add("persistent", toPersistentString())          //$NON-NLS-1$
+        return Objects.toStringHelper(this.getClass()).add("display", getDisplayName()) //$NON-NLS-1$
+                .add("persistent", toPersistentString()) //$NON-NLS-1$
                 .toString();
     }
 }

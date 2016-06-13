@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,10 @@ import static com.android.SdkConstants.ANDROID_URI;
 import static com.android.SdkConstants.ATTR_LAYOUT_X;
 import static com.android.SdkConstants.ATTR_LAYOUT_Y;
 import static com.android.SdkConstants.VALUE_N_DP;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
@@ -35,10 +36,6 @@ import com.android.ide.common.api.Point;
 import com.android.ide.common.api.Rect;
 import com.android.ide.common.api.SegmentType;
 import com.android.utils.Pair;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * An {@link IViewRule} for android.widget.AbsoluteLayout and all its derived
@@ -67,8 +64,7 @@ public class AbsoluteLayoutRule extends BaseLayoutRule {
 
         DropFeedback df = new DropFeedback(null, new IFeedbackPainter() {
             @Override
-            public void paint(@NonNull IGraphics gc, @NonNull INode node,
-                    @NonNull DropFeedback feedback) {
+            public void paint(@NonNull IGraphics gc, @NonNull INode node, @NonNull DropFeedback feedback) {
                 // Paint callback for the AbsoluteLayout.
                 // This is called by the canvas when a draw is needed.
                 drawFeedback(gc, node, elements, feedback);
@@ -78,11 +74,7 @@ public class AbsoluteLayoutRule extends BaseLayoutRule {
         return df;
     }
 
-    void drawFeedback(
-            IGraphics gc,
-            INode targetNode,
-            IDragElement[] elements,
-            DropFeedback feedback) {
+    void drawFeedback(IGraphics gc, INode targetNode, IDragElement[] elements, DropFeedback feedback) {
         Rect b = targetNode.getBounds();
         if (!b.isValid()) {
             return;
@@ -201,10 +193,8 @@ public class AbsoluteLayoutRule extends BaseLayoutRule {
                         y *= scale;
                     }
 
-                    newChild.setAttribute(ANDROID_URI, ATTR_LAYOUT_X,
-                            String.format(VALUE_N_DP, x));
-                    newChild.setAttribute(ANDROID_URI, ATTR_LAYOUT_Y,
-                            String.format(VALUE_N_DP, y));
+                    newChild.setAttribute(ANDROID_URI, ATTR_LAYOUT_X, String.format(VALUE_N_DP, x));
+                    newChild.setAttribute(ANDROID_URI, ATTR_LAYOUT_Y, String.format(VALUE_N_DP, y));
 
                     addInnerElements(newChild, element, idMap);
                 }
@@ -221,34 +211,28 @@ public class AbsoluteLayoutRule extends BaseLayoutRule {
      * this case, the bottom right corner will stay fixed).
      */
     @Override
-    protected void setNewSizeBounds(ResizeState resizeState, INode node, INode layout,
-            Rect previousBounds, Rect newBounds, SegmentType horizontalEdge,
-            SegmentType verticalEdge) {
-        super.setNewSizeBounds(resizeState, node, layout, previousBounds, newBounds,
-                horizontalEdge, verticalEdge);
+    protected void setNewSizeBounds(ResizeState resizeState, INode node, INode layout, Rect previousBounds,
+            Rect newBounds, SegmentType horizontalEdge, SegmentType verticalEdge) {
+        super.setNewSizeBounds(resizeState, node, layout, previousBounds, newBounds, horizontalEdge, verticalEdge);
         if (verticalEdge != null && newBounds.x != previousBounds.x) {
             node.setAttribute(ANDROID_URI, ATTR_LAYOUT_X,
-                    String.format(VALUE_N_DP,
-                            mRulesEngine.pxToDp(newBounds.x - node.getParent().getBounds().x)));
+                    String.format(VALUE_N_DP, mRulesEngine.pxToDp(newBounds.x - node.getParent().getBounds().x)));
         }
         if (horizontalEdge != null && newBounds.y != previousBounds.y) {
             node.setAttribute(ANDROID_URI, ATTR_LAYOUT_Y,
-                    String.format(VALUE_N_DP,
-                            mRulesEngine.pxToDp(newBounds.y - node.getParent().getBounds().y)));
+                    String.format(VALUE_N_DP, mRulesEngine.pxToDp(newBounds.y - node.getParent().getBounds().y)));
         }
     }
 
     @Override
-    protected String getResizeUpdateMessage(ResizeState resizeState, INode child, INode parent,
-            Rect newBounds, SegmentType horizontalEdge, SegmentType verticalEdge) {
+    protected String getResizeUpdateMessage(ResizeState resizeState, INode child, INode parent, Rect newBounds,
+            SegmentType horizontalEdge, SegmentType verticalEdge) {
         Rect parentBounds = parent.getBounds();
         if (horizontalEdge == SegmentType.BOTTOM && verticalEdge == SegmentType.RIGHT) {
-            return super.getResizeUpdateMessage(resizeState, child, parent, newBounds,
-                    horizontalEdge, verticalEdge);
+            return super.getResizeUpdateMessage(resizeState, child, parent, newBounds, horizontalEdge, verticalEdge);
         }
-        return String.format("x=%d, y=%d\nwidth=%s, height=%s",
-                mRulesEngine.pxToDp(newBounds.x - parentBounds.x),
-                mRulesEngine.pxToDp(newBounds.y - parentBounds.y),
-                resizeState.getWidthAttribute(), resizeState.getHeightAttribute());
+        return String.format("x=%d, y=%d\nwidth=%s, height=%s", mRulesEngine.pxToDp(newBounds.x - parentBounds.x),
+                mRulesEngine.pxToDp(newBounds.y - parentBounds.y), resizeState.getWidthAttribute(),
+                resizeState.getHeightAttribute());
     }
 }

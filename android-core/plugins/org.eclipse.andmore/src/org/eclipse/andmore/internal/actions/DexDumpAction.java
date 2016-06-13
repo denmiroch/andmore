@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +13,11 @@
 
 package org.eclipse.andmore.internal.actions;
 
-import com.android.SdkConstants;
-import com.android.annotations.Nullable;
-import com.android.sdklib.BuildToolInfo;
-import com.android.utils.GrabProcessOutput;
-import com.android.utils.GrabProcessOutput.IProcessOutput;
-import com.android.utils.GrabProcessOutput.Wait;
-import com.android.utils.SdkUtils;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.preferences.AdtPrefs.BuildVerbosity;
@@ -49,11 +44,13 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
+import com.android.SdkConstants;
+import com.android.annotations.Nullable;
+import com.android.sdklib.BuildToolInfo;
+import com.android.utils.GrabProcessOutput;
+import com.android.utils.GrabProcessOutput.IProcessOutput;
+import com.android.utils.GrabProcessOutput.Wait;
+import com.android.utils.SdkUtils;
 
 /**
  * Runs dexdump on the classes.dex of a selected project.
@@ -70,13 +67,13 @@ public class DexDumpAction implements IObjectActionDelegate {
     @Override
     public void run(IAction action) {
         if (mSelection instanceof IStructuredSelection) {
-            for (Iterator<?> it = ((IStructuredSelection)mSelection).iterator(); it.hasNext();) {
+            for (Iterator<?> it = ((IStructuredSelection) mSelection).iterator(); it.hasNext();) {
                 Object element = it.next();
                 IProject project = null;
                 if (element instanceof IProject) {
-                    project = (IProject)element;
+                    project = (IProject) element;
                 } else if (element instanceof IAdaptable) {
-                    project = (IProject)((IAdaptable)element).getAdapter(IProject.class);
+                    project = ((IAdaptable) element).getAdapter(IProject.class);
                 }
                 if (project != null) {
                     dexDumpProject(project);
@@ -122,15 +119,14 @@ public class DexDumpAction implements IObjectActionDelegate {
 
             Sdk current = Sdk.getCurrent();
             if (current == null) {
-                AndmoreAndroidPlugin.printErrorToConsole(project,
-                        "DexDump: missing current SDK");                            //$NON-NLS-1$
+                AndmoreAndroidPlugin.printErrorToConsole(project, "DexDump: missing current SDK"); //$NON-NLS-1$
                 return Status.OK_STATUS;
             }
 
             BuildToolInfo buildToolInfo = current.getLatestBuildTool();
             if (buildToolInfo == null) {
                 AndmoreAndroidPlugin.printErrorToConsole(project,
-                    "SDK missing build tools. Please install build tools using SDK Manager.");
+                        "SDK missing build tools. Please install build tools using SDK Manager.");
                 return Status.OK_STATUS;
             }
 
@@ -140,25 +136,22 @@ public class DexDumpAction implements IObjectActionDelegate {
             IPath binPath = project.getFolder(SdkConstants.FD_OUTPUT).getLocation();
             if (binPath == null) {
                 AndmoreAndroidPlugin.printErrorToConsole(project,
-                    "DexDump: missing project /bin folder. Please compile first."); //$NON-NLS-1$
+                        "DexDump: missing project /bin folder. Please compile first."); //$NON-NLS-1$
                 return Status.OK_STATUS;
             }
 
-            File classesDexFile =
-                new File(binPath.toOSString(), SdkConstants.FN_APK_CLASSES_DEX);
+            File classesDexFile = new File(binPath.toOSString(), SdkConstants.FN_APK_CLASSES_DEX);
             if (!classesDexFile.exists()) {
                 AndmoreAndroidPlugin.printErrorToConsole(project,
-                    "DexDump: missing classex.dex for project. Please compile first.");//$NON-NLS-1$
+                        "DexDump: missing classex.dex for project. Please compile first.");//$NON-NLS-1$
                 return Status.OK_STATUS;
             }
 
             try {
-                dstFile = File.createTempFile(
-                        "dexdump_" + project.getName() + "_",         //$NON-NLS-1$ //$NON-NLS-2$
-                        ".txt");                                                    //$NON-NLS-1$
+                dstFile = File.createTempFile("dexdump_" + project.getName() + "_", //$NON-NLS-1$ //$NON-NLS-2$
+                        ".txt"); //$NON-NLS-1$
             } catch (Exception e) {
-                AndmoreAndroidPlugin.logAndPrintError(e, project.getName(),
-                        "DexDump: createTempFile failed.");                         //$NON-NLS-1$
+                AndmoreAndroidPlugin.logAndPrintError(e, project.getName(), "DexDump: createTempFile failed."); //$NON-NLS-1$
                 return Status.OK_STATUS;
             }
 
@@ -175,28 +168,24 @@ public class DexDumpAction implements IObjectActionDelegate {
                 try {
                     final String lineSep = SdkUtils.getLineSeparator();
 
-                    int err = GrabProcessOutput.grabProcessOutput(
-                            process,
-                            Wait.WAIT_FOR_READERS,
-                            new IProcessOutput() {
-                                @Override
-                                public void out(@Nullable String line) {
-                                    if (line != null) {
-                                        try {
-                                            writer.write(line);
-                                            writer.write(lineSep);
-                                        } catch (IOException ignore) {}
-                                    }
-                                }
+                    int err = GrabProcessOutput.grabProcessOutput(process, Wait.WAIT_FOR_READERS, new IProcessOutput() {
+                        @Override
+                        public void out(@Nullable String line) {
+                            if (line != null) {
+                                try {
+                                    writer.write(line);
+                                    writer.write(lineSep);
+                                } catch (IOException ignore) {}
+                            }
+                        }
 
-                                @Override
-                                public void err(@Nullable String line) {
-                                    if (line != null) {
-                                        AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE,
-                                                project, line);
-                                    }
-                                }
-                            });
+                        @Override
+                        public void err(@Nullable String line) {
+                            if (line != null) {
+                                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project, line);
+                            }
+                        }
+                    });
 
                     if (err == 0) {
                         // The command worked. In this case we don't remove the
@@ -204,7 +193,7 @@ public class DexDumpAction implements IObjectActionDelegate {
                         removeDstFile = false;
                     } else {
                         AndmoreAndroidPlugin.printErrorToConsole(project,
-                            "DexDump failed with code " + Integer.toString(err));       //$NON-NLS-1$
+                                "DexDump failed with code " + Integer.toString(err)); //$NON-NLS-1$
                         return Status.OK_STATUS;
                     }
                 } finally {
@@ -224,10 +213,8 @@ public class DexDumpAction implements IObjectActionDelegate {
             AndmoreAndroidPlugin.getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    IFileStore fileStore =
-                        EFS.getLocalFileSystem().getStore(new Path(dstPath));
-                    if (!fileStore.fetchInfo().isDirectory() &&
-                            fileStore.fetchInfo().exists()) {
+                    IFileStore fileStore = EFS.getLocalFileSystem().getStore(new Path(dstPath));
+                    if (!fileStore.fetchInfo().isDirectory() && fileStore.fetchInfo().exists()) {
 
                         IWorkbench wb = PlatformUI.getWorkbench();
                         IWorkbenchWindow win = wb == null ? null : wb.getActiveWorkbenchWindow();
@@ -238,8 +225,8 @@ public class DexDumpAction implements IObjectActionDelegate {
                                 IDE.openEditorOnFileStore(page, fileStore);
                             } catch (PartInitException e) {
                                 AndmoreAndroidPlugin.logAndPrintError(e, project.getName(),
-                                "Opening DexDump result failed. Result is available at %1$s", //$NON-NLS-1$
-                                dstPath);
+                                        "Opening DexDump result failed. Result is available at %1$s", //$NON-NLS-1$
+                                        dstPath);
                             }
                         }
                     }
@@ -253,8 +240,7 @@ public class DexDumpAction implements IObjectActionDelegate {
             return Status.OK_STATUS;
 
         } catch (IOException e) {
-            AndmoreAndroidPlugin.logAndPrintError(e, project.getName(),
-                    "DexDump failed.");                                     //$NON-NLS-1$
+            AndmoreAndroidPlugin.logAndPrintError(e, project.getName(), "DexDump failed."); //$NON-NLS-1$
             return Status.OK_STATUS;
 
         } finally {
@@ -263,8 +249,7 @@ public class DexDumpAction implements IObjectActionDelegate {
                 try {
                     dstFile.delete();
                 } catch (Exception e) {
-                    AndmoreAndroidPlugin.logAndPrintError(e, project.getName(),
-                            "DexDump: can't delete temp file %1$s.",        //$NON-NLS-1$
+                    AndmoreAndroidPlugin.logAndPrintError(e, project.getName(), "DexDump: can't delete temp file %1$s.", //$NON-NLS-1$
                             dstFile.getAbsoluteFile());
                 }
             }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,8 +42,7 @@ public class GridLayoutPainter {
      * @param elements the dragged elements
      * @return a {@link IFeedbackPainter} which can paint the drop feedback
      */
-    public static IFeedbackPainter createDropFeedbackPainter(GridLayoutRule rule,
-            IDragElement[] elements) {
+    public static IFeedbackPainter createDropFeedbackPainter(GridLayoutRule rule, IDragElement[] elements) {
         return new DropFeedbackPainter(rule, elements);
     }
 
@@ -58,8 +54,7 @@ public class GridLayoutPainter {
      * @param gc the graphics context to paint into
      * @param grid the grid model to be visualized
      */
-    public static void paintStructure(DrawingStyle style, INode layout, IGraphics gc,
-            GridModel grid) {
+    public static void paintStructure(DrawingStyle style, INode layout, IGraphics gc, GridModel grid) {
         Rect b = layout.getBounds();
 
         gc.useStyle(style);
@@ -129,8 +124,7 @@ public class GridLayoutPainter {
 
         // Implements IFeedbackPainter
         @Override
-        public void paint(@NonNull IGraphics gc, @NonNull INode node,
-                @NonNull DropFeedback feedback) {
+        public void paint(@NonNull IGraphics gc, @NonNull INode node, @NonNull DropFeedback feedback) {
             Rect b = node.getBounds();
             if (!b.isValid()) {
                 return;
@@ -151,8 +145,8 @@ public class GridLayoutPainter {
         /**
          * Paints the drag feedback for a free-form mode drag
          */
-        private void paintFreeFormDropFeedback(IGraphics gc, INode node, DropFeedback feedback,
-                Rect b, GridDropHandler data) {
+        private void paintFreeFormDropFeedback(IGraphics gc, INode node, DropFeedback feedback, Rect b,
+                GridDropHandler data) {
             GridModel grid = data.getGrid();
             if (GridLayoutRule.sSnapToGrid) {
                 GridLayoutPainter.paintGrid(node, gc);
@@ -202,13 +196,11 @@ public class GridLayoutPainter {
                 }
                 gc.drawLine(b.x, y1, b.x2(), y1);
                 gc.drawLine(b.x, y2, b.x2(), y2);
-                gc.drawString(Integer.toString(rowMatch.margin),
-                        centerX - 3, y1 + (y2 - y1 - 16) / 2);
+                gc.drawString(Integer.toString(rowMatch.margin), centerX - 3, y1 + (y2 - y1 - 16) / 2);
             } else {
                 gc.useStyle(rowMatch.margin == 0 ? DrawingStyle.DISTANCE
-                        : rowMatch.createCell ? DrawingStyle.GUIDELINE_DASHED
-                                : DrawingStyle.GUIDELINE);
-                gc.drawLine(b.x, y, b.x2(), y );
+                        : rowMatch.createCell ? DrawingStyle.GUIDELINE_DASHED : DrawingStyle.GUIDELINE);
+                gc.drawLine(b.x, y, b.x2(), y);
             }
 
             if (columnMatch.margin != UNDEFINED && columnMatch.margin > 0) {
@@ -226,12 +218,10 @@ public class GridLayoutPainter {
                 }
                 gc.drawLine(x1, b.y, x1, b.y2());
                 gc.drawLine(x2, b.y, x2, b.y2());
-                gc.drawString(Integer.toString(columnMatch.margin),
-                        x1 + (x2 - x1 - 16) / 2, centerY - 3);
+                gc.drawString(Integer.toString(columnMatch.margin), x1 + (x2 - x1 - 16) / 2, centerY - 3);
             } else {
                 gc.useStyle(columnMatch.margin == 0 ? DrawingStyle.DISTANCE
-                        : columnMatch.createCell ? DrawingStyle.GUIDELINE_DASHED
-                                : DrawingStyle.GUIDELINE);
+                        : columnMatch.createCell ? DrawingStyle.GUIDELINE_DASHED : DrawingStyle.GUIDELINE);
                 gc.drawLine(x, b.y, x, b.y2());
             }
 
@@ -252,8 +242,7 @@ public class GridLayoutPainter {
                 } else {
                     b = element.getBounds();
                     if (b.isValid()) {
-                        gc.drawRect(b.x + offsetX, b.y + offsetY,
-                                b.x + offsetX + b.w, b.y + offsetY + b.h);
+                        gc.drawRect(b.x + offsetX, b.y + offsetY, b.x + offsetX + b.w, b.y + offsetY + b.h);
                     }
                 }
             }
@@ -280,8 +269,7 @@ public class GridLayoutPainter {
                 gc.drawLine(x + radius, b.y, x + radius, b.y2());
             }
             gc.drawRect(b.x, b.y, b.x2(), b.y2());
-            gc.drawRect(b.x + 2 * radius, b.y + 2 * radius,
-                    b.x2() - 2 * radius, b.y2() - 2 * radius);
+            gc.drawRect(b.x + 2 * radius, b.y + 2 * radius, b.x2() - 2 * radius, b.y2() - 2 * radius);
 
             GridMatch columnMatch = data.getColumnMatch();
             GridMatch rowMatch = data.getRowMatch();
@@ -299,19 +287,18 @@ public class GridLayoutPainter {
 
             gc.useStyle(DrawingStyle.DROP_ZONE_ACTIVE);
             if (createColumn) {
-                gc.fillRect(new Rect(cellBounds.x - radius,
-                        cellBounds.y + (createRow ? -radius : radius),
+                gc.fillRect(new Rect(cellBounds.x - radius, cellBounds.y + (createRow ? -radius : radius),
                         2 * radius + 1, cellBounds.h - (createRow ? 0 : 2 * radius)));
                 offsetX -= radius + dragBounds.w / 2;
             }
             if (createRow) {
-                gc.fillRect(new Rect(cellBounds.x + radius, cellBounds.y - radius,
-                        cellBounds.w - 2 * radius, 2 * radius + 1));
+                gc.fillRect(new Rect(cellBounds.x + radius, cellBounds.y - radius, cellBounds.w - 2 * radius,
+                        2 * radius + 1));
                 offsetY -= radius + dragBounds.h / 2;
             } else if (!createColumn) {
                 // Choose this cell
-                gc.fillRect(new Rect(cellBounds.x + radius, cellBounds.y + radius,
-                        cellBounds.w - 2 * radius, cellBounds.h - 2 * radius));
+                gc.fillRect(new Rect(cellBounds.x + radius, cellBounds.y + radius, cellBounds.w - 2 * radius,
+                        cellBounds.h - 2 * radius));
             }
 
             gc.useStyle(DrawingStyle.DROP_PREVIEW);
@@ -346,9 +333,8 @@ public class GridLayoutPainter {
      * @return true if the structure was successfully inferred from the view and
      *         painted
      */
-    public static boolean paintStructure(Object view, DrawingStyle style, INode layout,
-            IGraphics gc) {
-        Pair<int[],int[]> cellBounds = GridModel.getAxisBounds(view);
+    public static boolean paintStructure(Object view, DrawingStyle style, INode layout, IGraphics gc) {
+        Pair<int[], int[]> cellBounds = GridModel.getAxisBounds(view);
         if (cellBounds != null) {
             int[] xs = cellBounds.getFirst();
             int[] ys = cellBounds.getSecond();

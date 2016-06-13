@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,17 +17,16 @@ import static com.android.SdkConstants.TOOLS_PREFIX;
 import static com.android.SdkConstants.TOOLS_URI;
 import static org.eclipse.ui.IWorkbenchPage.MATCH_INPUT;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.sdklib.SdkVersionInfo;
-import com.android.resources.ResourceFolderType;
-import com.android.resources.ResourceType;
-import com.android.sdklib.AndroidVersion;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.repository.PkgProps;
-import com.android.utils.XmlUtils;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.layout.gle2.GraphicalEditorPart;
@@ -90,17 +86,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.resources.ResourceFolderType;
+import com.android.resources.ResourceType;
+import com.android.sdklib.AndroidVersion;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.SdkVersionInfo;
+import com.android.sdklib.repository.PkgProps;
+import com.android.utils.XmlUtils;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
 
 /** Utility methods for ADT */
 @SuppressWarnings("restriction") // WST API
@@ -357,7 +353,7 @@ public class AdtUtils {
             if (editor instanceof ITextEditor) {
                 return (ITextEditor) editor;
             } else {
-                return (ITextEditor) editor.getAdapter(ITextEditor.class);
+                return editor.getAdapter(ITextEditor.class);
             }
         }
 
@@ -383,7 +379,7 @@ public class AdtUtils {
         for (IWorkbenchWindow window : windows) {
             IWorkbenchPage[] pages = window.getPages();
             for (IWorkbenchPage page : pages) {
-                IEditorReference[] editors = page.findEditors(input, null,  MATCH_INPUT);
+                IEditorReference[] editors = page.findEditors(input, null, MATCH_INPUT);
                 if (editors != null) {
                     for (IEditorReference reference : editors) {
                         IEditorPart editor = reference.getEditor(restore);
@@ -587,11 +583,8 @@ public class AdtUtils {
      * @return a list (possibly empty but never null) of matching markers
      */
     @NonNull
-    public static List<IMarker> findMarkersOnLine(
-            @NonNull String markerType,
-            @NonNull IResource file,
-            @NonNull IDocument document,
-            int offset) {
+    public static List<IMarker> findMarkersOnLine(@NonNull String markerType, @NonNull IResource file,
+            @NonNull IDocument document, int offset) {
         List<IMarker> matchingMarkers = new ArrayList<IMarker>(2);
         try {
             IMarker[] markers = file.findMarkers(markerType, true, IResource.DEPTH_ZERO);
@@ -601,7 +594,6 @@ public class AdtUtils {
             int lineStart = lineInfo.getOffset();
             int lineEnd = lineStart + lineInfo.getLength();
             int offsetLine = document.getLineOfOffset(offset);
-
 
             for (IMarker marker : markers) {
                 int start = marker.getAttribute(IMarker.CHAR_START, -1);
@@ -689,8 +681,8 @@ public class AdtUtils {
     @NonNull
     public static String getParentFolderName(@Nullable IEditorInput editorInput) {
         if (editorInput instanceof IFileEditorInput) {
-             IFile file = ((IFileEditorInput) editorInput).getFile();
-             return file.getParent().getName();
+            IFile file = ((IFileEditorInput) editorInput).getFile();
+            return file.getParent().getName();
         }
 
         if (editorInput instanceof IURIEditorInput) {
@@ -742,28 +734,21 @@ public class AdtUtils {
      * @param appendValue if true, add this value as a comma separated value to
      *            the existing attribute value, if any
      */
-    public static void setToolsAttribute(
-            @NonNull final AndroidXmlEditor editor,
-            @NonNull final Element element,
-            @NonNull final String description,
-            @NonNull final String name,
-            @Nullable final String value,
-            final boolean reveal,
-            final boolean appendValue) {
+    public static void setToolsAttribute(@NonNull final AndroidXmlEditor editor, @NonNull final Element element,
+            @NonNull final String description, @NonNull final String name, @Nullable final String value,
+            final boolean reveal, final boolean appendValue) {
         editor.wrapUndoEditXmlModel(description, new Runnable() {
             @Override
             public void run() {
                 String prefix = XmlUtils.lookupNamespacePrefix(element, TOOLS_URI, null, true);
                 if (prefix == null) {
                     // Add in new prefix...
-                    prefix = XmlUtils.lookupNamespacePrefix(element,
-                            TOOLS_URI, TOOLS_PREFIX, true /*create*/);
+                    prefix = XmlUtils.lookupNamespacePrefix(element, TOOLS_URI, TOOLS_PREFIX, true /*create*/);
                     if (value != null) {
                         // ...and ensure that the header is formatted such that
                         // the XML namespace declaration is placed in the right
                         // position and wrapping is applied etc.
-                        editor.scheduleNodeReformat(editor.getUiRootNode(),
-                                true /*attributesOnly*/);
+                        editor.scheduleNodeReformat(editor.getUiRootNode(), true /*attributesOnly*/);
                     }
                 }
 
@@ -797,12 +782,11 @@ public class AdtUtils {
                                     @Override
                                     public void run() {
                                         Node xmlNode = uiNode.getXmlNode();
-                                        Attr attribute = ((Element) xmlNode).getAttributeNodeNS(
-                                                TOOLS_URI, name);
+                                        Attr attribute = ((Element) xmlNode).getAttributeNodeNS(TOOLS_URI, name);
                                         if (attribute instanceof IndexedRegion) {
                                             IndexedRegion region = (IndexedRegion) attribute;
-                                            editor.getStructuredTextEditor().selectAndReveal(
-                                                    region.getStartOffset(), region.getLength());
+                                            editor.getStructuredTextEditor().selectAndReveal(region.getStartOffset(),
+                                                    region.getLength());
                                         }
                                     }
                                 });
@@ -828,17 +812,12 @@ public class AdtUtils {
             String codename = target.getProperty(PkgProps.PLATFORM_CODENAME);
             String release = target.getProperty("ro.build.version.release"); //$NON-NLS-1$
             if (codename != null) {
-                return String.format("API %1$d: Android %2$s (%3$s)",
-                        version.getApiLevel(),
-                        release,
-                        codename);
+                return String.format("API %1$d: Android %2$s (%3$s)", version.getApiLevel(), release, codename);
             }
-            return String.format("API %1$d: Android %2$s", version.getApiLevel(),
-                    release);
+            return String.format("API %1$d: Android %2$s", version.getApiLevel(), release);
         }
 
-        return String.format("%1$s (API %2$s)", target.getFullName(),
-                target.getVersion().getApiString());
+        return String.format("%1$s (API %2$s)", target.getFullName(), target.getVersion().getApiString());
     }
 
     /**
@@ -855,12 +834,8 @@ public class AdtUtils {
      * @param appendValue if true, add this value as a comma separated value to
      *            the existing attribute value, if any
      */
-    public static void setToolsAttribute(
-            @NonNull final IFile file,
-            @NonNull final Element element,
-            @NonNull final String description,
-            @NonNull final String name,
-            @Nullable final String value,
+    public static void setToolsAttribute(@NonNull final IFile file, @NonNull final Element element,
+            @NonNull final String description, @NonNull final String name, @Nullable final String value,
             final boolean appendValue) {
         IModelManager modelManager = StructuredModelManager.getModelManager();
         if (modelManager == null) {
@@ -879,12 +854,10 @@ public class AdtUtils {
                         IDOMModel domModel = (IDOMModel) model;
                         Document doc = domModel.getDocument();
                         if (doc != null && element.getOwnerDocument() == doc) {
-                            String prefix = XmlUtils.lookupNamespacePrefix(element, TOOLS_URI,
-                                    null, true);
+                            String prefix = XmlUtils.lookupNamespacePrefix(element, TOOLS_URI, null, true);
                             if (prefix == null) {
                                 // Add in new prefix...
-                                prefix = XmlUtils.lookupNamespacePrefix(element,
-                                        TOOLS_URI, TOOLS_PREFIX, true);
+                                prefix = XmlUtils.lookupNamespacePrefix(element, TOOLS_URI, TOOLS_PREFIX, true);
                             }
 
                             String v = value;
@@ -917,13 +890,12 @@ public class AdtUtils {
                     IPath path = file.getFullPath();
                     manager.connect(path, LocationKind.IFILE, monitor);
                     try {
-                        ITextFileBuffer buffer = manager.getTextFileBuffer(path,
-                                LocationKind.IFILE);
+                        ITextFileBuffer buffer = manager.getTextFileBuffer(path, LocationKind.IFILE);
                         IDocument currentDocument = buffer.getDocument();
                         currentDocument.set(updated);
                         buffer.commit(monitor, true);
                     } finally {
-                        manager.disconnect(path, LocationKind.IFILE,  monitor);
+                        manager.disconnect(path, LocationKind.IFILE, monitor);
                     }
                 }
             }
@@ -993,7 +965,7 @@ public class AdtUtils {
 
         String[] versions = new String[max];
         for (int api = 1; api <= max; api++) {
-            versions[api-1] = getAndroidName(api);
+            versions[api - 1] = getAndroidName(api);
         }
 
         return versions;
@@ -1022,9 +994,9 @@ public class AdtUtils {
                 // always go from IResource to IProject)
                 IResource resource = null;
                 if (element instanceof IResource) { // may include IProject
-                   resource = (IResource) element;
+                    resource = (IResource) element;
                 } else if (element instanceof IAdaptable) {
-                    IAdaptable adaptable = (IAdaptable)element;
+                    IAdaptable adaptable = (IAdaptable) element;
                     Object adapter = adaptable.getAdapter(IResource.class);
                     resource = (IResource) adapter;
                 }
@@ -1034,7 +1006,7 @@ public class AdtUtils {
                 if (resource != null) {
                     project = resource.getProject();
                 } else if (element instanceof IAdaptable) {
-                    project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+                    project = ((IAdaptable) element).getAdapter(IProject.class);
                 }
 
                 if (project != null && !projects.contains(project)) {
@@ -1380,8 +1352,7 @@ public class AdtUtils {
                 try {
                     for (IResource resource : resFolder.members()) {
                         String n = resource.getName();
-                        if ((n.startsWith(prefix) || n.equals(parentName))
-                                && resource instanceof IContainer) {
+                        if ((n.startsWith(prefix) || n.equals(parentName)) && resource instanceof IContainer) {
                             IContainer layoutFolder = (IContainer) resource;
                             IResource r = layoutFolder.findMember(name);
                             if (r instanceof IFile) {
@@ -1507,7 +1478,7 @@ public class AdtUtils {
                 return ResourceFolderType.VALUES;
             default:
                 assert false : type;
-            return ResourceFolderType.VALUES;
+                return ResourceFolderType.VALUES;
 
         }
     }

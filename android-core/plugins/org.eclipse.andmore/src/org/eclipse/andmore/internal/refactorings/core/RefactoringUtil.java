@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,9 +20,8 @@ import static com.android.xml.AndroidManifest.ATTRIBUTE_MANAGE_SPACE_ACTIVITY;
 import static com.android.xml.AndroidManifest.ATTRIBUTE_PARENT_ACTIVITY_NAME;
 import static com.android.xml.AndroidManifest.ATTRIBUTE_TARGET_ACTIVITY;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.xml.AndroidManifest;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -38,8 +34,9 @@ import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.xml.AndroidManifest;
 
 /**
  * The utility class for android refactoring
@@ -124,15 +121,12 @@ public class RefactoringUtil {
      * @param document the document containing the attribute
      * @return the range of the value text, not including quotes, in the document
      */
-    public static int getAttributeValueRangeStart(
-            @NonNull Attr attr,
-            @NonNull IDocument document) {
+    public static int getAttributeValueRangeStart(@NonNull Attr attr, @NonNull IDocument document) {
         IndexedRegion region = (IndexedRegion) attr;
         int potentialStart = attr.getName().length() + 2; // + 2: add ="
         String text;
         try {
-            text = document.get(region.getStartOffset(),
-                    region.getEndOffset() - region.getStartOffset());
+            text = document.get(region.getStartOffset(), region.getEndOffset() - region.getStartOffset());
         } catch (BadLocationException e) {
             return -1;
         }
@@ -152,15 +146,12 @@ public class RefactoringUtil {
      * @param document the document containing the attribute
      * @return the index of the start tag in the document
      */
-    public static int getTagNameRangeStart(
-            @NonNull Element element,
-            @NonNull IDocument document) {
+    public static int getTagNameRangeStart(@NonNull Element element, @NonNull IDocument document) {
         IndexedRegion region = (IndexedRegion) element;
         int potentialStart = 1; // add '<'
         String text;
         try {
-            text = document.get(region.getStartOffset(),
-                    region.getEndOffset() - region.getStartOffset());
+            text = document.get(region.getStartOffset(), region.getEndOffset() - region.getStartOffset());
         } catch (BadLocationException e) {
             return -1;
         }
@@ -181,9 +172,7 @@ public class RefactoringUtil {
      * @return true if this attribute can describe a class
      */
     public static boolean isManifestClassAttribute(@NonNull Attr attribute) {
-        return isManifestClassAttribute(
-                attribute.getOwnerElement().getTagName(),
-                attribute.getNamespaceURI(),
+        return isManifestClassAttribute(attribute.getOwnerElement().getTagName(), attribute.getNamespaceURI(),
                 attribute.getLocalName());
     }
 
@@ -197,25 +186,17 @@ public class RefactoringUtil {
      * @param name the attribute local name, if any
      * @return true if this attribute can describe a class
      */
-    public static boolean isManifestClassAttribute(
-            @Nullable String tag,
-            @Nullable String uri,
-            @Nullable String name) {
+    public static boolean isManifestClassAttribute(@Nullable String tag, @Nullable String uri, @Nullable String name) {
         if (name == null) {
             return false;
         }
 
         if ((name.equals(ATTR_NAME)
-                && (AndroidManifest.NODE_ACTIVITY.equals(tag)
-                        || AndroidManifest.NODE_APPLICATION.equals(tag)
-                        || AndroidManifest.NODE_INSTRUMENTATION.equals(tag)
-                        || AndroidManifest.NODE_PROVIDER.equals(tag)
-                        || AndroidManifest.NODE_SERVICE.equals(tag)
-                        || AndroidManifest.NODE_RECEIVER.equals(tag)))
-                || name.equals(ATTRIBUTE_TARGET_ACTIVITY)
-                || name.equals(ATTRIBUTE_MANAGE_SPACE_ACTIVITY)
-                || name.equals(ATTRIBUTE_BACKUP_AGENT)
-                || name.equals(ATTRIBUTE_PARENT_ACTIVITY_NAME)) {
+                && (AndroidManifest.NODE_ACTIVITY.equals(tag) || AndroidManifest.NODE_APPLICATION.equals(tag)
+                        || AndroidManifest.NODE_INSTRUMENTATION.equals(tag) || AndroidManifest.NODE_PROVIDER.equals(tag)
+                        || AndroidManifest.NODE_SERVICE.equals(tag) || AndroidManifest.NODE_RECEIVER.equals(tag)))
+                || name.equals(ATTRIBUTE_TARGET_ACTIVITY) || name.equals(ATTRIBUTE_MANAGE_SPACE_ACTIVITY)
+                || name.equals(ATTRIBUTE_BACKUP_AGENT) || name.equals(ATTRIBUTE_PARENT_ACTIVITY_NAME)) {
             return ANDROID_URI.equals(uri);
         }
 

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,20 +12,16 @@
  */
 package org.eclipse.andmore.internal.wizards.templates;
 
-
 import static com.android.SdkConstants.ATTR_ID;
 import static org.eclipse.andmore.AdtUtils.extractClassName;
 import static org.eclipse.andmore.internal.wizards.templates.NewTemplatePage.WIZARD_PAGE_WIDTH;
 
-import com.android.annotations.Nullable;
-import com.android.sdklib.SdkVersionInfo;
-import com.android.sdklib.AndroidVersion;
-import com.android.sdklib.IAndroidTarget;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.andmore.internal.wizards.newproject.ApplicationInfoPage;
@@ -61,21 +54,23 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.android.annotations.Nullable;
+import com.android.sdklib.AndroidVersion;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.SdkVersionInfo;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * First wizard page in the "New Project From Template" wizard
  */
-public class NewProjectPage extends WizardPage
-        implements ModifyListener, SelectionListener, FocusListener {
+public class NewProjectPage extends WizardPage implements ModifyListener, SelectionListener, FocusListener {
     private static final int FIELD_WIDTH = 300;
     private static final String SAMPLE_PACKAGE_PREFIX = "com.example."; //$NON-NLS-1$
     /** Suffix added by default to activity names */
-    static final String ACTIVITY_NAME_SUFFIX = "Activity";              //$NON-NLS-1$
+    static final String ACTIVITY_NAME_SUFFIX = "Activity"; //$NON-NLS-1$
     /** Prefix added to default layout names */
-    static final String LAYOUT_NAME_PREFIX = "activity_";               //$NON-NLS-1$
+    static final String LAYOUT_NAME_PREFIX = "activity_"; //$NON-NLS-1$
     private static final int INITIAL_MIN_SDK = 8;
 
     private final NewProjectWizardState mValues;
@@ -128,8 +123,8 @@ public class NewProjectPage extends WizardPage
         mApplicationText.addModifyListener(this);
         mApplicationText.addFocusListener(this);
         mApplicationDec = createFieldDecoration(mApplicationText,
-                "The application name is shown in the Play Store, as well as in the " +
-                "Manage Application list in Settings.");
+                "The application name is shown in the Play Store, as well as in the "
+                        + "Manage Application list in Settings.");
 
         Label projectLabel = new Label(container, SWT.NONE);
         projectLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1));
@@ -141,8 +136,8 @@ public class NewProjectPage extends WizardPage
         mProjectText.addModifyListener(this);
         mProjectText.addFocusListener(this);
         mProjectDec = createFieldDecoration(mProjectText,
-                "The project name is only used by Eclipse, but must be unique within the " +
-                "workspace. This can typically be the same as the application name.");
+                "The project name is only used by Eclipse, but must be unique within the "
+                        + "workspace. This can typically be the same as the application name.");
 
         Label packageLabel = new Label(container, SWT.NONE);
         packageLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1));
@@ -155,13 +150,12 @@ public class NewProjectPage extends WizardPage
         mPackageText.addModifyListener(this);
         mPackageText.addFocusListener(this);
         mPackageDec = createFieldDecoration(mPackageText,
-                "The package name must be a unique identifier for your application.\n" +
-                "It is typically not shown to users, but it *must* stay the same " +
-                "for the lifetime of your application; it is how multiple versions " +
-                "of the same application are considered the \"same app\".\nThis is " +
-                "typically the reverse domain name of your organization plus one or " +
-                "more application identifiers, and it must be a valid Java package " +
-                "name.");
+                "The package name must be a unique identifier for your application.\n"
+                        + "It is typically not shown to users, but it *must* stay the same "
+                        + "for the lifetime of your application; it is how multiple versions "
+                        + "of the same application are considered the \"same app\".\nThis is "
+                        + "typically the reverse domain name of your organization plus one or "
+                        + "more application identifiers, and it must be a valid Java package " + "name.");
         new Label(container, SWT.NONE);
 
         new Label(container, SWT.NONE);
@@ -185,8 +179,7 @@ public class NewProjectPage extends WizardPage
         List<String> targetLabels = new ArrayList<String>(targets.length);
         for (IAndroidTarget target : targets) {
             String targetLabel;
-            if (target.isPlatform()
-                    && target.getVersion().getApiLevel() <= AdtUtils.getHighestKnownApiLevel()) {
+            if (target.isPlatform() && target.getVersion().getApiLevel() <= AdtUtils.getHighestKnownApiLevel()) {
                 targetLabel = AdtUtils.getAndroidName(target.getVersion().getApiLevel());
             } else {
                 targetLabel = AdtUtils.getTargetLabel(target);
@@ -207,8 +200,7 @@ public class NewProjectPage extends WizardPage
                 codeNames.add(targetLabel);
                 mMinNameToApi.put(targetLabel, apiLevel);
             } else if (target.isPlatform()
-                    && (mValues.target == null ||
-                        apiLevel > mValues.target.getVersion().getApiLevel())) {
+                    && (mValues.target == null || apiLevel > mValues.target.getVersion().getApiLevel())) {
                 mValues.target = target;
                 buildTargetIndex = i;
             }
@@ -237,9 +229,9 @@ public class NewProjectPage extends WizardPage
         mMinSdkCombo.addSelectionListener(this);
         mMinSdkCombo.addFocusListener(this);
         mMinSdkDec = createFieldDecoration(mMinSdkCombo,
-                "Choose the lowest version of Android that your application will support. Lower " +
-                "API levels target more devices, but means fewer features are available. By " +
-                "targeting API 8 and later, you reach approximately 95% of the market.");
+                "Choose the lowest version of Android that your application will support. Lower "
+                        + "API levels target more devices, but means fewer features are available. By "
+                        + "targeting API 8 and later, you reach approximately 95% of the market.");
         new Label(container, SWT.NONE);
 
         // Target SDK
@@ -258,13 +250,13 @@ public class NewProjectPage extends WizardPage
         mTargetSdkCombo.addSelectionListener(this);
         mTargetSdkCombo.addFocusListener(this);
         mTargetSdkDec = createFieldDecoration(mTargetSdkCombo,
-                "Choose the highest API level that the application is known to work with. " +
-                "This attribute informs the system that you have tested against the target " +
-                "version and the system should not enable any compatibility behaviors to " +
-                "maintain your app's forward-compatibility with the target version. " +
-                "The application is still able to run on older versions " +
-                "(down to minSdkVersion). Your application may look dated if you are not " +
-                "targeting the current version.");
+                "Choose the highest API level that the application is known to work with. "
+                        + "This attribute informs the system that you have tested against the target "
+                        + "version and the system should not enable any compatibility behaviors to "
+                        + "maintain your app's forward-compatibility with the target version. "
+                        + "The application is still able to run on older versions "
+                        + "(down to minSdkVersion). Your application may look dated if you are not "
+                        + "targeting the current version.");
         new Label(container, SWT.NONE);
 
         // Build Version
@@ -286,9 +278,9 @@ public class NewProjectPage extends WizardPage
         mBuildSdkCombo.addSelectionListener(this);
         mBuildSdkCombo.addFocusListener(this);
         mBuildTargetDec = createFieldDecoration(mBuildSdkCombo,
-                "Choose a target API to compile your code against, from your installed SDKs. " +
-                "This is typically the most recent version, or the first version that supports " +
-                "all the APIs you want to directly access without reflection.");
+                "Choose a target API to compile your code against, from your installed SDKs. "
+                        + "This is typically the most recent version, or the first version that supports "
+                        + "all the APIs you want to directly access without reflection.");
         new Label(container, SWT.NONE);
 
         TemplateMetadata metadata = mValues.template.getTemplate();
@@ -299,15 +291,14 @@ public class NewProjectPage extends WizardPage
                 themeLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1));
                 themeLabel.setText("Theme:");
 
-                mThemeCombo = NewTemplatePage.createOptionCombo(mThemeParameter, container,
-                        mValues.parameters, this, this);
+                mThemeCombo = NewTemplatePage.createOptionCombo(mThemeParameter, container, mValues.parameters, this,
+                        this);
                 GridData gdThemeCombo = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
                 gdThemeCombo.widthHint = FIELD_WIDTH;
                 mThemeCombo.setLayoutData(gdThemeCombo);
                 new Label(container, SWT.NONE);
 
-                mThemeDec = createFieldDecoration(mThemeCombo,
-                        "Choose the base theme to use for the application");
+                mThemeDec = createFieldDecoration(mThemeCombo, "Choose the base theme to use for the application");
             }
         }
 
@@ -355,8 +346,8 @@ public class NewProjectPage extends WizardPage
             if (parameter != null) {
                 String[] optionIds = (String[]) mThemeCombo.getData(ATTR_ID);
                 for (int index = optionIds.length - 1; index >= 0; index--) {
-                    IStatus status = NewTemplatePage.validateCombo(null, mThemeParameter,
-                            index, mValues.minSdkLevel, mValues.getBuildApi());
+                    IStatus status = NewTemplatePage.validateCombo(null, mThemeParameter, index, mValues.minSdkLevel,
+                            mValues.getBuildApi());
                     if (status == null || status.isOK()) {
                         String optionId = optionIds[index];
                         parameter.value = optionId;
@@ -386,9 +377,8 @@ public class NewProjectPage extends WizardPage
         List<IAndroidTarget> list = new ArrayList<IAndroidTarget>();
 
         for (IAndroidTarget target : targets) {
-            if (target.isPlatform() == false &&
-                    (target.getOptionalLibraries() == null ||
-                            target.getOptionalLibraries().size() == 0)) {
+            if (target.isPlatform() == false
+                    && (target.getOptionalLibraries() == null || target.getOptionalLibraries().size() == 0)) {
                 continue;
             }
             list.add(target);
@@ -400,8 +390,8 @@ public class NewProjectPage extends WizardPage
     private ControlDecoration createFieldDecoration(Control control, String description) {
         ControlDecoration dec = new ControlDecoration(control, SWT.LEFT);
         dec.setMarginWidth(2);
-        FieldDecoration errorFieldIndicator = FieldDecorationRegistry.getDefault().
-           getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
+        FieldDecoration errorFieldIndicator = FieldDecorationRegistry.getDefault()
+                .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
         dec.setImage(errorFieldIndicator.getImage());
         dec.setDescriptionText(description);
         control.setToolTipText(description);
@@ -616,8 +606,7 @@ public class NewProjectPage extends WizardPage
             } else {
                 String minSdk = mValues.minSdk;
                 int buildApiLevel = mValues.target.getVersion().getApiLevel();
-                if (minSdk != null && !minSdk.isEmpty()
-                        && Character.isDigit(minSdk.charAt(0))
+                if (minSdk != null && !minSdk.isEmpty() && Character.isDigit(minSdk.charAt(0))
                         && buildApiLevel < Integer.parseInt(minSdk)) {
                     mValues.minSdk = Integer.toString(buildApiLevel);
                     try {
@@ -695,11 +684,9 @@ public class NewProjectPage extends WizardPage
     private static void appendPackage(StringBuilder sb, String string) {
         for (int i = 0, n = string.length(); i < n; i++) {
             char c = string.charAt(i);
-            if (i == 0 && Character.isJavaIdentifierStart(c)
-                    || i != 0 && Character.isJavaIdentifierPart(c)) {
+            if (i == 0 && Character.isJavaIdentifierStart(c) || i != 0 && Character.isJavaIdentifierPart(c)) {
                 sb.append(Character.toLowerCase(c));
-            } else if ((c == '.')
-                    && (sb.length() > 0 && sb.charAt(sb.length() - 1) != '.')) {
+            } else if ((c == '.') && (sb.length() > 0 && sb.charAt(sb.length() - 1) != '.')) {
                 sb.append('.');
             } else if (c == '-') {
                 sb.append('_');
@@ -708,8 +695,7 @@ public class NewProjectPage extends WizardPage
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 
     // ---- Implements FocusListener ----
 
@@ -729,8 +715,7 @@ public class NewProjectPage extends WizardPage
             tip = mPackageDec.getDescriptionText();
             if (mPackageText.getText().startsWith(SAMPLE_PACKAGE_PREFIX)) {
                 int length = SAMPLE_PACKAGE_PREFIX.length();
-                if (mPackageText.getText().length() > length
-                        && SAMPLE_PACKAGE_PREFIX.endsWith(".")) { //$NON-NLS-1$
+                if (mPackageText.getText().length() > length && SAMPLE_PACKAGE_PREFIX.endsWith(".")) { //$NON-NLS-1$
                     length--;
                 }
                 mPackageText.setSelection(0, length);
@@ -753,8 +738,7 @@ public class NewProjectPage extends WizardPage
     // Validation
 
     private void validatePage() {
-        IStatus status = mValues.template.validateTemplate(mValues.minSdkLevel,
-                mValues.getBuildApi());
+        IStatus status = mValues.template.validateTemplate(mValues.minSdkLevel, mValues.getBuildApi());
         if (status != null && !status.isOK()) {
             updateDecorator(mApplicationDec, null, true);
             updateDecorator(mPackageDec, null, true);
@@ -767,26 +751,22 @@ public class NewProjectPage extends WizardPage
             */
         } else {
             IStatus appStatus = validateAppName();
-            if (appStatus != null && (status == null
-                    || appStatus.getSeverity() > status.getSeverity())) {
+            if (appStatus != null && (status == null || appStatus.getSeverity() > status.getSeverity())) {
                 status = appStatus;
             }
 
             IStatus projectStatus = validateProjectName();
-            if (projectStatus != null && (status == null
-                    || projectStatus.getSeverity() > status.getSeverity())) {
+            if (projectStatus != null && (status == null || projectStatus.getSeverity() > status.getSeverity())) {
                 status = projectStatus;
             }
 
             IStatus packageStatus = validatePackageName();
-            if (packageStatus != null && (status == null
-                    || packageStatus.getSeverity() > status.getSeverity())) {
+            if (packageStatus != null && (status == null || packageStatus.getSeverity() > status.getSeverity())) {
                 status = packageStatus;
             }
 
             IStatus locationStatus = ProjectContentsPage.validateLocationInWorkspace(mValues);
-            if (locationStatus != null && (status == null
-                    || locationStatus.getSeverity() > status.getSeverity())) {
+            if (locationStatus != null && (status == null || locationStatus.getSeverity() > status.getSeverity())) {
                 status = locationStatus;
             }
 
@@ -806,26 +786,24 @@ public class NewProjectPage extends WizardPage
                     if (version.isPreview()) {
                         if (version.getCodename().equals(mValues.minSdk) == false) {
                             status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                            "Preview platforms require the min SDK version to match their codenames.");
-                       }
-                    } else if (mValues.target.getVersion().compareTo(
-                            mValues.minSdkLevel,
+                                    "Preview platforms require the min SDK version to match their codenames.");
+                        }
+                    } else if (mValues.target.getVersion().compareTo(mValues.minSdkLevel,
                             version.isPreview() ? mValues.minSdk : null) < 0) {
                         status = new Status(IStatus.WARNING, AndmoreAndroidPlugin.PLUGIN_ID,
-                            "The minimum SDK version is higher than the build target version");
+                                "The minimum SDK version is higher than the build target version");
                     }
                     if (status == null || status.getSeverity() != IStatus.ERROR) {
                         if (mValues.targetSdkLevel < mValues.minSdkLevel) {
                             status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                                "The target SDK version should be at least as high as the minimum SDK version");
+                                    "The target SDK version should be at least as high as the minimum SDK version");
                         }
                     }
                 }
             }
 
             IStatus themeStatus = validateTheme();
-            if (themeStatus != null && (status == null
-                    || themeStatus.getSeverity() > status.getSeverity())) {
+            if (themeStatus != null && (status == null || themeStatus.getSeverity() > status.getSeverity())) {
                 status = themeStatus;
             }
         }
@@ -833,8 +811,7 @@ public class NewProjectPage extends WizardPage
         setPageComplete(status == null || status.getSeverity() != IStatus.ERROR);
         if (status != null) {
             setMessage(status.getMessage(),
-                    status.getSeverity() == IStatus.ERROR
-                        ? IMessageProvider.ERROR : IMessageProvider.WARNING);
+                    status.getSeverity() == IStatus.ERROR ? IMessageProvider.ERROR : IMessageProvider.WARNING);
         } else {
             setErrorMessage(null);
             setMessage(null);
@@ -867,17 +844,15 @@ public class NewProjectPage extends WizardPage
     private IStatus validatePackageName() {
         IStatus status;
         if (mValues.packageName == null || mValues.packageName.startsWith(SAMPLE_PACKAGE_PREFIX)) {
-            if (mValues.packageName != null
-                    && !mValues.packageName.equals(SAMPLE_PACKAGE_PREFIX)) {
+            if (mValues.packageName != null && !mValues.packageName.equals(SAMPLE_PACKAGE_PREFIX)) {
                 status = ApplicationInfoPage.validatePackage(mValues.packageName);
                 if (status == null || status.isOK()) {
                     status = new Status(IStatus.WARNING, AndmoreAndroidPlugin.PLUGIN_ID,
-                        String.format("The prefix '%1$s' is meant as a placeholder and should " +
-                                      "not be used", SAMPLE_PACKAGE_PREFIX));
+                            String.format("The prefix '%1$s' is meant as a placeholder and should " + "not be used",
+                                    SAMPLE_PACKAGE_PREFIX));
                 }
             } else {
-                status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                        "Package name must be specified.");
+                status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, "Package name must be specified.");
             }
         } else {
             status = ApplicationInfoPage.validatePackage(mValues.packageName);
@@ -892,9 +867,8 @@ public class NewProjectPage extends WizardPage
         IStatus status = null;
 
         if (mThemeParameter != null) {
-            status = NewTemplatePage.validateCombo(null, mThemeParameter,
-                    mThemeCombo.getSelectionIndex(),  mValues.minSdkLevel,
-                    mValues.getBuildApi());
+            status = NewTemplatePage.validateCombo(null, mThemeParameter, mThemeCombo.getSelectionIndex(),
+                    mValues.minSdkLevel, mValues.getBuildApi());
 
             updateDecorator(mThemeDec, status, true);
         }
@@ -924,8 +898,7 @@ public class NewProjectPage extends WizardPage
         } else {
             id = FieldDecorationRegistry.DEC_INFORMATION;
         }
-        FieldDecoration errorFieldIndicator = FieldDecorationRegistry.getDefault().
-                getFieldDecoration(id);
+        FieldDecoration errorFieldIndicator = FieldDecorationRegistry.getDefault().getFieldDecoration(id);
         decorator.setImage(errorFieldIndicator.getImage());
     }
 }

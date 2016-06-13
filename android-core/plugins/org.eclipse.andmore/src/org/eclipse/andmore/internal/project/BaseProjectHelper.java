@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.eclipse.org/org/documents/epl-v10.php
+ * http://www.eclipse.org/org/documents/epl-v10.php
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -116,8 +116,8 @@ public final class BaseProjectHelper {
      * @param severity the severity of the marker.
      * @return the IMarker that was added or null if it failed to add one.
      */
-    public final static IMarker markResource(IResource resource, String markerId,
-            String message, int lineNumber, int severity) {
+    public final static IMarker markResource(IResource resource, String markerId, String message, int lineNumber,
+            int severity) {
         return markResource(resource, markerId, message, lineNumber, -1, -1, severity);
     }
 
@@ -137,8 +137,8 @@ public final class BaseProjectHelper {
      * @return the IMarker that was added or null if it failed to add one.
      */
     @Nullable
-    public final static IMarker markResource(IResource resource, String markerId,
-                String message, int lineNumber, int startOffset, int endOffset, int severity) {
+    public final static IMarker markResource(IResource resource, String markerId, String message, int lineNumber,
+            int startOffset, int endOffset, int severity) {
         if (!resource.isAccessible()) {
             return null;
         }
@@ -187,8 +187,7 @@ public final class BaseProjectHelper {
      * @return the IMarker that was added or null if it failed to add one.
      */
     @Nullable
-    public final static IMarker markResource(IResource resource, String markerId,
-            String message, int severity) {
+    public final static IMarker markResource(IResource resource, String markerId, String message, int severity) {
         return markResource(resource, markerId, message, -1, severity);
     }
 
@@ -205,8 +204,8 @@ public final class BaseProjectHelper {
      * @throws CoreException if the marker cannot be added
      */
     @Nullable
-    public final static IMarker markProject(IProject project, String markerId,
-            String message, int severity, int priority) throws CoreException {
+    public final static IMarker markProject(IProject project, String markerId, String message, int severity,
+            int priority) throws CoreException {
         if (!project.isAccessible()) {
             return null;
         }
@@ -237,8 +236,8 @@ public final class BaseProjectHelper {
      * or of its constructors.
      * @return {@link #TEST_CLASS_OK} or an error message.
      */
-    public final static String testClassForManifest(IJavaProject javaProject, String className,
-            String superClassName, boolean testVisibility) {
+    public final static String testClassForManifest(IJavaProject javaProject, String className, String superClassName,
+            boolean testVisibility) {
         try {
             // replace $ by .
             String javaClassName = className.replaceAll("\\$", "\\."); //$NON-NLS-1$ //$NON-NLS-2$
@@ -265,8 +264,7 @@ public final class BaseProjectHelper {
                                     className);
                         }
                     } else {
-                        return String.format(
-                                "%1$s must be public, or the system will not be able to instantiate it.",
+                        return String.format("%1$s must be public, or the system will not be able to instantiate it.",
                                 className);
                     }
                 }
@@ -286,8 +284,7 @@ public final class BaseProjectHelper {
 
                             flags = tmpType.getFlags();
                             if (testVisibility && Flags.isPublic(flags) == false) {
-                                return String.format("%1$s is not public",
-                                        tmpType.getFullyQualifiedName());
+                                return String.format("%1$s is not public", tmpType.getFullyQualifiedName());
                             }
                         } else {
                             // if it doesn't exist, we need to exit so we may as well mark it null.
@@ -306,8 +303,7 @@ public final class BaseProjectHelper {
                 // will stop
                 IType superType = type;
                 boolean foundProperSuperClass = false;
-                while ((superType = hierarchy.getSuperclass(superType)) != null &&
-                        superType.exists()) {
+                while ((superType = hierarchy.getSuperclass(superType)) != null && superType.exists()) {
                     if (superClassName.equals(superType.getFullyQualifiedName())) {
                         foundProperSuperClass = true;
                     }
@@ -382,7 +378,7 @@ public final class BaseProjectHelper {
                 IEditorPart editor = JavaUI.openInEditor(result);
                 if (editor instanceof ITextEditor) {
                     // get the text editor that was just opened.
-                    ITextEditor textEditor = (ITextEditor)editor;
+                    ITextEditor textEditor = (ITextEditor) editor;
 
                     IEditorInput input = textEditor.getEditorInput();
 
@@ -397,10 +393,7 @@ public final class BaseProjectHelper {
 
                 return true;
             }
-        } catch (JavaModelException e) {
-        } catch (PartInitException e) {
-        } catch (BadLocationException e) {
-        }
+        } catch (JavaModelException e) {} catch (PartInitException e) {} catch (BadLocationException e) {}
 
         return false;
     }
@@ -427,14 +420,12 @@ public final class BaseProjectHelper {
      * @return an array of IJavaProject, which can be empty if no projects match.
      */
     @NonNull
-    public static IJavaProject[] getAndroidProjects(@NonNull IJavaModel javaModel,
-            @Nullable IProjectFilter filter) {
+    public static IJavaProject[] getAndroidProjects(@NonNull IJavaModel javaModel, @Nullable IProjectFilter filter) {
         // get the java projects
         IJavaProject[] javaProjectList = null;
         try {
-            javaProjectList  = javaModel.getJavaProjects();
-        }
-        catch (JavaModelException jme) {
+            javaProjectList = javaModel.getJavaProjects();
+        } catch (JavaModelException jme) {
             return new IJavaProject[0];
         }
 

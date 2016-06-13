@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -66,8 +63,8 @@ public class FixImportsJob extends WorkspaceJob {
      */
     public FixImportsJob(String name, IFile androidManifest, String javaPackage) {
         super(name);
-        this.mAndroidManifest = androidManifest;
-        this.mJavaPackage = javaPackage;
+        mAndroidManifest = androidManifest;
+        mJavaPackage = javaPackage;
     }
 
     @Override
@@ -91,18 +88,15 @@ public class FixImportsJob extends WorkspaceJob {
                 IJavaElement element = JavaCore.create(resource);
                 if (element != null && (element instanceof ICompilationUnit)) {
                     final ICompilationUnit cu = (ICompilationUnit) element;
-                    IPackageFragment packageFragment = (IPackageFragment) cu
-                            .getAncestor(IJavaElement.PACKAGE_FRAGMENT);
+                    IPackageFragment packageFragment = (IPackageFragment) cu.getAncestor(IJavaElement.PACKAGE_FRAGMENT);
                     if (packageFragment != null && packageFragment.exists()) {
                         String packageName = packageFragment.getElementName();
                         if (packageName != null && packageName.startsWith(mJavaPackage)) {
-                            CompilationUnit astRoot = SharedASTProvider.getAST(cu,
-                                    SharedASTProvider.WAIT_ACTIVE_ONLY, null);
+                            CompilationUnit astRoot = SharedASTProvider.getAST(cu, SharedASTProvider.WAIT_ACTIVE_ONLY,
+                                    null);
                             CodeGenerationSettings settings = JavaPreferencesSettings
                                     .getCodeGenerationSettings(cu.getJavaProject());
-                            final boolean hasAmbiguity[] = new boolean[] {
-                                false
-                            };
+                            final boolean hasAmbiguity[] = new boolean[] { false };
                             IChooseImportQuery query = new IChooseImportQuery() {
                                 @Override
                                 public TypeNameMatch[] chooseImports(TypeNameMatch[][] openChoices,
@@ -111,21 +105,17 @@ public class FixImportsJob extends WorkspaceJob {
                                     return new TypeNameMatch[0];
                                 }
                             };
-                            final OrganizeImportsOperation op = new OrganizeImportsOperation(cu,
-                                    astRoot, settings.importIgnoreLowercase, !cu.isWorkingCopy(),
-                                    true, query);
+                            final OrganizeImportsOperation op = new OrganizeImportsOperation(cu, astRoot,
+                                    settings.importIgnoreLowercase, !cu.isWorkingCopy(), true, query);
                             Display.getDefault().asyncExec(new Runnable() {
 
                                 @Override
                                 public void run() {
                                     try {
-                                        IProgressService progressService = PlatformUI
-                                                .getWorkbench().getProgressService();
-                                        progressService.run(
-                                                true,
-                                                true,
-                                                new WorkbenchRunnableAdapter(op, op
-                                                        .getScheduleRule()));
+                                        IProgressService progressService = PlatformUI.getWorkbench()
+                                                .getProgressService();
+                                        progressService.run(true, true,
+                                                new WorkbenchRunnableAdapter(op, op.getScheduleRule()));
                                         IEditorPart openEditor = EditorUtility.isOpenInEditor(cu);
                                         if (openEditor != null) {
                                             openEditor.doSave(monitor);

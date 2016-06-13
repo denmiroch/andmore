@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,9 +12,7 @@
  */
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.google.common.collect.Maps;
+import java.util.Map;
 
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
@@ -31,7 +26,9 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.google.common.collect.Maps;
 
 /**
  * The {@link LayoutWindowCoordinator} keeps track of Eclipse window events (opening, closing,
@@ -85,8 +82,7 @@ public class LayoutWindowCoordinator implements IPartListener2 {
     private boolean mInitialized;
 
     /** Map from workbench windows to each layout window coordinator instance for that window */
-    private static Map<IWorkbenchWindow, LayoutWindowCoordinator> sCoordinators =
-            Maps.newHashMapWithExpectedSize(2);
+    private static Map<IWorkbenchWindow, LayoutWindowCoordinator> sCoordinators = Maps.newHashMapWithExpectedSize(2);
 
     /**
      * Returns the coordinator for the given window.
@@ -97,7 +93,7 @@ public class LayoutWindowCoordinator implements IPartListener2 {
      */
     @Nullable
     public static LayoutWindowCoordinator get(@NonNull IWorkbenchWindow window, boolean create) {
-        synchronized (LayoutWindowCoordinator.class){
+        synchronized (LayoutWindowCoordinator.class) {
             LayoutWindowCoordinator coordinator = sCoordinators.get(window);
             if (coordinator == null && create) {
                 coordinator = new LayoutWindowCoordinator(window);
@@ -115,7 +111,6 @@ public class LayoutWindowCoordinator implements IPartListener2 {
         }
     }
 
-
     /** Disposes this coordinator (when a window is closed) */
     public void dispose() {
         IPartService service = mWindow.getPartService();
@@ -123,7 +118,7 @@ public class LayoutWindowCoordinator implements IPartListener2 {
             service.removePartListener(this);
         }
 
-        synchronized (LayoutWindowCoordinator.class){
+        synchronized (LayoutWindowCoordinator.class) {
             sCoordinators.remove(mWindow);
         }
     }
@@ -242,8 +237,7 @@ public class LayoutWindowCoordinator implements IPartListener2 {
             editor.showStructureViews(false /*outline*/, false /*properties*/, true /*layout*/);
             editor.getCanvasControl().getOutlinePage().setShowPropertySheet(!mPropertiesOpen);
         } else {
-            editor.showStructureViews(true /*outline*/, !mPropertiesOpen /*properties*/,
-                    true /*layout*/);
+            editor.showStructureViews(true /*outline*/, !mPropertiesOpen /*properties*/, true /*layout*/);
         }
     }
 
@@ -369,26 +363,24 @@ public class LayoutWindowCoordinator implements IPartListener2 {
     }
 
     @Override
-    public void partInputChanged(IWorkbenchPartReference partRef) {
-    }
+    public void partInputChanged(IWorkbenchPartReference partRef) {}
 
     @Override
     public void partActivated(IWorkbenchPartReference partRef) {
         IWorkbenchPart part = partRef.getPart(false);
         if (part instanceof AndroidXmlEditor) {
-            ((AndroidXmlEditor)part).activated();
+            ((AndroidXmlEditor) part).activated();
         }
     }
 
     @Override
-    public void partBroughtToTop(IWorkbenchPartReference partRef) {
-    }
+    public void partBroughtToTop(IWorkbenchPartReference partRef) {}
 
     @Override
     public void partDeactivated(IWorkbenchPartReference partRef) {
         IWorkbenchPart part = partRef.getPart(false);
         if (part instanceof AndroidXmlEditor) {
-            ((AndroidXmlEditor)part).deactivated();
+            ((AndroidXmlEditor) part).deactivated();
         }
     }
 }

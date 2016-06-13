@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,10 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.launch;
-
-import com.android.ddmlib.AndroidDebugBridge;
-import com.android.ide.common.xml.ManifestData;
-import com.android.ide.common.xml.ManifestData.Activity;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -37,6 +30,10 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
+import com.android.ddmlib.AndroidDebugBridge;
+import com.android.ide.common.xml.ManifestData;
+import com.android.ide.common.xml.ManifestData.Activity;
+
 /**
  * Implementation of an eclipse LauncConfigurationDelegate to launch android
  * application in debug.
@@ -44,20 +41,17 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
     final static int INVALID_DEBUG_PORT = -1;
 
-    public final static String ANDROID_LAUNCH_TYPE_ID =
-        "org.eclipse.andmore.debug.LaunchConfigType"; //$NON-NLS-1$
+    public final static String ANDROID_LAUNCH_TYPE_ID = "org.eclipse.andmore.debug.LaunchConfigType"; //$NON-NLS-1$
 
     /** Target mode parameters: true is automatic, false is manual */
     public static final String ATTR_TARGET_MODE = AndmoreAndroidPlugin.PLUGIN_ID + ".target"; //$NON-NLS-1$
     public static final TargetMode DEFAULT_TARGET_MODE = TargetMode.AUTO;
 
     /** Flag indicating whether the last used device should be used for future launches. */
-    public static final String ATTR_REUSE_LAST_USED_DEVICE =
-            AndmoreAndroidPlugin.PLUGIN_ID + ".reuse.last.used.device"; //$NON-NLS-1$
+    public static final String ATTR_REUSE_LAST_USED_DEVICE = AndmoreAndroidPlugin.PLUGIN_ID + ".reuse.last.used.device"; //$NON-NLS-1$
 
     /** Device on which the last launch happened. */
-    public static final String ATTR_LAST_USED_DEVICE =
-            AndmoreAndroidPlugin.PLUGIN_ID + ".last.used.device"; //$NON-NLS-1$
+    public static final String ATTR_LAST_USED_DEVICE = AndmoreAndroidPlugin.PLUGIN_ID + ".last.used.device"; //$NON-NLS-1$
 
     /**
      * Launch action:
@@ -111,12 +105,11 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
     public static final String ATTR_NO_BOOT_ANIM = AndmoreAndroidPlugin.PLUGIN_ID + ".nobootanim"; //$NON-NLS-1$
     public static final boolean DEFAULT_NO_BOOT_ANIM = false;
 
-    public static final String ATTR_DEBUG_PORT =
-        AndmoreAndroidPlugin.PLUGIN_ID + ".debugPort"; //$NON-NLS-1$
+    public static final String ATTR_DEBUG_PORT = AndmoreAndroidPlugin.PLUGIN_ID + ".debugPort"; //$NON-NLS-1$
 
     @Override
-    public void launch(ILaunchConfiguration configuration, String mode,
-            ILaunch launch, IProgressMonitor monitor) throws CoreException {
+    public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
+            throws CoreException {
         // We need to check if it's a standard launch or if it's a launch
         // to debug an application already running.
         int debugPort = AndroidLaunchController.getPortForConfig(configuration);
@@ -127,7 +120,7 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
         // first we make sure the launch is of the proper type
         AndroidLaunch androidLaunch = null;
         if (launch instanceof AndroidLaunch) {
-            androidLaunch = (AndroidLaunch)launch;
+            androidLaunch = (AndroidLaunch) launch;
         } else {
             // wrong type, not sure how we got there, but we don't do
             // anything else
@@ -190,15 +183,13 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
                     AndmoreAndroidPlugin.printErrorToConsole(project,
                             "The connection to adb is down, and a severe error has occured.",
                             "You must restart adb and Eclipse.",
-                            String.format(
-                                    "Please ensure that adb is correctly located at '%1$s' and can be executed.",
+                            String.format("Please ensure that adb is correctly located at '%1$s' and can be executed.",
                                     AndmoreAndroidPlugin.getOsAbsoluteAdb()));
                     return;
                 }
 
                 if (restarts == 0) {
-                    AndmoreAndroidPlugin.printErrorToConsole(project,
-                            "Connection with adb was interrupted.",
+                    AndmoreAndroidPlugin.printErrorToConsole(project, "Connection with adb was interrupted.",
                             String.format("%1$s attempts have been made to reconnect.", connections),
                             "You may want to manually restart adb from the Devices view.");
                 } else {
@@ -243,16 +234,15 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
             return;
         }
 
-        doLaunch(configuration, mode, monitor, project, androidLaunch, config, controller,
-                applicationPackage, manifestData);
+        doLaunch(configuration, mode, monitor, project, androidLaunch, config, controller, applicationPackage,
+                manifestData);
     }
 
-    protected void doLaunch(ILaunchConfiguration configuration, String mode,
-            IProgressMonitor monitor, IProject project, AndroidLaunch androidLaunch,
-            AndroidLaunchConfiguration config, AndroidLaunchController controller,
+    protected void doLaunch(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor, IProject project,
+            AndroidLaunch androidLaunch, AndroidLaunchConfiguration config, AndroidLaunchController controller,
             IFile applicationPackage, ManifestData manifestData) {
 
-       String activityName = null;
+        String activityName = null;
 
         if (config.mLaunchAction == ACTION_ACTIVITY) {
             // Get the activity name defined in the config
@@ -265,8 +255,7 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
             if (activities.length == 0) {
                 // if the activities list is null, then the manifest is empty
                 // and we can't launch the app. We'll revert to a sync-only launch
-                AndmoreAndroidPlugin.printErrorToConsole(project,
-                        "The Manifest defines no activity!",
+                AndmoreAndroidPlugin.printErrorToConsole(project, "The Manifest defines no activity!",
                         "The launch will only sync the application package on the device!");
                 config.mLaunchAction = ACTION_DO_NOTHING;
             } else if (activityName == null) {
@@ -327,15 +316,14 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
 
         // everything seems fine, we ask the launch controller to handle
         // the rest
-        controller.launch(project, mode, applicationPackage,manifestData.getPackage(),
-                manifestData.getPackage(), manifestData.getDebuggable(),
-                manifestData.getMinSdkVersionString(), launchAction, config, androidLaunch,
-                monitor);
+        controller.launch(project, mode, applicationPackage, manifestData.getPackage(), manifestData.getPackage(),
+                manifestData.getDebuggable(), manifestData.getMinSdkVersionString(), launchAction, config,
+                androidLaunch, monitor);
     }
 
     @Override
-    public boolean buildForLaunch(ILaunchConfiguration configuration,
-            String mode, IProgressMonitor monitor) throws CoreException {
+    public boolean buildForLaunch(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
+            throws CoreException {
         // if this returns true, this forces a full workspace rebuild which is not
         // what we want.
         // Instead in the #launch method, we'll rebuild only the launching project.
@@ -347,8 +335,7 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
      * @throws CoreException
      */
     @Override
-    public ILaunch getLaunch(ILaunchConfiguration configuration, String mode)
-            throws CoreException {
+    public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
         return new AndroidLaunch(configuration, mode, null);
     }
 
@@ -359,12 +346,11 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
      * @param configuration
      * @return The IProject object or null
      */
-    private IProject getProject(ILaunchConfiguration configuration){
+    private IProject getProject(ILaunchConfiguration configuration) {
         // get the project name from the config
         String projectName;
         try {
-            projectName = configuration.getAttribute(
-                    IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, "");
+            projectName = configuration.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, "");
         } catch (CoreException e) {
             return null;
         }
@@ -399,7 +385,6 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
         return true;
     }
 
-
     /**
      * Returns the name of the activity.
      */
@@ -416,8 +401,7 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
     }
 
     private final void revertToNoActionLaunch(IProject project, AndroidLaunchConfiguration config) {
-        AndmoreAndroidPlugin.printErrorToConsole(project,
-                "No Launcher activity found!",
+        AndmoreAndroidPlugin.printErrorToConsole(project, "No Launcher activity found!",
                 "The launch will only sync the application package on the device!");
         config.mLaunchAction = ACTION_DO_NOTHING;
     }

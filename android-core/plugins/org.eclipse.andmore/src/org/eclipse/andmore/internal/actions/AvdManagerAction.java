@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,9 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.actions;
-
-import com.android.sdkuilib.repository.AvdManagerWindow;
-import com.android.sdkuilib.repository.AvdManagerWindow.AvdInvocationContext;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.sdk.AdtConsoleSdkLog;
@@ -28,6 +22,9 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+
+import com.android.sdkuilib.repository.AvdManagerWindow;
+import com.android.sdkuilib.repository.AvdManagerWindow.AvdInvocationContext;
 
 /**
  * Delegate for the toolbar/menu action "AVD Manager".
@@ -54,11 +51,8 @@ public class AvdManagerAction implements IWorkbenchWindowActionDelegate, IObject
             AndmoreAndroidPlugin.getDefault().refreshSdk();
 
             // Runs the updater window, directing all logs to the ADT console.
-            AvdManagerWindow window = new AvdManagerWindow(
-                    AndmoreAndroidPlugin.getShell(),
-                    new AdtConsoleSdkLog(),
-                    sdk.getSdkOsLocation(),
-                    AvdInvocationContext.IDE);
+            AvdManagerWindow window = new AvdManagerWindow(AndmoreAndroidPlugin.getShell(), new AdtConsoleSdkLog(),
+                    sdk.getSdkOsLocation(), AvdInvocationContext.IDE);
             window.open();
         } else {
             AndmoreAndroidPlugin.displayError("Android SDK",

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,13 +17,11 @@ import static com.android.SdkConstants.ANDROID_URI;
 import static com.android.SdkConstants.XMLNS_ANDROID;
 import static com.android.SdkConstants.XMLNS_URI;
 
-import com.android.ide.common.resources.ResourceUrl;
-import com.android.resources.ResourceType;
-import com.android.utils.Pair;
+import java.util.List;
 
+import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.resources.ResourceHelper;
 import org.eclipse.core.resources.IFile;
@@ -61,7 +56,9 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.List;
+import com.android.ide.common.resources.ResourceUrl;
+import com.android.resources.ResourceType;
+import com.android.utils.Pair;
 
 /**
  * Shared handler for both quick assist processors (Control key handler) and quick fix
@@ -71,8 +68,7 @@ import java.util.List;
 @SuppressWarnings("restriction") // XML model
 public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistProcessor {
 
-    public AaptQuickFix() {
-    }
+    public AaptQuickFix() {}
 
     /** Returns the error message from aapt that signals missing resources */
     private static String getTargetMarkerErrorMessage() {
@@ -96,8 +92,7 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
         }
 
         return message != null
-                && (message.contains(getTargetMarkerErrorMessage())
-                        || message.contains(getUnboundErrorMessage()));
+                && (message.contains(getTargetMarkerErrorMessage()) || message.contains(getUnboundErrorMessage()));
     }
 
     @Override
@@ -107,9 +102,7 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
         try {
             String message = (String) marker.getAttribute(IMarker.MESSAGE);
             if (message.contains(getUnboundErrorMessage()) && markerResource instanceof IFile) {
-                return new IMarkerResolution[] {
-                        new CreateNamespaceFix((IFile) markerResource)
-                    };
+                return new IMarkerResolution[] { new CreateNamespaceFix((IFile) markerResource) };
             }
         } catch (CoreException e1) {
             AndmoreAndroidPlugin.log(e1, null);
@@ -125,9 +118,7 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
                 IDocument document = provider.getDocument(markerResource);
                 String resource = document.get(start, length);
                 if (ResourceHelper.canCreateResource(resource)) {
-                    return new IMarkerResolution[] {
-                        new CreateResourceProposal(project, resource)
-                    };
+                    return new IMarkerResolution[] { new CreateResourceProposal(project, resource) };
                 }
             } catch (Exception e) {
                 AndmoreAndroidPlugin.log(e, "Can't find range information for %1$s", markerResource);
@@ -152,8 +143,7 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
     }
 
     @Override
-    public ICompletionProposal[] computeQuickAssistProposals(
-            IQuickAssistInvocationContext invocationContext) {
+    public ICompletionProposal[] computeQuickAssistProposals(IQuickAssistInvocationContext invocationContext) {
 
         // We have to find the corresponding project/file (so we can look up the aapt
         // error markers). Unfortunately, an IQuickAssistProcessor only gets
@@ -173,8 +163,8 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
                 return null;
             }
             IDocument document = sourceViewer.getDocument();
-            List<IMarker> markers = AdtUtils.findMarkersOnLine(AndmoreAndroidConstants.MARKER_AAPT_COMPILE,
-                    file, document, invocationContext.getOffset());
+            List<IMarker> markers = AdtUtils.findMarkersOnLine(AndmoreAndroidConstants.MARKER_AAPT_COMPILE, file,
+                    document, invocationContext.getOffset());
             try {
                 for (IMarker marker : markers) {
                     String message = marker.getAttribute(IMarker.MESSAGE, ""); //$NON-NLS-1$
@@ -187,14 +177,10 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
                         // resources
                         if (ResourceHelper.canCreateResource(resource)) {
                             IProject project = editor.getProject();
-                            return new ICompletionProposal[] {
-                                new CreateResourceProposal(project, resource)
-                            };
+                            return new ICompletionProposal[] { new CreateResourceProposal(project, resource) };
                         }
                     } else if (message.contains(getUnboundErrorMessage())) {
-                        return new ICompletionProposal[] {
-                            new CreateNamespaceFix(null)
-                        };
+                        return new ICompletionProposal[] { new CreateNamespaceFix(null) };
                     }
                 }
             } catch (BadLocationException e) {
@@ -211,8 +197,7 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
     }
 
     /** Quick fix to insert namespace binding when missing */
-    private final static class CreateNamespaceFix
-            implements ICompletionProposal, IMarkerResolution2 {
+    private final static class CreateNamespaceFix implements ICompletionProposal, IMarkerResolution2 {
         private IFile mFile;
 
         public CreateNamespaceFix(IFile file) {
@@ -298,7 +283,6 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
             return null;
         }
 
-
         // ---- Implements MarkerResolution2 ----
 
         @Override
@@ -317,8 +301,7 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
             IndexedRegion indexedRegion = perform(mFile);
             if (indexedRegion != null) {
                 try {
-                    IRegion region =
-                        new Region(indexedRegion.getStartOffset(), indexedRegion.getLength());
+                    IRegion region = new Region(indexedRegion.getStartOffset(), indexedRegion.getLength());
                     AndmoreAndroidPlugin.openFile(mFile, region);
                 } catch (PartInitException e) {
                     AndmoreAndroidPlugin.log(e, "Can't open file %1$s", mFile.getName());
@@ -332,8 +315,7 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
         }
     }
 
-    private static class CreateResourceProposal
-            implements ICompletionProposal, IMarkerResolution2 {
+    private static class CreateResourceProposal implements ICompletionProposal, IMarkerResolution2 {
         private final IProject mProject;
         private final String mResource;
 
@@ -357,16 +339,27 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
             // selected for editing, but if we have an initial value then the new file
             // won't show an error.
             switch (type) {
-                case STRING: value = "TODO"; break; //$NON-NLS-1$
-                case DIMEN: value = "1dp"; break; //$NON-NLS-1$
-                case BOOL: value = "true"; break; //$NON-NLS-1$
-                case COLOR: value = "#000000"; break; //$NON-NLS-1$
-                case INTEGER: value = "1"; break; //$NON-NLS-1$
-                case ARRAY: value = "<item>1</item>"; break; //$NON-NLS-1$
+                case STRING:
+                    value = "TODO"; //$NON-NLS-1$
+                    break;
+                case DIMEN:
+                    value = "1dp"; //$NON-NLS-1$
+                    break;
+                case BOOL:
+                    value = "true"; //$NON-NLS-1$
+                    break;
+                case COLOR:
+                    value = "#000000"; //$NON-NLS-1$
+                    break;
+                case INTEGER:
+                    value = "1"; //$NON-NLS-1$
+                    break;
+                case ARRAY:
+                    value = "<item>1</item>"; //$NON-NLS-1$
+                    break;
             }
 
-            Pair<IFile, IRegion> location =
-                ResourceHelper.createResource(mProject, type, name, value);
+            Pair<IFile, IRegion> location = ResourceHelper.createResource(mProject, type, name, value);
             if (location != null) {
                 IFile file = location.getFirst();
                 IRegion region = location.getSecond();
@@ -387,8 +380,7 @@ public class AaptQuickFix implements IMarkerResolutionGenerator2, IQuickAssistPr
 
         @Override
         public String getAdditionalProposalInfo() {
-            return "Creates an XML file entry for the given missing resource "
-                    + "and opens it in the editor.";
+            return "Creates an XML file entry for the given missing resource " + "and opens it in the editor.";
         }
 
         @Override

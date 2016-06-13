@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +13,10 @@
 
 package org.eclipse.andmore.internal.build;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
+import java.util.List;
+
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -38,8 +37,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
-import java.util.List;
-
 /**
  * A quickfix processor which looks for "case expressions must be constant
  * expressions" errors, and if they apply to fields in a class named R, it
@@ -48,8 +45,7 @@ import java.util.List;
  */
 public class ConvertSwitchQuickFixProcessor implements IQuickFixProcessor {
     /** Constructs a new {@link ConvertSwitchQuickFixProcessor} */
-    public ConvertSwitchQuickFixProcessor() {
-    }
+    public ConvertSwitchQuickFixProcessor() {}
 
     @Override
     public boolean hasCorrections(ICompilationUnit cu, int problemId) {
@@ -57,8 +53,8 @@ public class ConvertSwitchQuickFixProcessor implements IQuickFixProcessor {
     }
 
     @Override
-    public IJavaCompletionProposal[] getCorrections(IInvocationContext context,
-            IProblemLocation[] location) throws CoreException {
+    public IJavaCompletionProposal[] getCorrections(IInvocationContext context, IProblemLocation[] location)
+            throws CoreException {
         if (location == null || location.length == 0) {
             return null;
         }
@@ -111,8 +107,7 @@ public class ConvertSwitchQuickFixProcessor implements IQuickFixProcessor {
                 provider.connect(file);
                 IDocument document = provider.getDocument(file);
                 if (document != null) {
-                    List<IMarker> markers = AdtUtils.findMarkersOnLine(IMarker.PROBLEM,
-                            file, document, errorStart);
+                    List<IMarker> markers = AdtUtils.findMarkersOnLine(IMarker.PROBLEM, file, document, errorStart);
                     for (IMarker marker : markers) {
                         String message = marker.getAttribute(IMarker.MESSAGE, "");
                         // There are no other attributes in the marker we can use to identify
@@ -166,9 +161,7 @@ public class ConvertSwitchQuickFixProcessor implements IQuickFixProcessor {
 
         if (sameLine) {
             String expression = buffer.getText(errorStart, errorLength);
-            return new IJavaCompletionProposal[] {
-                new MigrateProposal(expression)
-            };
+            return new IJavaCompletionProposal[] { new MigrateProposal(expression) };
         }
 
         return null;
@@ -196,8 +189,8 @@ public class ConvertSwitchQuickFixProcessor implements IQuickFixProcessor {
 
         @Override
         public String getAdditionalProposalInfo() {
-            return "As of ADT 14, resource fields cannot be used as switch cases. Invoke this " +
-                    "fix to get more information.";
+            return "As of ADT 14, resource fields cannot be used as switch cases. Invoke this "
+                    + "fix to get more information.";
         }
 
         @Override

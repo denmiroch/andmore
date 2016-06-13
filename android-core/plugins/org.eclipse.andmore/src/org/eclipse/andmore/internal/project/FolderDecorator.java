@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.project;
-
-import com.android.SdkConstants;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -29,6 +24,8 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
+
+import com.android.SdkConstants;
 
 /**
  * A {@link ILabelDecorator} associated with an org.eclipse.ui.decorators extension.
@@ -45,7 +42,7 @@ public class FolderDecorator implements ILightweightLabelDecorator {
     @Override
     public void decorate(Object element, IDecoration decoration) {
         if (element instanceof IFolder) {
-            IFolder folder = (IFolder)element;
+            IFolder folder = (IFolder) element;
 
             // get the project and make sure this is an android project
             IProject project = folder.getProject();

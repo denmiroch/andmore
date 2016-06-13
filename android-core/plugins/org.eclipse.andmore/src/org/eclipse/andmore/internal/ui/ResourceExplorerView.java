@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,15 +13,13 @@
 
 package org.eclipse.andmore.internal.ui;
 
-import com.android.ide.common.resources.ResourceFile;
-import com.android.ide.common.resources.ResourceItem;
-import com.android.io.IAbstractFile;
+import java.util.Iterator;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IResourceEventListener;
 import org.eclipse.andmore.internal.resources.manager.ProjectResources;
 import org.eclipse.andmore.internal.resources.manager.ResourceManager;
-import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IResourceEventListener;
 import org.eclipse.andmore.io.IFileWrapper;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -57,7 +52,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
 
-import java.util.Iterator;
+import com.android.ide.common.resources.ResourceFile;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.io.IAbstractFile;
 
 /**
  * Resource Explorer View.
@@ -70,23 +67,19 @@ import java.util.Iterator;
  *
  * @see ResourceContentProvider
  */
-public class ResourceExplorerView extends ViewPart implements ISelectionListener,
-        IResourceEventListener {
+public class ResourceExplorerView extends ViewPart implements ISelectionListener, IResourceEventListener {
 
     // Note: keep using the obsolete SdkConstants.EDITORS_NAMESPACE (which used
     // to be the Editors Plugin ID) to keep existing preferences functional.
-    private final static String PREFS_COLUMN_RES =
-        AndmoreAndroidConstants.EDITORS_NAMESPACE + "ResourceExplorer.Col1"; //$NON-NLS-1$
-    private final static String PREFS_COLUMN_2 =
-        AndmoreAndroidConstants.EDITORS_NAMESPACE + "ResourceExplorer.Col2"; //$NON-NLS-1$
+    private final static String PREFS_COLUMN_RES = AndmoreAndroidConstants.EDITORS_NAMESPACE + "ResourceExplorer.Col1"; //$NON-NLS-1$
+    private final static String PREFS_COLUMN_2 = AndmoreAndroidConstants.EDITORS_NAMESPACE + "ResourceExplorer.Col2"; //$NON-NLS-1$
 
     private Tree mTree;
     private TreeViewer mTreeViewer;
 
     private IProject mCurrentProject;
 
-    public ResourceExplorerView() {
-    }
+    public ResourceExplorerView() {}
 
     @Override
     public void createPartControl(Composite parent) {
@@ -98,10 +91,8 @@ public class ResourceExplorerView extends ViewPart implements ISelectionListener
         final IPreferenceStore store = AndmoreAndroidPlugin.getDefault().getPreferenceStore();
 
         // create 2 columns. The main one with the resources, and an "info" column.
-        createTreeColumn(mTree, "Resources", SWT.LEFT,
-                "abcdefghijklmnopqrstuvwxz", -1, PREFS_COLUMN_RES, store); //$NON-NLS-1$
-        createTreeColumn(mTree, "Info", SWT.LEFT,
-                "0123456789", -1, PREFS_COLUMN_2, store); //$NON-NLS-1$
+        createTreeColumn(mTree, "Resources", SWT.LEFT, "abcdefghijklmnopqrstuvwxz", -1, PREFS_COLUMN_RES, store); //$NON-NLS-2$
+        createTreeColumn(mTree, "Info", SWT.LEFT, "0123456789", -1, PREFS_COLUMN_2, store); //$NON-NLS-2$
 
         // create the jface wrapper
         mTreeViewer = new TreeViewer(mTree);
@@ -132,17 +123,16 @@ public class ResourceExplorerView extends ViewPart implements ISelectionListener
                         // if it's a resourceFile, we directly open it.
                         if (element instanceof ResourceFile) {
                             try {
-                                IAbstractFile iAbstractFile = ((ResourceFile)element).getFile();
+                                IAbstractFile iAbstractFile = ((ResourceFile) element).getFile();
                                 if (iAbstractFile instanceof IFileWrapper) {
                                     IDE.openEditor(getSite().getWorkbenchWindow().getActivePage(),
-                                            ((IFileWrapper)iAbstractFile).getIFile());
+                                            ((IFileWrapper) iAbstractFile).getIFile());
                                 }
-                            } catch (PartInitException e) {
-                            }
+                            } catch (PartInitException e) {}
                         } else if (element instanceof ResourceItem) {
                             // if it's a ResourceItem, we open the first file, but only if
                             // there's no alternate files.
-                            ResourceItem item = (ResourceItem)element;
+                            ResourceItem item = (ResourceItem) element;
 
                             if (item.isEditableDirectly()) {
                                 ResourceFile[] files = item.getSourceFileArray();
@@ -150,12 +140,10 @@ public class ResourceExplorerView extends ViewPart implements ISelectionListener
                                     try {
                                         IAbstractFile iAbstractFile = files[0].getFile();
                                         if (iAbstractFile instanceof IFileWrapper) {
-                                            IDE.openEditor(
-                                                    getSite().getWorkbenchWindow().getActivePage(),
-                                                    ((IFileWrapper)iAbstractFile).getIFile());
+                                            IDE.openEditor(getSite().getWorkbenchWindow().getActivePage(),
+                                                    ((IFileWrapper) iAbstractFile).getIFile());
                                         }
-                                    } catch (PartInitException e) {
-                                    }
+                                    } catch (PartInitException e) {}
                                 }
                             }
                         }
@@ -188,11 +176,11 @@ public class ResourceExplorerView extends ViewPart implements ISelectionListener
         // first we test if the part is an editor.
         if (part instanceof IEditorPart) {
             // if it is, we check if it's a file editor.
-            IEditorInput input = ((IEditorPart)part).getEditorInput();
+            IEditorInput input = ((IEditorPart) part).getEditorInput();
 
             if (input instanceof IFileEditorInput) {
                 // from the file editor we can get the IFile object, and from it, the IProject.
-                IFile file = ((IFileEditorInput)input).getFile();
+                IFile file = ((IFileEditorInput) input).getFile();
 
                 // get the file project
                 IProject project = file.getProject();
@@ -201,8 +189,7 @@ public class ResourceExplorerView extends ViewPart implements ISelectionListener
             }
         } else if (selection instanceof IStructuredSelection) {
             // if it's not an editor, we look for structured selection.
-            for (Iterator<?> it = ((IStructuredSelection) selection).iterator();
-                    it.hasNext();) {
+            for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {
                 Object element = it.next();
                 IProject project = null;
 
@@ -212,15 +199,14 @@ public class ResourceExplorerView extends ViewPart implements ISelectionListener
                     project = ((IResource) element).getProject();
                 } else if (element instanceof IJavaElement) {
                     // if we are in the package explorer on a java element, we handle that too.
-                    IJavaElement javaElement = (IJavaElement)element;
+                    IJavaElement javaElement = (IJavaElement) element;
                     IJavaProject javaProject = javaElement.getJavaProject();
                     if (javaProject != null) {
                         project = javaProject.getProject();
                     }
                 } else if (element instanceof IAdaptable) {
                     // finally we try to get a project object from IAdaptable.
-                    project = (IProject) ((IAdaptable) element)
-                            .getAdapter(IProject.class);
+                    project = ((IAdaptable) element).getAdapter(IProject.class);
                 }
 
                 // if we found a project, handle it, and return.
@@ -244,8 +230,7 @@ public class ResourceExplorerView extends ViewPart implements ISelectionListener
             // to the tree viewer.
             if (project.hasNature(AndmoreAndroidConstants.NATURE_DEFAULT)) {
                 if (mCurrentProject != project) {
-                    ProjectResources projRes = ResourceManager.getInstance().getProjectResources(
-                            project);
+                    ProjectResources projRes = ResourceManager.getInstance().getProjectResources(project);
                     if (projRes != null) {
                         mTreeViewer.setInput(projRes);
                         mCurrentProject = project;
@@ -253,8 +238,7 @@ public class ResourceExplorerView extends ViewPart implements ISelectionListener
                     }
                 }
             }
-        } catch (CoreException e) {
-        }
+        } catch (CoreException e) {}
 
         return false;
     }
@@ -274,9 +258,8 @@ public class ResourceExplorerView extends ViewPart implements ISelectionListener
      * @param pref_name The preference entry name for column width
      * @param prefs The preference store
      */
-    public void createTreeColumn(Tree parent, String header, int style,
-            String sample_text, int fixedSize, final String pref_name,
-            final IPreferenceStore prefs) {
+    public void createTreeColumn(Tree parent, String header, int style, String sample_text, int fixedSize,
+            final String pref_name, final IPreferenceStore prefs) {
 
         // create the column
         TreeColumn col = new TreeColumn(parent, style);
@@ -305,13 +288,12 @@ public class ResourceExplorerView extends ViewPart implements ISelectionListener
             if (prefs != null && pref_name != null) {
                 col.addControlListener(new ControlListener() {
                     @Override
-                    public void controlMoved(ControlEvent e) {
-                    }
+                    public void controlMoved(ControlEvent e) {}
 
                     @Override
                     public void controlResized(ControlEvent e) {
                         // get the new width
-                        int w = ((TreeColumn)e.widget).getWidth();
+                        int w = ((TreeColumn) e.widget).getWidth();
 
                         // store in pref store
                         prefs.setValue(pref_name, w);

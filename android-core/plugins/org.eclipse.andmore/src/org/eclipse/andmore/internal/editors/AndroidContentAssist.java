@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,10 +26,14 @@ import static com.android.SdkConstants.UNIT_PX;
 import static com.android.SdkConstants.UNIT_SP;
 import static org.eclipse.andmore.internal.editors.descriptors.AttributeDescriptor.ATTRIBUTE_ICON_FILENAME;
 
-import com.android.ide.common.api.IAttributeInfo;
-import com.android.ide.common.api.IAttributeInfo.Format;
-import com.android.utils.Pair;
-import com.android.utils.XmlUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.descriptors.AttributeDescriptor;
@@ -63,14 +64,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
+import com.android.ide.common.api.IAttributeInfo;
+import com.android.ide.common.api.IAttributeInfo.Format;
+import com.android.utils.Pair;
+import com.android.utils.XmlUtils;
 
 /**
  * Content Assist Processor for Android XML files
@@ -94,8 +91,7 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
      *    name = '...' quoted string with all but < and '
      * </pre>
      */
-    private static Pattern sFirstAttribute = Pattern.compile(
-            "^ *[a-zA-Z_:]+ *= *(?:\"[^<\"]*\"|'[^<']*')");  //$NON-NLS-1$
+    private static Pattern sFirstAttribute = Pattern.compile("^ *[a-zA-Z_:]+ *= *(?:\"[^<\"]*\"|'[^<']*')"); //$NON-NLS-1$
 
     /** Regexp to detect an element tag name */
     private static Pattern sFirstElementWord = Pattern.compile("^[a-zA-Z0-9_:.-]+"); //$NON-NLS-1$
@@ -166,23 +162,20 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
 
         UiElementNode rootUiNode = mEditor.getUiRootNode();
         if (currentNode == null || currentNode.getNodeType() == Node.TEXT_NODE) {
-             UiElementNode parentUiNode =
-                 rootUiNode == null ? null : rootUiNode.findXmlNode(parentNode);
-             computeTextValues(proposals, offset, parentNode, currentNode, parentUiNode,
-                    wordPrefix);
+            UiElementNode parentUiNode = rootUiNode == null ? null : rootUiNode.findXmlNode(parentNode);
+            computeTextValues(proposals, offset, parentNode, currentNode, parentUiNode, wordPrefix);
         } else if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
             String parent = currentNode.getNodeName();
             AttribInfo info = parseAttributeInfo(viewer, offset, offset - wordPrefix.length());
             char nextChar = extractChar(viewer, offset);
             if (info != null) {
                 // check to see if we can find a UiElementNode matching this XML node
-                UiElementNode currentUiNode = rootUiNode == null
-                    ? null : rootUiNode.findXmlNode(currentNode);
-                computeAttributeProposals(proposals, viewer, offset, wordPrefix, currentUiNode,
-                        parentNode, currentNode, parent, info, nextChar);
+                UiElementNode currentUiNode = rootUiNode == null ? null : rootUiNode.findXmlNode(currentNode);
+                computeAttributeProposals(proposals, viewer, offset, wordPrefix, currentUiNode, parentNode, currentNode,
+                        parent, info, nextChar);
             } else {
-                computeNonAttributeProposals(viewer, offset, wordPrefix, proposals, parentNode,
-                        currentNode, parent, nextChar);
+                computeNonAttributeProposals(viewer, offset, wordPrefix, proposals, parentNode, currentNode, parent,
+                        nextChar);
             }
         }
 
@@ -190,8 +183,7 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
     }
 
     private void computeNonAttributeProposals(ITextViewer viewer, int offset, String wordPrefix,
-            List<ICompletionProposal> proposals, Node parentNode, Node currentNode, String parent,
-            char nextChar) {
+            List<ICompletionProposal> proposals, Node parentNode, Node currentNode, String parent, char nextChar) {
         if (startsWith(parent, wordPrefix)) {
             // We are still editing the element's tag name, not the attributes
             // (the element's tag name may not even be complete)
@@ -216,29 +208,26 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
             // Per XML Spec, there's no whitespace between "<" or "</" and the tag name.
             char needTag = computeElementNeedTag(viewer, offset, wordPrefix);
 
-            addMatchingProposals(proposals, choices, offset,
-                    parentNode != null ? parentNode : null, wordPrefix, needTag,
-                    false /* isAttribute */, isNew, false /*isComplete*/,
-                    replaceLength);
+            addMatchingProposals(proposals, choices, offset, parentNode != null ? parentNode : null, wordPrefix,
+                    needTag, false /* isAttribute */, isNew, false /*isComplete*/, replaceLength);
         }
     }
 
-    private void computeAttributeProposals(List<ICompletionProposal> proposals, ITextViewer viewer,
-            int offset, String wordPrefix, UiElementNode currentUiNode, Node parentNode,
-            Node currentNode, String parent, AttribInfo info, char nextChar) {
+    private void computeAttributeProposals(List<ICompletionProposal> proposals, ITextViewer viewer, int offset,
+            String wordPrefix, UiElementNode currentUiNode, Node parentNode, Node currentNode, String parent,
+            AttribInfo info, char nextChar) {
         // We're editing attributes in an element node (either the attributes' names
         // or their values).
 
         if (info.isInValue) {
-            if (computeAttributeValues(proposals, offset, parent, info.name, currentNode,
-                    wordPrefix, info.skipEndTag, info.replaceLength)) {
+            if (computeAttributeValues(proposals, offset, parent, info.name, currentNode, wordPrefix, info.skipEndTag,
+                    info.replaceLength)) {
                 return;
             }
         }
 
         // Look up attribute proposals based on descriptors
-        Object[] choices = getChoicesForAttribute(parent, currentNode, currentUiNode,
-                info, wordPrefix);
+        Object[] choices = getChoicesForAttribute(parent, currentNode, currentUiNode, info, wordPrefix);
         if (choices == null || choices.length == 0) {
             return;
         }
@@ -249,12 +238,10 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
         }
         char needTag = info.needTag;
         // Look to the right and see if we're followed by whitespace
-        boolean isNew = replaceLength == 0
-            && (Character.isWhitespace(nextChar) || nextChar == '>' || nextChar == '/');
+        boolean isNew = replaceLength == 0 && (Character.isWhitespace(nextChar) || nextChar == '>' || nextChar == '/');
 
-        addMatchingProposals(proposals, choices, offset, parentNode != null ? parentNode : null,
-                wordPrefix, needTag, true /* isAttribute */, isNew, info.skipEndTag,
-                replaceLength);
+        addMatchingProposals(proposals, choices, offset, parentNode != null ? parentNode : null, wordPrefix, needTag,
+                true /* isAttribute */, isNew, info.skipEndTag, replaceLength);
     }
 
     private char computeElementNeedTag(ITextViewer viewer, int offset, String wordPrefix) {
@@ -354,15 +341,14 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
      *         a String[] if the user is editing an attribute value with some known values,
      *         or null if nothing is known about the context.
      */
-    private Object[] getChoicesForAttribute(
-            String parent, Node currentNode, UiElementNode currentUiNode, AttribInfo attrInfo,
-            String wordPrefix) {
+    private Object[] getChoicesForAttribute(String parent, Node currentNode, UiElementNode currentUiNode,
+            AttribInfo attrInfo, String wordPrefix) {
         Object[] choices = null;
         if (attrInfo.isInValue) {
             // Editing an attribute's value... Get the attribute name and then the
             // possible choices for the tuple(parent,attribute)
             String value = attrInfo.valuePrefix;
-            if (value.startsWith("'") || value.startsWith("\"")) {   //$NON-NLS-1$   //$NON-NLS-2$
+            if (value.startsWith("'") || value.startsWith("\"")) { //$NON-NLS-1$   //$NON-NLS-2$
                 value = value.substring(1);
                 // The prefix that was found at the beginning only scan for characters
                 // valid for tag name. We now know the real prefix for this attribute's
@@ -429,8 +415,7 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
         return choices;
     }
 
-    protected Object[] getAttributeValueChoices(UiAttributeNode currAttrNode, AttribInfo attrInfo,
-            String value) {
+    protected Object[] getAttributeValueChoices(UiAttributeNode currAttrNode, AttribInfo attrInfo, String value) {
         Object[] choices;
         int pos;
         choices = currAttrNode.getPossibleValues(value);
@@ -457,8 +442,7 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
         // Check to see if the user is attempting resource completion
         AttributeDescriptor attributeDescriptor = currAttrNode.getDescriptor();
         IAttributeInfo attributeInfo = attributeDescriptor.getAttributeInfo();
-        if (value.startsWith(PREFIX_RESOURCE_REF)
-                && !attributeInfo.getFormats().contains(Format.REFERENCE)) {
+        if (value.startsWith(PREFIX_RESOURCE_REF) && !attributeInfo.getFormats().contains(Format.REFERENCE)) {
             // Special case: If the attribute value looks like a reference to a
             // resource, offer to complete it, since in many cases our metadata
             // does not correctly state whether a resource value is allowed. We don't
@@ -466,13 +450,10 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
             // actually typed "@", in that case list resource matches.
             // For example, for android:minHeight this makes completion on @dimen/
             // possible.
-            choices = UiResourceAttributeNode.computeResourceStringMatches(
-                    mEditor, attributeDescriptor, value);
+            choices = UiResourceAttributeNode.computeResourceStringMatches(mEditor, attributeDescriptor, value);
             attrInfo.skipEndTag = false;
-        } else if (value.startsWith(PREFIX_THEME_REF)
-                && !attributeInfo.getFormats().contains(Format.REFERENCE)) {
-            choices = UiResourceAttributeNode.computeResourceStringMatches(
-                    mEditor, attributeDescriptor, value);
+        } else if (value.startsWith(PREFIX_THEME_REF) && !attributeInfo.getFormats().contains(Format.REFERENCE)) {
+            choices = UiResourceAttributeNode.computeResourceStringMatches(mEditor, attributeDescriptor, value);
             attrInfo.skipEndTag = false;
         }
 
@@ -483,32 +464,26 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
      * Compute attribute values. Return true if the complete set of values was
      * added, so addition descriptor information should not be added.
      */
-    protected boolean computeAttributeValues(List<ICompletionProposal> proposals, int offset,
-            String parentTagName, String attributeName, Node node, String wordPrefix,
-            boolean skipEndTag, int replaceLength) {
+    protected boolean computeAttributeValues(List<ICompletionProposal> proposals, int offset, String parentTagName,
+            String attributeName, Node node, String wordPrefix, boolean skipEndTag, int replaceLength) {
         return false;
     }
 
-    protected void computeTextValues(List<ICompletionProposal> proposals, int offset,
-            Node parentNode, Node currentNode, UiElementNode uiParent,
-            String wordPrefix) {
+    protected void computeTextValues(List<ICompletionProposal> proposals, int offset, Node parentNode, Node currentNode,
+            UiElementNode uiParent, String wordPrefix) {
 
-       if (parentNode != null) {
-           // Examine the parent of the text node.
-           Object[] choices = getElementChoicesForTextNode(parentNode);
-           if (choices != null && choices.length > 0) {
-               ISourceViewer viewer = mEditor.getStructuredSourceViewer();
-               char needTag = computeElementNeedTag(viewer, offset, wordPrefix);
+        if (parentNode != null) {
+            // Examine the parent of the text node.
+            Object[] choices = getElementChoicesForTextNode(parentNode);
+            if (choices != null && choices.length > 0) {
+                ISourceViewer viewer = mEditor.getStructuredSourceViewer();
+                char needTag = computeElementNeedTag(viewer, offset, wordPrefix);
 
-               int replaceLength = 0;
-               addMatchingProposals(proposals, choices,
-                       offset, parentNode, wordPrefix, needTag,
-                               false /* isAttribute */,
-                               false /*isNew*/,
-                               false /*isComplete*/,
-                               replaceLength);
-           }
-       }
+                int replaceLength = 0;
+                addMatchingProposals(proposals, choices, offset, parentNode, wordPrefix, needTag,
+                        false /* isAttribute */, false /*isNew*/, false /*isComplete*/, replaceLength);
+            }
+        }
     }
 
     /**
@@ -547,21 +522,21 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
         return choices;
     }
 
-     /**
-     * Given a list of choices, adds in any that match the current prefix into the
-     * proposals list.
-     * <p/>
-     * Choices is an object array. Items of the array can be:
-     * - ElementDescriptor: a possible element descriptor which XML name should be completed.
-     * - AttributeDescriptor: a possible attribute descriptor which XML name should be completed.
-     * - String: string values to display as-is to the user. Typically those are possible
-     *           values for a given attribute.
-     * - Pair of Strings: the first value is the keyword to insert, and the second value
-     *           is the tooltip/help for the value to be displayed in the documentation popup.
-     */
-    protected void addMatchingProposals(List<ICompletionProposal> proposals, Object[] choices,
-            int offset, Node currentNode, String wordPrefix, char needTag,
-            boolean isAttribute, boolean isNew, boolean skipEndTag, int replaceLength) {
+    /**
+    * Given a list of choices, adds in any that match the current prefix into the
+    * proposals list.
+    * <p/>
+    * Choices is an object array. Items of the array can be:
+    * - ElementDescriptor: a possible element descriptor which XML name should be completed.
+    * - AttributeDescriptor: a possible attribute descriptor which XML name should be completed.
+    * - String: string values to display as-is to the user. Typically those are possible
+    *           values for a given attribute.
+    * - Pair of Strings: the first value is the keyword to insert, and the second value
+    *           is the tooltip/help for the value to be displayed in the documentation popup.
+    */
+    protected void addMatchingProposals(List<ICompletionProposal> proposals, Object[] choices, int offset,
+            Node currentNode, String wordPrefix, char needTag, boolean isAttribute, boolean isNew, boolean skipEndTag,
+            int replaceLength) {
         if (choices == null) {
             return;
         }
@@ -576,21 +551,21 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
             Image icon = null;
             String tooltip = null;
             if (choice instanceof ElementDescriptor) {
-                keyword = ((ElementDescriptor)choice).getXmlName();
-                icon    = ((ElementDescriptor)choice).getGenericIcon();
+                keyword = ((ElementDescriptor) choice).getXmlName();
+                icon = ((ElementDescriptor) choice).getGenericIcon();
                 // Tooltip computed lazily in {@link CompletionProposal}
             } else if (choice instanceof TextValueDescriptor) {
                 continue; // Value nodes are not part of the completion choices
             } else if (choice instanceof SeparatorAttributeDescriptor) {
                 continue; // not real attribute descriptors
             } else if (choice instanceof AttributeDescriptor) {
-                keyword = ((AttributeDescriptor)choice).getXmlLocalName();
-                icon    = ((AttributeDescriptor)choice).getGenericIcon();
+                keyword = ((AttributeDescriptor) choice).getXmlLocalName();
+                icon = ((AttributeDescriptor) choice).getGenericIcon();
                 // Tooltip computed lazily in {@link CompletionProposal}
 
                 // Get the namespace URI for the attribute. Note that some attributes
                 // do not have a namespace and thus return null here.
-                nsUri = ((AttributeDescriptor)choice).getNamespaceUri();
+                nsUri = ((AttributeDescriptor) choice).getNamespaceUri();
                 if (nsUri != null) {
                     nsPrefix = nsUriMap.get(nsUri);
                     if (nsPrefix == null) {
@@ -634,9 +609,9 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
                         endTag = String.valueOf(needTag);
                     } else if (needTag == '<') {
                         if (elementCanHaveChildren(choice)) {
-                            endTag = String.format("></%1$s>", keyword);  //$NON-NLS-1$
+                            endTag = String.format("></%1$s>", keyword); //$NON-NLS-1$
                         } else {
-                            endTag = "/>";  //$NON-NLS-1$
+                            endTag = "/>"; //$NON-NLS-1$
                         }
                         keyword = needTag + keyword + ' ';
                     } else if (needTag == ' ') {
@@ -644,9 +619,9 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
                     }
                 } else if (!isAttribute && isNew) {
                     if (elementCanHaveChildren(choice)) {
-                        endTag = String.format("></%1$s>", keyword);  //$NON-NLS-1$
+                        endTag = String.format("></%1$s>", keyword); //$NON-NLS-1$
                     } else {
-                        endTag = "/>";  //$NON-NLS-1$
+                        endTag = "/>"; //$NON-NLS-1$
                     }
                     keyword = keyword + ' ';
                 }
@@ -670,33 +645,26 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
                     cursorPosition++;
                 }
 
-                if (nsPrefix != null &&
-                        keyword.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX, nsPrefix.length())) {
+                if (nsPrefix != null && keyword.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX, nsPrefix.length())) {
                     haveLayoutParams = true;
                 }
 
                 // For attributes, automatically insert ns:attribute="" and place the cursor
                 // inside the quotes.
                 // Special case for attributes: insert ="" stuff and locate caret inside ""
-                proposals.add(new CompletionProposal(
-                    this,
-                    choice,
-                    keyword + suffix,                   // String replacementString
-                    offset - wordPrefix.length(),       // int replacementOffset
-                    wordPrefix.length() + replaceLength,// int replacementLength
-                    cursorPosition,                     // cursorPosition
-                    icon,                               // Image image
-                    displayString,                      // displayString
-                    null,                               // IContextInformation contextInformation
-                    tooltip,                            // String additionalProposalInfo
-                    nsPrefix,
-                    nsUri
-                ));
+                proposals.add(new CompletionProposal(this, choice, keyword + suffix, // String replacementString
+                        offset - wordPrefix.length(), // int replacementOffset
+                        wordPrefix.length() + replaceLength, // int replacementLength
+                        cursorPosition, // cursorPosition
+                        icon, // Image image
+                        displayString, // displayString
+                        null, // IContextInformation contextInformation
+                        tooltip, // String additionalProposalInfo
+                        nsPrefix, nsUri));
             }
         }
 
-        if (wordPrefix.length() > 0 && haveLayoutParams
-                && !wordPrefix.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)) {
+        if (wordPrefix.length() > 0 && haveLayoutParams && !wordPrefix.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)) {
             // Sort layout parameters to the front if we automatically inserted some
             // that you didn't request. For example, you typed "width" and we match both
             // "width" and "layout_width" - should match layout_width.
@@ -712,8 +680,8 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
                 for (int i = 0, n = proposals.size(); i < n; i++) {
                     ICompletionProposal proposal = proposals.get(i);
                     String keyword = proposal.getDisplayString();
-                    if (keyword.startsWith(nsPrefix) &&
-                            keyword.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX, nsPrefix.length())
+                    if (keyword.startsWith(nsPrefix)
+                            && keyword.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX, nsPrefix.length())
                             && i != nextLayoutIndex) {
                         // Swap to front
                         ICompletionProposal temp = proposals.get(nextLayoutIndex);
@@ -742,8 +710,7 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
         }
 
         for (int i = 0; i < prefixLength; i++) {
-            if (Character.toLowerCase(prefix.charAt(i))
-                    != Character.toLowerCase(word.charAt(i))) {
+            if (Character.toLowerCase(prefix.charAt(i)) != Character.toLowerCase(word.charAt(i))) {
                 return false;
             }
         }
@@ -883,7 +850,7 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
      */
     @Override
     public char[] getCompletionProposalAutoActivationCharacters() {
-        return new char[]{ '<', ':', '=' };
+        return new char[] { '<', ':', '=' };
     }
 
     @Override
@@ -917,7 +884,9 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
     protected String extractElementPrefix(ITextViewer viewer, int offset) {
         int i = offset;
         IDocument document = viewer.getDocument();
-        if (i > document.getLength()) return ""; //$NON-NLS-1$
+        if (i > document.getLength()) {
+            return ""; //$NON-NLS-1$
+        }
 
         try {
             for (; i > 0; --i) {
@@ -931,8 +900,7 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
                 // going to be exclusive: take everything till we get one of:
                 // - any form of whitespace
                 // - any xml separator, e.g. < > ' " and =
-                if (Character.isWhitespace(ch) ||
-                        ch == '<' || ch == '>' || ch == '\'' || ch == '"' || ch == '=') {
+                if (Character.isWhitespace(ch) || ch == '<' || ch == '>' || ch == '\'' || ch == '"' || ch == '=') {
                     break;
                 }
             }
@@ -949,7 +917,9 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
      */
     protected char extractChar(ITextViewer viewer, int offset) {
         IDocument document = viewer.getDocument();
-        if (offset > document.getLength()) return 0;
+        if (offset > document.getLength()) {
+            return 0;
+        }
 
         try {
             return document.getChar(offset);
@@ -983,8 +953,7 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
      * Information about the current edit of an attribute as reported by parseAttributeInfo.
      */
     protected static class AttribInfo {
-        public AttribInfo() {
-        }
+        public AttribInfo() {}
 
         /** True if the cursor is located in an attribute's value, false if in an attribute name */
         public boolean isInValue = false;
@@ -1034,10 +1003,14 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
                 }
 
                 n = offset;
-                for (;offset > 0; --offset) {
+                for (; offset > 0; --offset) {
                     char ch = document.getChar(offset - 1);
-                    if (ch == '>') break;
-                    if (ch == '<') break;
+                    if (ch == '>') {
+                        break;
+                    }
+                    if (ch == '<') {
+                        break;
+                    }
                 }
 
                 // text will contain the full string of the current element,
@@ -1050,7 +1023,7 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
                 // Remove the leading element name. By spec, it must be after the < without
                 // any whitespace. If there's nothing left, no attribute has been defined yet.
                 // Be sure to keep any whitespace after the initial word if any, as it matters.
-                text = sFirstElementWord.matcher(text).replaceFirst("");  //$NON-NLS-1$
+                text = sFirstElementWord.matcher(text).replaceFirst(""); //$NON-NLS-1$
 
                 // There MUST be space after the element name. If not, the cursor is still
                 // defining the element name.
@@ -1066,8 +1039,8 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
                 String temp;
                 do {
                     temp = text;
-                    text = sFirstAttribute.matcher(temp).replaceFirst("");  //$NON-NLS-1$
-                } while(!temp.equals(text));
+                    text = sFirstAttribute.matcher(temp).replaceFirst(""); //$NON-NLS-1$
+                } while (!temp.equals(text));
 
                 IRegion lineInfo = document.getLineInformationOfOffset(originalOffset);
                 int lineStart = lineInfo.getOffset();
@@ -1187,11 +1160,10 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
         if (mRootDescriptor == null) {
             AndroidTargetData data = mEditor.getTargetData();
             if (data != null) {
-                IDescriptorProvider descriptorProvider =
-                    data.getDescriptorProvider(getRootDescriptorId());
+                IDescriptorProvider descriptorProvider = data.getDescriptorProvider(getRootDescriptorId());
 
                 if (descriptorProvider != null) {
-                    mRootDescriptor = new ElementDescriptor("",     //$NON-NLS-1$
+                    mRootDescriptor = new ElementDescriptor("", //$NON-NLS-1$
                             descriptorProvider.getRootElementDescriptors());
                 }
             }
@@ -1204,39 +1176,30 @@ public abstract class AndroidContentAssist implements IContentAssistProcessor {
      * Fixed list of dimension units, along with user documentation, for use by
      * {@link #completeSuffix}.
      */
-    private static final String[] sDimensionUnits = new String[] {
-        UNIT_DP,
-        "<b>Density-independent Pixels</b> - an abstract unit that is based on the physical "
-                + "density of the screen.",
+    private static final String[] sDimensionUnits = new String[] { UNIT_DP,
+            "<b>Density-independent Pixels</b> - an abstract unit that is based on the physical "
+                    + "density of the screen.",
 
-        UNIT_SP,
-        "<b>Scale-independent Pixels</b> - this is like the dp unit, but it is also scaled by "
-                + "the user's font size preference.",
+            UNIT_SP, "<b>Scale-independent Pixels</b> - this is like the dp unit, but it is also scaled by "
+                    + "the user's font size preference.",
 
-        UNIT_PT,
-        "<b>Points</b> - 1/72 of an inch based on the physical size of the screen.",
+            UNIT_PT, "<b>Points</b> - 1/72 of an inch based on the physical size of the screen.",
 
-        UNIT_MM,
-        "<b>Millimeters</b> - based on the physical size of the screen.",
+            UNIT_MM, "<b>Millimeters</b> - based on the physical size of the screen.",
 
-        UNIT_IN,
-        "<b>Inches</b> - based on the physical size of the screen.",
+            UNIT_IN, "<b>Inches</b> - based on the physical size of the screen.",
 
-        UNIT_PX,
-        "<b>Pixels</b> - corresponds to actual pixels on the screen. Not recommended.",
-    };
+            UNIT_PX, "<b>Pixels</b> - corresponds to actual pixels on the screen. Not recommended.", };
 
     /**
      * Fixed list of fractional units, along with user documentation, for use by
      * {@link #completeSuffix}
      */
-    private static final String[] sFractionUnits = new String[] {
-        "%",  //$NON-NLS-1$
-        "<b>Fraction</b> - a percentage of the base size",
+    private static final String[] sFractionUnits = new String[] { "%", //$NON-NLS-1$
+            "<b>Fraction</b> - a percentage of the base size",
 
-        "%p", //$NON-NLS-1$
-        "<b>Fraction</b> - a percentage relative to parent container",
-    };
+            "%p", //$NON-NLS-1$
+            "<b>Fraction</b> - a percentage relative to parent container", };
 
     /**
      * Completes suffixes for applicable types (like dimensions and fractions) such that

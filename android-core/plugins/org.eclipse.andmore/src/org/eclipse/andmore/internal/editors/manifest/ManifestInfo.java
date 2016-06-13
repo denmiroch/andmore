@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,15 +33,18 @@ import static com.android.xml.AndroidManifest.NODE_USES_SDK;
 import static com.android.xml.AndroidManifest.VALUE_PARENT_ACTIVITY;
 import static org.eclipse.jdt.core.search.IJavaSearchConstants.REFERENCES;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.io.IAbstractFile;
-import com.android.io.StreamException;
-import com.android.resources.ScreenSize;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
-import com.android.xml.AndroidManifest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
@@ -84,18 +84,15 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPathExpressionException;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.io.IAbstractFile;
+import com.android.io.StreamException;
+import com.android.resources.ScreenSize;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
+import com.android.xml.AndroidManifest;
 
 /**
  * Retrieves and caches manifest information such as the themes to be used for
@@ -128,7 +125,7 @@ public class ManifestInfo {
             }
             int index = name.indexOf('.');
             if (index <= 0 && packageName != null && !packageName.isEmpty()) {
-              name =  packageName + (index == -1 ? "." : "") + name;
+                name = packageName + (index == -1 ? "." : "") + name;
             }
             mName = name;
 
@@ -246,8 +243,7 @@ public class ManifestInfo {
      * Qualified name for the per-project non-persistent property storing the
      * {@link ManifestInfo} for this project
      */
-    final static QualifiedName MANIFEST_FINDER = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID,
-            "manifest"); //$NON-NLS-1$
+    final static QualifiedName MANIFEST_FINDER = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "manifest"); //$NON-NLS-1$
 
     /**
      * Constructs an {@link ManifestInfo} for the given project. Don't use this method;
@@ -362,8 +358,7 @@ public class ManifestInfo {
                 if (application.hasAttributeNS(NS_RESOURCES, ATTRIBUTE_LABEL)) {
                     mApplicationLabel = application.getAttributeNS(NS_RESOURCES, ATTRIBUTE_LABEL);
                 }
-                if (SdkConstants.VALUE_TRUE.equals(application.getAttributeNS(NS_RESOURCES,
-                        ATTRIBUTE_SUPPORTS_RTL))) {
+                if (SdkConstants.VALUE_TRUE.equals(application.getAttributeNS(NS_RESOURCES, ATTRIBUTE_SUPPORTS_RTL))) {
                     mApplicationSupportsRtl = true;
                 }
 
@@ -406,8 +401,7 @@ public class ManifestInfo {
             } catch (NumberFormatException e) {
                 // Handle codename
                 if (Sdk.getCurrent() != null) {
-                    IAndroidTarget target = Sdk.getCurrent().getTargetFromHashString(
-                            "android-" + valueString); //$NON-NLS-1$
+                    IAndroidTarget target = Sdk.getCurrent().getTargetFromHashString("android-" + valueString); //$NON-NLS-1$
                     if (target != null) {
                         // codename future API level is current api + 1
                         apiLevel = target.getVersion().getApiLevel() + 1;
@@ -643,9 +637,9 @@ public class ManifestInfo {
                     IType declaringType = method.getDeclaringType();
                     String fqcn = declaringType.getFullyQualifiedName();
 
-                    if ((declaringType.getSuperclassName() != null &&
-                            declaringType.getSuperclassName().endsWith("Activity")) //$NON-NLS-1$
-                        || method.getElementName().equals("onCreate")) { //$NON-NLS-1$
+                    if ((declaringType.getSuperclassName() != null
+                            && declaringType.getSuperclassName().endsWith("Activity")) //$NON-NLS-1$
+                            || method.getElementName().equals("onCreate")) { //$NON-NLS-1$
                         activities.addFirst(fqcn);
                     } else {
                         activities.addLast(fqcn);
@@ -703,12 +697,11 @@ public class ManifestInfo {
                 IType[] activityTypes = new IType[0];
                 IType activityType = javaProject.findType(CLASS_ACTIVITY);
                 if (activityType != null) {
-                    ITypeHierarchy hierarchy =
-                        activityType.newTypeHierarchy(javaProject, new NullProgressMonitor());
+                    ITypeHierarchy hierarchy = activityType.newTypeHierarchy(javaProject, new NullProgressMonitor());
                     activityTypes = hierarchy.getAllSubtypes(activityType);
                     for (IType type : activityTypes) {
-                        if (type instanceof BinaryType && (type.getClassFile() == null
-                                    || type.getClassFile().getResource() == null)) {
+                        if (type instanceof BinaryType
+                                && (type.getClassFile() == null || type.getClassFile().getResource() == null)) {
                             continue;
                         }
                         activities.add(type.getFullyQualifiedName());
@@ -721,7 +714,6 @@ public class ManifestInfo {
 
         return activities;
     }
-
 
     /**
      * Returns the activity associated with the given layout file.
@@ -758,8 +750,7 @@ public class ManifestInfo {
     public String guessActivityBySetContentView(String layoutName) {
         if (false) {
             // These should be fields
-            final Pattern LAYOUT_FIELD_PATTERN =
-                Pattern.compile("R\\.layout\\.([a-z0-9_]+)"); //$NON-NLS-1$
+            final Pattern LAYOUT_FIELD_PATTERN = Pattern.compile("R\\.layout\\.([a-z0-9_]+)"); //$NON-NLS-1$
             Map<String, String> mUsages = null;
 
             sync();
@@ -780,8 +771,7 @@ public class ManifestInfo {
                                 provider.connect(resource);
                                 IDocument document = provider.getDocument(resource);
                                 if (document != null) {
-                                    String matchText = document.get(match.getOffset(),
-                                            match.getLength());
+                                    String matchText = document.get(match.getOffset(), match.getLength());
                                     Matcher matcher = LAYOUT_FIELD_PATTERN.matcher(matchText);
                                     if (matcher.find()) {
                                         usages.put(matcher.group(1), fqcn);
@@ -810,11 +800,9 @@ public class ManifestInfo {
 
                     IType activityType = javaProject.findType(CLASS_ACTIVITY);
                     if (activityType != null) {
-                        IMethod method = activityType.getMethod(
-                                "setContentView", new String[] {"I"}); //$NON-NLS-1$ //$NON-NLS-2$
+                        IMethod method = activityType.getMethod("setContentView", new String[] { "I" }); //$NON-NLS-1$ //$NON-NLS-2$
                         if (method.exists()) {
-                            SearchPattern pattern = SearchPattern.createPattern(method,
-                                    REFERENCES);
+                            SearchPattern pattern = SearchPattern.createPattern(method, REFERENCES);
                             search(requestor, javaProject, pattern);
                         }
                     }
@@ -833,20 +821,19 @@ public class ManifestInfo {
      * Performs a search using the given pattern, scope and handler. The search will abort
      * if it takes longer than {@link #SEARCH_TIMEOUT_MS} milliseconds.
      */
-    private static void search(SearchRequestor requestor, IJavaProject javaProject,
-            SearchPattern pattern) throws CoreException {
+    private static void search(SearchRequestor requestor, IJavaProject javaProject, SearchPattern pattern)
+            throws CoreException {
         // Find the package fragment specified in the manifest; the activities should
         // live there.
         IJavaSearchScope scope = createPackageScope(javaProject);
 
-        SearchParticipant[] participants = new SearchParticipant[] {
-            SearchEngine.getDefaultSearchParticipant()
-        };
+        SearchParticipant[] participants = new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() };
         SearchEngine engine = new SearchEngine();
 
         final long searchStart = System.currentTimeMillis();
         NullProgressMonitor monitor = new NullProgressMonitor() {
             private boolean mCancelled;
+
             @Override
             public void internalWorked(double work) {
                 long searchEnd = System.currentTimeMillis();
@@ -922,8 +909,7 @@ public class ManifestInfo {
                 } else if (value instanceof String) {
                     // handle codename, only if we can resolve it.
                     if (Sdk.getCurrent() != null) {
-                        IAndroidTarget target = Sdk.getCurrent().getTargetFromHashString(
-                                "android-" + value); //$NON-NLS-1$
+                        IAndroidTarget target = Sdk.getCurrent().getTargetFromHashString("android-" + value); //$NON-NLS-1$
                         if (target != null) {
                             // codename future API level is current api + 1
                             mMinSdkVersion = target.getVersion().getApiLevel() + 1;
@@ -937,11 +923,10 @@ public class ManifestInfo {
                 } else if (value instanceof String) {
                     // handle codename, only if we can resolve it.
                     if (Sdk.getCurrent() != null) {
-                        IAndroidTarget target = Sdk.getCurrent().getTargetFromHashString(
-                                "android-" + value); //$NON-NLS-1$
+                        IAndroidTarget target = Sdk.getCurrent().getTargetFromHashString("android-" + value); //$NON-NLS-1$
                         if (target != null) {
                             // codename future API level is current api + 1
-                        	mTargetSdkVersion = target.getVersion().getApiLevel() + 1;
+                            mTargetSdkVersion = target.getVersion().getApiLevel() + 1;
                         }
                     }
                 }

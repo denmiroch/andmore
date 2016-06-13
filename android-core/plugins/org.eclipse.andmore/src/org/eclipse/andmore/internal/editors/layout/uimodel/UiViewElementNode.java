@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,8 +21,6 @@ import static com.android.SdkConstants.FQCN_FRAME_LAYOUT;
 import static com.android.SdkConstants.LINEAR_LAYOUT;
 import static com.android.SdkConstants.VALUE_VERTICAL;
 import static com.android.SdkConstants.VIEW_TAG;
-
-import com.android.sdklib.IAndroidTarget;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -45,6 +40,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.graphics.Image;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * Specialized version of {@link UiElementNode} for the {@link ViewElementDescriptor}s.
@@ -95,8 +92,7 @@ public class UiViewElementNode extends UiElementNode {
                         AndroidTargetData data = currentSdk.getTargetData(target);
                         if (data != null) {
                             LayoutDescriptors descriptors = data.getLayoutDescriptors();
-                            ViewElementDescriptor desc =
-                                descriptors.findDescriptorByClass(FQCN_FRAME_LAYOUT);
+                            ViewElementDescriptor desc = descriptors.findDescriptorByClass(FQCN_FRAME_LAYOUT);
                             if (desc != null) {
                                 layout_attrs = desc.getLayoutAttributes();
                                 need_xmlns = true;
@@ -106,24 +102,17 @@ public class UiViewElementNode extends UiElementNode {
                 }
             }
         } else if (ui_parent instanceof UiViewElementNode) {
-            layout_attrs =
-                ((ViewElementDescriptor) ui_parent.getDescriptor()).getLayoutAttributes();
+            layout_attrs = ((ViewElementDescriptor) ui_parent.getDescriptor()).getLayoutAttributes();
         }
 
         if (layout_attrs == null || layout_attrs.length == 0) {
             return mCachedAttributeDescriptors;
         }
 
-        mCachedAttributeDescriptors =
-            new AttributeDescriptor[direct_attrs.length +
-                                    layout_attrs.length +
-                                    (need_xmlns ? 1 : 0)];
-        System.arraycopy(direct_attrs, 0,
-                mCachedAttributeDescriptors, 0,
-                direct_attrs.length);
-        System.arraycopy(layout_attrs, 0,
-                mCachedAttributeDescriptors, direct_attrs.length,
-                layout_attrs.length);
+        mCachedAttributeDescriptors = new AttributeDescriptor[direct_attrs.length + layout_attrs.length
+                + (need_xmlns ? 1 : 0)];
+        System.arraycopy(direct_attrs, 0, mCachedAttributeDescriptors, 0, direct_attrs.length);
+        System.arraycopy(layout_attrs, 0, mCachedAttributeDescriptors, direct_attrs.length, layout_attrs.length);
         if (need_xmlns) {
             AttributeDescriptor desc = new XmlnsAttributeDescriptor(ANDROID_NS_NAME, ANDROID_URI);
             mCachedAttributeDescriptors[direct_attrs.length + layout_attrs.length] = desc;

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +13,8 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.ResizePolicy;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.gre.NodeProxy;
@@ -27,8 +23,9 @@ import org.eclipse.andmore.internal.editors.layout.uimodel.UiViewElementNode;
 import org.eclipse.swt.graphics.Rectangle;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.ResizePolicy;
 
 /**
  * Represents one selection in {@link LayoutCanvas}.
@@ -181,9 +178,7 @@ class SelectionItem {
      * @return An array of wrapper elements. Never null.
      */
     @NonNull
-    static SimpleElement[] getAsElements(
-            @NonNull List<SelectionItem> items,
-            @Nullable SelectionItem primary) {
+    static SimpleElement[] getAsElements(@NonNull List<SelectionItem> items, @Nullable SelectionItem primary) {
         List<SimpleElement> elements = new ArrayList<SimpleElement>();
 
         if (primary != null) {

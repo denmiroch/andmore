@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,47 +30,46 @@ import org.w3c.dom.Element;
 /** Helper class for looking up the gravity masks of gravity attributes */
 public class GravityHelper {
     // From SDK constants; temporary
-    public static final String GRAVITY_VALUE_START = "start";                         //$NON-NLS-1$
-    public static final String GRAVITY_VALUE_END = "end";                             //$NON-NLS-1$
+    public static final String GRAVITY_VALUE_START = "start"; //$NON-NLS-1$
+    public static final String GRAVITY_VALUE_END = "end"; //$NON-NLS-1$
 
     /** Bitmask for a gravity which includes left */
     @SuppressWarnings("PointlessBitwiseExpression") // for symmetry with other fields
-    public static final int GRAVITY_LEFT         = 1 << 0;
+    public static final int GRAVITY_LEFT = 1 << 0;
 
     /** Bitmask for a gravity which includes right */
-    public static final int GRAVITY_RIGHT        = 1 << 1;
+    public static final int GRAVITY_RIGHT = 1 << 1;
 
     /** Bitmask for a gravity which includes center horizontal */
     public static final int GRAVITY_CENTER_HORIZ = 1 << 2;
 
     /** Bitmask for a gravity which includes fill horizontal */
-    public static final int GRAVITY_FILL_HORIZ   = 1 << 3;
+    public static final int GRAVITY_FILL_HORIZ = 1 << 3;
 
     /** Bitmask for a gravity which includes center vertical */
-    public static final int GRAVITY_CENTER_VERT  = 1 << 4;
+    public static final int GRAVITY_CENTER_VERT = 1 << 4;
 
     /** Bitmask for a gravity which includes fill vertical */
-    public static final int GRAVITY_FILL_VERT    = 1 << 5;
+    public static final int GRAVITY_FILL_VERT = 1 << 5;
 
     /** Bitmask for a gravity which includes top */
-    public static final int GRAVITY_TOP          = 1 << 6;
+    public static final int GRAVITY_TOP = 1 << 6;
 
     /** Bitmask for a gravity which includes bottom */
-    public static final int GRAVITY_BOTTOM       = 1 << 7;
+    public static final int GRAVITY_BOTTOM = 1 << 7;
 
     /** Bitmask for a gravity which includes start */
-    public static final int GRAVITY_START        = 1 << 8;
+    public static final int GRAVITY_START = 1 << 8;
 
     /** Bitmask for a gravity which includes end */
-    public static final int GRAVITY_END          = 1 << 9;
+    public static final int GRAVITY_END = 1 << 9;
 
     /** Bitmask for a gravity which includes any horizontal constraint */
-    public static final int GRAVITY_HORIZ_MASK = GRAVITY_CENTER_HORIZ | GRAVITY_FILL_HORIZ
-            | GRAVITY_LEFT | GRAVITY_RIGHT | GRAVITY_START | GRAVITY_END;
+    public static final int GRAVITY_HORIZ_MASK = GRAVITY_CENTER_HORIZ | GRAVITY_FILL_HORIZ | GRAVITY_LEFT
+            | GRAVITY_RIGHT | GRAVITY_START | GRAVITY_END;
 
     /** Bitmask for a gravity which any vertical constraint */
-    public static final int GRAVITY_VERT_MASK = GRAVITY_CENTER_VERT | GRAVITY_FILL_VERT
-            | GRAVITY_TOP | GRAVITY_BOTTOM;
+    public static final int GRAVITY_VERT_MASK = GRAVITY_CENTER_VERT | GRAVITY_FILL_VERT | GRAVITY_TOP | GRAVITY_BOTTOM;
 
     /**
      * Returns the gravity of the given element
@@ -115,13 +111,13 @@ public class GravityHelper {
                 } else if (GRAVITY_VALUE_BOTTOM.equals(anchor)) {
                     gravity = (gravity & GRAVITY_HORIZ_MASK) | GRAVITY_BOTTOM;
                 } else if (GRAVITY_VALUE_LEFT.equals(anchor)) {
-                    gravity = (gravity & (GRAVITY_VERT_MASK|GRAVITY_START)) | GRAVITY_LEFT;
+                    gravity = (gravity & (GRAVITY_VERT_MASK | GRAVITY_START)) | GRAVITY_LEFT;
                 } else if (GRAVITY_VALUE_RIGHT.equals(anchor)) {
-                    gravity = (gravity & (GRAVITY_VERT_MASK|GRAVITY_END)) | GRAVITY_RIGHT;
+                    gravity = (gravity & (GRAVITY_VERT_MASK | GRAVITY_END)) | GRAVITY_RIGHT;
                 } else if (GRAVITY_VALUE_START.equals(anchor)) {
-                    gravity = (gravity & (GRAVITY_VERT_MASK|GRAVITY_LEFT)) | GRAVITY_START;
+                    gravity = (gravity & (GRAVITY_VERT_MASK | GRAVITY_LEFT)) | GRAVITY_START;
                 } else if (GRAVITY_VALUE_END.equals(anchor)) {
-                    gravity = (gravity & (GRAVITY_VERT_MASK|GRAVITY_RIGHT)) | GRAVITY_END;
+                    gravity = (gravity & (GRAVITY_VERT_MASK | GRAVITY_RIGHT)) | GRAVITY_END;
                 } // else: "clip" not supported
             }
         }
@@ -156,7 +152,7 @@ public class GravityHelper {
      * @return true if the given gravity bitmask is left aligned
      */
     public static boolean isLeftAligned(int gravity) {
-        return (gravity & (GRAVITY_LEFT|GRAVITY_START)) != 0;
+        return (gravity & (GRAVITY_LEFT | GRAVITY_START)) != 0;
     }
 
     /**
@@ -179,8 +175,7 @@ public class GravityHelper {
             return "";
         }
 
-        if ((gravity & (GRAVITY_CENTER_HORIZ | GRAVITY_CENTER_VERT)) ==
-                (GRAVITY_CENTER_HORIZ | GRAVITY_CENTER_VERT)) {
+        if ((gravity & (GRAVITY_CENTER_HORIZ | GRAVITY_CENTER_VERT)) == (GRAVITY_CENTER_HORIZ | GRAVITY_CENTER_VERT)) {
             return GRAVITY_VALUE_CENTER;
         }
 
@@ -188,7 +183,7 @@ public class GravityHelper {
         int horizontal = gravity & GRAVITY_HORIZ_MASK;
         int vertical = gravity & GRAVITY_VERT_MASK;
 
-        if ((horizontal & (GRAVITY_LEFT|GRAVITY_START)) != 0) {
+        if ((horizontal & (GRAVITY_LEFT | GRAVITY_START)) != 0) {
             if ((horizontal & GRAVITY_LEFT) != 0) {
                 sb.append(GRAVITY_VALUE_LEFT);
             }
@@ -198,7 +193,7 @@ public class GravityHelper {
                 }
                 sb.append(GRAVITY_VALUE_START);
             }
-        } else if ((horizontal & (GRAVITY_RIGHT|GRAVITY_END)) != 0) {
+        } else if ((horizontal & (GRAVITY_RIGHT | GRAVITY_END)) != 0) {
             if ((horizontal & GRAVITY_RIGHT) != 0) {
                 sb.append(GRAVITY_VALUE_RIGHT);
             }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,34 +39,18 @@ import static org.eclipse.wb.core.controls.flyout.IFlyoutPreferences.DOCK_WEST;
 import static org.eclipse.wb.core.controls.flyout.IFlyoutPreferences.STATE_COLLAPSED;
 import static org.eclipse.wb.core.controls.flyout.IFlyoutPreferences.STATE_OPEN;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.rendering.LayoutLibrary;
-import com.android.ide.common.rendering.RenderSecurityException;
-import com.android.ide.common.rendering.RenderSecurityManager;
-import com.android.ide.common.rendering.StaticRenderSession;
-import com.android.ide.common.rendering.api.Capability;
-import com.android.ide.common.rendering.api.LayoutLog;
-import com.android.ide.common.rendering.api.RenderSession;
-import com.android.ide.common.rendering.api.ResourceValue;
-import com.android.ide.common.rendering.api.Result;
-import com.android.ide.common.rendering.api.SessionParams.RenderingMode;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.ide.common.resources.ResourceResolver;
-import com.android.ide.common.resources.configuration.FolderConfiguration;
-import com.android.ide.common.sdk.LoadStatus;
-import com.android.resources.Density;
-import com.android.resources.ResourceFolderType;
-import com.android.resources.ResourceType;
-import com.android.sdklib.IAndroidTarget;
-import com.android.tools.lint.detector.api.LintUtils;
-import com.android.utils.Pair;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
-import org.eclipse.andmore.common.layout.BaseLayoutRule;
 import org.eclipse.andmore.common.layout.BaseViewRule;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.IPageImageProvider;
@@ -78,9 +59,9 @@ import org.eclipse.andmore.internal.editors.common.CommonXmlDelegate;
 import org.eclipse.andmore.internal.editors.common.CommonXmlEditor;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.LayoutReloadMonitor;
-import org.eclipse.andmore.internal.editors.layout.ProjectCallback;
 import org.eclipse.andmore.internal.editors.layout.LayoutReloadMonitor.ChangeFlags;
 import org.eclipse.andmore.internal.editors.layout.LayoutReloadMonitor.ILayoutReloadListener;
+import org.eclipse.andmore.internal.editors.layout.ProjectCallback;
 import org.eclipse.andmore.internal.editors.layout.configuration.Configuration;
 import org.eclipse.andmore.internal.editors.layout.configuration.ConfigurationChooser;
 import org.eclipse.andmore.internal.editors.layout.configuration.ConfigurationClient;
@@ -179,14 +160,29 @@ import org.eclipse.wb.internal.core.editor.structure.PageSiteComposite;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.rendering.LayoutLibrary;
+import com.android.ide.common.rendering.RenderSecurityException;
+import com.android.ide.common.rendering.RenderSecurityManager;
+import com.android.ide.common.rendering.StaticRenderSession;
+import com.android.ide.common.rendering.api.Capability;
+import com.android.ide.common.rendering.api.LayoutLog;
+import com.android.ide.common.rendering.api.RenderSession;
+import com.android.ide.common.rendering.api.ResourceValue;
+import com.android.ide.common.rendering.api.Result;
+import com.android.ide.common.rendering.api.SessionParams.RenderingMode;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.ide.common.resources.ResourceResolver;
+import com.android.ide.common.resources.configuration.FolderConfiguration;
+import com.android.ide.common.sdk.LoadStatus;
+import com.android.resources.Density;
+import com.android.resources.ResourceFolderType;
+import com.android.resources.ResourceType;
+import com.android.sdklib.IAndroidTarget;
+import com.android.tools.lint.detector.api.LintUtils;
+import com.android.utils.Pair;
 
 /**
  * Graphical layout editor part, version 2.
@@ -205,8 +201,7 @@ import java.util.Set;
  * @since GLE2
  */
 public class GraphicalEditorPart extends EditorPart
-    implements IPageImageProvider, INullSelectionListener, IFlyoutListener,
-            ConfigurationClient {
+        implements IPageImageProvider, INullSelectionListener, IFlyoutListener, ConfigurationClient {
 
     /*
      * Useful notes:
@@ -226,24 +221,23 @@ public class GraphicalEditorPart extends EditorPart
      */
 
     /** Property key for the window preferences for the structure flyout */
-    private static final String PREF_STRUCTURE = "design.structure";     //$NON-NLS-1$
+    private static final String PREF_STRUCTURE = "design.structure"; //$NON-NLS-1$
 
     /** Property key for the window preferences for the palette flyout */
-    private static final String PREF_PALETTE = "design.palette";         //$NON-NLS-1$
+    private static final String PREF_PALETTE = "design.palette"; //$NON-NLS-1$
 
     /**
      * Session-property on files which specifies the initial config state to be used on
      * this file
      */
-    public final static QualifiedName NAME_INITIAL_STATE =
-        new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "initialstate");//$NON-NLS-1$
+    public final static QualifiedName NAME_INITIAL_STATE = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID,
+            "initialstate");//$NON-NLS-1$
 
     /**
      * Session-property on files which specifies the inclusion-context (reference to another layout
      * which should be "including" this layout) when the file is opened
      */
-    public final static QualifiedName NAME_INCLUDE =
-        new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "includer");//$NON-NLS-1$
+    public final static QualifiedName NAME_INCLUDE = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "includer");//$NON-NLS-1$
 
     /** Reference to the layout editor */
     private final LayoutEditorDelegate mEditorDelegate;
@@ -337,14 +331,14 @@ public class GraphicalEditorPart extends EditorPart
     private void useNewEditorInput(IEditorInput input) throws PartInitException {
         // The contract of init() mentions we need to fail if we can't understand the input.
         if (!(input instanceof FileEditorInput)) {
-            throw new PartInitException("Input is not of type FileEditorInput: " +  //$NON-NLS-1$
-                    input == null ? "null" : input.toString());                     //$NON-NLS-1$
+            throw new PartInitException("Input is not of type FileEditorInput: " + //$NON-NLS-1$
+                    input == null ? "null" : input.toString()); //$NON-NLS-1$
         }
     }
 
     @Override
     public Image getPageImage() {
-        return IconFactory.getInstance().getIcon("editor_page_design");  //$NON-NLS-1$
+        return IconFactory.getInstance().getIcon("editor_page_design"); //$NON-NLS-1$
     }
 
     @Override
@@ -504,8 +498,7 @@ public class GraphicalEditorPart extends EditorPart
 
             @Override
             public void registerContextMenu(String menuId, MenuManager menuManager,
-                    ISelectionProvider selectionProvider) {
-            }
+                    ISelectionProvider selectionProvider) {}
 
             @Override
             public IActionBars getActionBars() {
@@ -523,8 +516,7 @@ public class GraphicalEditorPart extends EditorPart
     }
 
     /** Shows the embedded (within the layout editor) outline and or properties */
-    void showStructureViews(final boolean showOutline, final boolean showProperties,
-            final boolean updateLayout) {
+    void showStructureViews(final boolean showOutline, final boolean showProperties, final boolean updateLayout) {
         Display display = mConfigChooser.getDisplay();
         if (display.getThread() != Thread.currentThread()) {
             display.asyncExec(new Runnable() {
@@ -600,12 +592,11 @@ public class GraphicalEditorPart extends EditorPart
      */
     @Override
     public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-        Object delegate = part instanceof IEditorPart ?
-                LayoutEditorDelegate.fromEditor((IEditorPart) part) : null;
+        Object delegate = part instanceof IEditorPart ? LayoutEditorDelegate.fromEditor((IEditorPart) part) : null;
         if (delegate == null) {
             if (part instanceof PageBookView) {
                 PageBookView pbv = (PageBookView) part;
-                 org.eclipse.ui.part.IPage currentPage = pbv.getCurrentPage();
+                org.eclipse.ui.part.IPage currentPage = pbv.getCurrentPage();
                 if (currentPage instanceof OutlinePage) {
                     LayoutCanvas canvas = getCanvasControl();
                     if (canvas != null && canvas.getOutlinePage() != currentPage) {
@@ -706,8 +697,7 @@ public class GraphicalEditorPart extends EditorPart
                         }
 
                         // ask the IDE to open the replacement file.
-                        IDE.openEditor(getSite().getWorkbenchWindow().getActivePage(), best,
-                                CommonXmlEditor.ID);
+                        IDE.openEditor(getSite().getWorkbenchWindow().getActivePage(), best, CommonXmlEditor.ID);
 
                         // we're done!
                         return reuseEditor;
@@ -728,19 +718,10 @@ public class GraphicalEditorPart extends EditorPart
                 // display the error.
                 Configuration configuration = mConfigChooser.getConfiguration();
                 FolderConfiguration currentConfig = configuration.getFullConfig();
-                displayError(
-                        "No resources match the configuration\n" +
-                        " \n" +
-                        "\t%1$s\n" +
-                        " \n" +
-                        "Change the configuration or create:\n" +
-                        " \n" +
-                        "\tres/%2$s/%3$s\n" +
-                        " \n" +
-                        "You can also click the 'Create New...' item in the configuration " +
-                        "dropdown menu above.",
-                        currentConfig.toDisplayString(),
-                        currentConfig.getFolderName(ResourceFolderType.LAYOUT),
+                displayError("No resources match the configuration\n" + " \n" + "\t%1$s\n" + " \n"
+                        + "Change the configuration or create:\n" + " \n" + "\tres/%2$s/%3$s\n" + " \n"
+                        + "You can also click the 'Create New...' item in the configuration " + "dropdown menu above.",
+                        currentConfig.toDisplayString(), currentConfig.getFolderName(ResourceFolderType.LAYOUT),
                         mEditedFile.getName());
             } else {
                 // Something else changed, such as the theme - just recompute existing
@@ -765,7 +746,7 @@ public class GraphicalEditorPart extends EditorPart
             // out to fit the content, or zoom back in if we were zoomed out more from the
             // previous view, but only up to 100% such that we never blow up pixels
             if (mActionBar.isZoomingAllowed()) {
-                getCanvasControl().setFitScale(true,  true /*allowZoomIn*/);
+                getCanvasControl().setFitScale(true, true /*allowZoomIn*/);
             }
         }
 
@@ -780,15 +761,13 @@ public class GraphicalEditorPart extends EditorPart
     public void setActivity(@NonNull String activity) {
         ManifestInfo manifest = ManifestInfo.get(mEditedFile.getProject());
         String pkg = manifest.getPackage();
-        if (activity.startsWith(pkg) && activity.length() > pkg.length()
-                && activity.charAt(pkg.length()) == '.') {
+        if (activity.startsWith(pkg) && activity.length() > pkg.length() && activity.charAt(pkg.length()) == '.') {
             activity = activity.substring(pkg.length());
         }
         CommonXmlEditor editor = getEditorDelegate().getEditor();
         Element element = editor.getUiRootNode().getXmlDocument().getDocumentElement();
-        AdtUtils.setToolsAttribute(editor,
-                element, "Choose Activity", ATTR_CONTEXT,
-                activity, false /*reveal*/, false /*append*/);
+        AdtUtils.setToolsAttribute(editor, element, "Choose Activity", ATTR_CONTEXT, activity, false /*reveal*/,
+                false /*append*/);
     }
 
     /**
@@ -833,7 +812,6 @@ public class GraphicalEditorPart extends EditorPart
         return null;
     }
 
-
     @Override
     @NonNull
     public Map<ResourceType, Map<String, ResourceValue>> getConfiguredFrameworkResources() {
@@ -844,8 +822,8 @@ public class GraphicalEditorPart extends EditorPart
                 AndmoreAndroidPlugin.log(IStatus.ERROR, "Failed to get ProjectResource for the framework");
             } else {
                 // get the framework resource values based on the current config
-                mConfiguredFrameworkRes = frameworkRes.getConfiguredResources(
-                        mConfigChooser.getConfiguration().getFullConfig());
+                mConfiguredFrameworkRes = frameworkRes
+                        .getConfiguredResources(mConfigChooser.getConfiguration().getFullConfig());
             }
         }
 
@@ -859,8 +837,7 @@ public class GraphicalEditorPart extends EditorPart
             ProjectResources project = getProjectResources();
 
             // get the project resource values based on the current config
-            mConfiguredProjectRes = project.getConfiguredResources(
-                    mConfigChooser.getConfiguration().getFullConfig());
+            mConfiguredProjectRes = project.getConfiguredResources(mConfigChooser.getConfiguration().getFullConfig());
         }
 
         return mConfiguredProjectRes;
@@ -868,8 +845,8 @@ public class GraphicalEditorPart extends EditorPart
 
     @Override
     public void createConfigFile() {
-        LayoutCreatorDialog dialog = new LayoutCreatorDialog(mConfigChooser.getShell(),
-                mEditedFile.getName(), mConfigChooser.getConfiguration().getFullConfig());
+        LayoutCreatorDialog dialog = new LayoutCreatorDialog(mConfigChooser.getShell(), mEditedFile.getName(),
+                mConfigChooser.getConfiguration().getFullConfig());
         if (dialog.open() != Window.OK) {
             return;
         }
@@ -1005,8 +982,8 @@ public class GraphicalEditorPart extends EditorPart
     @Override
     public void doSave(IProgressMonitor monitor) {
         // TODO implement a command stack
-//        getCommandStack().markSaveLocation();
-//        firePropertyChange(PROP_DIRTY);
+        //        getCommandStack().markSaveLocation();
+        //        firePropertyChange(PROP_DIRTY);
     }
 
     /**
@@ -1290,11 +1267,8 @@ public class GraphicalEditorPart extends EditorPart
                 // For that purpose, create a special LayoutScene that has no image,
                 // no root view yet indicates success and then update the canvas with it.
 
-                canvas.setSession(
-                        new StaticRenderSession(
-                                Result.Status.SUCCESS.createResult(),
-                                null /*rootViewInfo*/, null /*image*/),
-                        null /*explodeNodes*/, true /* layoutlib5 */);
+                canvas.setSession(new StaticRenderSession(Result.Status.SUCCESS.createResult(), null /*rootViewInfo*/,
+                        null /*image*/), null /*explodeNodes*/, true /* layoutlib5 */);
                 return;
             }
 
@@ -1365,14 +1339,12 @@ public class GraphicalEditorPart extends EditorPart
         // or deleted for some reason (changed from outside of eclipse), then this will
         // return false;
         if (mEditedFile.exists() == false) {
-            displayError("Resource '%1$s' does not exist.",
-                         mEditedFile.getFullPath().toString());
+            displayError("Resource '%1$s' does not exist.", mEditedFile.getFullPath().toString());
             return false;
         }
 
         if (mEditedFile.isSynchronized(IResource.DEPTH_ZERO) == false) {
-            String message = String.format("%1$s is out of sync. Please refresh.",
-                    mEditedFile.getName());
+            String message = String.format("%1$s is out of sync. Please refresh.", mEditedFile.getName());
 
             displayError(message);
 
@@ -1412,12 +1384,13 @@ public class GraphicalEditorPart extends EditorPart
 
                         // check whether the bridge managed to load, or not
                         if (layoutLib.getStatus() == LoadStatus.LOADING) {
-                            displayError("Eclipse is loading framework information and the layout library from the SDK folder.\n%1$s will refresh automatically once the process is finished.",
-                                         mEditedFile.getName());
+                            displayError(
+                                    "Eclipse is loading framework information and the layout library from the SDK folder.\n%1$s will refresh automatically once the process is finished.",
+                                    mEditedFile.getName());
                         } else {
                             String message = layoutLib.getLoadMessage();
-                            displayError("Eclipse failed to load the framework information and the layout library!" +
-                                    message != null ? "\n" + message : "");
+                            displayError("Eclipse failed to load the framework information and the layout library!"
+                                    + message != null ? "\n" + message : "");
                         }
                     }
                 } else { // data == null
@@ -1436,13 +1409,9 @@ public class GraphicalEditorPart extends EditorPart
                             case LOADING:
                                 String s;
                                 if (currentSdk.getTarget(getProject()) == target) {
-                                    s = String.format(
-                                            "The project target (%1$s) is still loading.",
-                                            targetName);
+                                    s = String.format("The project target (%1$s) is still loading.", targetName);
                                 } else {
-                                    s = String.format(
-                                            "The rendering target (%1$s) is still loading.",
-                                            targetName);
+                                    s = String.format("The rendering target (%1$s) is still loading.", targetName);
                                 }
                                 s += "\nThe layout will refresh automatically once the process is finished.";
                                 displayError(s);
@@ -1450,8 +1419,7 @@ public class GraphicalEditorPart extends EditorPart
                                 break;
                             case FAILED: // known failure
                             case LOADED: // success but data isn't loaded?!?!
-                                displayError("The project target (%s) was not properly loaded.",
-                                        targetName);
+                                displayError("The project target (%s) was not properly loaded.", targetName);
                                 break;
                         }
                     }
@@ -1462,7 +1430,7 @@ public class GraphicalEditorPart extends EditorPart
             }
         } else if (displayError) { // currentSdk == null
             displayError("Eclipse is loading the SDK.\n%1$s will refresh automatically once the process is finished.",
-                         mEditedFile.getName());
+                    mEditedFile.getName());
         }
 
         return null;
@@ -1523,8 +1491,7 @@ public class GraphicalEditorPart extends EditorPart
                 displayError("Loading editor");
                 return false;
             }
-            displayError(
-                    "No XML content. Please add a root view or layout to your document.");
+            displayError("No XML content. Please add a root view or layout to your document.");
             return false;
         }
 
@@ -1558,31 +1525,24 @@ public class GraphicalEditorPart extends EditorPart
      * @return the render service
      */
     @NonNull
-    public RenderService createRenderService(Configuration configuration,
-            ResourceResolver resolver) {
+    public RenderService createRenderService(Configuration configuration, ResourceResolver resolver) {
         return RenderService.create(this, configuration, resolver, mCredential);
     }
 
-    private void renderWithBridge(IProject iProject, UiDocumentNode model,
-            LayoutLibrary layoutLib) {
+    private void renderWithBridge(IProject iProject, UiDocumentNode model, LayoutLibrary layoutLib) {
         LayoutCanvas canvas = getCanvasControl();
         Set<UiElementNode> explodeNodes = canvas.getNodesToExplode();
         RenderLogger logger = createRenderLogger(mEditedFile.getName());
         RenderingMode renderingMode = RenderingMode.NORMAL;
         // FIXME set the rendering mode using ViewRule or something.
         List<UiElementNode> children = model.getUiChildren();
-        if (children.size() > 0 &&
-                children.get(0).getDescriptor().getXmlLocalName().equals(SCROLL_VIEW)) {
+        if (children.size() > 0 && children.get(0).getDescriptor().getXmlLocalName().equals(SCROLL_VIEW)) {
             renderingMode = RenderingMode.V_SCROLL;
         }
 
-        RenderSession session = RenderService.create(this, mCredential)
-            .setModel(model)
-            .setLog(logger)
-            .setRenderingMode(renderingMode)
-            .setIncludedWithin(mIncludedWithin)
-            .setNodesToExpand(explodeNodes)
-            .createRenderSession();
+        RenderSession session = RenderService.create(this, mCredential).setModel(model).setLog(logger)
+                .setRenderingMode(renderingMode).setIncludedWithin(mIncludedWithin).setNodesToExpand(explodeNodes)
+                .createRenderSession();
 
         boolean layoutlib5 = layoutLib.supports(Capability.EMBEDDED_LAYOUT);
         canvas.setSession(session, explodeNodes, layoutlib5);
@@ -1598,8 +1558,7 @@ public class GraphicalEditorPart extends EditorPart
             if (exception != null || (errorMessage != null && errorMessage.length() > 0)) {
                 logger.error(null, errorMessage, exception, null /*data*/);
             } else if (!logger.hasProblems()) {
-                logger.error(null, "Unexpected error in rendering, no details given",
-                        null /*data*/);
+                logger.error(null, "Unexpected error in rendering, no details given", null /*data*/);
             }
             // These errors will be included in the log warnings which are
             // displayed regardless of render success status below
@@ -1657,12 +1616,10 @@ public class GraphicalEditorPart extends EditorPart
             }
             boolean isProjectTheme = mConfigChooser.getConfiguration().isProjectTheme();
 
-            Map<ResourceType, Map<String, ResourceValue>> configuredProjectRes =
-                getConfiguredProjectResources();
+            Map<ResourceType, Map<String, ResourceValue>> configuredProjectRes = getConfiguredProjectResources();
 
             // Get the framework resources
-            Map<ResourceType, Map<String, ResourceValue>> frameworkResources =
-                getConfiguredFrameworkResources();
+            Map<ResourceType, Map<String, ResourceValue>> frameworkResources = getConfiguredFrameworkResources();
 
             if (configuredProjectRes == null) {
                 displayError("Missing project resources for current configuration.");
@@ -1674,9 +1631,8 @@ public class GraphicalEditorPart extends EditorPart
                 return null;
             }
 
-            mResourceResolver = ResourceResolver.create(
-                    configuredProjectRes, frameworkResources,
-                    theme, isProjectTheme);
+            mResourceResolver = ResourceResolver.create(configuredProjectRes, frameworkResources, theme,
+                    isProjectTheme);
         }
 
         return mResourceResolver;
@@ -1689,8 +1645,7 @@ public class GraphicalEditorPart extends EditorPart
             ResourceManager resManager = ResourceManager.getInstance();
             IProject project = getProject();
             ProjectResources projectRes = resManager.getProjectResources(project);
-            mProjectCallback = new ProjectCallback(layoutLibrary, projectRes, project,
-                    mCredential, this);
+            mProjectCallback = new ProjectCallback(layoutLibrary, projectRes, project, mCredential, this);
         } else if (reset) {
             // Also clears the set of missing/broken classes prior to rendering
             mProjectCallback.getMissingClasses().clear();
@@ -1765,8 +1720,7 @@ public class GraphicalEditorPart extends EditorPart
                 recompute = true;
                 if (mEditedFile != null) {
                     ResourceManager manager = ResourceManager.getInstance();
-                    ProjectResources projectRes = manager.getProjectResources(
-                            mEditedFile.getProject());
+                    ProjectResources projectRes = manager.getProjectResources(mEditedFile.getProject());
 
                     if (projectRes != null) {
                         projectRes.resetDynamicIds();
@@ -1831,7 +1785,7 @@ public class GraphicalEditorPart extends EditorPart
      * @param errorFormat The new error to display if not null.
      * @param parameters String.format parameters for the error format.
      */
-    private void displayError(String errorFormat, Object...parameters) {
+    private void displayError(String errorFormat, Object... parameters) {
         if (errorFormat != null) {
             mErrorLabel.setText(String.format(errorFormat, parameters));
         } else {
@@ -1869,8 +1823,7 @@ public class GraphicalEditorPart extends EditorPart
                 File normalized = new File(tempDir);
                 builder.append("Normalized temp dir: ").append(normalized.getPath()).append('\n');
                 try {
-                    builder.append("Canonical temp dir: ").append(normalized.getCanonicalPath())
-                    .append('\n');
+                    builder.append("Canonical temp dir: ").append(normalized.getCanonicalPath()).append('\n');
                 } catch (IOException e) {
                     // ignore
                 }
@@ -1883,13 +1836,11 @@ public class GraphicalEditorPart extends EditorPart
             if (throwable.getMessage().equals("Unable to create temporary file")) {
                 String javaVersion = System.getProperty("java.version");
                 if (javaVersion.startsWith("1.7.0_")) {
-                    int version = Integer
-                            .parseInt(javaVersion.substring(javaVersion.indexOf('_') + 1));
+                    int version = Integer.parseInt(javaVersion.substring(javaVersion.indexOf('_') + 1));
                     if (version > 0 && version < 45) {
                         builder.append('\n');
-                        builder.append("Tip: This may be caused by using an older version " +
-                                "of JDK 1.7.0; try using at least 1.7.0_45 (you are using " +
-                                javaVersion + ")");
+                        builder.append("Tip: This may be caused by using an older version "
+                                + "of JDK 1.7.0; try using at least 1.7.0_45 (you are using " + javaVersion + ")");
                     }
                 }
             }
@@ -1907,8 +1858,7 @@ public class GraphicalEditorPart extends EditorPart
                 haveInterestingFrame = true;
             }
             String className = frame.getClassName();
-            if (className.equals(
-                    "com.android.layoutlib.bridge.impl.RenderSessionImpl")) { //$NON-NLS-1$
+            if (className.equals("com.android.layoutlib.bridge.impl.RenderSessionImpl")) { //$NON-NLS-1$
                 end = i;
                 break;
             }
@@ -1920,7 +1870,7 @@ public class GraphicalEditorPart extends EditorPart
         }
 
         if (!append) {
-            mErrorLabel.setText("\n");    //$NON-NLS-1$
+            mErrorLabel.setText("\n"); //$NON-NLS-1$
         } else {
             addText(mErrorLabel, "\n\n"); //$NON-NLS-1$
         }
@@ -1936,8 +1886,8 @@ public class GraphicalEditorPart extends EditorPart
                 int lineNumber = frame.getLineNumber();
                 String location = fileName + ':' + lineNumber;
                 if (isInterestingFrame(frame)) {
-                    addActionLink(mErrorLabel, ActionLinkStyleRange.LINK_OPEN_LINE,
-                            location, className, methodName, fileName, lineNumber);
+                    addActionLink(mErrorLabel, ActionLinkStyleRange.LINK_OPEN_LINE, location, className, methodName,
+                            fileName, lineNumber);
                 } else {
                     addText(mErrorLabel, location);
                 }
@@ -1948,25 +1898,24 @@ public class GraphicalEditorPart extends EditorPart
 
     private static boolean isInterestingFrame(StackTraceElement frame) {
         String className = frame.getClassName();
-        return !(className.startsWith("android.")         //$NON-NLS-1$
-                || className.startsWith("com.android.")   //$NON-NLS-1$
-                || className.startsWith("java.")          //$NON-NLS-1$
-                || className.startsWith("javax.")         //$NON-NLS-1$
-                || className.startsWith("sun."));         //$NON-NLS-1$
+        return !(className.startsWith("android.") //$NON-NLS-1$
+                || className.startsWith("com.android.") //$NON-NLS-1$
+                || className.startsWith("java.") //$NON-NLS-1$
+                || className.startsWith("javax.") //$NON-NLS-1$
+                || className.startsWith("sun.")); //$NON-NLS-1$
     }
 
     /**
      * Switches the sash to display the error label to show a list of
      * missing classes and give options to create them.
      */
-    private void displayFailingClasses(Set<String> missingClasses, Set<String> brokenClasses,
-            boolean append) {
+    private void displayFailingClasses(Set<String> missingClasses, Set<String> brokenClasses, boolean append) {
         if (missingClasses.size() == 0 && brokenClasses.size() == 0) {
             return;
         }
 
         if (!append) {
-            mErrorLabel.setText("");    //$NON-NLS-1$
+            mErrorLabel.setText(""); //$NON-NLS-1$
         } else {
             addText(mErrorLabel, "\n"); //$NON-NLS-1$
         }
@@ -1984,16 +1933,13 @@ public class GraphicalEditorPart extends EditorPart
                 addTypoSuggestions(clazz, customViews, true);
                 addTypoSuggestions(clazz, getAndroidViewClassNames(project), false);
 
-                addActionLink(mErrorLabel,
-                        ActionLinkStyleRange.LINK_FIX_BUILD_PATH, "Fix Build Path", clazz);
+                addActionLink(mErrorLabel, ActionLinkStyleRange.LINK_FIX_BUILD_PATH, "Fix Build Path", clazz);
                 addText(mErrorLabel, ", ");
-                addActionLink(mErrorLabel,
-                        ActionLinkStyleRange.LINK_EDIT_XML, "Edit XML", clazz);
+                addActionLink(mErrorLabel, ActionLinkStyleRange.LINK_EDIT_XML, "Edit XML", clazz);
                 if (clazz.indexOf('.') != -1) {
                     // Add "Create Class" link, but only for custom views
                     addText(mErrorLabel, ", ");
-                    addActionLink(mErrorLabel,
-                            ActionLinkStyleRange.LINK_CREATE_CLASS, "Create Class", clazz);
+                    addActionLink(mErrorLabel, ActionLinkStyleRange.LINK_CREATE_CLASS, "Create Class", clazz);
                 }
                 addText(mErrorLabel, ")\n");
             }
@@ -2008,11 +1954,9 @@ public class GraphicalEditorPart extends EditorPart
                 addText(mErrorLabel, "- ");
                 addText(mErrorLabel, clazz);
                 addText(mErrorLabel, " (");
-                addActionLink(mErrorLabel,
-                        ActionLinkStyleRange.LINK_OPEN_CLASS, "Open Class", clazz);
+                addActionLink(mErrorLabel, ActionLinkStyleRange.LINK_OPEN_CLASS, "Open Class", clazz);
                 addText(mErrorLabel, ", ");
-                addActionLink(mErrorLabel,
-                        ActionLinkStyleRange.LINK_SHOW_LOG, "Show Error Log", clazz);
+                addActionLink(mErrorLabel, ActionLinkStyleRange.LINK_SHOW_LOG, "Show Error Log", clazz);
                 addText(mErrorLabel, ")\n");
 
                 if (!(clazz.startsWith("android.") || //$NON-NLS-1$
@@ -2024,16 +1968,15 @@ public class GraphicalEditorPart extends EditorPart
             addText(mErrorLabel, "See the Error Log (Window > Show View) for more details.\n");
 
             if (haveCustomClass) {
-                addBoldText(mErrorLabel, "Tip: Use View.isInEditMode() in your custom views "
-                        + "to skip code when shown in Eclipse");
+                addBoldText(mErrorLabel,
+                        "Tip: Use View.isInEditMode() in your custom views " + "to skip code when shown in Eclipse");
             }
         }
 
         mSashError.setMaximizedControl(null);
     }
 
-    private void addTypoSuggestions(String actual, Collection<String> views,
-            boolean compareWithPackage) {
+    private void addTypoSuggestions(String actual, Collection<String> views, boolean compareWithPackage) {
         if (views.size() == 0) {
             return;
         }
@@ -2055,16 +1998,14 @@ public class GraphicalEditorPart extends EditorPart
                 }
                 if (LintUtils.editDistance(actualBase, matchWith) <= maxDistance) {
                     // Suggest this class as a typo for the given class
-                    String labelClass = (suggestedBase.equals(actual) || actual.indexOf('.') != -1)
-                        ? suggested : suggestedBase;
-                    addActionLink(mErrorLabel,
-                            ActionLinkStyleRange.LINK_CHANGE_CLASS_TO,
+                    String labelClass = (suggestedBase.equals(actual) || actual.indexOf('.') != -1) ? suggested
+                            : suggestedBase;
+                    addActionLink(mErrorLabel, ActionLinkStyleRange.LINK_CHANGE_CLASS_TO,
                             String.format("Change to %1$s",
                                     // Only show full package name if class name
                                     // is the same
                                     labelClass),
-                            actual,
-                            viewNeedsPackage(suggested) ? suggested : suggestedBase);
+                            actual, viewNeedsPackage(suggested) ? suggested : suggestedBase);
                     addText(mErrorLabel, ", ");
                 }
             }
@@ -2097,7 +2038,7 @@ public class GraphicalEditorPart extends EditorPart
     }
 
     /** Add a normal line of text to the styled text widget. */
-    private void addText(StyledText styledText, String...string) {
+    private void addText(StyledText styledText, String... string) {
         for (String s : string) {
             styledText.append(s);
         }
@@ -2137,43 +2078,36 @@ public class GraphicalEditorPart extends EditorPart
             }
 
             if (logger.seenTagPrefix(LayoutLog.TAG_RESOURCES_RESOLVE_THEME_ATTR)) {
-                addBoldText(mErrorLabel,
-                        "Missing styles. Is the correct theme chosen for this layout?\n");
-                addText(mErrorLabel,
-                        "Use the Theme combo box above the layout to choose a different layout, " +
-                        "or fix the theme style references.\n\n");
+                addBoldText(mErrorLabel, "Missing styles. Is the correct theme chosen for this layout?\n");
+                addText(mErrorLabel, "Use the Theme combo box above the layout to choose a different layout, "
+                        + "or fix the theme style references.\n\n");
             }
 
             List<Throwable> trace = logger.getFirstTrace();
-            if (trace != null
-                    && trace.toString().contains(
-                            "java.lang.IndexOutOfBoundsException: Index: 2, Size: 2") //$NON-NLS-1$
+            if (trace != null && trace.toString().contains("java.lang.IndexOutOfBoundsException: Index: 2, Size: 2") //$NON-NLS-1$
                     && mConfigChooser.getConfiguration().getDensity() == Density.TV) {
-                addBoldText(mErrorLabel,
-                        "It looks like you are using a render target where the layout library " +
-                        "does not support the tvdpi density.\n\n");
-                addText(mErrorLabel, "Please try either updating to " +
-                        "the latest available version (using the SDK manager), or if no updated " +
-                        "version is available for this specific version of Android, try using " +
-                        "a more recent render target version.\n\n");
+                addBoldText(mErrorLabel, "It looks like you are using a render target where the layout library "
+                        + "does not support the tvdpi density.\n\n");
+                addText(mErrorLabel,
+                        "Please try either updating to "
+                                + "the latest available version (using the SDK manager), or if no updated "
+                                + "version is available for this specific version of Android, try using "
+                                + "a more recent render target version.\n\n");
 
             }
 
             if (hasAaptErrors && logger.seenTagPrefix(LayoutLog.TAG_RESOURCES_PREFIX)) {
                 // Text will automatically be wrapped by the error widget so no reason
                 // to insert linebreaks in this error message:
-                String message =
-                    "NOTE: This project contains resource errors, so aapt did not succeed, "
-                     + "which can cause rendering failures. "
-                     + "Fix resource problems first.\n\n";
-                 addBoldText(mErrorLabel, message);
+                String message = "NOTE: This project contains resource errors, so aapt did not succeed, "
+                        + "which can cause rendering failures. " + "Fix resource problems first.\n\n";
+                addBoldText(mErrorLabel, message);
             } else if (hasJavaErrors && mProjectCallback != null && mProjectCallback.isUsed()) {
                 // Text will automatically be wrapped by the error widget so no reason
                 // to insert linebreaks in this error message:
-                String message =
-                   "NOTE: This project contains Java compilation errors, "
-                    + "which can cause rendering failures for custom views. "
-                    + "Fix compilation problems first.\n\n";
+                String message = "NOTE: This project contains Java compilation errors, "
+                        + "which can cause rendering failures for custom views. "
+                        + "Fix compilation problems first.\n\n";
                 addBoldText(mErrorLabel, message);
             }
 
@@ -2197,12 +2131,10 @@ public class GraphicalEditorPart extends EditorPart
 
             List<String> fidelityWarnings = logger.getFidelityWarnings();
             if (fidelityWarnings != null && fidelityWarnings.size() > 0) {
-                addText(mErrorLabel,
-                        "The graphics preview in the layout editor may not be accurate:\n");
+                addText(mErrorLabel, "The graphics preview in the layout editor may not be accurate:\n");
                 for (String warning : fidelityWarnings) {
                     addText(mErrorLabel, warning + ' ');
-                    addActionLink(mErrorLabel,
-                            ActionLinkStyleRange.IGNORE_FIDELITY_WARNING,
+                    addActionLink(mErrorLabel, ActionLinkStyleRange.IGNORE_FIDELITY_WARNING,
                             "(Ignore for this session)\n", warning);
                 }
             }
@@ -2237,17 +2169,12 @@ public class GraphicalEditorPart extends EditorPart
             id = BaseViewRule.stripIdPrefix(id);
         }
 
-        addText(mErrorLabel, String.format("\"%1$s\" does not set the required %2$s attribute:\n",
-                id, attribute));
+        addText(mErrorLabel, String.format("\"%1$s\" does not set the required %2$s attribute:\n", id, attribute));
         addText(mErrorLabel, " (1) ");
-        addActionLink(mErrorLabel,
-                ActionLinkStyleRange.SET_ATTRIBUTE,
-                String.format("Set to \"%1$s\"", VALUE_WRAP_CONTENT),
-                element, attribute, VALUE_WRAP_CONTENT);
+        addActionLink(mErrorLabel, ActionLinkStyleRange.SET_ATTRIBUTE,
+                String.format("Set to \"%1$s\"", VALUE_WRAP_CONTENT), element, attribute, VALUE_WRAP_CONTENT);
         addText(mErrorLabel, "\n (2) ");
-        addActionLink(mErrorLabel,
-                ActionLinkStyleRange.SET_ATTRIBUTE,
-                String.format("Set to \"%1$s\"\n", fill),
+        addActionLink(mErrorLabel, ActionLinkStyleRange.SET_ATTRIBUTE, String.format("Set to \"%1$s\"\n", fill),
                 element, attribute, fill);
     }
 
@@ -2270,8 +2197,7 @@ public class GraphicalEditorPart extends EditorPart
      * A mouse-click listener is setup and it interprets the link based on the
      * action, corresponding to the value fields in {@link ActionLinkStyleRange}.
      */
-    private void addActionLink(StyledText styledText, int action, String label,
-            Object... data) {
+    private void addActionLink(StyledText styledText, int action, String label, Object... data) {
         String s = styledText.getText();
         int start = (s == null ? 0 : s.length());
         styledText.append(label);
@@ -2454,18 +2380,17 @@ public class GraphicalEditorPart extends EditorPart
                 case LINK_FIX_BUILD_PATH:
                     @SuppressWarnings("restriction")
                     String id = BuildPathsPropertyPage.PROP_ID;
-                    PreferencesUtil.createPropertyDialogOn(
-                            AndmoreAndroidPlugin.getShell(),
-                            getProject(), id, null, null).open();
+                    PreferencesUtil
+                            .createPropertyDialogOn(AndmoreAndroidPlugin.getShell(), getProject(), id, null, null)
+                            .open();
                     break;
                 case LINK_OPEN_CLASS:
                     AndmoreAndroidPlugin.openJavaClass(getProject(), (String) mData[0]);
                     break;
                 case LINK_OPEN_LINE:
-                    boolean success = AndmoreAndroidPlugin.openStackTraceLine(
-                            (String) mData[0],   // class
-                            (String) mData[1],   // method
-                            (String) mData[2],   // file
+                    boolean success = AndmoreAndroidPlugin.openStackTraceLine((String) mData[0], // class
+                            (String) mData[1], // method
+                            (String) mData[2], // file
                             (Integer) mData[3]); // line
                     if (!success) {
                         MessageDialog.openError(mErrorLabel.getShell(), "Not Found",
@@ -2486,8 +2411,7 @@ public class GraphicalEditorPart extends EditorPart
                     // Change class reference of mData[0] to mData[1]
                     // TODO: run under undo lock
                     MultiTextEdit edits = new MultiTextEdit();
-                    ISourceViewer textViewer =
-                        mEditorDelegate.getEditor().getStructuredSourceViewer();
+                    ISourceViewer textViewer = mEditorDelegate.getEditor().getStructuredSourceViewer();
                     IDocument document = textViewer.getDocument();
                     String xml = document.get();
                     int index = 0;
@@ -2546,26 +2470,23 @@ public class GraphicalEditorPart extends EditorPart
                     final String attribute = (String) mData[1];
                     final String value = (String) mData[2];
                     mEditorDelegate.getEditor().wrapUndoEditXmlModel(
-                            String.format("Set \"%1$s\" to \"%2$s\"", attribute, value),
-                            new Runnable() {
-                        @Override
-                        public void run() {
-                            element.setAttributeValue(attribute, ANDROID_URI, value, true);
-                            element.commitDirtyAttributesToXml();
-                        }
-                    });
+                            String.format("Set \"%1$s\" to \"%2$s\"", attribute, value), new Runnable() {
+                                @Override
+                                public void run() {
+                                    element.setAttributeValue(attribute, ANDROID_URI, value, true);
+                                    element.commitDirtyAttributesToXml();
+                                }
+                            });
                     break;
                 }
                 case LINK_DISABLE_SANDBOX: {
                     RenderSecurityManager.sEnabled = false;
                     recomputeLayout();
 
-                    MessageDialog.openInformation(AndmoreAndroidPlugin.getShell(),
-                        "Disabled Rendering Sandbox",
-                        "The custom view rendering sandbox was disabled for this session.\n\n" +
-                        "You can turn it off permanently by adding\n" +
-                        "-D" + ENABLED_PROPERTY + "=" + VALUE_FALSE + "\n" +
-                        "as a new line in eclipse.ini.");
+                    MessageDialog.openInformation(AndmoreAndroidPlugin.getShell(), "Disabled Rendering Sandbox",
+                            "The custom view rendering sandbox was disabled for this session.\n\n"
+                                    + "You can turn it off permanently by adding\n" + "-D" + ENABLED_PROPERTY + "="
+                                    + VALUE_FALSE + "\n" + "as a new line in eclipse.ini.");
 
                     break;
                 }
@@ -2634,7 +2555,7 @@ public class GraphicalEditorPart extends EditorPart
     private void createNewClass(String fqcn) {
 
         int pos = fqcn.lastIndexOf('.');
-        String packageName = pos < 0 ? "" : fqcn.substring(0, pos);  //$NON-NLS-1$
+        String packageName = pos < 0 ? "" : fqcn.substring(0, pos); //$NON-NLS-1$
         String className = pos <= 0 || pos >= fqcn.length() ? "" : fqcn.substring(pos + 1); //$NON-NLS-1$
 
         // create the wizard page for the class creation, and configure it
@@ -2644,8 +2565,7 @@ public class GraphicalEditorPart extends EditorPart
         page.setSuperClass(SdkConstants.CLASS_VIEW, true /* canBeModified */);
 
         // get the source folders as java elements.
-        IPackageFragmentRoot[] roots = getPackageFragmentRoots(
-                mEditorDelegate.getEditor().getProject(),
+        IPackageFragmentRoot[] roots = getPackageFragmentRoots(mEditorDelegate.getEditor().getProject(),
                 false /*includeContainers*/, true /*skipGenFolder*/);
 
         IPackageFragmentRoot currentRoot = null;
@@ -2671,7 +2591,7 @@ public class GraphicalEditorPart extends EditorPart
                     children = root.getChildren();
                     for (IJavaElement child : children) {
                         if (child instanceof IPackageFragment) {
-                            fragment = (IPackageFragment)child;
+                            fragment = (IPackageFragment) child;
                             if (packageName.startsWith(fragment.getElementName())) {
                                 // its a match. get the number of segments
                                 String[] segments = fragment.getElementName().split("\\."); //$NON-NLS-1$
@@ -2708,27 +2628,26 @@ public class GraphicalEditorPart extends EditorPart
                     int index = -1;
                     // skip the matching packages
                     while (count < packageMatchCount) {
-                        index = packageName.indexOf('.', index+1);
+                        index = packageName.indexOf('.', index + 1);
                         count++;
                     }
 
                     // create the rest of the segments, except for the last one as indexOf will
                     // return -1;
                     while (count < totalCount - 1) {
-                        index = packageName.indexOf('.', index+1);
+                        index = packageName.indexOf('.', index + 1);
                         count++;
-                        createdFragments.add(currentRoot.createPackageFragment(
-                                packageName.substring(0, index),
+                        createdFragments.add(currentRoot.createPackageFragment(packageName.substring(0, index),
                                 true /* force*/, new NullProgressMonitor()));
                     }
 
                     // create the last package
-                    createdFragments.add(currentRoot.createPackageFragment(
-                            packageName, true /* force*/, new NullProgressMonitor()));
+                    createdFragments.add(
+                            currentRoot.createPackageFragment(packageName, true /* force*/, new NullProgressMonitor()));
 
                     // set the root and fragment in the Wizard page
                     page.setPackageFragmentRoot(currentRoot, true /* canBeModified*/);
-                    page.setPackageFragment(createdFragments.get(createdFragments.size()-1),
+                    page.setPackageFragment(createdFragments.get(createdFragments.size() - 1),
                             true /* canBeModified */);
                 } catch (JavaModelException e) {
                     // If we can't create the packages, there's a problem.
@@ -2767,9 +2686,8 @@ public class GraphicalEditorPart extends EditorPart
             // we need to start with the leaf and go up
             if (createdFragments != null) {
                 try {
-                    for (int i = createdFragments.size() - 1 ; i >= 0 ; i--) {
-                        createdFragments.get(i).delete(true /* force*/,
-                                                       new NullProgressMonitor());
+                    for (int i = createdFragments.size() - 1; i >= 0; i--) {
+                        createdFragments.get(i).delete(true /* force*/, new NullProgressMonitor());
                     }
                 } catch (JavaModelException e) {
                     e.printStackTrace();
@@ -2787,8 +2705,8 @@ public class GraphicalEditorPart extends EditorPart
      * @param skipGenFolder True to skip the "gen" folder
      * @return an array of IPackageFragmentRoot.
      */
-    private IPackageFragmentRoot[] getPackageFragmentRoots(IProject project,
-            boolean includeContainers, boolean skipGenFolder) {
+    private IPackageFragmentRoot[] getPackageFragmentRoots(IProject project, boolean includeContainers,
+            boolean skipGenFolder) {
         ArrayList<IPackageFragmentRoot> result = new ArrayList<IPackageFragmentRoot>();
         try {
             IJavaProject javaProject = JavaCore.create(project);
@@ -2801,14 +2719,12 @@ public class GraphicalEditorPart extends EditorPart
                     }
                 }
                 IClasspathEntry entry = roots[i].getRawClasspathEntry();
-                if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE ||
-                        (includeContainers &&
-                                entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER)) {
+                if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE
+                        || (includeContainers && entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER)) {
                     result.add(roots[i]);
                 }
             }
-        } catch (JavaModelException e) {
-        }
+        } catch (JavaModelException e) {}
 
         return result.toArray(new IPackageFragmentRoot[result.size()]);
     }
@@ -2845,8 +2761,7 @@ public class GraphicalEditorPart extends EditorPart
      * @return a collection of resource names, never null but possibly empty
      */
     public Collection<String> getResourceNames(boolean framework, ResourceType type) {
-        Map<ResourceType, Map<String, ResourceValue>> map =
-            framework ? mConfiguredFrameworkRes : mConfiguredProjectRes;
+        Map<ResourceType, Map<String, ResourceValue>> map = framework ? mConfiguredFrameworkRes : mConfiguredProjectRes;
         Map<String, ResourceValue> animations = map.get(type);
         if (animations != null) {
             return animations.keySet();

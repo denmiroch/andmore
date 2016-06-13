@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,13 +22,17 @@ import static com.android.SdkConstants.ATTR_STYLE;
 import static com.android.SdkConstants.PREFIX_RESOURCE_REF;
 import static com.android.SdkConstants.PREFIX_THEME_REF;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.IAttributeInfo;
-import com.android.ide.common.api.IAttributeInfo.Format;
-import com.android.ide.common.resources.ResourceItem;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.resources.ResourceType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.descriptors.AttributeDescriptor;
@@ -60,17 +61,13 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.IAttributeInfo;
+import com.android.ide.common.api.IAttributeInfo.Format;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.resources.ResourceType;
 
 /**
  * Represents an XML attribute for a resource that can be modified using a simple text field or
@@ -91,8 +88,7 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
      * @param attributeDescriptor the attribute descriptor for this attribute
      * @param uiParent the parent ui node, if any
      */
-    public UiResourceAttributeNode(ResourceType type,
-            AttributeDescriptor attributeDescriptor, UiElementNode uiParent) {
+    public UiResourceAttributeNode(ResourceType type, AttributeDescriptor attributeDescriptor, UiElementNode uiParent) {
         super(attributeDescriptor, uiParent);
 
         mType = type;
@@ -125,7 +121,7 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
 
         final Text text = toolkit.createText(composite, getCurrentValue());
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalIndent = 1;  // Needed by the fixed composite borders under GTK
+        gd.horizontalIndent = 1; // Needed by the fixed composite borders under GTK
         text.setLayoutData(gd);
         Button browseButton = toolkit.createButton(composite, "Browse...", SWT.PUSH);
 
@@ -160,22 +156,18 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
         IProject project = editor.getProject();
         if (project != null) {
             // get the resource repository for this project and the system resources.
-            ResourceRepository projectRepository =
-                ResourceManager.getInstance().getProjectResources(project);
+            ResourceRepository projectRepository = ResourceManager.getInstance().getProjectResources(project);
 
             if (mType != null) {
                 // get the Target Data to get the system resources
                 AndroidTargetData data = editor.getTargetData();
                 ResourceChooser dlg = ResourceChooser.create(project, mType, data, shell)
-                    .setCurrentResource(currentValue);
+                        .setCurrentResource(currentValue);
                 if (dlg.open() == Window.OK) {
                     return dlg.getCurrentResource();
                 }
             } else {
-                ReferenceChooserDialog dlg = new ReferenceChooserDialog(
-                        project,
-                        projectRepository,
-                        shell);
+                ReferenceChooserDialog dlg = new ReferenceChooserDialog(project, projectRepository, shell);
 
                 dlg.setCurrentResource(currentValue);
 
@@ -231,10 +223,8 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
      * @return an array of resource string matches
      */
     @Nullable
-    public static String[] computeResourceStringMatches(
-            @NonNull AndroidXmlEditor editor,
-            @Nullable AttributeDescriptor descriptor,
-            @Nullable String prefix) {
+    public static String[] computeResourceStringMatches(@NonNull AndroidXmlEditor editor,
+            @Nullable AttributeDescriptor descriptor, @Nullable String prefix) {
 
         if (prefix == null || !prefix.regionMatches(1, ANDROID_PKG, 0, ANDROID_PKG.length())) {
             IProject project = editor.getProject();
@@ -249,8 +239,7 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
                     libraries = projectState.getFullLibraryProjects();
                 }
 
-                String[] projectMatches = computeResourceStringMatches(descriptor, prefix,
-                        repository, false);
+                String[] projectMatches = computeResourceStringMatches(descriptor, prefix, repository, false);
 
                 if (libraries == null || libraries.isEmpty()) {
                     return projectMatches;
@@ -264,8 +253,7 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
 
                 for (IProject library : libraries) {
                     repository = resourceManager.getProjectResources(library);
-                    projectMatches = computeResourceStringMatches(descriptor, prefix,
-                            repository, false);
+                    projectMatches = computeResourceStringMatches(descriptor, prefix, repository, false);
                     for (String s : projectMatches) {
                         matches.add(s);
                     }
@@ -300,21 +288,17 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
      * @return an array of resource string matches
      */
     @NonNull
-    public static String[] computeResourceStringMatches(
-            @Nullable AttributeDescriptor attributeDescriptor,
-            @Nullable String prefix,
-            @NonNull ResourceRepository repository,
-            boolean isSystem) {
+    public static String[] computeResourceStringMatches(@Nullable AttributeDescriptor attributeDescriptor,
+            @Nullable String prefix, @NonNull ResourceRepository repository, boolean isSystem) {
         // Get list of potential resource types, either specific to this project
         // or the generic list.
-        Collection<ResourceType> resTypes = (repository != null) ?
-                    repository.getAvailableResourceTypes() :
-                    EnumSet.allOf(ResourceType.class);
+        Collection<ResourceType> resTypes = (repository != null) ? repository.getAvailableResourceTypes()
+                : EnumSet.allOf(ResourceType.class);
 
         // Get the type name from the prefix, if any. It's any word before the / if there's one
         String typeName = null;
         if (prefix != null) {
-            Matcher m = Pattern.compile(".*?([a-z]+)/.*").matcher(prefix);      //$NON-NLS-1$
+            Matcher m = Pattern.compile(".*?([a-z]+)/.*").matcher(prefix); //$NON-NLS-1$
             if (m.matches()) {
                 typeName = m.group(1);
             }
@@ -329,13 +313,11 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
             // resource types.
             if (prefix != null && prefix.startsWith(PREFIX_THEME_REF)) {
                 results.add(ANDROID_THEME_PREFIX + ResourceType.ATTR.getName() + '/');
-                if (resTypes.contains(ResourceType.ATTR)
-                        || resTypes.contains(ResourceType.STYLE)) {
+                if (resTypes.contains(ResourceType.ATTR) || resTypes.contains(ResourceType.STYLE)) {
                     results.add(PREFIX_THEME_REF + ResourceType.ATTR.getName() + '/');
                     if (prefix != null && prefix.startsWith(ANDROID_THEME_PREFIX)) {
                         // including attr isn't required
-                        for (ResourceItem item : repository.getResourceItemsOfType(
-                                ResourceType.ATTR)) {
+                        for (ResourceItem item : repository.getResourceItemsOfType(ResourceType.ATTR)) {
                             results.add(ANDROID_THEME_PREFIX + item.getName());
                         }
                     }
@@ -351,22 +333,21 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
                 }
                 if (resType == ResourceType.ID) {
                     // Also offer the + version to create an id from scratch
-                    results.add("@+" + resType.getName() + '/');    //$NON-NLS-1$
+                    results.add("@+" + resType.getName() + '/'); //$NON-NLS-1$
                 }
             }
 
             // Also add in @android: prefix to completion such that if user has typed
             // "@an" we offer to complete it.
-            if (prefix == null ||
-                    ANDROID_PKG.regionMatches(0, prefix, 1, prefix.length() - 1)) {
+            if (prefix == null || ANDROID_PKG.regionMatches(0, prefix, 1, prefix.length() - 1)) {
                 results.add(ANDROID_PREFIX);
             }
         } else if (repository != null) {
             // We have a style name and a repository. Find all resources that match this
             // type and recreate suggestions out of them.
 
-            String initial = prefix != null && prefix.startsWith(PREFIX_THEME_REF)
-                    ? PREFIX_THEME_REF : PREFIX_RESOURCE_REF;
+            String initial = prefix != null && prefix.startsWith(PREFIX_THEME_REF) ? PREFIX_THEME_REF
+                    : PREFIX_RESOURCE_REF;
             ResourceType resType = ResourceType.getEnum(typeName);
             if (resType != null) {
                 StringBuilder sb = new StringBuilder();
@@ -387,8 +368,7 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
                 }
 
                 if (!isSystem && resType == ResourceType.ATTR) {
-                    for (ResourceItem item : repository.getResourceItemsOfType(
-                            ResourceType.STYLE)) {
+                    for (ResourceItem item : repository.getResourceItemsOfType(ResourceType.STYLE)) {
                         results.add(base + item.getName());
                     }
                 }
@@ -414,8 +394,7 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
      *          used to prioritize some of the resource types
      * @param choices the set of string resource values
      */
-    public static void sortAttributeChoices(AttributeDescriptor descriptor,
-            List<String> choices) {
+    public static void sortAttributeChoices(AttributeDescriptor descriptor, List<String> choices) {
         final IAttributeInfo attributeInfo = descriptor.getAttributeInfo();
         Collections.sort(choices, new Comparator<String>() {
             @Override
@@ -494,7 +473,7 @@ public class UiResourceAttributeNode extends UiTextAttributeNode {
             type = "drawable"; //$NON-NLS-1$
         } else if (attribute.equals("entries")) { //$NON-NLS-1$
             // Spinner
-            type = "array";    //$NON-NLS-1$
+            type = "array"; //$NON-NLS-1$
         }
 
         if (type != null) {

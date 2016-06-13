@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,11 +17,12 @@ import static org.eclipse.andmore.AndmoreAndroidConstants.MARKER_AAPT_COMPILE;
 import static org.eclipse.core.resources.IResource.DEPTH_ONE;
 import static org.eclipse.core.resources.IResource.DEPTH_ZERO;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.ide.common.resources.ScanningContext;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.common.resources.platform.AttributeInfo;
@@ -37,12 +35,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.ide.common.resources.ScanningContext;
+import com.android.utils.Pair;
 
 /**
  * An {@link IdeScanningContext} is a specialized {@link ScanningContext} which
@@ -68,8 +65,7 @@ public class IdeScanningContext extends ScanningContext {
      * @param validate if true, check that the attributes and resources are
      *            valid and if not request a full AAPT check
      */
-    public IdeScanningContext(@NonNull ResourceRepository repository, @NonNull IProject project,
-            boolean validate) {
+    public IdeScanningContext(@NonNull ResourceRepository repository, @NonNull IProject project, boolean validate) {
         super(repository);
         mProject = project;
         mValidate = validate;
@@ -89,7 +85,7 @@ public class IdeScanningContext extends ScanningContext {
         super.addError(error);
 
         if (mErrors == null) {
-            mErrors = new ArrayList<Pair<IResource,String>>();
+            mErrors = new ArrayList<Pair<IResource, String>>();
         }
         mErrors.add(Pair.of(mCurrentFile, error));
     }
@@ -174,11 +170,9 @@ public class IdeScanningContext extends ScanningContext {
             try {
                 int depth = resource instanceof IFolder ? DEPTH_ONE : DEPTH_ZERO;
                 if (resource.exists()) {
-                    IMarker[] markers = resource.findMarkers(IMarker.PROBLEM,
-                            true /*includeSubtypes*/, depth);
+                    IMarker[] markers = resource.findMarkers(IMarker.PROBLEM, true /*includeSubtypes*/, depth);
                     for (IMarker marker : markers) {
-                        if (marker.getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO) ==
-                                IMarker.SEVERITY_ERROR) {
+                        if (marker.getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO) == IMarker.SEVERITY_ERROR) {
                             return true;
                         }
                     }

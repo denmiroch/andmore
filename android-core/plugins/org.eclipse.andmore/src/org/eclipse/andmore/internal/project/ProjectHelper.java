@@ -499,8 +499,7 @@ public final class ProjectHelper {
             IFolder sourceFolder = project.getFolder(sourcePath);
             IPath fullPath = sourceFolder.getFullPath();
 
-            int found = ProjectHelper.findClasspathEntryByPath(entries, fullPath,
-                    IClasspathEntry.CPE_SOURCE);
+            int found = ProjectHelper.findClasspathEntryByPath(entries, fullPath, IClasspathEntry.CPE_SOURCE);
 
             if (!sourceFolder.isAccessible()) {
                 if (found != -1) {
@@ -510,8 +509,7 @@ public final class ProjectHelper {
             }
 
             if (found == -1) {
-                entries = ProjectHelper.addEntryToClasspath(entries,
-                        JavaCore.newSourceEntry(fullPath));
+                entries = ProjectHelper.addEntryToClasspath(entries, JavaCore.newSourceEntry(fullPath));
             }
         }
         return entries;

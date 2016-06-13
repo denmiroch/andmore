@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,8 +29,7 @@ public class AndroidDoubleClickStrategy extends XMLDoubleClickStrategy {
     /**
      * Creates a new {@linkplain AndroidDoubleClickStrategy}
      */
-    public AndroidDoubleClickStrategy() {
-    }
+    public AndroidDoubleClickStrategy() {}
 
     @Override
     protected void processElementDoubleClicked() {
@@ -46,8 +42,8 @@ public class AndroidDoubleClickStrategy extends XMLDoubleClickStrategy {
             int ns = regionText.indexOf(':');
             if (cursor > ns) {
                 int start = ns + 1;
-                fTextViewer.setSelectedRange(fStructuredDocumentRegion.getStartOffset(fTextRegion)
-                        + start,  fTextRegion.getTextLength() - start);
+                fTextViewer.setSelectedRange(fStructuredDocumentRegion.getStartOffset(fTextRegion) + start,
+                        fTextRegion.getTextLength() - start);
                 return;
             }
         }
@@ -68,8 +64,7 @@ public class AndroidDoubleClickStrategy extends XMLDoubleClickStrategy {
 
         // Special case: when you click on a resource identifier name, only select the
         // name portion
-        if (string.startsWith(PREFIX_RESOURCE_REF, position.x) ||
-                string.startsWith(PREFIX_THEME_REF, position.x)) {
+        if (string.startsWith(PREFIX_RESOURCE_REF, position.x) || string.startsWith(PREFIX_THEME_REF, position.x)) {
             int nameStart = string.indexOf('/', position.x + 1);
             if (nameStart != -1 && nameStart < cursor) {
                 position.x = nameStart + 1;

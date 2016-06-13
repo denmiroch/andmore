@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,7 +57,16 @@ import static org.eclipse.andmore.common.layout.GravityHelper.GRAVITY_RIGHT;
 import static org.eclipse.andmore.common.layout.GravityHelper.GRAVITY_TOP;
 import static org.eclipse.andmore.common.layout.GravityHelper.GRAVITY_VERT_MASK;
 
-import com.android.utils.Pair;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.common.layout.GravityHelper;
@@ -77,16 +83,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.utils.Pair;
 
 /**
  * Helper class which performs the bulk of the layout conversion to relative layout
@@ -109,8 +106,8 @@ class RelativeLayoutConversionHelper {
     private final CanvasViewInfo mRootView;
     private List<Element> mDeletedElements;
 
-    RelativeLayoutConversionHelper(ChangeLayoutRefactoring refactoring,
-            Element layout, boolean flatten, MultiTextEdit rootEdit, CanvasViewInfo rootView) {
+    RelativeLayoutConversionHelper(ChangeLayoutRefactoring refactoring, Element layout, boolean flatten,
+            MultiTextEdit rootEdit, CanvasViewInfo rootView) {
         mRefactoring = refactoring;
         mLayout = layout;
         mFlatten = flatten;
@@ -180,8 +177,8 @@ class RelativeLayoutConversionHelper {
         for (View view : views) {
             assert view.getLeftEdge() == left[view.mCol];
             assert view.getTopEdge() == top[view.mRow];
-            assert view.getRightEdge() == left[view.mCol+view.mColSpan];
-            assert view.getBottomEdge() == top[view.mRow+view.mRowSpan];
+            assert view.getRightEdge() == left[view.mCol + view.mColSpan];
+            assert view.getBottomEdge() == top[view.mRow + view.mRowSpan];
         }
 
         // Ensure that every view has a proper id such that it can be referred to
@@ -237,8 +234,8 @@ class RelativeLayoutConversionHelper {
      * Initializes the column and row indices, as well as any column span and row span
      * values
      */
-    private void initializeSpans(EdgeList edgeList, List<Integer> columnOffsets,
-            List<Integer> rowOffsets, Map<Integer, Integer> xToCol, Map<Integer, Integer> yToRow) {
+    private void initializeSpans(EdgeList edgeList, List<Integer> columnOffsets, List<Integer> rowOffsets,
+            Map<Integer, Integer> xToCol, Map<Integer, Integer> yToRow) {
         // Now initialize table view row, column and spans
         for (Integer offset : columnOffsets) {
             List<View> leftEdgeViews = edgeList.getLeftEdgeViews(offset);
@@ -284,12 +281,12 @@ class RelativeLayoutConversionHelper {
         String namespace = mRefactoring.getAndroidNamespacePrefix();
         for (View view : views) {
             for (Pair<String, String> constraint : view.getHorizConstraints()) {
-                mRefactoring.setAttribute(mRootEdit, view.mElement, ANDROID_URI,
-                        namespace, constraint.getFirst(), constraint.getSecond());
+                mRefactoring.setAttribute(mRootEdit, view.mElement, ANDROID_URI, namespace, constraint.getFirst(),
+                        constraint.getSecond());
             }
             for (Pair<String, String> constraint : view.getVerticalConstraints()) {
-                mRefactoring.setAttribute(mRootEdit, view.mElement, ANDROID_URI,
-                        namespace, constraint.getFirst(), constraint.getSecond());
+                mRefactoring.setAttribute(mRootEdit, view.mElement, ANDROID_URI, namespace, constraint.getFirst(),
+                        constraint.getSecond());
             }
         }
     }
@@ -372,11 +369,9 @@ class RelativeLayoutConversionHelper {
      * LinearLayouts with weight distribution.
      */
     private void analyzeLinearLayout(EdgeList edgeList, Element layout) {
-        boolean isVertical = VALUE_VERTICAL.equals(layout.getAttributeNS(ANDROID_URI,
-                ATTR_ORIENTATION));
+        boolean isVertical = VALUE_VERTICAL.equals(layout.getAttributeNS(ANDROID_URI, ATTR_ORIENTATION));
         View baselineRef = null;
-        if (!isVertical &&
-            !VALUE_FALSE.equals(layout.getAttributeNS(ANDROID_URI, ATTR_BASELINE_ALIGNED))) {
+        if (!isVertical && !VALUE_FALSE.equals(layout.getAttributeNS(ANDROID_URI, ATTR_BASELINE_ALIGNED))) {
             // Baseline alignment. Find the tallest child and set it as the baseline reference.
             int tallestHeight = 0;
             View tallest = null;
@@ -460,22 +455,18 @@ class RelativeLayoutConversionHelper {
                     View referenced = edgeList.getSharedTopEdge(layout);
                     if (referenced != null) {
                         if (isAncestor(referenced.getElement(), child)) {
-                            childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_TOP,
-                                VALUE_TRUE);
+                            childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_TOP, VALUE_TRUE);
                         } else {
-                            childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_TOP,
-                                    referenced.getId());
+                            childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_TOP, referenced.getId());
                         }
                     }
                 } else {
                     View referenced = edgeList.getSharedLeftEdge(layout);
                     if (referenced != null) {
                         if (isAncestor(referenced.getElement(), child)) {
-                            childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_LEFT,
-                                    VALUE_TRUE);
+                            childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_LEFT, VALUE_TRUE);
                         } else {
-                            childView.addHorizConstraint(
-                                    ATTR_LAYOUT_ALIGN_LEFT, referenced.getId());
+                            childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_LEFT, referenced.getId());
                         }
                     }
                 }
@@ -498,34 +489,28 @@ class RelativeLayoutConversionHelper {
                         View referenced = edgeList.getSharedBottomEdge(layout);
                         if (referenced != null) {
                             if (isAncestor(referenced.getElement(), child)) {
-                                childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_BOTTOM,
-                                    VALUE_TRUE);
+                                childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_BOTTOM, VALUE_TRUE);
                             } else {
-                                childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_BOTTOM,
-                                        referenced.getId());
+                                childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_BOTTOM, referenced.getId());
                             }
                         }
                     } else {
                         View referenced = edgeList.getSharedRightEdge(layout);
                         if (referenced != null) {
                             if (isAncestor(referenced.getElement(), child)) {
-                                childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_RIGHT,
-                                        VALUE_TRUE);
+                                childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_RIGHT, VALUE_TRUE);
                             } else {
-                                childView.addHorizConstraint(
-                                        ATTR_LAYOUT_ALIGN_RIGHT, referenced.getId());
+                                childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_RIGHT, referenced.getId());
                             }
                         }
                     }
                 }
             }
 
-            if (baselineRef != null && baselineRef.getId() != null
-                    && !baselineRef.getId().equals(childView.getId())) {
+            if (baselineRef != null && baselineRef.getId() != null && !baselineRef.getId().equals(childView.getId())) {
                 assert !isVertical;
                 // Only align if they share the same gravity
-                if ((childView.getGravity() & GRAVITY_VERT_MASK) ==
-                        (baselineRef.getGravity() & GRAVITY_VERT_MASK)) {
+                if ((childView.getGravity() & GRAVITY_VERT_MASK) == (baselineRef.getGravity() & GRAVITY_VERT_MASK)) {
                     childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_BASELINE, baselineRef.getId());
                 }
             }
@@ -539,8 +524,7 @@ class RelativeLayoutConversionHelper {
      * Checks the layout "gravity" value for the given child and updates the constraints
      * to account for the gravity
      */
-    private int analyzeGravity(EdgeList edgeList, Element layout, boolean isVertical,
-            Element child, View childView) {
+    private int analyzeGravity(EdgeList edgeList, Element layout, boolean isVertical, Element child, View childView) {
         // Use gravity to constrain elements in the axis orthogonal to the
         // direction of the layout
         int gravity = childView.getGravity();
@@ -549,11 +533,9 @@ class RelativeLayoutConversionHelper {
                 View referenced = edgeList.getSharedRightEdge(layout);
                 if (referenced != null) {
                     if (isAncestor(referenced.getElement(), child)) {
-                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_RIGHT,
-                                VALUE_TRUE);
+                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_RIGHT, VALUE_TRUE);
                     } else {
-                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_RIGHT,
-                                referenced.getId());
+                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_RIGHT, referenced.getId());
                     }
                 }
             } else if ((gravity & GRAVITY_CENTER_HORIZ) != 0) {
@@ -561,8 +543,7 @@ class RelativeLayoutConversionHelper {
                 View referenced2 = edgeList.getSharedRightEdge(layout);
                 if (referenced1 != null && referenced2 == referenced1) {
                     if (isAncestor(referenced1.getElement(), child)) {
-                        childView.addHorizConstraint(ATTR_LAYOUT_CENTER_HORIZONTAL,
-                                VALUE_TRUE);
+                        childView.addHorizConstraint(ATTR_LAYOUT_CENTER_HORIZONTAL, VALUE_TRUE);
                     }
                 }
             } else if ((gravity & GRAVITY_FILL_HORIZ) != 0) {
@@ -570,26 +551,20 @@ class RelativeLayoutConversionHelper {
                 View referenced2 = edgeList.getSharedRightEdge(layout);
                 if (referenced1 != null && referenced2 == referenced1) {
                     if (isAncestor(referenced1.getElement(), child)) {
-                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_LEFT,
-                                VALUE_TRUE);
-                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_RIGHT,
-                                VALUE_TRUE);
+                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_LEFT, VALUE_TRUE);
+                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_RIGHT, VALUE_TRUE);
                     } else {
-                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_LEFT,
-                                referenced1.getId());
-                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_RIGHT,
-                                referenced2.getId());
+                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_LEFT, referenced1.getId());
+                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_RIGHT, referenced2.getId());
                     }
                 }
             } else if ((gravity & GRAVITY_LEFT) != 0) {
                 View referenced = edgeList.getSharedLeftEdge(layout);
                 if (referenced != null) {
                     if (isAncestor(referenced.getElement(), child)) {
-                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_LEFT,
-                                VALUE_TRUE);
+                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_PARENT_LEFT, VALUE_TRUE);
                     } else {
-                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_LEFT,
-                                referenced.getId());
+                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_LEFT, referenced.getId());
                     }
                 }
             }
@@ -599,11 +574,9 @@ class RelativeLayoutConversionHelper {
                 View referenced = edgeList.getSharedBottomEdge(layout);
                 if (referenced != null) {
                     if (isAncestor(referenced.getElement(), child)) {
-                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_BOTTOM,
-                                VALUE_TRUE);
+                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_BOTTOM, VALUE_TRUE);
                     } else {
-                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_BOTTOM,
-                                referenced.getId());
+                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_BOTTOM, referenced.getId());
                     }
                 }
             } else if ((gravity & GRAVITY_CENTER_VERT) != 0) {
@@ -611,8 +584,7 @@ class RelativeLayoutConversionHelper {
                 View referenced2 = edgeList.getSharedBottomEdge(layout);
                 if (referenced1 != null && referenced2 == referenced1) {
                     if (isAncestor(referenced1.getElement(), child)) {
-                        childView.addVerticalConstraint(ATTR_LAYOUT_CENTER_VERTICAL,
-                                VALUE_TRUE);
+                        childView.addVerticalConstraint(ATTR_LAYOUT_CENTER_VERTICAL, VALUE_TRUE);
                     }
                 }
             } else if ((gravity & GRAVITY_FILL_VERT) != 0) {
@@ -620,26 +592,20 @@ class RelativeLayoutConversionHelper {
                 View referenced2 = edgeList.getSharedBottomEdge(layout);
                 if (referenced1 != null && referenced2 == referenced1) {
                     if (isAncestor(referenced1.getElement(), child)) {
-                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_TOP,
-                                VALUE_TRUE);
-                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_BOTTOM,
-                                VALUE_TRUE);
+                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_TOP, VALUE_TRUE);
+                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_BOTTOM, VALUE_TRUE);
                     } else {
-                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_TOP,
-                                referenced1.getId());
-                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_BOTTOM,
-                                referenced2.getId());
+                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_TOP, referenced1.getId());
+                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_BOTTOM, referenced2.getId());
                     }
                 }
             } else if ((gravity & GRAVITY_TOP) != 0) {
                 View referenced = edgeList.getSharedTopEdge(layout);
                 if (referenced != null) {
                     if (isAncestor(referenced.getElement(), child)) {
-                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_TOP,
-                                VALUE_TRUE);
+                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_PARENT_TOP, VALUE_TRUE);
                     } else {
-                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_TOP,
-                                referenced.getId());
+                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_TOP, referenced.getId());
                     }
                 }
             }
@@ -658,15 +624,13 @@ class RelativeLayoutConversionHelper {
         String height = child.getAttributeNS(ANDROID_URI, ATTR_LAYOUT_HEIGHT);
         // 0dip, 0dp, 0px, etc
         if (height != null && height.startsWith("0")) { //$NON-NLS-1$
-            mRefactoring.setAttribute(mRootEdit, child, ANDROID_URI,
-                    mRefactoring.getAndroidNamespacePrefix(), ATTR_LAYOUT_HEIGHT,
-                    VALUE_WRAP_CONTENT);
+            mRefactoring.setAttribute(mRootEdit, child, ANDROID_URI, mRefactoring.getAndroidNamespacePrefix(),
+                    ATTR_LAYOUT_HEIGHT, VALUE_WRAP_CONTENT);
         }
         String width = child.getAttributeNS(ANDROID_URI, ATTR_LAYOUT_WIDTH);
         if (width != null && width.startsWith("0")) { //$NON-NLS-1$
-            mRefactoring.setAttribute(mRootEdit, child, ANDROID_URI,
-                    mRefactoring.getAndroidNamespacePrefix(), ATTR_LAYOUT_WIDTH,
-                    VALUE_WRAP_CONTENT);
+            mRefactoring.setAttribute(mRootEdit, child, ANDROID_URI, mRefactoring.getAndroidNamespacePrefix(),
+                    ATTR_LAYOUT_WIDTH, VALUE_WRAP_CONTENT);
         }
     }
 
@@ -692,8 +656,7 @@ class RelativeLayoutConversionHelper {
                     Attr attribute = (Attr) attributes.item(j);
                     String name = attribute.getLocalName();
                     String value = attribute.getValue();
-                    if (name.equals(ATTR_LAYOUT_WIDTH)
-                            || name.equals(ATTR_LAYOUT_HEIGHT)) {
+                    if (name.equals(ATTR_LAYOUT_WIDTH) || name.equals(ATTR_LAYOUT_HEIGHT)) {
                         // Ignore these for now
                     } else if (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)
                             && ANDROID_URI.equals(attribute.getNamespaceURI())) {
@@ -704,17 +667,14 @@ class RelativeLayoutConversionHelper {
                             if (referenced != null) {
                                 // This is a valid reference, so preserve
                                 // the attribute
-                                if (name.equals(ATTR_LAYOUT_BELOW) ||
-                                        name.equals(ATTR_LAYOUT_ABOVE) ||
-                                        name.equals(ATTR_LAYOUT_ALIGN_TOP) ||
-                                        name.equals(ATTR_LAYOUT_ALIGN_BOTTOM) ||
-                                        name.equals(ATTR_LAYOUT_ALIGN_BASELINE)) {
+                                if (name.equals(ATTR_LAYOUT_BELOW) || name.equals(ATTR_LAYOUT_ABOVE)
+                                        || name.equals(ATTR_LAYOUT_ALIGN_TOP) || name.equals(ATTR_LAYOUT_ALIGN_BOTTOM)
+                                        || name.equals(ATTR_LAYOUT_ALIGN_BASELINE)) {
                                     // Vertical constraint
                                     childView.addVerticalConstraint(name, value);
-                                } else if (name.equals(ATTR_LAYOUT_ALIGN_LEFT) ||
-                                        name.equals(ATTR_LAYOUT_TO_LEFT_OF) ||
-                                        name.equals(ATTR_LAYOUT_TO_RIGHT_OF) ||
-                                        name.equals(ATTR_LAYOUT_ALIGN_RIGHT)) {
+                                } else if (name.equals(ATTR_LAYOUT_ALIGN_LEFT) || name.equals(ATTR_LAYOUT_TO_LEFT_OF)
+                                        || name.equals(ATTR_LAYOUT_TO_RIGHT_OF)
+                                        || name.equals(ATTR_LAYOUT_ALIGN_RIGHT)) {
                                     // Horizontal constraint
                                     childView.addHorizConstraint(name, value);
                                 } else {
@@ -738,8 +698,7 @@ class RelativeLayoutConversionHelper {
                                     if (isAncestor(referenced.getElement(), child)) {
                                         childView.addHorizConstraint(name, VALUE_TRUE);
                                     } else {
-                                        childView.addHorizConstraint(
-                                                ATTR_LAYOUT_ALIGN_LEFT, referenced.getId());
+                                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_LEFT, referenced.getId());
                                     }
                                     remove = false;
                                 }
@@ -749,8 +708,7 @@ class RelativeLayoutConversionHelper {
                                     if (isAncestor(referenced.getElement(), child)) {
                                         childView.addHorizConstraint(name, VALUE_TRUE);
                                     } else {
-                                        childView.addHorizConstraint(
-                                            ATTR_LAYOUT_ALIGN_RIGHT, referenced.getId());
+                                        childView.addHorizConstraint(ATTR_LAYOUT_ALIGN_RIGHT, referenced.getId());
                                     }
                                     remove = false;
                                 }
@@ -760,8 +718,7 @@ class RelativeLayoutConversionHelper {
                                     if (isAncestor(referenced.getElement(), child)) {
                                         childView.addVerticalConstraint(name, VALUE_TRUE);
                                     } else {
-                                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_TOP,
-                                                referenced.getId());
+                                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_TOP, referenced.getId());
                                     }
                                     remove = false;
                                 }
@@ -771,15 +728,13 @@ class RelativeLayoutConversionHelper {
                                     if (isAncestor(referenced.getElement(), child)) {
                                         childView.addVerticalConstraint(name, VALUE_TRUE);
                                     } else {
-                                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_BOTTOM,
-                                                referenced.getId());
+                                        childView.addVerticalConstraint(ATTR_LAYOUT_ALIGN_BOTTOM, referenced.getId());
                                     }
                                     remove = false;
                                 }
                             }
 
-                            boolean alignWithParent =
-                                    name.equals(ATTR_LAYOUT_ALIGN_WITH_PARENT_MISSING);
+                            boolean alignWithParent = name.equals(ATTR_LAYOUT_ALIGN_WITH_PARENT_MISSING);
                             if (remove && alignWithParent) {
                                 // TODO - look for this one AFTER we have processed
                                 // everything else, and then set constraints as necessary
@@ -874,8 +829,7 @@ class RelativeLayoutConversionHelper {
                         } else if (attachLeftProperty != null) {
                             view.addHorizConstraint(attachLeftProperty, attachLeftValue);
                             if (marginLeft > 0) {
-                                view.addHorizConstraint(ATTR_LAYOUT_MARGIN_LEFT,
-                                        String.format(VALUE_N_DP, marginLeft));
+                                view.addHorizConstraint(ATTR_LAYOUT_MARGIN_LEFT, String.format(VALUE_N_DP, marginLeft));
                                 marginLeft = 0;
                             }
                         } else {
@@ -1304,10 +1258,8 @@ class RelativeLayoutConversionHelper {
         private int mColSpan = -1;
         private CanvasViewInfo mInfo;
         private String mId;
-        private List<Pair<String, String>> mHorizConstraints =
-            new ArrayList<Pair<String, String>>(4);
-        private List<Pair<String, String>> mVerticalConstraints =
-            new ArrayList<Pair<String, String>>(4);
+        private List<Pair<String, String>> mHorizConstraints = new ArrayList<Pair<String, String>>(4);
+        private List<Pair<String, String>> mVerticalConstraints = new ArrayList<Pair<String, String>>(4);
         private int mGravity;
 
         public View(CanvasViewInfo view, Element element) {
@@ -1483,6 +1435,7 @@ class RelativeLayoutConversionHelper {
         public List<Integer> getColumnOffsets() {
             return getOffsets(mLeft.keySet(), mRight.keySet());
         }
+
         public List<Integer> getRowOffsets() {
             return getOffsets(mTop.keySet(), mBottom.keySet());
         }
@@ -1540,12 +1493,10 @@ class RelativeLayoutConversionHelper {
                         if (parentBounds.y == childViewBounds.y) {
                             mSharedTopEdge.put(childViewElement, parentElement);
                         }
-                        if (parentBounds.x + parentBounds.width == childViewBounds.x
-                                + childViewBounds.width) {
+                        if (parentBounds.x + parentBounds.width == childViewBounds.x + childViewBounds.width) {
                             mSharedRightEdge.put(childViewElement, parentElement);
                         }
-                        if (parentBounds.y + parentBounds.height == childViewBounds.y
-                                + childViewBounds.height) {
+                        if (parentBounds.y + parentBounds.height == childViewBounds.y + childViewBounds.height) {
                             mSharedBottomEdge.put(childViewElement, parentElement);
                         }
                     }

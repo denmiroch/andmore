@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,35 +67,31 @@ public final class MenuDescriptors implements IDescriptorProvider {
         //  - sub items cannot contain anything
 
         if (mDescriptor == null) {
-            mDescriptor = createElement(styleMap,
-                TAG_MENU, // xmlName
-                "Menu", // uiName,
-                null, // TODO SDK URL
-                null, // extraAttribute
-                null, // childrenElements,
-                true /* mandatory */);
+            mDescriptor = createElement(styleMap, TAG_MENU, // xmlName
+                    "Menu", // uiName,
+                    null, // TODO SDK URL
+                    null, // extraAttribute
+                    null, // childrenElements,
+                    true /* mandatory */);
         }
 
         // -- sub menu can have sub_items, sub_groups but not sub_menus
 
-        ElementDescriptor sub_item = createElement(styleMap,
-                "item", // xmlName //$NON-NLS-1$
+        ElementDescriptor sub_item = createElement(styleMap, "item", // xmlName //$NON-NLS-1$
                 "Item", // uiName,
                 null, // TODO SDK URL
                 null, // extraAttribute
                 null, // childrenElements,
                 false /* mandatory */);
 
-        ElementDescriptor sub_group = createElement(styleMap,
-                "group", // xmlName //$NON-NLS-1$
+        ElementDescriptor sub_group = createElement(styleMap, "group", // xmlName //$NON-NLS-1$
                 "Group", // uiName,
                 null, // TODO SDK URL
                 null, // extraAttribute
                 new ElementDescriptor[] { sub_item }, // childrenElements,
                 false /* mandatory */);
 
-        ElementDescriptor sub_menu = createElement(styleMap,
-                TAG_MENU, // xmlName
+        ElementDescriptor sub_menu = createElement(styleMap, TAG_MENU, // xmlName
                 "Sub-Menu", // uiName,
                 null, // TODO SDK URL
                 null, // extraAttribute
@@ -107,24 +100,21 @@ public final class MenuDescriptors implements IDescriptorProvider {
 
         // -- top menu can have all top groups and top items (which can have sub menus)
 
-        ElementDescriptor top_item = createElement(styleMap,
-                "item", // xmlName //$NON-NLS-1$
+        ElementDescriptor top_item = createElement(styleMap, "item", // xmlName //$NON-NLS-1$
                 "Item", // uiName,
                 null, // TODO SDK URL
                 null, // extraAttribute
                 new ElementDescriptor[] { sub_menu }, // childrenElements,
                 false /* mandatory */);
 
-        ElementDescriptor top_group = createElement(styleMap,
-                "group", // xmlName //$NON-NLS-1$
+        ElementDescriptor top_group = createElement(styleMap, "group", // xmlName //$NON-NLS-1$
                 "Group", // uiName,
                 null, // TODO SDK URL
                 null, // extraAttribute
                 new ElementDescriptor[] { top_item }, // childrenElements,
                 false /* mandatory */);
 
-        XmlnsAttributeDescriptor xmlns = new XmlnsAttributeDescriptor(ANDROID_NS_NAME,
-                ANDROID_URI);
+        XmlnsAttributeDescriptor xmlns = new XmlnsAttributeDescriptor(ANDROID_NS_NAME, ANDROID_URI);
 
         updateElement(mDescriptor, styleMap, "Menu", xmlns); //$NON-NLS-1$
         mDescriptor.setChildren(new ElementDescriptor[] { top_item, top_group });
@@ -134,38 +124,29 @@ public final class MenuDescriptors implements IDescriptorProvider {
      * Returns a new ElementDescriptor constructed from the information given here
      * and the javadoc & attributes extracted from the style map if any.
      */
-    private ElementDescriptor createElement(
-            Map<String, DeclareStyleableInfo> styleMap,
-            String xmlName, String uiName, String sdkUrl,
-            AttributeDescriptor extraAttribute,
-            ElementDescriptor[] childrenElements, boolean mandatory) {
+    private ElementDescriptor createElement(Map<String, DeclareStyleableInfo> styleMap, String xmlName, String uiName,
+            String sdkUrl, AttributeDescriptor extraAttribute, ElementDescriptor[] childrenElements,
+            boolean mandatory) {
 
-        ElementDescriptor element = new ElementDescriptor(xmlName, uiName, null, sdkUrl,
-                null, childrenElements, mandatory);
+        ElementDescriptor element = new ElementDescriptor(xmlName, uiName, null, sdkUrl, null, childrenElements,
+                mandatory);
 
-        return updateElement(element, styleMap,
-                getStyleName(xmlName),
-                extraAttribute);
+        return updateElement(element, styleMap, getStyleName(xmlName), extraAttribute);
     }
 
     /**
      * Updates an ElementDescriptor with the javadoc & attributes extracted from the style
      * map if any.
      */
-    private ElementDescriptor updateElement(ElementDescriptor element,
-            Map<String, DeclareStyleableInfo> styleMap,
-            String styleName,
-            AttributeDescriptor extraAttribute) {
+    private ElementDescriptor updateElement(ElementDescriptor element, Map<String, DeclareStyleableInfo> styleMap,
+            String styleName, AttributeDescriptor extraAttribute) {
         ArrayList<AttributeDescriptor> descs = new ArrayList<AttributeDescriptor>();
 
         DeclareStyleableInfo style = styleMap != null ? styleMap.get(styleName) : null;
         if (style != null) {
-            DescriptorsUtils.appendAttributes(descs,
-                    null,   // elementName
-                    ANDROID_URI,
-                    style.getAttributes(),
-                    null,   // requiredAttributes
-                    null);  // overrides
+            DescriptorsUtils.appendAttributes(descs, null, // elementName
+                    ANDROID_URI, style.getAttributes(), null, // requiredAttributes
+                    null); // overrides
             element.setTooltip(style.getJavaDoc());
         }
 

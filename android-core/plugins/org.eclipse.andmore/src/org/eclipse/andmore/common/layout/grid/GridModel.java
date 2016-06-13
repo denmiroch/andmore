@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,17 +43,6 @@ import static org.eclipse.andmore.common.layout.GravityHelper.GRAVITY_CENTER_HOR
 import static org.eclipse.andmore.common.layout.GravityHelper.GRAVITY_CENTER_VERT;
 import static org.eclipse.andmore.common.layout.GravityHelper.GRAVITY_RIGHT;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.IClientRulesEngine;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.IViewMetadata;
-import com.android.ide.common.api.Margins;
-import com.android.ide.common.api.Rect;
-import com.android.utils.Pair;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
@@ -74,6 +60,17 @@ import java.util.Set;
 
 import org.eclipse.andmore.common.layout.GravityHelper;
 import org.eclipse.andmore.common.layout.GridLayoutRule;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.IClientRulesEngine;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.IViewMetadata;
+import com.android.ide.common.api.Margins;
+import com.android.ide.common.api.Rect;
+import com.android.utils.Pair;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /** Models a GridLayout */
 public class GridModel {
@@ -184,9 +181,7 @@ public class GridModel {
      * @return a new model
      */
     @NonNull
-    public static GridModel get(
-            @NonNull IClientRulesEngine rulesEngine,
-            @NonNull INode node,
+    public static GridModel get(@NonNull IClientRulesEngine rulesEngine, @NonNull INode node,
             @Nullable Object viewObject) {
         if (viewObject != null && viewObject == sCachedViewObject.get()) {
             GridModel model = sCachedViewModel.get();
@@ -291,10 +286,8 @@ public class GridModel {
                         // Even views that do have baselines do not count towards a row
                         // baseline if they have a vertical gravity
                         String gravity = getGridAttribute(view.node, ATTR_LAYOUT_GRAVITY);
-                        if (gravity == null
-                                || !(gravity.contains(VALUE_TOP)
-                                        || gravity.contains(VALUE_BOTTOM)
-                                        || gravity.contains(VALUE_CENTER_VERTICAL))) {
+                        if (gravity == null || !(gravity.contains(VALUE_TOP) || gravity.contains(VALUE_BOTTOM)
+                                || gravity.contains(VALUE_CENTER_VERTICAL))) {
                             // Compute baseline relative to the row, not the view itself
                             baseline += view.node.getBounds().y - getRowY(row);
                             break;
@@ -315,8 +308,7 @@ public class GridModel {
         }
 
         // Also fix the columnCount
-        if (getGridAttribute(layout, ATTR_COLUMN_COUNT) != null &&
-                declaredColumnCount > actualColumnCount) {
+        if (getGridAttribute(layout, ATTR_COLUMN_COUNT) != null && declaredColumnCount > actualColumnCount) {
             setGridAttribute(layout, ATTR_COLUMN_COUNT, actualColumnCount);
         }
     }
@@ -416,8 +408,7 @@ public class GridModel {
 
         // Assign row/column positions to all cells that do not explicitly define them
         if (!assignRowsAndColumnsFromViews(mChildViews)) {
-            assignRowsAndColumnsFromXml(
-                    declaredRowCount == UNDEFINED ? children.length : declaredRowCount,
+            assignRowsAndColumnsFromXml(declaredRowCount == UNDEFINED ? children.length : declaredRowCount,
                     declaredColumnCount == UNDEFINED ? children.length : declaredColumnCount);
         }
 
@@ -617,7 +608,7 @@ public class GridModel {
                 Object layoutParams = getLayoutParams.invoke(child);
                 if (rowSpecField == null) {
                     Class<? extends Object> layoutParamsClass = layoutParams.getClass();
-                    rowSpecField = layoutParamsClass.getDeclaredField("rowSpec");    //$NON-NLS-1$
+                    rowSpecField = layoutParamsClass.getDeclaredField("rowSpec"); //$NON-NLS-1$
                     colSpecField = layoutParamsClass.getDeclaredField("columnSpec"); //$NON-NLS-1$
                     rowSpecField.setAccessible(true);
                     colSpecField.setAccessible(true);
@@ -835,8 +826,7 @@ public class GridModel {
                 int y2 = bounds.y2();
                 int column = view.column;
                 int row = view.row;
-                int targetColumn = min(actualColumnCount - 1,
-                        column + view.columnSpan - 1);
+                int targetColumn = min(actualColumnCount - 1, column + view.columnSpan - 1);
                 int targetRow = min(actualRowCount - 1, row + view.rowSpan - 1);
                 IViewMetadata metadata = mRulesEngine.getMetadata(view.node.getFqcn());
                 if (metadata != null) {
@@ -846,12 +836,10 @@ public class GridModel {
                         y2 -= insets.bottom;
                     }
                 }
-                if (mMaxRight[targetColumn] < x2
-                        && ((view.gravity & (GRAVITY_CENTER_HORIZ | GRAVITY_RIGHT)) == 0)) {
+                if (mMaxRight[targetColumn] < x2 && ((view.gravity & (GRAVITY_CENTER_HORIZ | GRAVITY_RIGHT)) == 0)) {
                     mMaxRight[targetColumn] = x2;
                 }
-                if (mMaxBottom[targetRow] < y2
-                        && ((view.gravity & (GRAVITY_CENTER_VERT | GRAVITY_BOTTOM)) == 0)) {
+                if (mMaxBottom[targetRow] < y2 && ((view.gravity & (GRAVITY_CENTER_VERT | GRAVITY_BOTTOM)) == 0)) {
                     mMaxBottom[targetRow] = y2;
                 }
             }
@@ -934,8 +922,7 @@ public class GridModel {
      * @param x the x position of the column we're inserting
      * @return the column spacer
      */
-    public INode addColumn(int newColumn, INode newView, int columnWidthDp,
-            boolean split, int row, int x) {
+    public INode addColumn(int newColumn, INode newView, int columnWidthDp, boolean split, int row, int x) {
         // Insert a new column
         actualColumnCount++;
         if (declaredColumnCount != UNDEFINED) {
@@ -967,11 +954,9 @@ public class GridModel {
                             index++;
                         }
 
-                        ViewData newViewData = addSpacer(layout, index,
-                                split ? row : UNDEFINED,
+                        ViewData newViewData = addSpacer(layout, index, split ? row : UNDEFINED,
                                 split ? newColumn - 1 : UNDEFINED,
-                                columnWidthDp != UNDEFINED ? columnWidthDp : DEFAULT_CELL_WIDTH,
-                                DEFAULT_CELL_HEIGHT);
+                                columnWidthDp != UNDEFINED ? columnWidthDp : DEFAULT_CELL_WIDTH, DEFAULT_CELL_HEIGHT);
                         newViewData.column = newColumn - 1;
                         newViewData.row = row;
                         newView = newViewData.node;
@@ -1013,9 +998,8 @@ public class GridModel {
             }
             if (split) {
                 assert newView == null;
-                addSpacer(layout, -1, row, newColumn -1,
-                        columnWidthDp != UNDEFINED ? columnWidthDp : DEFAULT_CELL_WIDTH,
-                                SPACER_SIZE_DP);
+                addSpacer(layout, -1, row, newColumn - 1,
+                        columnWidthDp != UNDEFINED ? columnWidthDp : DEFAULT_CELL_WIDTH, SPACER_SIZE_DP);
             }
         }
 
@@ -1067,17 +1051,16 @@ public class GridModel {
                     if (view.columnSpan > 1) {
                         // Make a new spacer which is the width of the following
                         // columns
-                        int columnWidth = getColumnWidth(removedColumn, view.columnSpan) -
-                                getColumnWidth(removedColumn, 1);
+                        int columnWidth = getColumnWidth(removedColumn, view.columnSpan)
+                                - getColumnWidth(removedColumn, 1);
                         int columnWidthDip = mRulesEngine.pxToDp(columnWidth);
-                        ViewData spacer = addSpacer(layout, index, UNDEFINED, UNDEFINED,
-                                columnWidthDip, SPACER_SIZE_DP);
+                        ViewData spacer = addSpacer(layout, index, UNDEFINED, UNDEFINED, columnWidthDip,
+                                SPACER_SIZE_DP);
                         spacer.row = 0;
                         spacer.column = removedColumn;
                     }
                     layout.removeChild(view.node);
-                } else if (view.column < removedColumn
-                        && view.column + view.columnSpan > removedColumn) {
+                } else if (view.column < removedColumn && view.column + view.columnSpan > removedColumn) {
                     // Subtract column span to skip this item
                     view.columnSpan--;
                     setColumnSpanAttribute(view.node, view.columnSpan);
@@ -1094,8 +1077,7 @@ public class GridModel {
         if (removedViews.size() <= 2) {
             mChildViews.removeAll(removedViews);
         } else {
-            List<ViewData> remaining =
-                    new ArrayList<ViewData>(mChildViews.size() - removedViews.size());
+            List<ViewData> remaining = new ArrayList<ViewData>(mChildViews.size() - removedViews.size());
             for (ViewData view : mChildViews) {
                 if (!removedViews.contains(view)) {
                     remaining.add(view);
@@ -1105,7 +1087,7 @@ public class GridModel {
         }
 
         //if (declaredColumnCount != UNDEFINED) {
-            setGridAttribute(layout, ATTR_COLUMN_COUNT, actualColumnCount);
+        setGridAttribute(layout, ATTR_COLUMN_COUNT, actualColumnCount);
         //}
 
     }
@@ -1147,8 +1129,7 @@ public class GridModel {
      * @param y the y position of the row we're inserting
      * @return the row spacer
      */
-    public INode addRow(int newRow, INode newView, int rowHeightDp, boolean split,
-            int column, int y) {
+    public INode addRow(int newRow, INode newView, int rowHeightDp, boolean split, int column, int y) {
         actualRowCount++;
         if (declaredRowCount != UNDEFINED) {
             declaredRowCount++;
@@ -1167,11 +1148,9 @@ public class GridModel {
                         if (declaredColumnCount != UNDEFINED && !split) {
                             setGridAttribute(layout, ATTR_COLUMN_COUNT, declaredColumnCount);
                         }
-                        ViewData newViewData = addSpacer(layout, index,
-                                    split ? newRow - 1 : UNDEFINED,
-                                    split ? column : UNDEFINED,
-                                    SPACER_SIZE_DP,
-                                    rowHeightDp != UNDEFINED ? rowHeightDp : DEFAULT_CELL_HEIGHT);
+                        ViewData newViewData = addSpacer(layout, index, split ? newRow - 1 : UNDEFINED,
+                                split ? column : UNDEFINED, SPACER_SIZE_DP,
+                                rowHeightDp != UNDEFINED ? rowHeightDp : DEFAULT_CELL_HEIGHT);
                         newViewData.column = column;
                         newViewData.row = newRow - 1;
                         newView = newViewData.node;
@@ -1206,8 +1185,7 @@ public class GridModel {
         if (!added) {
             // Append a row at the end
             if (newView == null) {
-                ViewData newViewData = addSpacer(layout, -1, UNDEFINED, UNDEFINED,
-                        SPACER_SIZE_DP,
+                ViewData newViewData = addSpacer(layout, -1, UNDEFINED, UNDEFINED, SPACER_SIZE_DP,
                         rowHeightDp != UNDEFINED ? rowHeightDp : DEFAULT_CELL_HEIGHT);
                 newViewData.column = column;
                 // TODO: MAke sure this row number is right!
@@ -1270,15 +1248,14 @@ public class GridModel {
                     // We don't have to worry about a rowSpan > 1 here, because even
                     // if it is, those rowspans are not used to assign default row/column
                     // positions for other cells
-// TODO: Check this; it differs from the removeColumns logic!
+                    // TODO: Check this; it differs from the removeColumns logic!
                     layout.removeChild(view.node);
                 } else if (view.row > removedRow) {
                     view.row--;
                     if (getGridAttribute(view.node, ATTR_LAYOUT_ROW) != null) {
                         setGridAttribute(view.node, ATTR_LAYOUT_ROW, view.row);
                     }
-                } else if (view.row < removedRow
-                        && view.row + view.rowSpan > removedRow) {
+                } else if (view.row < removedRow && view.row + view.rowSpan > removedRow) {
                     // Subtract row span to skip this item
                     view.rowSpan--;
                     setRowSpanAttribute(view.node, view.rowSpan);
@@ -1290,8 +1267,7 @@ public class GridModel {
         if (removedViews.size() <= 2) {
             mChildViews.removeAll(removedViews);
         } else {
-            List<ViewData> remaining =
-                    new ArrayList<ViewData>(mChildViews.size() - removedViews.size());
+            List<ViewData> remaining = new ArrayList<ViewData>(mChildViews.size() - removedViews.size());
             for (ViewData view : mChildViews) {
                 if (!removedViews.contains(view)) {
                     remaining.add(view);
@@ -1525,8 +1501,7 @@ public class GridModel {
      * @return the bounds, in pixels, of the given cell
      */
     public Rect getCellBounds(int row, int column, int rowSpan, int columnSpan) {
-        return new Rect(getColumnX(column), getRowY(row),
-                getColumnWidth(column, columnSpan),
+        return new Rect(getColumnX(column), getRowY(row), getColumnWidth(column, columnSpan),
                 getRowHeight(row, rowSpan));
     }
 
@@ -1712,10 +1687,9 @@ public class GridModel {
                 //  (3) the new column is within the last cell and the cell has gravity
                 //      right or gravity center
                 int endColumn = column + view.columnSpan;
-                if (endColumn > newColumn
-                        || endColumn == newColumn && (view.node.getBounds().x2() > x
-                                || GravityHelper.isConstrainedHorizontally(view.gravity)
-                                    &&  !GravityHelper.isLeftAligned(view.gravity))) {
+                if (endColumn > newColumn || endColumn == newColumn
+                        && (view.node.getBounds().x2() > x || GravityHelper.isConstrainedHorizontally(view.gravity)
+                                && !GravityHelper.isLeftAligned(view.gravity))) {
                     // This cell spans the new insert position, so increment the column span
                     view.columnSpan += insertMarginColumn ? 2 : 1;
                     setColumnSpanAttribute(node, view.columnSpan);
@@ -1735,16 +1709,14 @@ public class GridModel {
                 prevColumnSpacer.node.setAttribute(ANDROID_URI, ATTR_LAYOUT_WIDTH,
                         String.format(VALUE_N_DP, remaining));
                 prevColumnSpacer.column = insertMarginColumn ? newColumn + 1 : newColumn;
-                setGridAttribute(prevColumnSpacer.node, ATTR_LAYOUT_COLUMN,
-                        prevColumnSpacer.column);
+                setGridAttribute(prevColumnSpacer.node, ATTR_LAYOUT_COLUMN, prevColumnSpacer.column);
             }
         }
 
         if (columnWidthDp > 0) {
             int index = prevColumnSpacer != null ? prevColumnSpacer.index : -1;
 
-            addSpacer(layout, index, 0, insertMarginColumn ? newColumn : newColumn - 1,
-                columnWidthDp, SPACER_SIZE_DP);
+            addSpacer(layout, index, 0, insertMarginColumn ? newColumn : newColumn - 1, columnWidthDp, SPACER_SIZE_DP);
         }
     }
 
@@ -1797,10 +1769,9 @@ public class GridModel {
                 //}
             } else if (!view.isSpacer()) {
                 int endRow = row + view.rowSpan;
-                if (endRow > newRow
-                        || endRow == newRow && (view.node.getBounds().y2() > y
-                                || GravityHelper.isConstrainedVertically(view.gravity)
-                                    && !GravityHelper.isTopAligned(view.gravity))) {
+                if (endRow > newRow || endRow == newRow
+                        && (view.node.getBounds().y2() > y || GravityHelper.isConstrainedVertically(view.gravity)
+                                && !GravityHelper.isTopAligned(view.gravity))) {
                     // This cell spans the new insert position, so increment the row span
                     view.rowSpan += insertMarginRow ? 2 : 1;
                     setRowSpanAttribute(node, view.rowSpan);
@@ -1817,8 +1788,7 @@ public class GridModel {
             int dp = mRulesEngine.pxToDp(px);
             int remaining = dp - rowHeightDp;
             if (remaining > 0) {
-                prevRowSpacer.node.setAttribute(ANDROID_URI, ATTR_LAYOUT_HEIGHT,
-                        String.format(VALUE_N_DP, remaining));
+                prevRowSpacer.node.setAttribute(ANDROID_URI, ATTR_LAYOUT_HEIGHT, String.format(VALUE_N_DP, remaining));
                 prevRowSpacer.row = insertMarginRow ? newRow + 1 : newRow;
                 setGridAttribute(prevRowSpacer.node, ATTR_LAYOUT_ROW, prevRowSpacer.row);
             }
@@ -1826,8 +1796,7 @@ public class GridModel {
 
         if (rowHeightDp > 0) {
             int index = prevRowSpacer != null ? prevRowSpacer.index : -1;
-            addSpacer(layout, index, insertMarginRow ? newRow : newRow - 1,
-                    0, SPACER_SIZE_DP, rowHeightDp);
+            addSpacer(layout, index, insertMarginRow ? newRow : newRow - 1, 0, SPACER_SIZE_DP, rowHeightDp);
         }
     }
 
@@ -1868,8 +1837,7 @@ public class GridModel {
                 id = "<unknownid>"; //$NON-NLS-1$
                 String fqn = node.getFqcn();
                 fqn = fqn.substring(fqn.lastIndexOf('.') + 1);
-                id = fqn + "-"
-                        + Integer.toString(System.identityHashCode(node)).substring(0, 3);
+                id = fqn + "-" + Integer.toString(System.identityHashCode(node)).substring(0, 3);
             }
 
             return id;
@@ -1885,12 +1853,12 @@ public class GridModel {
          */
         boolean isColumnSpacer() {
             return isSpacer() &&
-                // Any spacer not found in column 0 is a column spacer since we
-                // place all horizontal spacers in column 0
-                ((column > 0)
-                // TODO: Find a cleaner way. Maybe set ids on the elements in (0,0) and
-                // for column distinguish by id. Or at least only do this for column 0!
-                || !SPACER_SIZE.equals(node.getStringAttr(ANDROID_URI, ATTR_LAYOUT_WIDTH)));
+            // Any spacer not found in column 0 is a column spacer since we
+            // place all horizontal spacers in column 0
+                    ((column > 0)
+                            // TODO: Find a cleaner way. Maybe set ids on the elements in (0,0) and
+                            // for column distinguish by id. Or at least only do this for column 0!
+                            || !SPACER_SIZE.equals(node.getStringAttr(ANDROID_URI, ATTR_LAYOUT_WIDTH)));
         }
 
         /**
@@ -1898,12 +1866,12 @@ public class GridModel {
          */
         boolean isRowSpacer() {
             return isSpacer() &&
-                // Any spacer not found in row 0 is a row spacer since we
-                // place all vertical spacers in row 0
-                ((row > 0)
-                // TODO: Find a cleaner way. Maybe set ids on the elements in (0,0) and
-                // for column distinguish by id. Or at least only do this for column 0!
-                || !SPACER_SIZE.equals(node.getStringAttr(ANDROID_URI, ATTR_LAYOUT_HEIGHT)));
+            // Any spacer not found in row 0 is a row spacer since we
+            // place all vertical spacers in row 0
+                    ((row > 0)
+                            // TODO: Find a cleaner way. Maybe set ids on the elements in (0,0) and
+                            // for column distinguish by id. Or at least only do this for column 0!
+                            || !SPACER_SIZE.equals(node.getStringAttr(ANDROID_URI, ATTR_LAYOUT_HEIGHT)));
         }
     }
 
@@ -2045,7 +2013,6 @@ public class GridModel {
         rowMap[actualRowCount] = newRow;
         assert rowMap[0] == 0;
 
-
         // Adjust column and row numbers to account for deletions: for a given cell, if it
         // is to the right of a deleted column, reduce its column number, and if it only
         // spans across the deleted column, reduce its column span.
@@ -2055,8 +2022,7 @@ public class GridModel {
             }
             int newColumnStart = columnMap[Math.min(columnMap.length - 1, view.column)];
             // Gracefully handle rogue/invalid columnSpans in the XML
-            int newColumnEnd = columnMap[Math.min(columnMap.length - 1,
-                    view.column + view.columnSpan)];
+            int newColumnEnd = columnMap[Math.min(columnMap.length - 1, view.column + view.columnSpan)];
             if (newColumnStart != view.column) {
                 view.column = newColumnStart;
                 setGridAttribute(view.node, ATTR_LAYOUT_COLUMN, view.column);
@@ -2069,7 +2035,6 @@ public class GridModel {
                     setColumnSpanAttribute(view.node, view.columnSpan);
                 } // else: merging spacing columns together
             }
-
 
             int newRowStart = rowMap[Math.min(rowMap.length - 1, view.row)];
             int newRowEnd = rowMap[Math.min(rowMap.length - 1, view.row + view.rowSpan)];
@@ -2154,10 +2119,10 @@ public class GridModel {
             start = end;
         }
         actualColumnCount = newColumn;
-//if (usedColumns.contains(newColumn)) {
-//    // TODO: This may be totally wrong for right aligned content!
-//    actualColumnCount++;
-//}
+        //if (usedColumns.contains(newColumn)) {
+        //    // TODO: This may be totally wrong for right aligned content!
+        //    actualColumnCount++;
+        //}
 
         // Merge spacers for rows
         start = 0;
@@ -2226,16 +2191,15 @@ public class GridModel {
             start = end;
         }
         actualRowCount = newRow;
-//        if (usedRows.contains(newRow)) {
-//            actualRowCount++;
-//        }
+        //        if (usedRows.contains(newRow)) {
+        //            actualRowCount++;
+        //        }
 
         // Update the model: remove removed children from the view data list
         if (removedViews.size() <= 2) {
             mChildViews.removeAll(removedViews);
         } else {
-            List<ViewData> remaining =
-                    new ArrayList<ViewData>(mChildViews.size() - removedViews.size());
+            List<ViewData> remaining = new ArrayList<ViewData>(mChildViews.size() - removedViews.size());
             for (ViewData view : mChildViews) {
                 if (!removedViews.contains(view)) {
                     remaining.add(view);
@@ -2267,8 +2231,7 @@ public class GridModel {
      * @param heightDp the height in device independent pixels to assign to the spacer
      * @return the newly added spacer
      */
-    ViewData addSpacer(INode parent, int index, int row, int column,
-            int widthDp, int heightDp) {
+    ViewData addSpacer(INode parent, int index, int row, int column, int widthDp, int heightDp) {
         INode spacer;
 
         String tag = FQCN_SPACE;
@@ -2295,12 +2258,10 @@ public class GridModel {
             setGridAttribute(spacer, ATTR_LAYOUT_COLUMN, column);
         }
         if (widthDp > 0) {
-            spacer.setAttribute(ANDROID_URI, ATTR_LAYOUT_WIDTH,
-                    String.format(VALUE_N_DP, widthDp));
+            spacer.setAttribute(ANDROID_URI, ATTR_LAYOUT_WIDTH, String.format(VALUE_N_DP, widthDp));
         }
         if (heightDp > 0) {
-            spacer.setAttribute(ANDROID_URI, ATTR_LAYOUT_HEIGHT,
-                    String.format(VALUE_N_DP, heightDp));
+            spacer.setAttribute(ANDROID_URI, ATTR_LAYOUT_HEIGHT, String.format(VALUE_N_DP, heightDp));
         }
 
         // Temporary hack
@@ -2322,7 +2283,6 @@ public class GridModel {
                     + Integer.toString(System.identityHashCode(spacer)).substring(0, 3);
             spacer.setAttribute(ANDROID_URI, ATTR_ID, id);
         }
-
 
         return view;
     }

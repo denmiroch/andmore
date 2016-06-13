@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +16,12 @@ import static com.android.SdkConstants.CLASS_VIEW;
 import static com.android.SdkConstants.CLASS_VIEWGROUP;
 import static com.android.SdkConstants.FN_FRAMEWORK_LIBRARY;
 
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
@@ -51,12 +53,7 @@ import org.eclipse.jdt.internal.core.ResolvedBinaryType;
 import org.eclipse.jdt.internal.core.ResolvedSourceType;
 import org.eclipse.swt.widgets.Display;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.android.utils.Pair;
 
 /**
  * The {@link CustomViewFinder} can look up the custom views and third party views
@@ -159,8 +156,7 @@ public class CustomViewFinder {
     }
 
     public Collection<String> getThirdPartyViews() {
-        return mThirdPartyViews == null
-            ? null : Collections.unmodifiableCollection(mThirdPartyViews);
+        return mThirdPartyViews == null ? null : Collections.unmodifiableCollection(mThirdPartyViews);
     }
 
     public Collection<String> getAllViews() {
@@ -184,20 +180,19 @@ public class CustomViewFinder {
      * @return a pair of lists, the first containing custom views and the second
      *         containing 3rd party views
      */
-    public static Pair<List<String>,List<String>> findViews(
-            final IProject project, boolean layoutsOnly) {
+    public static Pair<List<String>, List<String>> findViews(final IProject project, boolean layoutsOnly) {
         CustomViewFinder finder = get(project);
 
         return finder.findViews(layoutsOnly);
     }
 
-    private Pair<List<String>,List<String>> findViews(final boolean layoutsOnly) {
+    private Pair<List<String>, List<String>> findViews(final boolean layoutsOnly) {
         final Set<String> customViews = new HashSet<String>();
         final Set<String> thirdPartyViews = new HashSet<String>();
 
         ProjectState state = Sdk.getProjectState(mProject);
-        final List<IProject> libraries = state != null
-            ? state.getFullLibraryProjects() : Collections.<IProject>emptyList();
+        final List<IProject> libraries = state != null ? state.getFullLibraryProjects()
+                : Collections.<IProject> emptyList();
 
         SearchRequestor requestor = new SearchRequestor() {
             @Override
@@ -250,22 +245,18 @@ public class CustomViewFinder {
                 if (viewType != null) {
                     IJavaSearchScope scope = SearchEngine.createHierarchyScope(viewType);
                     SearchParticipant[] participants = new SearchParticipant[] {
-                        SearchEngine.getDefaultSearchParticipant()
-                    };
+                            SearchEngine.getDefaultSearchParticipant() };
                     int matchRule = SearchPattern.R_PATTERN_MATCH | SearchPattern.R_CASE_SENSITIVE;
 
-                    SearchPattern pattern = SearchPattern.createPattern("*",
-                            IJavaSearchConstants.CLASS, IJavaSearchConstants.IMPLEMENTORS,
-                            matchRule);
+                    SearchPattern pattern = SearchPattern.createPattern("*", IJavaSearchConstants.CLASS,
+                            IJavaSearchConstants.IMPLEMENTORS, matchRule);
                     SearchEngine engine = new SearchEngine();
-                    engine.search(pattern, participants, scope, requestor,
-                            new NullProgressMonitor());
+                    engine.search(pattern, participants, scope, requestor, new NullProgressMonitor());
                 }
             }
         } catch (CoreException e) {
             AndmoreAndroidPlugin.log(e, null);
         }
-
 
         List<String> custom = new ArrayList<String>(customViews);
         List<String> thirdParty = new ArrayList<String>(thirdPartyViews);
@@ -284,8 +275,7 @@ public class CustomViewFinder {
      * list of custom views or third party views. It checks that the view is public and
      * not abstract for example.
      */
-    private static boolean isValidView(IType type, boolean layoutsOnly)
-            throws JavaModelException {
+    private static boolean isValidView(IType type, boolean layoutsOnly) throws JavaModelException {
         // Skip anonymous classes
         if (type.isAnonymous()) {
             return false;
@@ -324,19 +314,19 @@ public class CustomViewFinder {
             // JDT's Signature.createTypeSignature("Context", false /*isResolved*/);.
             // This is not a typo; they were copy/pasted from the actual parameter names
             // observed in the debugger examining these data structures.
-            if (first.equals("QContext;")                                   //$NON-NLS-1$
-                    || first.equals("Qandroid.content.Context;")) {         //$NON-NLS-1$
+            if (first.equals("QContext;") //$NON-NLS-1$
+                    || first.equals("Qandroid.content.Context;")) { //$NON-NLS-1$
                 if (parameterTypes.length == 1) {
                     return true;
                 }
                 String second = parameterTypes[1];
-                if (second.equals("QAttributeSet;")                         //$NON-NLS-1$
-                        || second.equals("Qandroid.util.AttributeSet;")) {  //$NON-NLS-1$
+                if (second.equals("QAttributeSet;") //$NON-NLS-1$
+                        || second.equals("Qandroid.util.AttributeSet;")) { //$NON-NLS-1$
                     if (parameterTypes.length == 2) {
                         return true;
                     }
                     String third = parameterTypes[2];
-                    if (third.equals("I")) {                                //$NON-NLS-1$
+                    if (third.equals("I")) { //$NON-NLS-1$
                         if (parameterTypes.length == 3) {
                             return true;
                         }
@@ -366,6 +356,7 @@ public class CustomViewFinder {
             super("Find Custom Views");
             setSystem(true);
         }
+
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             Pair<List<String>, List<String>> views = findViews(false);
@@ -376,10 +367,8 @@ public class CustomViewFinder {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    Collection<String> customViews =
-                        Collections.unmodifiableCollection(mCustomViews);
-                    Collection<String> thirdPartyViews =
-                        Collections.unmodifiableCollection(mThirdPartyViews);
+                    Collection<String> customViews = Collections.unmodifiableCollection(mCustomViews);
+                    Collection<String> thirdPartyViews = Collections.unmodifiableCollection(mThirdPartyViews);
                     synchronized (this) {
                         for (Listener l : mListeners) {
                             l.viewsUpdated(customViews, thirdPartyViews);

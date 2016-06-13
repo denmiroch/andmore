@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,27 +27,27 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public class AdtUtils {
 
-	/**
-	 * Exports APK in release mode, signing the package with the given
-	 * certificate/key
-	 * 
-	 * @throws CoreException
-	 */
-	public static void exportReleaseApk(IProject project, File outputFile, PrivateKey key, X509Certificate certificate,
-			IProgressMonitor monitor) throws CoreException {
-		ExportHelper exportHelper = new ExportHelper();
-		ExportHelper.exportReleaseApk(project, outputFile, key, certificate, monitor);
-	}
+    /**
+     * Exports APK in release mode, signing the package with the given
+     * certificate/key
+     * 
+     * @throws CoreException
+     */
+    public static void exportReleaseApk(IProject project, File outputFile, PrivateKey key, X509Certificate certificate,
+            IProgressMonitor monitor) throws CoreException {
+        ExportHelper exportHelper = new ExportHelper();
+        ExportHelper.exportReleaseApk(project, outputFile, key, certificate, monitor);
+    }
 
-	/**
-	 * Exports APK in release mode, without signing
-	 * 
-	 * @throws CoreException
-	 */
-	public static void exportUnsignedReleaseApk(IProject project, File outputFile, IProgressMonitor monitor)
-			throws CoreException {
-		ExportHelper exportHelper = new ExportHelper();
-		ExportHelper.exportReleaseApk(project, outputFile, null, null, monitor);
-	}
+    /**
+     * Exports APK in release mode, without signing
+     * 
+     * @throws CoreException
+     */
+    public static void exportUnsignedReleaseApk(IProject project, File outputFile, IProgressMonitor monitor)
+            throws CoreException {
+        ExportHelper exportHelper = new ExportHelper();
+        ExportHelper.exportReleaseApk(project, outputFile, null, null, monitor);
+    }
 
 }

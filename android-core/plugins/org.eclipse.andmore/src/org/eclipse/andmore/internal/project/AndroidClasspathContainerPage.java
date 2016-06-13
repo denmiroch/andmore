@@ -1,21 +1,19 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  *******************************************************************************/
 
 package org.eclipse.andmore.internal.project;
+
+import java.util.Arrays;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.core.resources.IProject;
@@ -38,10 +36,8 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import java.util.Arrays;
-
-public class AndroidClasspathContainerPage extends WizardPage implements IClasspathContainerPage,
-        IClasspathContainerPageExtension {
+public class AndroidClasspathContainerPage extends WizardPage
+        implements IClasspathContainerPage, IClasspathContainerPageExtension {
 
     private IProject mOwnerProject;
 
@@ -65,12 +61,11 @@ public class AndroidClasspathContainerPage extends WizardPage implements IClassp
     public IClasspathEntry getSelection() {
         IPath path = new Path(AndmoreAndroidConstants.CONTAINER_FRAMEWORK);
 
-        final int index = this.mProjectsCombo.getSelectionIndex();
+        final int index = mProjectsCombo.getSelectionIndex();
         if (index != -1) {
-            final String selectedProjectName = this.mProjectsCombo.getItem(index);
+            final String selectedProjectName = mProjectsCombo.getItem(index);
 
-            if (this.mOwnerProject == null
-                    || !selectedProjectName.equals(this.mOwnerProject.getName())) {
+            if (mOwnerProject == null || !selectedProjectName.equals(mOwnerProject.getName())) {
                 path = path.append(selectedProjectName);
             }
         }
@@ -83,11 +78,11 @@ public class AndroidClasspathContainerPage extends WizardPage implements IClassp
         final IPath path = cpentry == null ? null : cpentry.getPath();
 
         if (path == null || path.segmentCount() == 1) {
-            if (this.mOwnerProject != null) {
-                this.mLibsProjectName = this.mOwnerProject.getName();
+            if (mOwnerProject != null) {
+                mLibsProjectName = mOwnerProject.getName();
             }
         } else {
-            this.mLibsProjectName = path.segment(1);
+            mLibsProjectName = path.segment(1);
         }
     }
 
@@ -101,15 +96,15 @@ public class AndroidClasspathContainerPage extends WizardPage implements IClassp
 
         final String[] androidProjects = getAndroidProjects();
 
-        this.mProjectsCombo = new Combo(composite, SWT.READ_ONLY);
-        this.mProjectsCombo.setItems(androidProjects);
+        mProjectsCombo = new Combo(composite, SWT.READ_ONLY);
+        mProjectsCombo.setItems(androidProjects);
 
         final int index;
 
-        if (this.mOwnerProject != null) {
-            index = indexOf(androidProjects, this.mLibsProjectName);
+        if (mOwnerProject != null) {
+            index = indexOf(androidProjects, mLibsProjectName);
         } else {
-            if (this.mProjectsCombo.getItemCount() > 0) {
+            if (mProjectsCombo.getItemCount() > 0) {
                 index = 0;
             } else {
                 index = -1;
@@ -117,14 +112,14 @@ public class AndroidClasspathContainerPage extends WizardPage implements IClassp
         }
 
         if (index != -1) {
-            this.mProjectsCombo.select(index);
+            mProjectsCombo.select(index);
         }
 
         final GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.minimumWidth = 100;
 
-        this.mProjectsCombo.setLayoutData(gd);
+        mProjectsCombo.setLayoutData(gd);
 
         setControl(composite);
     }
@@ -174,7 +169,7 @@ public class AndroidClasspathContainerPage extends WizardPage implements IClassp
 
     @Override
     public void initialize(final IJavaProject project, final IClasspathEntry[] currentEntries) {
-        this.mOwnerProject = (project == null ? null : project.getProject());
+        mOwnerProject = (project == null ? null : project.getProject());
     }
 
     private static String[] getAndroidProjects() {

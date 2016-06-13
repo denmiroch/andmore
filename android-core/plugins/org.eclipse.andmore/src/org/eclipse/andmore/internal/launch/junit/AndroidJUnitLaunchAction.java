@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,7 @@
  */
 package org.eclipse.andmore.internal.launch.junit;
 
-import com.android.ddmlib.IDevice;
-import com.google.common.base.Joiner;
+import java.util.Collection;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.launch.DelayedLaunchInfo;
@@ -37,7 +33,8 @@ import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.eclipse.swt.widgets.Display;
 
-import java.util.Collection;
+import com.android.ddmlib.IDevice;
+import com.google.common.base.Joiner;
 
 /**
  * A launch action that executes a instrumentation test run on an Android device.
@@ -65,21 +62,19 @@ class AndroidJUnitLaunchAction implements IAndroidLaunchAction {
      */
     @Override
     public boolean doLaunchAction(DelayedLaunchInfo info, Collection<IDevice> devices) {
-        String msg = String.format(LaunchMessages.AndroidJUnitLaunchAction_LaunchInstr_2s,
-                mLaunchInfo.getRunner(), JOINER.join(devices));
+        String msg = String.format(LaunchMessages.AndroidJUnitLaunchAction_LaunchInstr_2s, mLaunchInfo.getRunner(),
+                JOINER.join(devices));
         AndmoreAndroidPlugin.printToConsole(info.getProject(), msg);
 
         try {
-           mLaunchInfo.setDebugMode(info.isDebugMode());
-           mLaunchInfo.setDevices(devices);
-           JUnitLaunchDelegate junitDelegate = new JUnitLaunchDelegate(mLaunchInfo);
-           final String mode = info.isDebugMode() ? ILaunchManager.DEBUG_MODE :
-               ILaunchManager.RUN_MODE;
+            mLaunchInfo.setDebugMode(info.isDebugMode());
+            mLaunchInfo.setDevices(devices);
+            JUnitLaunchDelegate junitDelegate = new JUnitLaunchDelegate(mLaunchInfo);
+            final String mode = info.isDebugMode() ? ILaunchManager.DEBUG_MODE : ILaunchManager.RUN_MODE;
 
-           junitDelegate.launch(info.getLaunch().getLaunchConfiguration(), mode, info.getLaunch(),
-                   info.getMonitor());
+            junitDelegate.launch(info.getLaunch().getLaunchConfiguration(), mode, info.getLaunch(), info.getMonitor());
 
-           // TODO: need to add AMReceiver-type functionality somewhere
+            // TODO: need to add AMReceiver-type functionality somewhere
         } catch (CoreException e) {
             AndmoreAndroidPlugin.printErrorToConsole(info.getProject(),
                     LaunchMessages.AndroidJUnitLaunchAction_LaunchFail);
@@ -92,8 +87,7 @@ class AndroidJUnitLaunchAction implements IAndroidLaunchAction {
      */
     @Override
     public String getLaunchDescription() {
-        return String.format(LaunchMessages.AndroidJUnitLaunchAction_LaunchDesc_s,
-                mLaunchInfo.getRunner());
+        return String.format(LaunchMessages.AndroidJUnitLaunchAction_LaunchDesc_s, mLaunchInfo.getRunner());
     }
 
     /**
@@ -111,8 +105,8 @@ class AndroidJUnitLaunchAction implements IAndroidLaunchAction {
          * @see org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
          */
         @Override
-        public synchronized void launch(ILaunchConfiguration configuration, String mode,
-                ILaunch launch, IProgressMonitor monitor) throws CoreException {
+        public synchronized void launch(ILaunchConfiguration configuration, String mode, ILaunch launch,
+                IProgressMonitor monitor) throws CoreException {
             // TODO: is progress monitor adjustment needed here?
             super.launch(configuration, mode, launch, monitor);
         }
@@ -161,11 +155,10 @@ class AndroidJUnitLaunchAction implements IAndroidLaunchAction {
          * @throws CoreException
          */
         @Override
-        public void run(final VMRunnerConfiguration config, ILaunch launch,
-                IProgressMonitor monitor) throws CoreException {
+        public void run(final VMRunnerConfiguration config, ILaunch launch, IProgressMonitor monitor)
+                throws CoreException {
 
-            TestRunnerProcess runnerProcess =
-                new TestRunnerProcess(config, mJUnitInfo);
+            TestRunnerProcess runnerProcess = new TestRunnerProcess(config, mJUnitInfo);
             launch.addProcess(runnerProcess);
             runnerProcess.run();
         }
@@ -174,7 +167,7 @@ class AndroidJUnitLaunchAction implements IAndroidLaunchAction {
     /**
      * Launch process that executes the tests.
      */
-    private static class TestRunnerProcess implements IProcess  {
+    private static class TestRunnerProcess implements IProcess {
 
         private final VMRunnerConfiguration mRunConfig;
         private final AndroidJUnitLaunchInfo mJUnitInfo;
@@ -290,4 +283,3 @@ class AndroidJUnitLaunchAction implements IAndroidLaunchAction {
         }
     }
 }
-

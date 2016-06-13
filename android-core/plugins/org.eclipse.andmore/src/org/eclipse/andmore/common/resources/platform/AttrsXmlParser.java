@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,16 +15,6 @@ package org.eclipse.andmore.common.resources.platform;
 
 import static com.android.SdkConstants.DOT_LAYOUT_PARAMS;
 import static org.eclipse.andmore.AndmoreAndroidConstants.DOC_HIDE;
-
-import com.android.ide.common.api.IAttributeInfo.Format;
-import com.android.utils.ILogger;
-import com.google.common.collect.Maps;
-
-import org.eclipse.andmore.AdtUtils;
-import org.eclipse.andmore.common.resources.platform.ViewClassInfo.LayoutParamsInfo;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,12 +30,22 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.common.resources.platform.ViewClassInfo.LayoutParamsInfo;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import com.android.ide.common.api.IAttributeInfo.Format;
+import com.android.utils.ILogger;
+import com.google.common.collect.Maps;
+
 /**
  * Parser for attributes description files.
  */
 public final class AttrsXmlParser {
 
-    public static final String ANDROID_MANIFEST_STYLEABLE = "AndroidManifest";  //$NON-NLS-1$
+    public static final String ANDROID_MANIFEST_STYLEABLE = "AndroidManifest"; //$NON-NLS-1$
 
     private Document mDocument;
     private String mOsAttrsXmlPath;
@@ -58,8 +55,7 @@ public final class AttrsXmlParser {
     private Map<String, AttributeInfo> mAttributeMap;
 
     /** Map of all attribute names for a given element */
-    private final Map<String, DeclareStyleableInfo> mStyleMap =
-        new HashMap<String, DeclareStyleableInfo>();
+    private final Map<String, DeclareStyleableInfo> mStyleMap = new HashMap<String, DeclareStyleableInfo>();
 
     /** Map from format name (lower case) to the uppercase version */
     private Map<String, Format> mFormatNames = new HashMap<String, Format>(10);
@@ -115,10 +111,7 @@ public final class AttrsXmlParser {
      * @param log A logger object. Must not be null.
      * @param expectedAttributeCount expected number of attributes in the file
      */
-    public AttrsXmlParser(
-            String osAttrsXmlPath,
-            AttrsXmlParser inheritableAttributes,
-            ILogger log,
+    public AttrsXmlParser(String osAttrsXmlPath, AttrsXmlParser inheritableAttributes, ILogger log,
             int expectedAttributeCount) {
         mOsAttrsXmlPath = osAttrsXmlPath;
         mLog = log;
@@ -128,11 +121,10 @@ public final class AttrsXmlParser {
 
         mAttributeMap = Maps.newHashMapWithExpectedSize(expectedAttributeCount);
         if (inheritableAttributes == null) {
-            mEnumFlagValues = new HashMap<String, Map<String,Integer>>();
+            mEnumFlagValues = new HashMap<String, Map<String, Integer>>();
         } else {
             mAttributeMap.putAll(inheritableAttributes.mAttributeMap);
-            mEnumFlagValues = new HashMap<String, Map<String,Integer>>(
-                                                         inheritableAttributes.mEnumFlagValues);
+            mEnumFlagValues = new HashMap<String, Map<String, Integer>>(inheritableAttributes.mEnumFlagValues);
         }
 
         // Pre-compute the set of format names such that we don't have to compute the uppercase
@@ -164,9 +156,7 @@ public final class AttrsXmlParser {
         }
 
         Node res = doc.getFirstChild();
-        while (res != null &&
-                res.getNodeType() != Node.ELEMENT_NODE &&
-                !res.getNodeName().equals("resources")) { //$NON-NLS-1$
+        while (res != null && res.getNodeType() != Node.ELEMENT_NODE && !res.getNodeName().equals("resources")) { //$NON-NLS-1$
             res = res.getNextSibling();
         }
 
@@ -209,8 +199,7 @@ public final class AttrsXmlParser {
             // Transforms "LinearLayout" and "LayoutParams" into "LinearLayout_Layout".
             ViewClassInfo viewLayoutClass = info.getViewLayoutClass();
             String xmlName = String.format("%1$s_%2$s", //$NON-NLS-1$
-                    viewLayoutClass.getShortClassName(),
-                    info.getShortClassName());
+                    viewLayoutClass.getShortClassName(), info.getShortClassName());
             xmlName = AdtUtils.stripSuffix(xmlName, "Params"); //$NON-NLS-1$
 
             DeclareStyleableInfo style = mStyleMap.get(xmlName);
@@ -282,42 +271,41 @@ public final class AttrsXmlParser {
         Node lastComment = null;
         for (Node node = res.getFirstChild(); node != null; node = node.getNextSibling()) {
             switch (node.getNodeType()) {
-            case Node.COMMENT_NODE:
-                lastComment = node;
-                break;
-            case Node.ELEMENT_NODE:
-                if (node.getNodeName().equals("declare-styleable")) {          //$NON-NLS-1$
-                    Node nameNode = node.getAttributes().getNamedItem("name"); //$NON-NLS-1$
-                    if (nameNode != null) {
-                        String name = nameNode.getNodeValue();
+                case Node.COMMENT_NODE:
+                    lastComment = node;
+                    break;
+                case Node.ELEMENT_NODE:
+                    if (node.getNodeName().equals("declare-styleable")) { //$NON-NLS-1$
+                        Node nameNode = node.getAttributes().getNamedItem("name"); //$NON-NLS-1$
+                        if (nameNode != null) {
+                            String name = nameNode.getNodeValue();
 
-                        Node parentNode = node.getAttributes().getNamedItem("parent"); //$NON-NLS-1$
-                        String parents = parentNode == null ? null : parentNode.getNodeValue();
+                            Node parentNode = node.getAttributes().getNamedItem("parent"); //$NON-NLS-1$
+                            String parents = parentNode == null ? null : parentNode.getNodeValue();
 
-                        if (name != null && !mStyleMap.containsKey(name)) {
-                            DeclareStyleableInfo style = parseDeclaredStyleable(name, node);
-                            if (parents != null) {
-                                String[] parentsArray =
-                                    parseStyleableParents(parents, mStyleMap, unknownParents);
-                                style.setParents(parentsArray);
-                            }
-                            mStyleMap.put(name, style);
-                            unknownParents.remove(name);
-                            if (lastComment != null) {
-                                String nodeValue = lastComment.getNodeValue();
-                                if (nodeValue.contains(DOC_HIDE)) {
-                                    mStyleMap.remove(name);
-                                } else {
-                                    style.setJavaDoc(parseJavadoc(nodeValue));
+                            if (name != null && !mStyleMap.containsKey(name)) {
+                                DeclareStyleableInfo style = parseDeclaredStyleable(name, node);
+                                if (parents != null) {
+                                    String[] parentsArray = parseStyleableParents(parents, mStyleMap, unknownParents);
+                                    style.setParents(parentsArray);
+                                }
+                                mStyleMap.put(name, style);
+                                unknownParents.remove(name);
+                                if (lastComment != null) {
+                                    String nodeValue = lastComment.getNodeValue();
+                                    if (nodeValue.contains(DOC_HIDE)) {
+                                        mStyleMap.remove(name);
+                                    } else {
+                                        style.setJavaDoc(parseJavadoc(nodeValue));
+                                    }
                                 }
                             }
                         }
+                    } else if (node.getNodeName().equals("attr")) { //$NON-NLS-1$
+                        parseAttr(node, lastComment);
                     }
-                } else if (node.getNodeName().equals("attr")) {                //$NON-NLS-1$
-                    parseAttr(node, lastComment);
-                }
-                lastComment = null;
-                break;
+                    lastComment = null;
+                    break;
             }
         }
 
@@ -326,7 +314,7 @@ public final class AttrsXmlParser {
             String name = entry.getKey();
             String parent = entry.getValue();
 
-            DeclareStyleableInfo style = new DeclareStyleableInfo(name, (AttributeInfo[])null);
+            DeclareStyleableInfo style = new DeclareStyleableInfo(name, (AttributeInfo[]) null);
             if (parent != null) {
                 style.setParents(new String[] { parent });
             }
@@ -341,8 +329,7 @@ public final class AttrsXmlParser {
                     // parent. Simplify the children name.
                     String newName = ANDROID_MANIFEST_STYLEABLE + key.substring(name.length());
 
-                    DeclareStyleableInfo newStyle =
-                        new DeclareStyleableInfo(newName, mStyleMap.get(key));
+                    DeclareStyleableInfo newStyle = new DeclareStyleableInfo(newName, mStyleMap.get(key));
                     mStyleMap.remove(key);
                     mStyleMap.put(newName, newStyle);
                 }
@@ -379,13 +366,12 @@ public final class AttrsXmlParser {
      * @param unknownParents A map of all unknown parents collected here.
      * @return The array of terminal parent names parsed from the parents string.
      */
-    private String[] parseStyleableParents(String parents,
-            Map<String, DeclareStyleableInfo> knownParents,
+    private String[] parseStyleableParents(String parents, Map<String, DeclareStyleableInfo> knownParents,
             Map<String, String> unknownParents) {
 
         ArrayList<String> result = new ArrayList<String>();
 
-        for (String parent : parents.split("[ \t\n\r\f,|]")) {          //$NON-NLS-1$
+        for (String parent : parents.split("[ \t\n\r\f,|]")) { //$NON-NLS-1$
             parent = parent.trim();
             if (parent.length() == 0) {
                 continue;
@@ -394,7 +380,7 @@ public final class AttrsXmlParser {
                 // This is a grand-parent/parent chain. Make sure we know about the
                 // parents and only record the terminal one.
                 String last = null;
-                for (String name : parent.split("\\.")) {          //$NON-NLS-1$
+                for (String name : parent.split("\\.")) { //$NON-NLS-1$
                     if (name.length() > 0) {
                         if (!knownParents.containsKey(name)) {
                             // Record this unknown parent and its grand parent.
@@ -454,27 +440,24 @@ public final class AttrsXmlParser {
      * @param styleName The name of the declare-styleable node
      * @param declareStyleableNode The declare-styleable node itself
      */
-    private DeclareStyleableInfo parseDeclaredStyleable(String styleName,
-            Node declareStyleableNode) {
+    private DeclareStyleableInfo parseDeclaredStyleable(String styleName, Node declareStyleableNode) {
         ArrayList<AttributeInfo> attrs = new ArrayList<AttributeInfo>();
         Node lastComment = null;
-        for (Node node = declareStyleableNode.getFirstChild();
-             node != null;
-             node = node.getNextSibling()) {
+        for (Node node = declareStyleableNode.getFirstChild(); node != null; node = node.getNextSibling()) {
 
             switch (node.getNodeType()) {
-            case Node.COMMENT_NODE:
-                lastComment = node;
-                break;
-            case Node.ELEMENT_NODE:
-                if (node.getNodeName().equals("attr")) {                       //$NON-NLS-1$
-                    AttributeInfo info = parseAttr(node, lastComment);
-                    if (info != null) {
-                        attrs.add(info);
+                case Node.COMMENT_NODE:
+                    lastComment = node;
+                    break;
+                case Node.ELEMENT_NODE:
+                    if (node.getNodeName().equals("attr")) { //$NON-NLS-1$
+                        AttributeInfo info = parseAttr(node, lastComment);
+                        if (info != null) {
+                            attrs.add(info);
+                        }
                     }
-                }
-                lastComment = null;
-                break;
+                    lastComment = null;
+                    break;
             }
 
         }
@@ -509,11 +492,9 @@ public final class AttrsXmlParser {
             for (String f : attrFormat.getNodeValue().split("\\|")) { //$NON-NLS-1$
                 Format format = mFormatNames.get(f);
                 if (format == null) {
-                    mLog.info(
-                        "Unknown format name '%s' in <attr name=\"%s\">, file '%s'.", //$NON-NLS-1$
-                        f, name, getOsAttrsXmlPath());
-                } else if (format != AttributeInfo.Format.ENUM &&
-                        format != AttributeInfo.Format.FLAG) {
+                    mLog.info("Unknown format name '%s' in <attr name=\"%s\">, file '%s'.", //$NON-NLS-1$
+                            f, name, getOsAttrsXmlPath());
+                } else if (format != AttributeInfo.Format.ENUM && format != AttributeInfo.Format.FLAG) {
                     if (formats == null) {
                         formats = format.asSet();
                     } else {
@@ -584,10 +565,9 @@ public final class AttrsXmlParser {
         ArrayList<String> names = null;
         for (Node child = attrNode.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getNodeType() == Node.ELEMENT_NODE && child.getNodeName().equals(filter)) {
-                Node nameNode = child.getAttributes().getNamedItem("name");  //$NON-NLS-1$
+                Node nameNode = child.getAttributes().getNamedItem("name"); //$NON-NLS-1$
                 if (nameNode == null) {
-                    mLog.warning(
-                            "Missing name attribute in <attr name=\"%s\"><%s></attr>", //$NON-NLS-1$
+                    mLog.warning("Missing name attribute in <attr name=\"%s\"><%s></attr>", //$NON-NLS-1$
                             attrName, filter);
                 } else {
                     if (names == null) {
@@ -596,11 +576,10 @@ public final class AttrsXmlParser {
                     String name = nameNode.getNodeValue();
                     names.add(name);
 
-                    Node valueNode = child.getAttributes().getNamedItem("value");  //$NON-NLS-1$
+                    Node valueNode = child.getAttributes().getNamedItem("value"); //$NON-NLS-1$
                     if (valueNode == null) {
-                        mLog.warning(
-                            "Missing value attribute in <attr name=\"%s\"><%s name=\"%s\"></attr>", //$NON-NLS-1$
-                            attrName, filter, name);
+                        mLog.warning("Missing value attribute in <attr name=\"%s\"><%s name=\"%s\"></attr>", //$NON-NLS-1$
+                                attrName, filter, name);
                     } else {
                         String value = valueNode.getNodeValue();
                         try {
@@ -614,7 +593,7 @@ public final class AttrsXmlParser {
                             }
                             map.put(name, Integer.valueOf(i));
 
-                        } catch(NumberFormatException e) {
+                        } catch (NumberFormatException e) {
                             mLog.error(e,
                                     "Value in <attr name=\"%s\"><%s name=\"%s\" value=\"%s\"></attr> is not a valid decimal or hexadecimal", //$NON-NLS-1$
                                     attrName, filter, name, value);
@@ -661,7 +640,6 @@ public final class AttrsXmlParser {
 
         return comment;
     }
-
 
     /**
      * Parses the javadoc and extract the first @deprecated tag, if any.

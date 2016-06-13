@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,8 @@
  */
 package org.eclipse.andmore.internal.refactorings.extractstring;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.JavaModelException;
@@ -58,16 +55,14 @@ public class ExtractStringProposal implements IJavaCompletionProposal {
         int length = coveringNode.getLength();
         ITextSelection selection = new TextSelection(start, length);
 
-        ExtractStringRefactoring refactoring = new ExtractStringRefactoring(file, editor,
-                selection);
+        ExtractStringRefactoring refactoring = new ExtractStringRefactoring(file, editor, selection);
 
         RefactoringWizard wizard = new ExtractStringWizard(refactoring, file.getProject());
         RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
         try {
             IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             op.run(window.getShell(), wizard.getDefaultPageTitle());
-        } catch (InterruptedException e) {
-        }
+        } catch (InterruptedException e) {}
     }
 
     @Override
@@ -120,8 +115,7 @@ public class ExtractStringProposal implements IJavaCompletionProposal {
             ASTNode parent = coveringNode.getParent();
             if (parent != null) {
                 int type = parent.getNodeType();
-                if (type == ASTNode.ASSIGNMENT
-                        || type == ASTNode.VARIABLE_DECLARATION_STATEMENT
+                if (type == ASTNode.ASSIGNMENT || type == ASTNode.VARIABLE_DECLARATION_STATEMENT
                         || type == ASTNode.VARIABLE_DECLARATION_FRAGMENT
                         || type == ASTNode.VARIABLE_DECLARATION_EXPRESSION) {
                     useContext = true;
@@ -129,30 +123,30 @@ public class ExtractStringProposal implements IJavaCompletionProposal {
             }
 
             // Display .java change:
-            sb.append("...<br>");                   //$NON-NLS-1$
+            sb.append("...<br>"); //$NON-NLS-1$
             sb.append(linePrefix);
-            sb.append("<b>");                       //$NON-NLS-1$
+            sb.append("<b>"); //$NON-NLS-1$
             if (useContext) {
-                sb.append("context.getString(");    //$NON-NLS-1$
+                sb.append("context.getString("); //$NON-NLS-1$
             }
-            sb.append("R.string.");                 //$NON-NLS-1$
+            sb.append("R.string."); //$NON-NLS-1$
             sb.append(token);
             if (useContext) {
-                sb.append(")");                     //$NON-NLS-1$
+                sb.append(")"); //$NON-NLS-1$
             }
-            sb.append("</b>");                      //$NON-NLS-1$
+            sb.append("</b>"); //$NON-NLS-1$
             sb.append(lineSuffix);
-            sb.append("<br>...<br>");               //$NON-NLS-1$
+            sb.append("<br>...<br>"); //$NON-NLS-1$
 
             // Display strings.xml change:
-            sb.append("<br>");                      //$NON-NLS-1$
-            sb.append("&lt;resources&gt;<br>");     //$NON-NLS-1$
+            sb.append("<br>"); //$NON-NLS-1$
+            sb.append("&lt;resources&gt;<br>"); //$NON-NLS-1$
             sb.append("    <b>&lt;string name=\""); //$NON-NLS-1$
             sb.append(token);
-            sb.append("\"&gt;");                    //$NON-NLS-1$
+            sb.append("\"&gt;"); //$NON-NLS-1$
             sb.append(string);
-            sb.append("&lt;/string&gt;</b><br>");   //$NON-NLS-1$
-            sb.append("&lt;/resources&gt;");        //$NON-NLS-1$
+            sb.append("&lt;/string&gt;</b><br>"); //$NON-NLS-1$
+            sb.append("&lt;/resources&gt;"); //$NON-NLS-1$
 
             return sb.toString();
         } catch (JavaModelException e) {

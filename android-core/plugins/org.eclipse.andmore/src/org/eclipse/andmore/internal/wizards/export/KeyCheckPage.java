@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,20 @@
  */
 
 package org.eclipse.andmore.internal.wizards.export;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.KeyStore;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Calendar;
 
 import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.andmore.internal.wizards.export.ExportWizard.ExportWizardPage;
@@ -37,20 +48,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormText;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.KeyStore;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Calendar;
-
 /**
  * Final page of the wizard that checks the key and ask for the ouput location.
  */
@@ -58,15 +55,12 @@ final class KeyCheckPage extends ExportWizardPage {
 
     private static final int REQUIRED_YEARS = 25;
 
-    private static final String VALIDITY_WARNING =
-            "<p>Make sure the certificate is valid for the planned lifetime of the product.</p>"
+    private static final String VALIDITY_WARNING = "<p>Make sure the certificate is valid for the planned lifetime of the product.</p>"
             + "<p>If the certificate expires, you will be forced to sign your application with "
-            + "a different one.</p>"
-            + "<p>Applications cannot be upgraded if their certificate changes from "
+            + "a different one.</p>" + "<p>Applications cannot be upgraded if their certificate changes from "
             + "one version to another, forcing a full uninstall/install, which will make "
             + "the user lose his/her data.</p>"
-            + "<p>Google Play(Android Market) currently requires certificates to be valid "
-            + "until 2033.</p>";
+            + "<p>Google Play(Android Market) currently requires certificates to be valid " + "until 2033.</p>";
 
     private final ExportWizard mWizard;
     private PrivateKey mPrivateKey;
@@ -119,8 +113,7 @@ final class KeyCheckPage extends ExportWizardPage {
 
                 fileDialog.setText("Destination file name");
                 // get a default apk name based on the project
-                String filename = ProjectHelper.getApkFilename(mWizard.getProject(),
-                        null /*config*/);
+                String filename = ProjectHelper.getApkFilename(mWizard.getProject(), null /*config*/);
                 fileDialog.setFileName(filename);
 
                 String saveLocation = fileDialog.open();
@@ -156,8 +149,7 @@ final class KeyCheckPage extends ExportWizardPage {
             // reset the destination from the content of the project
             IProject project = mWizard.getProject();
 
-            String destination = ProjectHelper.loadStringProperty(project,
-                    ExportWizard.PROPERTY_DESTINATION);
+            String destination = ProjectHelper.loadStringProperty(project, ExportWizard.PROPERTY_DESTINATION);
             if (destination != null) {
                 mDestination.setText(destination);
             }
@@ -177,8 +169,7 @@ final class KeyCheckPage extends ExportWizardPage {
             if (mWizard.getKeystoreCreationMode() || mWizard.getKeyCreationMode()) {
                 int validity = mWizard.getValidity();
                 StringBuilder sb = new StringBuilder(
-                        String.format("<p>Certificate expires in %d years.</p>",
-                        validity));
+                        String.format("<p>Certificate expires in %d years.</p>", validity));
 
                 if (validity < REQUIRED_YEARS) {
                     sb.append(VALIDITY_WARNING);
@@ -191,14 +182,12 @@ final class KeyCheckPage extends ExportWizardPage {
                     FileInputStream fis = new FileInputStream(mWizard.getKeystore());
                     keyStore.load(fis, mWizard.getKeystorePassword().toCharArray());
                     fis.close();
-                    PrivateKeyEntry entry = (KeyStore.PrivateKeyEntry)keyStore.getEntry(
-                            mWizard.getKeyAlias(),
-                            new KeyStore.PasswordProtection(
-                                    mWizard.getKeyPassword().toCharArray()));
+                    PrivateKeyEntry entry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(mWizard.getKeyAlias(),
+                            new KeyStore.PasswordProtection(mWizard.getKeyPassword().toCharArray()));
 
                     if (entry != null) {
                         mPrivateKey = entry.getPrivateKey();
-                        mCertificate = (X509Certificate)entry.getCertificate();
+                        mCertificate = (X509Certificate) entry.getCertificate();
                     } else {
                         setErrorMessage("Unable to find key.");
 
@@ -226,8 +215,7 @@ final class KeyCheckPage extends ExportWizardPage {
                     Calendar today = Calendar.getInstance();
 
                     if (expirationCalendar.before(today)) {
-                        mKeyDetails = String.format(
-                                "<p>Certificate expired on %s</p>",
+                        mKeyDetails = String.format("<p>Certificate expired on %s</p>",
                                 mCertificate.getNotAfter().toString());
 
                         // fatal error = nothing can make the page complete.
@@ -239,8 +227,7 @@ final class KeyCheckPage extends ExportWizardPage {
                         // valid, key/cert: put it in the wizard so that it can be finished
                         mWizard.setSigningInfo(mPrivateKey, mCertificate);
 
-                        StringBuilder sb = new StringBuilder(String.format(
-                                "<p>Certificate expires on %s.</p>",
+                        StringBuilder sb = new StringBuilder(String.format("<p>Certificate expires on %s.</p>",
                                 mCertificate.getNotAfter().toString()));
 
                         int expirationYear = expirationCalendar.get(Calendar.YEAR);
@@ -252,10 +239,9 @@ final class KeyCheckPage extends ExportWizardPage {
                             if (expirationYear == thisYear) {
                                 sb.append("<p>The certificate expires this year.</p>");
                             } else {
-                                int count = expirationYear-thisYear;
-                                sb.append(String.format(
-                                        "<p>The Certificate expires in %1$s %2$s.</p>",
-                                        count, count == 1 ? "year" : "years"));
+                                int count = expirationYear - thisYear;
+                                sb.append(String.format("<p>The Certificate expires in %1$s %2$s.</p>", count,
+                                        count == 1 ? "year" : "years"));
                             }
                             sb.append(VALIDITY_WARNING);
                         }
@@ -360,8 +346,7 @@ final class KeyCheckPage extends ExportWizardPage {
 
         sb.append("</form>");
 
-        mDetailText.setText(sb.toString(), true /* parseTags */,
-                true /* expandURLs */);
+        mDetailText.setText(sb.toString(), true /* parseTags */, true /* expandURLs */);
 
         mDetailText.getParent().layout();
 

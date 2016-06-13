@@ -6,8 +6,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Kaloyan Raev - bug 471527 - Some wizards still open the Java perspective
+ * IBM Corporation - initial API and implementation
+ * Kaloyan Raev - bug 471527 - Some wizards still open the Java perspective
  *******************************************************************************/
 package org.eclipse.andmore.internal.actions;
 

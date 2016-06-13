@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,11 +16,16 @@ package org.eclipse.andmore.internal.refactorings.extractstring;
 import static com.android.SdkConstants.QUOT_ENTITY;
 import static com.android.SdkConstants.STRING_PREFIX;
 
-import com.android.SdkConstants;
-import com.android.ide.common.res2.ValueXmlHelper;
-import com.android.ide.common.xml.ManifestData;
-import com.android.resources.ResourceFolderType;
-import com.android.resources.ResourceType;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -87,16 +89,11 @@ import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegionList;
 import org.eclipse.wst.xml.core.internal.regions.DOMRegionContext;
 import org.w3c.dom.Node;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import com.android.SdkConstants;
+import com.android.ide.common.res2.ValueXmlHelper;
+import com.android.ide.common.xml.ManifestData;
+import com.android.resources.ResourceFolderType;
+import com.android.resources.ResourceType;
 
 /**
  * This refactoring extracts a string from a file and replaces it by an Android resource ID
@@ -201,15 +198,15 @@ public class ExtractStringRefactoring extends Refactoring {
 
     private XmlStringFileHelper mXmlHelper = new XmlStringFileHelper();
 
-    private static final String KEY_MODE = "mode";                      //$NON-NLS-1$
-    private static final String KEY_FILE = "file";                      //$NON-NLS-1$
-    private static final String KEY_PROJECT = "proj";                   //$NON-NLS-1$
-    private static final String KEY_SEL_START = "sel-start";            //$NON-NLS-1$
-    private static final String KEY_SEL_END = "sel-end";                //$NON-NLS-1$
-    private static final String KEY_TOK_ESC = "tok-esc";                //$NON-NLS-1$
-    private static final String KEY_XML_ATTR_NAME = "xml-attr-name";    //$NON-NLS-1$
-    private static final String KEY_RPLC_ALL_JAVA = "rplc-all-java";    //$NON-NLS-1$
-    private static final String KEY_RPLC_ALL_XML  = "rplc-all-xml";     //$NON-NLS-1$
+    private static final String KEY_MODE = "mode"; //$NON-NLS-1$
+    private static final String KEY_FILE = "file"; //$NON-NLS-1$
+    private static final String KEY_PROJECT = "proj"; //$NON-NLS-1$
+    private static final String KEY_SEL_START = "sel-start"; //$NON-NLS-1$
+    private static final String KEY_SEL_END = "sel-end"; //$NON-NLS-1$
+    private static final String KEY_TOK_ESC = "tok-esc"; //$NON-NLS-1$
+    private static final String KEY_XML_ATTR_NAME = "xml-attr-name"; //$NON-NLS-1$
+    private static final String KEY_RPLC_ALL_JAVA = "rplc-all-java"; //$NON-NLS-1$
+    private static final String KEY_RPLC_ALL_XML = "rplc-all-xml"; //$NON-NLS-1$
 
     /**
      * This constructor is solely used by {@link ExtractStringDescriptor},
@@ -223,7 +220,7 @@ public class ExtractStringRefactoring extends Refactoring {
     public ExtractStringRefactoring(Map<String, String> arguments) throws NullPointerException {
 
         mReplaceAllJava = Boolean.parseBoolean(arguments.get(KEY_RPLC_ALL_JAVA));
-        mReplaceAllXml  = Boolean.parseBoolean(arguments.get(KEY_RPLC_ALL_XML));
+        mReplaceAllXml = Boolean.parseBoolean(arguments.get(KEY_RPLC_ALL_XML));
         mMode = Mode.valueOf(arguments.get(KEY_MODE));
 
         IPath path = Path.fromPortableString(arguments.get(KEY_PROJECT));
@@ -233,9 +230,9 @@ public class ExtractStringRefactoring extends Refactoring {
             path = Path.fromPortableString(arguments.get(KEY_FILE));
             mFile = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(path);
 
-            mSelectionStart   = Integer.parseInt(arguments.get(KEY_SEL_START));
-            mSelectionEnd     = Integer.parseInt(arguments.get(KEY_SEL_END));
-            mTokenString      = arguments.get(KEY_TOK_ESC);
+            mSelectionStart = Integer.parseInt(arguments.get(KEY_SEL_START));
+            mSelectionEnd = Integer.parseInt(arguments.get(KEY_SEL_END));
+            mTokenString = arguments.get(KEY_TOK_ESC);
             mXmlAttributeName = arguments.get(KEY_XML_ATTR_NAME);
         } else {
             mFile = null;
@@ -250,14 +247,14 @@ public class ExtractStringRefactoring extends Refactoring {
     private Map<String, String> createArgumentMap() {
         HashMap<String, String> args = new HashMap<String, String>();
         args.put(KEY_RPLC_ALL_JAVA, Boolean.toString(mReplaceAllJava));
-        args.put(KEY_RPLC_ALL_XML,  Boolean.toString(mReplaceAllXml));
-        args.put(KEY_MODE,      mMode.name());
-        args.put(KEY_PROJECT,   mProject.getFullPath().toPortableString());
+        args.put(KEY_RPLC_ALL_XML, Boolean.toString(mReplaceAllXml));
+        args.put(KEY_MODE, mMode.name());
+        args.put(KEY_PROJECT, mProject.getFullPath().toPortableString());
         if (mMode == Mode.EDIT_SOURCE) {
-            args.put(KEY_FILE,      mFile.getFullPath().toPortableString());
+            args.put(KEY_FILE, mFile.getFullPath().toPortableString());
             args.put(KEY_SEL_START, Integer.toString(mSelectionStart));
-            args.put(KEY_SEL_END,   Integer.toString(mSelectionEnd));
-            args.put(KEY_TOK_ESC,   mTokenString);
+            args.put(KEY_SEL_END, Integer.toString(mSelectionEnd));
+            args.put(KEY_TOK_ESC, mTokenString);
             args.put(KEY_XML_ATTR_NAME, mXmlAttributeName);
         }
         return args;
@@ -437,10 +434,9 @@ public class ExtractStringRefactoring extends Refactoring {
                 // unknown folders.
 
                 IPath path = mFile.getFullPath();
-                if ((path.segmentCount() == 4 &&
-                     path.segment(1).equalsIgnoreCase(SdkConstants.FD_RESOURCES)) ||
-                    (path.segmentCount() == 2 &&
-                     path.segment(1).equalsIgnoreCase(SdkConstants.FN_ANDROID_MANIFEST_XML))) {
+                if ((path.segmentCount() == 4 && path.segment(1).equalsIgnoreCase(SdkConstants.FD_RESOURCES))
+                        || (path.segmentCount() == 2
+                                && path.segment(1).equalsIgnoreCase(SdkConstants.FN_ANDROID_MANIFEST_XML))) {
                     if (!findSelectionInXmlFile(mFile, status, monitor)) {
                         return status;
                     }
@@ -448,8 +444,7 @@ public class ExtractStringRefactoring extends Refactoring {
             }
 
             if (!status.isOK()) {
-                status.addFatalError(
-                        "Selection must be inside a Java source or an Android Layout XML file.");
+                status.addFatalError("Selection must be inside a Java source or an Android Layout XML file.");
             }
 
         } finally {
@@ -468,25 +463,22 @@ public class ExtractStringRefactoring extends Refactoring {
      * On success, advance the monitor by 3.
      * Returns status.isOK().
      */
-    private boolean findSelectionInJavaUnit(ICompilationUnit unit,
-            RefactoringStatus status, IProgressMonitor monitor) {
+    private boolean findSelectionInJavaUnit(ICompilationUnit unit, RefactoringStatus status, IProgressMonitor monitor) {
         try {
             IBuffer buffer = unit.getBuffer();
 
-            IScanner scanner = ToolFactory.createScanner(
-                    false, //tokenizeComments
+            IScanner scanner = ToolFactory.createScanner(false, //tokenizeComments
                     false, //tokenizeWhiteSpace
                     false, //assertMode
-                    false  //recordLineSeparator
-                    );
+                    false //recordLineSeparator
+            );
             scanner.setSource(buffer.getCharacters());
             monitor.worked(1);
 
-            for(int token = scanner.getNextToken();
-                    token != ITerminalSymbols.TokenNameEOF;
-                    token = scanner.getNextToken()) {
-                if (scanner.getCurrentTokenStartPosition() <= mSelectionStart &&
-                        scanner.getCurrentTokenEndPosition() >= mSelectionEnd) {
+            for (int token = scanner.getNextToken(); token != ITerminalSymbols.TokenNameEOF; token = scanner
+                    .getNextToken()) {
+                if (scanner.getCurrentTokenStartPosition() <= mSelectionStart
+                        && scanner.getCurrentTokenEndPosition() >= mSelectionEnd) {
                     // found the token, but only keep if the right type
                     if (token == ITerminalSymbols.TokenNameStringLiteral) {
                         mTokenString = new String(scanner.getCurrentTokenSource());
@@ -538,9 +530,7 @@ public class ExtractStringRefactoring extends Refactoring {
      * On success, advance the monitor by 1.
      * Returns status.isOK().
      */
-    private boolean findSelectionInXmlFile(IFile file,
-            RefactoringStatus status,
-            IProgressMonitor monitor) {
+    private boolean findSelectionInXmlFile(IFile file, RefactoringStatus status, IProgressMonitor monitor) {
 
         try {
             if (!(mEditor instanceof AndroidXmlEditor)) {
@@ -563,13 +553,12 @@ public class ExtractStringRefactoring extends Refactoring {
                     // check if it accepts a string reference. This does not however tell us if
                     // the selection is actually in an attribute value, nor which attribute is
                     // being edited.
-                    for(int offset = mSelectionStart; offset >= 0 && node == null; --offset) {
+                    for (int offset = mSelectionStart; offset >= 0 && node == null; --offset) {
                         node = (Node) smodel.getIndexedRegion(offset);
                     }
 
                     if (node == null) {
-                        status.addFatalError(
-                                "The selection does not match any element in the XML document.");
+                        status.addFatalError("The selection does not match any element in the XML document.");
                         return status.isOK();
                     }
 
@@ -586,18 +575,15 @@ public class ExtractStringRefactoring extends Refactoring {
                         // that is.
 
                         int selStart = mSelectionStart;
-                        IStructuredDocumentRegion region =
-                            sdoc.getRegionAtCharacterOffset(selStart);
-                        if (region != null &&
-                                DOMRegionContext.XML_TAG_NAME.equals(region.getType())) {
+                        IStructuredDocumentRegion region = sdoc.getRegionAtCharacterOffset(selStart);
+                        if (region != null && DOMRegionContext.XML_TAG_NAME.equals(region.getType())) {
                             // Find if any sub-region representing an attribute contains the
                             // selection. If it does, returns the name of the attribute in
                             // currAttrName and returns the value in the field mTokenString.
                             currAttrName = findSelectionInRegion(region, selStart);
 
                             if (mTokenString == null) {
-                                status.addFatalError(
-                                    "The selection is not inside an actual XML attribute value.");
+                                status.addFatalError("The selection is not inside an actual XML attribute value.");
                             }
                         }
                     }
@@ -619,8 +605,7 @@ public class ExtractStringRefactoring extends Refactoring {
             } catch (Throwable t) {
                 // Since we use some internal APIs, use a broad catch-all to report any
                 // unexpected issue rather than crash the whole refactoring.
-                status.addFatalError(
-                        String.format("XML parsing error: %1$s", t.getMessage()));
+                status.addFatalError(String.format("XML parsing error: %1$s", t.getMessage()));
             } finally {
                 if (smodel != null) {
                     smodel.releaseFromRead();
@@ -667,26 +652,21 @@ public class ExtractStringRefactoring extends Refactoring {
                 // the attribute name part, find the value that is just
                 // after and use it as if it were the selection.
 
-                if (subRegion.getStart() <= startInRegion &&
-                        startInRegion < subRegion.getTextEnd()) {
+                if (subRegion.getStart() <= startInRegion && startInRegion < subRegion.getTextEnd()) {
                     // A well-formed attribute is composed of a name,
                     // an equal sign and the value. There can't be any space
                     // in between, which makes the parsing a lot easier.
-                    if (i <= nb - 3 &&
-                            DOMRegionContext.XML_TAG_ATTRIBUTE_EQUALS.equals(
-                                                   list.get(i + 1).getType())) {
+                    if (i <= nb - 3 && DOMRegionContext.XML_TAG_ATTRIBUTE_EQUALS.equals(list.get(i + 1).getType())) {
                         subRegion = list.get(i + 2);
                         type = subRegion.getType();
-                        if (DOMRegionContext.XML_TAG_ATTRIBUTE_VALUE.equals(
-                                type)) {
+                        if (DOMRegionContext.XML_TAG_ATTRIBUTE_VALUE.equals(type)) {
                             currAttrValue = region.getText(subRegion);
                         }
                     }
                 }
 
-            } else if (subRegion.getStart() <= startInRegion &&
-                    startInRegion < subRegion.getTextEnd() &&
-                    DOMRegionContext.XML_TAG_ATTRIBUTE_VALUE.equals(type)) {
+            } else if (subRegion.getStart() <= startInRegion && startInRegion < subRegion.getTextEnd()
+                    && DOMRegionContext.XML_TAG_ATTRIBUTE_VALUE.equals(type)) {
                 currAttrValue = region.getText(subRegion);
             }
 
@@ -723,13 +703,9 @@ public class ExtractStringRefactoring extends Refactoring {
     static String unquoteAttrValue(String attrValue) {
         int len = attrValue.length();
         int len1 = len - 1;
-        if (len >= 2 &&
-                attrValue.charAt(0) == '"' &&
-                attrValue.charAt(len1) == '"') {
+        if (len >= 2 && attrValue.charAt(0) == '"' && attrValue.charAt(len1) == '"') {
             attrValue = attrValue.substring(1, len1);
-        } else if (len >= 2 &&
-                attrValue.charAt(0) == '\'' &&
-                attrValue.charAt(len1) == '\'') {
+        } else if (len >= 2 && attrValue.charAt(0) == '\'' && attrValue.charAt(len1) == '\'') {
             attrValue = attrValue.substring(1, len1);
         }
 
@@ -741,11 +717,10 @@ public class ExtractStringRefactoring extends Refactoring {
      * This sets mTokenString to null by side-effect when it fails and
      * adds a fatal error to the status as needed.
      */
-    private void validateSelectedAttribute(AndroidXmlEditor editor, Node node,
-            String attrName, RefactoringStatus status) {
+    private void validateSelectedAttribute(AndroidXmlEditor editor, Node node, String attrName,
+            RefactoringStatus status) {
         UiElementNode rootUiNode = editor.getUiRootNode();
-        UiElementNode currentUiNode =
-            rootUiNode == null ? null : rootUiNode.findXmlNode(node);
+        UiElementNode currentUiNode = rootUiNode == null ? null : rootUiNode.findXmlNode(node);
         ReferenceAttributeDescriptor attrDesc = null;
 
         if (currentUiNode != null) {
@@ -769,12 +744,11 @@ public class ExtractStringRefactoring extends Refactoring {
 
         // The attribute descriptor is a resource reference. It must either accept
         // of any resource type or specifically accept string types.
-        if (attrDesc != null &&
-                (attrDesc.getResourceType() == null ||
-                 attrDesc.getResourceType() == ResourceType.STRING)) {
+        if (attrDesc != null
+                && (attrDesc.getResourceType() == null || attrDesc.getResourceType() == ResourceType.STRING)) {
             // We have one more check to do: is the current string value already
             // an Android XML string reference? If so, we can't edit it.
-            if (mTokenString != null && mTokenString.startsWith("@")) {                             //$NON-NLS-1$
+            if (mTokenString != null && mTokenString.startsWith("@")) { //$NON-NLS-1$
                 int pos1 = 0;
                 if (mTokenString.length() > 1 && mTokenString.charAt(1) == '+') {
                     pos1++;
@@ -784,10 +758,8 @@ public class ExtractStringRefactoring extends Refactoring {
                     String kind = mTokenString.substring(pos1 + 1, pos2);
                     if (ResourceType.STRING.getName().equals(kind)) {
                         mTokenString = null;
-                        status.addFatalError(String.format(
-                                "The attribute %1$s already contains a %2$s reference.",
-                                attrName,
-                                kind));
+                        status.addFatalError(
+                                String.format("The attribute %1$s already contains a %2$s reference.", attrName, kind));
                     }
                 }
             }
@@ -802,9 +774,7 @@ public class ExtractStringRefactoring extends Refactoring {
 
         } else {
             mTokenString = null;
-            status.addFatalError(String.format(
-                    "The attribute %1$s does not accept a string reference.",
-                    attrName));
+            status.addFatalError(String.format("The attribute %1$s does not accept a string reference.", attrName));
         }
     }
 
@@ -816,9 +786,7 @@ public class ExtractStringRefactoring extends Refactoring {
      *
      * @return False if caller should abort, true if caller should continue.
      */
-    private boolean checkSourceFile(IFile file,
-            RefactoringStatus status,
-            IProgressMonitor monitor) {
+    private boolean checkSourceFile(IFile file, RefactoringStatus status, IProgressMonitor monitor) {
         // check whether the source file is in sync
         if (!file.isSynchronized(IResource.DEPTH_ZERO)) {
             status.addFatalError("The file is not synchronized. Please save it first.");
@@ -873,14 +841,11 @@ public class ExtractStringRefactoring extends Refactoring {
             IResource targetXml = getTargetXmlResource(mTargetXmlFileWsPath);
             if (targetXml != null) {
                 if (targetXml.getType() != IResource.FILE) {
-                    status.addFatalError(
-                            String.format("XML file '%1$s' is not a file.", mTargetXmlFileWsPath));
+                    status.addFatalError(String.format("XML file '%1$s' is not a file.", mTargetXmlFileWsPath));
                 } else {
                     ResourceAttributes attr = targetXml.getResourceAttributes();
                     if (attr != null && attr.isReadOnly()) {
-                        status.addFatalError(
-                                String.format("XML file '%1$s' is read-only.",
-                                        mTargetXmlFileWsPath));
+                        status.addFatalError(String.format("XML file '%1$s' is read-only.", mTargetXmlFileWsPath));
                     }
                 }
             }
@@ -892,13 +857,11 @@ public class ExtractStringRefactoring extends Refactoring {
 
             mChanges = new ArrayList<Change>();
 
-
             // Prepare the change to create/edit the String ID in the res/values XML file.
-            if (!mXmlStringValue.equals(
-                    mXmlHelper.valueOfStringId(mProject, mTargetXmlFileWsPath, mXmlStringId))) {
+            if (!mXmlStringValue.equals(mXmlHelper.valueOfStringId(mProject, mTargetXmlFileWsPath, mXmlStringId))) {
                 // We actually change it only if the ID doesn't exist yet or has a different value
-                Change change = createXmlChanges((IFile) targetXml, mXmlStringId, mXmlStringValue,
-                        status, SubMonitor.convert(monitor, 1));
+                Change change = createXmlChanges((IFile) targetXml, mXmlStringId, mXmlStringValue, status,
+                        SubMonitor.convert(monitor, 1));
                 if (change != null) {
                     mChanges.add(change);
                 }
@@ -912,18 +875,13 @@ public class ExtractStringRefactoring extends Refactoring {
                 List<Change> changes = null;
                 if (mXmlAttributeName != null) {
                     // Prepare the change to the Android resource XML file
-                    changes = computeXmlSourceChanges(mFile,
-                            mXmlStringId,
-                            mTokenString,
-                            mXmlAttributeName,
-                            true, // allConfigurations
-                            status,
-                            monitor);
+                    changes = computeXmlSourceChanges(mFile, mXmlStringId, mTokenString, mXmlAttributeName, true, // allConfigurations
+                            status, monitor);
 
                 } else if (mUnit != null) {
                     // Prepare the change to the Java compilation unit
-                    changes = computeJavaChanges(mUnit, mXmlStringId, mTokenString,
-                            status, SubMonitor.convert(monitor, 1));
+                    changes = computeJavaChanges(mUnit, mXmlStringId, mTokenString, status,
+                            SubMonitor.convert(monitor, 1));
                 }
                 if (changes != null) {
                     mChanges.addAll(changes);
@@ -956,9 +914,8 @@ public class ExtractStringRefactoring extends Refactoring {
                         continue;
                     }
 
-                    List<Change> changes = computeJavaChanges(
-                            unit, mXmlStringId, mTokenString,
-                            status, SubMonitor.convert(submon, 1));
+                    List<Change> changes = computeJavaChanges(unit, mXmlStringId, mTokenString, status,
+                            SubMonitor.convert(submon, 1));
                     if (changes != null) {
                         mChanges.addAll(changes);
                     }
@@ -969,13 +926,9 @@ public class ExtractStringRefactoring extends Refactoring {
                 SubMonitor submon = SubMonitor.convert(monitor, 1);
                 for (IFile xmlFile : findAllResXmlFiles()) {
                     if (xmlFile != null) {
-                        List<Change> changes = computeXmlSourceChanges(xmlFile,
-                                mXmlStringId,
-                                mTokenString,
-                                mXmlAttributeName,
-                                false, // allConfigurations
-                                status,
-                                SubMonitor.convert(submon, 1));
+                        List<Change> changes = computeXmlSourceChanges(xmlFile, mXmlStringId, mTokenString,
+                                mXmlAttributeName, false, // allConfigurations
+                                status, SubMonitor.convert(submon, 1));
                         if (changes != null) {
                             mChanges.addAll(changes);
                         }
@@ -1030,8 +983,7 @@ public class ExtractStringRefactoring extends Refactoring {
                         IFolder f = mProject.getFolder(AndmoreAndroidConstants.WS_RESOURCES);
                         if (f.exists()) {
                             try {
-                                mFolders.addAll(
-                                        Arrays.asList(f.members(IContainer.EXCLUDE_DERIVED)));
+                                mFolders.addAll(Arrays.asList(f.members(IContainer.EXCLUDE_DERIVED)));
                             } catch (CoreException e) {
                                 // pass
                             }
@@ -1070,8 +1022,8 @@ public class ExtractStringRefactoring extends Refactoring {
                                 if (SdkConstants.EXT_XML.equals(file.getFileExtension())) {
                                     IPath p = file.getFullPath();
                                     // And not be either paths we want to filter out
-                                    if ((mFilterPath1 != null && mFilterPath1.equals(p)) ||
-                                            (mFilterPath2 != null && mFilterPath2.equals(p))) {
+                                    if ((mFilterPath1 != null && mFilterPath1.equals(p))
+                                            || (mFilterPath2 != null && mFilterPath2.equals(p))) {
                                         continue;
                                     }
                                     mFiles.add(file);
@@ -1089,8 +1041,7 @@ public class ExtractStringRefactoring extends Refactoring {
 
                     @Override
                     public void remove() {
-                        throw new UnsupportedOperationException(
-                            "This iterator does not support removal");  //$NON-NLS-1$
+                        throw new UnsupportedOperationException("This iterator does not support removal"); //$NON-NLS-1$
                     }
                 };
             }
@@ -1108,16 +1059,13 @@ public class ExtractStringRefactoring extends Refactoring {
      * @param tokenString The old string, which will be the value in the XML string.
      * @return A new {@link TextEdit} that describes how to change the file.
      */
-    private Change createXmlChanges(IFile targetXml,
-            String xmlStringId,
-            String tokenString,
-            RefactoringStatus status,
+    private Change createXmlChanges(IFile targetXml, String xmlStringId, String tokenString, RefactoringStatus status,
             SubMonitor monitor) {
 
         TextFileChange xmlChange = new TextFileChange(getName(), targetXml);
         xmlChange.setTextType(SdkConstants.EXT_XML);
 
-        String error = "";                  //$NON-NLS-1$
+        String error = ""; //$NON-NLS-1$
         TextEdit edit = null;
         TextEditGroup editGroup = null;
 
@@ -1127,8 +1075,7 @@ public class ExtractStringRefactoring extends Refactoring {
                 targetXml = null;
             }
 
-            edit = createXmlReplaceEdit(targetXml, xmlStringId, tokenString, status,
-                    SubMonitor.convert(monitor, 1));
+            edit = createXmlReplaceEdit(targetXml, xmlStringId, tokenString, status, SubMonitor.convert(monitor, 1));
         } catch (IOException e) {
             error = e.toString();
         } catch (CoreException e) {
@@ -1137,15 +1084,14 @@ public class ExtractStringRefactoring extends Refactoring {
         }
 
         if (edit == null) {
-            status.addFatalError(String.format("Failed to modify file %1$s%2$s",
-                    targetXml == null ? "" : targetXml.getFullPath(),   //$NON-NLS-1$
-                    error == null ? "" : ": " + error));                //$NON-NLS-1$
+            status.addFatalError(
+                    String.format("Failed to modify file %1$s%2$s", targetXml == null ? "" : targetXml.getFullPath(), //$NON-NLS-2$
+                            error == null ? "" : ": " + error)); //$NON-NLS-1$
             return null;
         }
 
-        editGroup = new TextEditGroup(targetXml == null ? "Create <string> in new XML file"
-                                                        : "Insert <string> in XML file",
-                                      edit);
+        editGroup = new TextEditGroup(
+                targetXml == null ? "Create <string> in new XML file" : "Insert <string> in XML file", edit);
 
         xmlChange.setEdit(edit);
         // The TextEditChangeGroup let the user toggle this change on and off later.
@@ -1175,19 +1121,14 @@ public class ExtractStringRefactoring extends Refactoring {
      * @throws IOException   - if the file's contents can not be read or its detected encoding does
      *                         not support its contents.
      */
-    private TextEdit createXmlReplaceEdit(IFile file,
-            String xmlStringId,
-            String tokenString,
-            RefactoringStatus status,
-            SubMonitor monitor)
-                throws IOException, CoreException {
+    private TextEdit createXmlReplaceEdit(IFile file, String xmlStringId, String tokenString, RefactoringStatus status,
+            SubMonitor monitor) throws IOException, CoreException {
 
         IModelManager modelMan = StructuredModelManager.getModelManager();
 
         final String NODE_RESOURCES = SdkConstants.TAG_RESOURCES;
         final String NODE_STRING = SdkConstants.TAG_STRING;
         final String ATTR_NAME = SdkConstants.ATTR_NAME;
-
 
         // Scan the source to find the best insertion point.
 
@@ -1226,7 +1167,7 @@ public class ExtractStringRefactoring extends Refactoring {
             boolean hasPiXml = false;
             int newResStart = 0;
             int newResLength = 0;
-            String lineSep = "\n";                  //$NON-NLS-1$
+            String lineSep = "\n"; //$NON-NLS-1$
 
             if (file != null) {
                 smodel = modelMan.getExistingModelForRead(file);
@@ -1248,7 +1189,7 @@ public class ExtractStringRefactoring extends Refactoring {
             }
 
             if (sdoc != null) {
-                String wsBefore = "";   //$NON-NLS-1$
+                String wsBefore = ""; //$NON-NLS-1$
                 String lastWs = null;
 
                 lineSep = sdoc.getLineDelimiter();
@@ -1264,8 +1205,7 @@ public class ExtractStringRefactoring extends Refactoring {
 
                         if (replaceStringContent) {
                             // Generate a replacement for a <string> value matching the string ID.
-                            return new ReplaceEdit(
-                                    regions.getStartOffset(), regions.getLength(), tokenString);
+                            return new ReplaceEdit(regions.getStartOffset(), regions.getLength(), tokenString);
                         }
 
                         // Otherwise capture what should be whitespace content
@@ -1281,7 +1221,7 @@ public class ExtractStringRefactoring extends Refactoring {
                             type = region.getType();
                             if (DOMRegionContext.XML_TAG_NAME.equals(type)) {
                                 String name = regions.getText(region);
-                                if ("xml".equals(name)) {   //$NON-NLS-1$
+                                if ("xml".equals(name)) { //$NON-NLS-1$
                                     hasPiXml = true;
                                     break;
                                 }
@@ -1313,17 +1253,15 @@ public class ExtractStringRefactoring extends Refactoring {
                             isEmptyTag = true;
                         } else if (DOMRegionContext.XML_TAG_NAME.equals(type)) {
                             name = regions.getText(region);
-                        } else if (DOMRegionContext.XML_TAG_ATTRIBUTE_NAME.equals(type) &&
-                                NODE_STRING.equals(name)) {
+                        } else if (DOMRegionContext.XML_TAG_ATTRIBUTE_NAME.equals(type) && NODE_STRING.equals(name)) {
                             // Record the attribute names into a <string> element.
                             attrName = regions.getText(region);
-                        } else if (DOMRegionContext.XML_TAG_ATTRIBUTE_VALUE.equals(type) &&
-                                ATTR_NAME.equals(attrName)) {
+                        } else if (DOMRegionContext.XML_TAG_ATTRIBUTE_VALUE.equals(type)
+                                && ATTR_NAME.equals(attrName)) {
                             // Record the value of a <string name=...> attribute
                             attrValue = regions.getText(region);
 
-                            if (attrValue != null &&
-                                    unquoteAttrValue(attrValue).equals(xmlStringId)) {
+                            if (attrValue != null && unquoteAttrValue(attrValue).equals(xmlStringId)) {
                                 // We found a <string name=> matching the string ID to replace.
                                 // We'll generate a replacement when we process the string value
                                 // (that is the next XML_CONTENT region.)
@@ -1337,8 +1275,7 @@ public class ExtractStringRefactoring extends Refactoring {
                         checkTopElement = false;
                         if (!NODE_RESOURCES.equals(name)) {
                             status.addFatalError(
-                                    String.format("XML file lacks a <resource> tag: %1$s",
-                                            mTargetXmlFileWsPath));
+                                    String.format("XML file lacks a <resource> tag: %1$s", mTargetXmlFileWsPath));
                             return null;
 
                         }
@@ -1357,20 +1294,16 @@ public class ExtractStringRefactoring extends Refactoring {
                             // to insert just before this one.
 
                             StringBuilder content = new StringBuilder();
-                            content.append(wsBefore)
-                                   .append("<string name=\"")                   //$NON-NLS-1$
-                                   .append(xmlStringId)
-                                   .append("\">")                               //$NON-NLS-1$
-                                   .append(tokenString)
-                                   .append("</string>");                        //$NON-NLS-1$
+                            content.append(wsBefore).append("<string name=\"") //$NON-NLS-1$
+                                    .append(xmlStringId).append("\">") //$NON-NLS-1$
+                                    .append(tokenString).append("</string>"); //$NON-NLS-1$
 
                             // Backup to insert before the whitespace preceding </resource>
                             IStructuredDocumentRegion insertBeforeReg = regions;
                             while (true) {
                                 IStructuredDocumentRegion previous = insertBeforeReg.getPrevious();
-                                if (previous != null &&
-                                        DOMRegionContext.XML_CONTENT.equals(previous.getType()) &&
-                                        previous.getText().trim().length() == 0) {
+                                if (previous != null && DOMRegionContext.XML_CONTENT.equals(previous.getType())
+                                        && previous.getText().trim().length() == 0) {
                                     insertBeforeReg = previous;
                                 } else {
                                     break;
@@ -1382,8 +1315,7 @@ public class ExtractStringRefactoring extends Refactoring {
                                 content.append(lineSep);
                             }
 
-                            return new InsertEdit(insertBeforeReg.getStartOffset(),
-                                                  content.toString());
+                            return new InsertEdit(insertBeforeReg.getStartOffset(), content.toString());
                         }
                     } else {
                         // For any other tag than <resource>, capture whitespace before and after.
@@ -1411,14 +1343,12 @@ public class ExtractStringRefactoring extends Refactoring {
             }
 
             // FIXME how to access formatting preferences to generate the proper indentation?
-            content.append("<resources>").append(lineSep);                  //$NON-NLS-1$
-            content.append("    <string name=\"")                           //$NON-NLS-1$
-                   .append(xmlStringId)
-                   .append("\">")                                           //$NON-NLS-1$
-                   .append(tokenString)
-                   .append("</string>")                                     //$NON-NLS-1$
-                   .append(lineSep);
-            content.append("</resources>").append(lineSep);                 //$NON-NLS-1$
+            content.append("<resources>").append(lineSep); //$NON-NLS-1$
+            content.append("    <string name=\"") //$NON-NLS-1$
+                    .append(xmlStringId).append("\">") //$NON-NLS-1$
+                    .append(tokenString).append("</string>") //$NON-NLS-1$
+                    .append(lineSep);
+            content.append("</resources>").append(lineSep); //$NON-NLS-1$
 
             if (newResLength > 0) {
                 // Replace existing piece
@@ -1437,8 +1367,7 @@ public class ExtractStringRefactoring extends Refactoring {
         } catch (Throwable t) {
             // Since we use some internal APIs, use a broad catch-all to report any
             // unexpected issue rather than crash the whole refactoring.
-            status.addFatalError(
-                    String.format("XML replace error: %1$s", t.getMessage()));
+            status.addFatalError(String.format("XML replace error: %1$s", t.getMessage()));
         } finally {
             if (smodel != null) {
                 smodel.releaseFromRead();
@@ -1468,17 +1397,12 @@ public class ExtractStringRefactoring extends Refactoring {
      * @param status Status used to report fatal errors.
      * @param monitor Used to log progress.
      */
-    private List<Change> computeXmlSourceChanges(IFile sourceFile,
-            String xmlStringId,
-            String tokenString,
-            String xmlAttrName,
-            boolean allConfigurations,
-            RefactoringStatus status,
-            IProgressMonitor monitor) {
+    private List<Change> computeXmlSourceChanges(IFile sourceFile, String xmlStringId, String tokenString,
+            String xmlAttrName, boolean allConfigurations, RefactoringStatus status, IProgressMonitor monitor) {
 
         if (!sourceFile.exists()) {
-            status.addFatalError(String.format("XML file '%1$s' does not exist.",
-                    sourceFile.getFullPath().toOSString()));
+            status.addFatalError(
+                    String.format("XML file '%1$s' does not exist.", sourceFile.getFullPath().toOSString()));
             return null;
         }
 
@@ -1512,12 +1436,10 @@ public class ExtractStringRefactoring extends Refactoring {
                                 // Skip the initial folder name, it's already in the list.
                                 if (!name.equals(initialTypeName)) {
                                     // Only accept the same folder type (e.g. layout-*)
-                                    ResourceFolderType t =
-                                        ResourceFolderType.getFolderType(name);
+                                    ResourceFolderType t = ResourceFolderType.getFolderType(name);
                                     if (type.equals(t)) {
                                         // recompute the path
-                                        IPath p = res.getProjectRelativePath().append(name).
-                                                                               append(filename);
+                                        IPath p = res.getProjectRelativePath().append(name).append(filename);
                                         IResource f = project.findMember(p);
                                         if (f != null && f instanceof IFile) {
                                             files.add((IFile) f);
@@ -1566,14 +1488,14 @@ public class ExtractStringRefactoring extends Refactoring {
                 }
 
                 if (sdoc == null) {
-                    status.addFatalError("XML structured document not found");     //$NON-NLS-1$
+                    status.addFatalError("XML structured document not found"); //$NON-NLS-1$
                     continue;
                 }
 
                 multiEdit = new MultiTextEdit();
                 editGroups = new ArrayList<TextEditGroup>();
                 xmlChange = new TextFileChange(getName(), file);
-                xmlChange.setTextType("xml");   //$NON-NLS-1$
+                xmlChange.setTextType("xml"); //$NON-NLS-1$
 
                 String quotedReplacement = quotedAttrValue(STRING_PREFIX + xmlStringId);
 
@@ -1603,17 +1525,12 @@ public class ExtractStringRefactoring extends Refactoring {
                             // Remove " or ' quoting present in the attribute value
                             text = unquoteAttrValue(text);
 
-                            if (tokenString.equals(text) &&
-                                    (xmlAttrName == null || xmlAttrName.equals(lastAttrName))) {
+                            if (tokenString.equals(text) && (xmlAttrName == null || xmlAttrName.equals(lastAttrName))) {
 
                                 // Found an occurrence. Create a change for it.
-                                TextEdit edit = new ReplaceEdit(
-                                        regions.getStartOffset() + subRegion.getStart(),
-                                        subRegion.getTextLength(),
-                                        quotedReplacement);
-                                TextEditGroup editGroup = new TextEditGroup(
-                                        "Replace attribute string by ID",
-                                        edit);
+                                TextEdit edit = new ReplaceEdit(regions.getStartOffset() + subRegion.getStart(),
+                                        subRegion.getTextLength(), quotedReplacement);
+                                TextEditGroup editGroup = new TextEditGroup("Replace attribute string by ID", edit);
 
                                 multiEdit.addChild(edit);
                                 editGroups.add(editGroup);
@@ -1624,21 +1541,16 @@ public class ExtractStringRefactoring extends Refactoring {
             } catch (Throwable t) {
                 // Since we use some internal APIs, use a broad catch-all to report any
                 // unexpected issue rather than crash the whole refactoring.
-                status.addFatalError(
-                        String.format("XML refactoring error: %1$s", t.getMessage()));
+                status.addFatalError(String.format("XML refactoring error: %1$s", t.getMessage()));
             } finally {
                 if (smodel != null) {
                     smodel.releaseFromRead();
                 }
 
-                if (multiEdit != null &&
-                        xmlChange != null &&
-                        editGroups != null &&
-                        multiEdit.hasChildren()) {
+                if (multiEdit != null && xmlChange != null && editGroups != null && multiEdit.hasChildren()) {
                     xmlChange.setEdit(multiEdit);
                     for (TextEditGroup group : editGroups) {
-                        xmlChange.addTextEditChangeGroup(
-                                new TextEditChangeGroup(xmlChange, group));
+                        xmlChange.addTextEditChangeGroup(new TextEditChangeGroup(xmlChange, group));
                     }
                     changes.add(xmlChange);
                 }
@@ -1671,7 +1583,7 @@ public class ExtractStringRefactoring extends Refactoring {
         }
         // If we get here, there's a mix. Opt for double-quote around and replace
         // inner double-quotes.
-        attrValue = attrValue.replace("\"", QUOT_ENTITY);  //$NON-NLS-1$
+        attrValue = attrValue.replace("\"", QUOT_ENTITY); //$NON-NLS-1$
         return '"' + attrValue + '"';
     }
 
@@ -1732,8 +1644,7 @@ public class ExtractStringRefactoring extends Refactoring {
 
                     @Override
                     public void remove() {
-                        throw new UnsupportedOperationException(
-                                "This iterator does not support removal");  //$NON-NLS-1$
+                        throw new UnsupportedOperationException("This iterator does not support removal"); //$NON-NLS-1$
                     }
                 };
             }
@@ -1753,11 +1664,8 @@ public class ExtractStringRefactoring extends Refactoring {
      * @param status Status used to report fatal errors.
      * @param monitor Used to log progress.
      */
-    private List<Change> computeJavaChanges(ICompilationUnit unit,
-            String xmlStringId,
-            String tokenString,
-            RefactoringStatus status,
-            SubMonitor monitor) {
+    private List<Change> computeJavaChanges(ICompilationUnit unit, String xmlStringId, String tokenString,
+            RefactoringStatus status, SubMonitor monitor) {
 
         // We shouldn't be trying to replace a null or empty string.
         assert tokenString != null && tokenString.length() > 0;
@@ -1785,10 +1693,9 @@ public class ExtractStringRefactoring extends Refactoring {
         }
 
         if (error != null) {
-            status.addFatalError(
-                    String.format("Failed to parse file %1$s: %2$s.",
-                            manifestFile == null ? "" : manifestFile.getFullPath(),  //$NON-NLS-1$
-                            error));
+            status.addFatalError(String.format("Failed to parse file %1$s: %2$s.",
+                    manifestFile == null ? "" : manifestFile.getFullPath(), //$NON-NLS-1$
+                    error));
             return null;
         }
 
@@ -1808,7 +1715,7 @@ public class ExtractStringRefactoring extends Refactoring {
 
         // The ASTNode must be a CompilationUnit, by design
         if (!(node instanceof CompilationUnit)) {
-            status.addFatalError(String.format("Internal error: ASTNode class %s",  //$NON-NLS-1$
+            status.addFatalError(String.format("Internal error: ASTNode class %s", //$NON-NLS-1$
                     node.getClass()));
             return null;
         }
@@ -1823,9 +1730,8 @@ public class ExtractStringRefactoring extends Refactoring {
         AST ast = node.getAST();
         ASTRewrite astRewrite = ASTRewrite.create(ast);
         ArrayList<TextEditGroup> astEditGroups = new ArrayList<TextEditGroup>();
-        ReplaceStringsVisitor visitor = new ReplaceStringsVisitor(
-                ast, astRewrite, astEditGroups,
-                tokenString, Rqualifier, xmlStringId);
+        ReplaceStringsVisitor visitor = new ReplaceStringsVisitor(ast, astRewrite, astEditGroups, tokenString,
+                Rqualifier, xmlStringId);
         node.accept(visitor);
 
         // Finally prepare the change set
@@ -1885,25 +1791,19 @@ public class ExtractStringRefactoring extends Refactoring {
      * @throws CoreException
      */
     @Override
-    public Change createChange(IProgressMonitor monitor)
-            throws CoreException, OperationCanceledException {
+    public Change createChange(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
 
         try {
             monitor.beginTask("Applying changes...", 1);
 
-            CompositeChange change = new CompositeChange(
-                    getName(),
-                    mChanges.toArray(new Change[mChanges.size()])) {
+            CompositeChange change = new CompositeChange(getName(), mChanges.toArray(new Change[mChanges.size()])) {
                 @Override
                 public ChangeDescriptor getDescriptor() {
 
-                    String comment = String.format(
-                            "Extracts string '%1$s' into R.string.%2$s",
-                            mTokenString,
+                    String comment = String.format("Extracts string '%1$s' into R.string.%2$s", mTokenString,
                             mXmlStringId);
 
-                    ExtractStringDescriptor desc = new ExtractStringDescriptor(
-                            mProject.getName(), //project
+                    ExtractStringDescriptor desc = new ExtractStringDescriptor(mProject.getName(), //project
                             comment, //description
                             comment, //comment
                             createArgumentMap());

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,11 +15,9 @@ package org.eclipse.andmore.internal.resources;
 
 import static com.android.SdkConstants.DOT_XML;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.resources.ResourceItem;
-import com.android.resources.ResourceFolderType;
-import com.android.resources.ResourceType;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.gle2.ImageUtils;
@@ -33,9 +28,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jface.dialogs.IInputValidator;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.resources.ResourceFolderType;
+import com.android.resources.ResourceType;
 
 /**
  * Validator which ensures that new Android resource names are valid.
@@ -65,8 +62,8 @@ public class ResourceNameValidator implements IInputValidator {
     /** If true, allow .xml as a name suffix */
     private boolean mAllowXmlExtension;
 
-    private ResourceNameValidator(boolean allowXmlExtension, Set<String> existing,
-            boolean isFileType, boolean isImageType) {
+    private ResourceNameValidator(boolean allowXmlExtension, Set<String> existing, boolean isFileType,
+            boolean isImageType) {
         mAllowXmlExtension = allowXmlExtension;
         mExisting = existing;
         mIsFileType = isFileType;
@@ -109,8 +106,7 @@ public class ResourceNameValidator implements IInputValidator {
                 newText = newText.substring(0, newText.length() - DOT_XML.length());
             }
 
-            if (mAllowXmlExtension && mIsImageType
-                    && ImageUtils.hasImageExtension(newText)) {
+            if (mAllowXmlExtension && mIsImageType && ImageUtils.hasImageExtension(newText)) {
                 newText = newText.substring(0, newText.lastIndexOf('.'));
             }
 
@@ -141,8 +137,7 @@ public class ResourceNameValidator implements IInputValidator {
             if (mIsFileType) {
                 char first = newText.charAt(0);
                 if (!(first >= 'a' && first <= 'z')) {
-                    return String.format(
-                            "File-based resource names must start with a lowercase letter.");
+                    return String.format("File-based resource names must start with a lowercase letter.");
                 }
 
                 // AAPT only allows lowercase+digits+_:
@@ -150,8 +145,7 @@ public class ResourceNameValidator implements IInputValidator {
                 for (int i = 0, n = newText.length(); i < n; i++) {
                     char c = newText.charAt(i);
                     if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_')) {
-                        return String.format(
-                          "File-based resource names must contain only lowercase a-z, 0-9, or _.");
+                        return String.format("File-based resource names must contain only lowercase a-z, 0-9, or _.");
                     }
                 }
             }
@@ -161,7 +155,6 @@ public class ResourceNameValidator implements IInputValidator {
             if (!validIdentifier.isOK()) {
                 return String.format("%1$s is not a valid name (reserved Java keyword)", newText);
             }
-
 
             if (mExisting != null && (mUnique || mExist)) {
                 boolean exists = mExisting.contains(newText);
@@ -187,11 +180,9 @@ public class ResourceNameValidator implements IInputValidator {
      * @param type the resource type of the resource name being validated
      * @return a new {@link ResourceNameValidator}
      */
-    public static ResourceNameValidator create(boolean allowXmlExtension,
-            ResourceFolderType type) {
+    public static ResourceNameValidator create(boolean allowXmlExtension, ResourceFolderType type) {
         boolean isFileType = type != ResourceFolderType.VALUES;
-        return new ResourceNameValidator(allowXmlExtension, null, isFileType,
-                type == ResourceFolderType.DRAWABLE);
+        return new ResourceNameValidator(allowXmlExtension, null, isFileType, type == ResourceFolderType.DRAWABLE);
     }
 
     /**
@@ -204,11 +195,10 @@ public class ResourceNameValidator implements IInputValidator {
      * @param type the resource type of the resource name being validated
      * @return a new {@link ResourceNameValidator}
      */
-    public static ResourceNameValidator create(boolean allowXmlExtension, Set<String> existing,
-            ResourceType type) {
+    public static ResourceNameValidator create(boolean allowXmlExtension, Set<String> existing, ResourceType type) {
         boolean isFileType = ResourceHelper.isFileBasedResourceType(type);
-        return new ResourceNameValidator(allowXmlExtension, existing, isFileType,
-                type == ResourceType.DRAWABLE).unique();
+        return new ResourceNameValidator(allowXmlExtension, existing, isFileType, type == ResourceType.DRAWABLE)
+                .unique();
     }
 
     /**
@@ -221,8 +211,7 @@ public class ResourceNameValidator implements IInputValidator {
      * @param type the resource type of the resource name being validated
      * @return a new {@link ResourceNameValidator}
      */
-    public static ResourceNameValidator create(boolean allowXmlExtension,
-            @Nullable IProject project,
+    public static ResourceNameValidator create(boolean allowXmlExtension, @Nullable IProject project,
             @NonNull ResourceType type) {
         Set<String> existing = null;
         if (project != null) {
@@ -236,7 +225,6 @@ public class ResourceNameValidator implements IInputValidator {
         }
 
         boolean isFileType = ResourceHelper.isFileBasedResourceType(type);
-        return new ResourceNameValidator(allowXmlExtension, existing, isFileType,
-                type == ResourceType.DRAWABLE);
+        return new ResourceNameValidator(allowXmlExtension, existing, isFileType, type == ResourceType.DRAWABLE);
     }
 }

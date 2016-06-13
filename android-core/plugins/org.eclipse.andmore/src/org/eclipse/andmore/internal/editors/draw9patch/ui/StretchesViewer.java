@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,8 +41,7 @@ public class StretchesViewer extends Composite {
 
     private static final int PADDING_COLOR_ALPHA = 100;
 
-    private static final PaletteData PADDING_PALLET
-            = new PaletteData(new RGB[] {new RGB(0x00, 0x00, 0xCC)});
+    private static final PaletteData PADDING_PALLET = new PaletteData(new RGB[] { new RGB(0x00, 0x00, 0xCC) });
 
     private static final String CHECKER_PNG_PATH = "/icons/checker.png";
 
@@ -100,11 +96,7 @@ public class StretchesViewer extends Composite {
 
         if (mContentAreaImageData == null
                 || (mContentAreaImageData != null && !equalSize(base, mContentAreaImageData))) {
-            mContentAreaImageData = new ImageData(
-                    base.width,
-                    base.height,
-                    1,
-                    PADDING_PALLET);
+            mContentAreaImageData = new ImageData(base.width, base.height, 1, PADDING_PALLET);
         } else {
             GraphicsUtilities.clearImageData(mContentAreaImageData);
         }
@@ -217,17 +209,13 @@ public class StretchesViewer extends Composite {
             int backgroundLayerWidth = mBackgroundLayer.getImageData().width;
             int backgroundLayerHeight = mBackgroundLayer.getImageData().height;
 
-            int yCount = size.y / backgroundLayerHeight
-                    + ((size.y % backgroundLayerHeight) > 0 ? 1 : 0);
-            int xCount = size.x / backgroundLayerWidth
-                    + ((size.x % backgroundLayerWidth) > 0 ? 1 : 0);
+            int yCount = size.y / backgroundLayerHeight + ((size.y % backgroundLayerHeight) > 0 ? 1 : 0);
+            int xCount = size.x / backgroundLayerWidth + ((size.x % backgroundLayerWidth) > 0 ? 1 : 0);
 
             // draw background layer
             for (int y = 0; y < yCount; y++) {
                 for (int x = 0; x < xCount; x++) {
-                    gc.drawImage(mBackgroundLayer,
-                            x * backgroundLayerWidth,
-                            y * backgroundLayerHeight);
+                    gc.drawImage(mBackgroundLayer, x * backgroundLayerWidth, y * backgroundLayerHeight);
                 }
             }
 
@@ -248,16 +236,12 @@ public class StretchesViewer extends Composite {
                     dest.width = (int) Math.ceil(p.dest.width * ratio);
                     dest.height = (int) Math.ceil(p.dest.height * ratio);
 
-                    gc.drawImage(mNinePatchedImage.getImage(), p.src.x, p.src.y,
-                            p.src.width, p.src.height,
-                            (mPadding.x + dest.x), (mPadding.y + dest.y),
-                            dest.width, dest.height);
+                    gc.drawImage(mNinePatchedImage.getImage(), p.src.x, p.src.y, p.src.width, p.src.height,
+                            (mPadding.x + dest.x), (mPadding.y + dest.y), dest.width, dest.height);
 
                     if (mIsContentAreaShown) {
-                        gc.drawImage(mContentAreaImage, p.src.x, p.src.y,
-                                p.src.width, p.src.height,
-                                (mPadding.x + dest.x), (mPadding.y + dest.y),
-                                dest.width, dest.height);
+                        gc.drawImage(mContentAreaImage, p.src.x, p.src.y, p.src.width, p.src.height,
+                                (mPadding.x + dest.x), (mPadding.y + dest.y), dest.width, dest.height);
                     }
                 }
             }

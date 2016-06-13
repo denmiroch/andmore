@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,13 +12,11 @@
  */
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.annotations.NonNull;
-import com.android.ide.common.resources.configuration.FolderConfiguration;
-import com.android.resources.ResourceFolderType;
-import com.google.common.base.Charsets;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.configuration.ConfigurationChooser;
 import org.eclipse.andmore.internal.resources.manager.ResourceManager;
 import org.eclipse.core.resources.IFile;
@@ -36,8 +31,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import com.android.annotations.NonNull;
+import com.android.ide.common.resources.configuration.FolderConfiguration;
+import com.android.resources.ResourceFolderType;
+import com.google.common.base.Charsets;
 
 /** Job which creates a new layout file for a given configuration */
 class CreateNewConfigJob extends Job {
@@ -45,9 +42,7 @@ class CreateNewConfigJob extends Job {
     private final IFile mFromFile;
     private final FolderConfiguration mConfig;
 
-    CreateNewConfigJob(
-            @NonNull GraphicalEditorPart editor,
-            @NonNull IFile fromFile,
+    CreateNewConfigJob(@NonNull GraphicalEditorPart editor, @NonNull IFile fromFile,
             @NonNull FolderConfiguration config) {
         super("Create Alternate Layout");
         mEditor = editor;
@@ -68,8 +63,7 @@ class CreateNewConfigJob extends Job {
             AdtUtils.ensureExists(newParentFolder);
             final IFile file = newParentFolder.getFile(mFromFile.getName());
             if (file.exists()) {
-                String message = String.format("File 'res/%1$s/%2$s' already exists!",
-                        folderName, mFromFile.getName());
+                String message = String.format("File 'res/%1$s/%2$s' already exists!", folderName, mFromFile.getName());
                 return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, message);
             }
 
@@ -111,17 +105,14 @@ class CreateNewConfigJob extends Job {
                 }
             });
         } catch (IOException e2) {
-            String message = String.format(
-                    "Failed to create File 'res/%1$s/%2$s' : %3$s",
-                    folderName, mFromFile.getName(), e2.getMessage());
+            String message = String.format("Failed to create File 'res/%1$s/%2$s' : %3$s", folderName,
+                    mFromFile.getName(), e2.getMessage());
             AndmoreAndroidPlugin.displayError("Layout Creation", message);
 
-            return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    message, e2);
+            return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, message, e2);
         } catch (CoreException e2) {
-            String message = String.format(
-                    "Failed to create File 'res/%1$s/%2$s' : %3$s",
-                    folderName, mFromFile.getName(), e2.getMessage());
+            String message = String.format("Failed to create File 'res/%1$s/%2$s' : %3$s", folderName,
+                    mFromFile.getName(), e2.getMessage());
             AndmoreAndroidPlugin.displayError("Layout Creation", message);
 
             return e2.getStatus();

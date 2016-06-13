@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
+ * IBM Corporation - initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.andmore.internal.wizards.newproject;
@@ -37,11 +37,8 @@ public class WorkingSetGroup {
     private Button mEnableButton;
 
     public WorkingSetGroup() {
-        String[] workingSetIds = new String[] {
-                IWorkingSetIDs.JAVA, IWorkingSetIDs.RESOURCE
-        };
-        fWorkingSetBlock = new WorkingSetConfigurationBlock(workingSetIds, JavaPlugin.getDefault()
-                .getDialogSettings());
+        String[] workingSetIds = new String[] { IWorkingSetIDs.JAVA, IWorkingSetIDs.RESOURCE };
+        fWorkingSetBlock = new WorkingSetConfigurationBlock(workingSetIds, JavaPlugin.getDefault().getDialogSettings());
     }
 
     public Composite createControl(Composite composite) {

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +12,10 @@
  */
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.ide.common.api.DropFeedback;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.InsertType;
-import com.android.ide.common.api.Point;
-import com.android.ide.common.api.Rect;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.gre.NodeFactory;
@@ -37,10 +33,11 @@ import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Display;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import com.android.ide.common.api.DropFeedback;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.InsertType;
+import com.android.ide.common.api.Point;
+import com.android.ide.common.api.Rect;
 
 /**
  * The Move gesture provides the operation for moving widgets around in the canvas.
@@ -152,7 +149,7 @@ public class MoveGesture extends DropGesture {
         mCanvas.redraw();
         return true;
     }
-
+    
     @Override
     public boolean keyReleased(KeyEvent event) {
         update(mCanvas.getGestureManager().getCurrentControlPoint());
@@ -167,7 +164,9 @@ public class MoveGesture extends DropGesture {
      */
     @Override
     public void dragEnter(DropTargetEvent event) {
-        if (DEBUG) AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "drag enter", event);
+        if (DEBUG) {
+            AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "drag enter", event);
+        }
 
         // Make sure we don't have any residual data from an earlier operation.
         clearDropInfo();
@@ -198,11 +197,8 @@ public class MoveGesture extends DropGesture {
         // if there is no data to transfer, invalidate the drag'n'drop.
         // The assumption is that the transfer should have at least one element with a
         // a non-null non-empty FQCN. Everything else is optional.
-        if (mCurrentDragElements == null ||
-                mCurrentDragElements.length == 0 ||
-                mCurrentDragElements[0] == null ||
-                mCurrentDragElements[0].getFqcn() == null ||
-                mCurrentDragElements[0].getFqcn().length() == 0) {
+        if (mCurrentDragElements == null || mCurrentDragElements.length == 0 || mCurrentDragElements[0] == null
+                || mCurrentDragElements[0].getFqcn() == null || mCurrentDragElements[0].getFqcn().length() == 0) {
             event.detail = DND.DROP_NONE;
         }
 
@@ -215,7 +211,9 @@ public class MoveGesture extends DropGesture {
      */
     @Override
     public void dragOperationChanged(DropTargetEvent event) {
-        if (DEBUG) AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "drag changed", event);
+        if (DEBUG) {
+            AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "drag changed", event);
+        }
 
         checkDataType(event);
         recomputeDragType(event);
@@ -227,8 +225,7 @@ public class MoveGesture extends DropGesture {
             // If the drag comes from the same canvas we default to move, otherwise we
             // default to copy.
 
-            if (mGlobalDragInfo.getSourceCanvas() == mCanvas &&
-                    (event.operations & DND.DROP_MOVE) != 0) {
+            if (mGlobalDragInfo.getSourceCanvas() == mCanvas && (event.operations & DND.DROP_MOVE) != 0) {
                 event.detail = DND.DROP_MOVE;
             } else if ((event.operations & DND.DROP_COPY) != 0) {
                 event.detail = DND.DROP_COPY;
@@ -247,7 +244,9 @@ public class MoveGesture extends DropGesture {
      */
     @Override
     public void dragLeave(DropTargetEvent event) {
-        if (DEBUG) AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "drag leave");
+        if (DEBUG) {
+            AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "drag leave");
+        }
 
         // dragLeave is unfortunately called right before data is about to be dropped
         // (between the last dropMove and the next dropAccept). That means we can't just
@@ -277,7 +276,9 @@ public class MoveGesture extends DropGesture {
      */
     @Override
     public void dropAccept(DropTargetEvent event) {
-        if (DEBUG) AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "drop accept");
+        if (DEBUG) {
+            AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "drop accept");
+        }
 
         checkDataType(event);
 
@@ -309,7 +310,9 @@ public class MoveGesture extends DropGesture {
      */
     @Override
     public void drop(final DropTargetEvent event) {
-        if (DEBUG) AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "dropped");
+        if (DEBUG) {
+            AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "dropped");
+        }
 
         SimpleElement[] elements = null;
 
@@ -322,7 +325,9 @@ public class MoveGesture extends DropGesture {
         }
 
         if (elements == null || elements.length < 1) {
-            if (DEBUG) AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "drop missing drop data");
+            if (DEBUG) {
+                AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "drop missing drop data");
+            }
             return;
         }
 
@@ -337,7 +342,9 @@ public class MoveGesture extends DropGesture {
                 // Attempt to create a root node accordingly.
                 createDocumentRoot(elements);
             } else {
-                if (DEBUG) AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "dropped on null targetNode");
+                if (DEBUG) {
+                    AndmoreAndroidPlugin.printErrorToConsole("DEBUG", "dropped on null targetNode");
+                }
             }
             return;
         }
@@ -397,11 +404,8 @@ public class MoveGesture extends DropGesture {
                 @Override
                 public void run() {
                     InsertType insertType = getInsertType(event, mTargetNode);
-                    mCanvas.getRulesEngine().callOnDropped(mTargetNode,
-                            elementsFinal,
-                            mFeedback,
-                            new Point(canvasPoint.x, canvasPoint.y),
-                            insertType);
+                    mCanvas.getRulesEngine().callOnDropped(mTargetNode, elementsFinal, mFeedback,
+                            new Point(canvasPoint.x, canvasPoint.y), insertType);
                     mTargetNode.applyPendingChanges();
                     // Clean up drag if applicable
                     if (event.detail == DND.DROP_MOVE) {
@@ -468,8 +472,7 @@ public class MoveGesture extends DropGesture {
             SelectionItem[] selection = dragInfo.getCurrentSelection();
             if (selection != null) {
                 for (SelectionItem item : selection) {
-                    if (item.getNode() != null
-                            && item.getNode().getParent() == mTargetNode) {
+                    if (item.getNode() != null && item.getNode().getParent() == mTargetNode) {
                         return InsertType.MOVE_WITHIN;
                     }
                 }
@@ -492,8 +495,7 @@ public class MoveGesture extends DropGesture {
      * @param detail The DnD mode, as used in {@link DropTargetEvent#detail}.
      * @return A string suitable as an undo-label for the drop event
      */
-    public static String computeUndoLabel(NodeProxy targetNode,
-            SimpleElement[] elements, int detail) {
+    public static String computeUndoLabel(NodeProxy targetNode, SimpleElement[] elements, int detail) {
         // Decide whether it's a move or a copy; we'll label moves specifically
         // as a move and consider everything else a "Drop"
         String verb = (detail == DND.DROP_MOVE) ? "Move" : "Drop";
@@ -675,12 +677,10 @@ public class MoveGesture extends DropGesture {
                 DropFeedback df = null;
                 NodeProxy targetNode = null;
 
-                for (CanvasViewInfo targetVi = vi;
-                     targetVi != null && df == null;
-                     targetVi = targetVi.getParent()) {
+                for (CanvasViewInfo targetVi = vi; targetVi != null && df == null; targetVi = targetVi.getParent()) {
                     targetNode = mCanvas.getNodeFactory().create(targetVi);
-                    df = mCanvas.getRulesEngine().callOnDropEnter(targetNode,
-                            targetVi.getViewObject(), mCurrentDragElements);
+                    df = mCanvas.getRulesEngine().callOnDropEnter(targetNode, targetVi.getViewObject(),
+                            mCurrentDragElements);
 
                     if (df != null) {
                         // We should also dispatch an onDropMove() call to the initial enter
@@ -691,13 +691,11 @@ public class MoveGesture extends DropGesture {
                         // the -position- of the mouse), and we want this computation to happen
                         // before we ask the view to draw its feedback.
                         updateDropFeedback(df, event);
-                        df = mCanvas.getRulesEngine().callOnDropMove(targetNode,
-                                mCurrentDragElements, df, new Point(p.x, p.y));
+                        df = mCanvas.getRulesEngine().callOnDropMove(targetNode, mCurrentDragElements, df,
+                                new Point(p.x, p.y));
                     }
 
-                    if (df != null &&
-                            event.detail == DND.DROP_MOVE &&
-                            mCanvas == mGlobalDragInfo.getSourceCanvas()) {
+                    if (df != null && event.detail == DND.DROP_MOVE && mCanvas == mGlobalDragInfo.getSourceCanvas()) {
                         // You can't move an object into itself in the same canvas.
                         // E.g. case of moving a layout and the node under the mouse is the
                         // layout itself: a copy would be ok but not a move operation of the
@@ -712,8 +710,7 @@ public class MoveGesture extends DropGesture {
                                     // parent in the ViewInfo chain.
 
                                     updateDropFeedback(df, event);
-                                    mCanvas.getRulesEngine().callOnDropLeave(
-                                            targetNode, mCurrentDragElements, df);
+                                    mCanvas.getRulesEngine().callOnDropLeave(targetNode, mCurrentDragElements, df);
                                     df = null;
                                     targetNode = null;
                                 }
@@ -746,11 +743,9 @@ public class MoveGesture extends DropGesture {
 
         if (isMove && mTargetNode != null && mFeedback != null) {
             // this is a move inside the same view
-            com.android.ide.common.api.Point p2 =
-                new com.android.ide.common.api.Point(p.x, p.y);
+            com.android.ide.common.api.Point p2 = new com.android.ide.common.api.Point(p.x, p.y);
             updateDropFeedback(mFeedback, event);
-            DropFeedback df = mCanvas.getRulesEngine().callOnDropMove(
-                    mTargetNode, mCurrentDragElements, mFeedback, p2);
+            DropFeedback df = mCanvas.getRulesEngine().callOnDropMove(mTargetNode, mCurrentDragElements, mFeedback, p2);
             mCanvas.getGestureManager().updateMessage(mFeedback);
 
             if (df == null) {

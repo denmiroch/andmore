@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,9 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
-
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -32,6 +26,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 
 /**
  * An ImageControl which simply renders an image, with optional margins and tooltips. This
@@ -194,8 +191,8 @@ public class ImageControl extends Canvas implements MouseTrackListener {
             gc.setInterpolation(SWT.HIGH);
         }
 
-        gc.drawImage(mImage, 0, 0, imageWidth, imageHeight, rect.x + mLeftMargin, rect.y
-                + mTopMargin, destWidth, destHeight);
+        gc.drawImage(mImage, 0, 0, imageWidth, imageHeight, rect.x + mLeftMargin, rect.y + mTopMargin, destWidth,
+                destHeight);
 
         gc.setAntialias(oldGcAlias);
         gc.setInterpolation(oldGcInterpolation);
@@ -236,6 +233,5 @@ public class ImageControl extends Canvas implements MouseTrackListener {
     }
 
     @Override
-    public void mouseHover(MouseEvent e) {
-    }
+    public void mouseHover(MouseEvent e) {}
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,17 +17,19 @@ import static com.android.SdkConstants.GRADLE_LATEST_VERSION;
 import static com.android.SdkConstants.GRADLE_PLUGIN_LATEST_VERSION;
 import static com.android.SdkConstants.GRADLE_PLUGIN_NAME;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.io.IAbstractFile;
-import com.android.sdklib.io.FileOp;
-import com.android.xml.AndroidManifest;
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.io.Closeables;
-import com.google.common.io.Files;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
 import org.eclipse.andmore.internal.sdk.ProjectState;
@@ -52,19 +51,17 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.io.IAbstractFile;
+import com.android.sdklib.io.FileOp;
+import com.android.xml.AndroidManifest;
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.google.common.io.Closeables;
+import com.google.common.io.Files;
 
 /**
  * Creates build.gradle and settings.gradle files for a set of projects.
@@ -75,17 +72,14 @@ public class BuildFileCreator {
     static final String BUILD_FILE = "build.gradle"; //$NON-NLS-1$
     static final String SETTINGS_FILE = "settings.gradle"; //$NON-NLS-1$
     private static final String NEWLINE = System.getProperty("line.separator"); //$NON-NLS-1$
-    private static final String GRADLE_WRAPPER_LOCATION =
-            "tools/templates/gradle/wrapper"; //$NON-NLS-1$
-    static final String PLUGIN_CLASSPATH =
-            "classpath '" + GRADLE_PLUGIN_NAME + GRADLE_PLUGIN_LATEST_VERSION + "'"; //$NON-NLS-1$
+    private static final String GRADLE_WRAPPER_LOCATION = "tools/templates/gradle/wrapper"; //$NON-NLS-1$
+    static final String PLUGIN_CLASSPATH = "classpath '" + GRADLE_PLUGIN_NAME + GRADLE_PLUGIN_LATEST_VERSION + "'"; //$NON-NLS-1$
     static final String MAVEN_REPOSITORY = "mavenCentral()"; //$NON-NLS-1$
 
-    private static final String[] GRADLE_WRAPPER_FILES = new String[] {
-        "gradlew", //$NON-NLS-1$
-        "gradlew.bat", //$NON-NLS-1$
-        "gradle/wrapper/gradle-wrapper.jar", //$NON-NLS-1$
-        "gradle/wrapper/gradle-wrapper.properties" //$NON-NLS-1$
+    private static final String[] GRADLE_WRAPPER_FILES = new String[] { "gradlew", //$NON-NLS-1$
+            "gradlew.bat", //$NON-NLS-1$
+            "gradle/wrapper/gradle-wrapper.jar", //$NON-NLS-1$
+            "gradle/wrapper/gradle-wrapper.properties" //$NON-NLS-1$
     };
 
     private static final Comparator<IFile> FILE_COMPARATOR = new Comparator<IFile>() {
@@ -105,9 +99,7 @@ public class BuildFileCreator {
      * @return project names for which buildfiles were created
      * @throws InterruptedException thrown when user cancels task
      */
-    public static void createBuildFiles(
-            @NonNull ProjectSetupBuilder builder,
-            @NonNull Shell shell,
+    public static void createBuildFiles(@NonNull ProjectSetupBuilder builder, @NonNull Shell shell,
             @NonNull IProgressMonitor pm) {
 
         File gradleLocation = new File(Sdk.getCurrent().getSdkOsLocation(), GRADLE_WRAPPER_LOCATION);
@@ -191,8 +183,7 @@ public class BuildFileCreator {
             }
 
             // Now iterate over all the modules and generate the build files.
-            localmonitor = SubMonitor.convert(pm, ExportMessages.PageTitle,
-                    confirmedFiles.size());
+            localmonitor = SubMonitor.convert(pm, ExportMessages.PageTitle, confirmedFiles.size());
             List<String> projectSettingsPath = Lists.newArrayList();
             for (GradleModule currentModule : modules) {
                 IProject moduleProject = currentModule.getProject();
@@ -202,8 +193,7 @@ public class BuildFileCreator {
                     continue;
                 }
 
-                localmonitor.setTaskName(NLS.bind(ExportMessages.FileStatusMessage,
-                        moduleProject.getName()));
+                localmonitor.setTaskName(NLS.bind(ExportMessages.FileStatusMessage, moduleProject.getName()));
 
                 ProjectState projectState = Sdk.getProjectState(moduleProject);
                 BuildFileCreator instance = new BuildFileCreator(currentModule, shell);
@@ -224,27 +214,25 @@ public class BuildFileCreator {
                     instance.createJavaSourceSets();
                 }
 
-               try {
+                try {
                     // Write the build file
                     String buildfile = instance.mBuildFile.toString();
-                    InputStream is =
-                            new ByteArrayInputStream(buildfile.getBytes("UTF-8")); //$NON-NLS-1$
+                    InputStream is = new ByteArrayInputStream(buildfile.getBytes("UTF-8")); //$NON-NLS-1$
                     if (file.exists()) {
                         file.setContents(is, true, true, null);
                     } else {
                         file.create(is, true, null);
                     }
-               } catch (Exception e) {
-                     status.addFileStatus(ExportStatus.FileStatus.IO_FAILURE,
-                             file.getLocation().toFile());
-                     status.setErrorMessage(e.getMessage());
-                     return;
-               }
+                } catch (Exception e) {
+                    status.addFileStatus(ExportStatus.FileStatus.IO_FAILURE, file.getLocation().toFile());
+                    status.setErrorMessage(e.getMessage());
+                    return;
+                }
 
-               if (localmonitor.isCanceled()) {
-                   return;
-               }
-               localmonitor.worked(1);
+                if (localmonitor.isCanceled()) {
+                    return;
+                }
+                localmonitor.worked(1);
 
                 // get the project path to add it to the settings.gradle.
                 projectSettingsPath.add(currentModule.getPath());
@@ -399,8 +387,7 @@ public class BuildFileCreator {
             // otherwise we check source compatibility
             String source = javaProject.getOption(JavaCore.COMPILER_SOURCE, true);
             if (JavaCore.VERSION_1_7.equals(source)) {
-                mBuildFile.append(
-                        "    compileOptions {\n" + //$NON-NLS-1$
+                mBuildFile.append("    compileOptions {\n" + //$NON-NLS-1$
                         "        sourceCompatibility JavaVersion.VERSION_1_7\n" + //$NON-NLS-1$
                         "        targetCompatibility JavaVersion.VERSION_1_7\n" + //$NON-NLS-1$
                         "    }\n" + //$NON-NLS-1$
@@ -423,8 +410,8 @@ public class BuildFileCreator {
         }
         List<String> srcDirs = new ArrayList<String>();
         for (IClasspathEntry entry : mModule.getJavaProject().readRawClasspath()) {
-            if (entry.getEntryKind() != IClasspathEntry.CPE_SOURCE ||
-                    SdkConstants.FD_GEN_SOURCES.equals(entry.getPath().lastSegment())) {
+            if (entry.getEntryKind() != IClasspathEntry.CPE_SOURCE
+                    || SdkConstants.FD_GEN_SOURCES.equals(entry.getPath().lastSegment())) {
                 continue;
             }
             IPath path = entry.getPath().removeFirstSegments(1);
@@ -449,8 +436,10 @@ public class BuildFileCreator {
         if (srcDirs.contains("'src'")) {
             mBuildFile.append("\n"); //$NON-NLS-1$
             mBuildFile.append("        // Move the build types to build-types/<type>\n"); //$NON-NLS-1$
-            mBuildFile.append("        // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...\n"); //$NON-NLS-1$
-            mBuildFile.append("        // This moves them out of them default location under src/<type>/... which would\n"); //$NON-NLS-1$
+            mBuildFile.append(
+                    "        // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...\n"); //$NON-NLS-1$
+            mBuildFile.append(
+                    "        // This moves them out of them default location under src/<type>/... which would\n"); //$NON-NLS-1$
             mBuildFile.append("        // conflict with src/ being used by the main source set.\n"); //$NON-NLS-1$
             mBuildFile.append("        // Adding new build types or product flavors should be accompanied\n"); //$NON-NLS-1$
             mBuildFile.append("        // by a similar customization.\n"); //$NON-NLS-1$
@@ -502,8 +491,7 @@ public class BuildFileCreator {
      * and creates one if it does not.
      * @throws IOException
      */
-    private static void writeGradleSettingsFile(File settingsFile, List<String> projectPaths)
-            throws IOException {
+    private static void writeGradleSettingsFile(File settingsFile, List<String> projectPaths) throws IOException {
         StringBuilder contents = new StringBuilder();
         for (String path : projectPaths) {
             contents.append("include '").append(path).append("'\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -531,24 +519,20 @@ public class BuildFileCreator {
      * @throws CoreException
      *             thrown if project is under version control, but not connected
      */
-    static Set<IFile> validateEdit(
-            @NonNull List<IFile> files,
-            @NonNull ExportStatus exportStatus,
+    static Set<IFile> validateEdit(@NonNull List<IFile> files, @NonNull ExportStatus exportStatus,
             @NonNull Shell shell) {
         Set<IFile> confirmedFiles = new TreeSet<IFile>(FILE_COMPARATOR);
         if (files.size() == 0) {
             return confirmedFiles;
         }
-        IStatus status = (files.get(0)).getWorkspace().validateEdit(
-                files.toArray(new IFile[files.size()]), shell);
+        IStatus status = (files.get(0)).getWorkspace().validateEdit(files.toArray(new IFile[files.size()]), shell);
         if (status.isMultiStatus() && status.getChildren().length > 0) {
             for (int i = 0; i < status.getChildren().length; i++) {
                 IStatus statusChild = status.getChildren()[i];
                 if (statusChild.isOK()) {
                     confirmedFiles.add(files.get(i));
                 } else {
-                    exportStatus.addFileStatus(
-                            ExportStatus.FileStatus.VCS_FAILURE,
+                    exportStatus.addFileStatus(ExportStatus.FileStatus.VCS_FAILURE,
                             files.get(i).getLocation().toFile());
                 }
             }
@@ -579,8 +563,8 @@ public class BuildFileCreator {
     // -------------------------------------------------------------------------------
 
     private static final String GRADLE_PROPERTIES = "gradle-wrapper.properties";
-    private static final String GRADLEW_PROPERTIES_PATH =
-            "gradle" + File.separator + "wrapper" + File.separator + GRADLE_PROPERTIES;
+    private static final String GRADLEW_PROPERTIES_PATH = "gradle" + File.separator + "wrapper" + File.separator
+            + GRADLE_PROPERTIES;
     private static final String GRADLEW_DISTRIBUTION_URL_PROPERTY_NAME = "distributionUrl";
 
     @NonNull
@@ -590,19 +574,17 @@ public class BuildFileCreator {
 
     @Nullable
     public static File findWrapperPropertiesFile(@NonNull File projectRootDir) {
-      File wrapperPropertiesFile = getGradleWrapperPropertiesFilePath(projectRootDir);
-      return wrapperPropertiesFile.isFile() ? wrapperPropertiesFile : null;
+        File wrapperPropertiesFile = getGradleWrapperPropertiesFilePath(projectRootDir);
+        return wrapperPropertiesFile.isFile() ? wrapperPropertiesFile : null;
     }
 
-    private static boolean updateGradleDistributionUrl(
-            @NonNull String gradleVersion,
-            @NonNull File propertiesFile) throws IOException {
+    private static boolean updateGradleDistributionUrl(@NonNull String gradleVersion, @NonNull File propertiesFile)
+            throws IOException {
         Properties properties = loadGradleWrapperProperties(propertiesFile);
         String gradleDistributionUrl = getGradleDistributionUrl(gradleVersion, false);
         String property = properties.getProperty(GRADLEW_DISTRIBUTION_URL_PROPERTY_NAME);
-        if (property != null
-                && (property.equals(gradleDistributionUrl) || property
-                        .equals(getGradleDistributionUrl(gradleVersion, true)))) {
+        if (property != null && (property.equals(gradleDistributionUrl)
+                || property.equals(getGradleDistributionUrl(gradleVersion, true)))) {
             return false;
         }
         properties.setProperty(GRADLEW_DISTRIBUTION_URL_PROPERTY_NAME, gradleDistributionUrl);
@@ -617,8 +599,7 @@ public class BuildFileCreator {
     }
 
     @NonNull
-    private static Properties loadGradleWrapperProperties(@NonNull File propertiesFile)
-            throws IOException {
+    private static Properties loadGradleWrapperProperties(@NonNull File propertiesFile) throws IOException {
         Properties properties = new Properties();
         FileInputStream fileInputStream = null;
         try {
@@ -631,10 +612,8 @@ public class BuildFileCreator {
     }
 
     @NonNull
-    private static String getGradleDistributionUrl(@NonNull String gradleVersion,
-            boolean binOnly) {
+    private static String getGradleDistributionUrl(@NonNull String gradleVersion, boolean binOnly) {
         String suffix = binOnly ? "bin" : "all";
-        return String.format("http://services.gradle.org/distributions/gradle-%1$s-" + suffix
-                + ".zip", gradleVersion);
+        return String.format("http://services.gradle.org/distributions/gradle-%1$s-" + suffix + ".zip", gradleVersion);
     }
 }

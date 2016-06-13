@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,11 +36,12 @@ import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.TAG
 import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.TAG_PARAMETER;
 import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.TAG_THUMB;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.assetstudiolib.GraphicGenerator;
-import com.android.utils.Pair;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.assetstudio.AssetType;
@@ -61,12 +59,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.assetstudiolib.GraphicGenerator;
+import com.android.utils.Pair;
+import com.google.common.collect.Lists;
 
 /** An ADT template along with metadata */
 class TemplateMetadata {
@@ -79,8 +76,8 @@ class TemplateMetadata {
     private Integer mRevision;
     private boolean mNoIcons;
     private CreateAssetSetWizardState mIconState;
-	private String mFormFactor;
-	private String mCategory;
+    private String mFormFactor;
+    private String mCategory;
 
     TemplateMetadata(@NonNull Document document) {
         mDocument = document;
@@ -185,32 +182,32 @@ class TemplateMetadata {
 
         return mRevision.intValue();
     }
-    
+
     public String getFormFactor() {
         if (mFormFactor == null) {
             mFormFactor = "Mobile";
-            
+
             NodeList formfactorDeclarations = mDocument.getElementsByTagName(TAG_FORMFACTOR);
             if (formfactorDeclarations.getLength() > 0) {
-            	Element element = (Element) formfactorDeclarations.item(0);
+                Element element = (Element) formfactorDeclarations.item(0);
                 String formFactor = element.getAttribute(ATTR_VALUE);
                 if (formFactor != null && !formFactor.isEmpty()) {
-                	mFormFactor = formFactor;
+                    mFormFactor = formFactor;
                 }
             }
         }
         return mFormFactor;
     }
-    
+
     public String getCategory() {
         if (mCategory == null) {
-        	mCategory = "";
-        	NodeList categories = mDocument.getElementsByTagName(TAG_CATEGORY);
+            mCategory = "";
+            NodeList categories = mDocument.getElementsByTagName(TAG_CATEGORY);
             if (categories.getLength() > 0) {
-            	Element element = (Element) categories.item(0);
-            	String category = element.getAttribute(ATTR_VALUE);
+                Element element = (Element) categories.item(0);
+                String category = element.getAttribute(ATTR_VALUE);
                 if (category != null && !category.isEmpty()) {
-                	mCategory = category;
+                    mCategory = category;
                 }
             }
         }
@@ -256,8 +253,8 @@ class TemplateMetadata {
             if (mIconState.outputName != null) {
                 // Register parameter such that if it is referencing other values, it gets
                 // updated when other values are edited
-                Parameter outputParameter = new Parameter(this,
-                        Parameter.Type.STRING, "_iconname", mIconState.outputName); //$NON-NLS-1$
+                Parameter outputParameter = new Parameter(this, Parameter.Type.STRING, "_iconname", //$NON-NLS-1$
+                        mIconState.outputName);
                 getParameters().add(outputParameter);
             }
 
@@ -359,7 +356,6 @@ class TemplateMetadata {
         if (thumbs.getLength() == 0) {
             return null;
         }
-
 
         int bestMatchCount = 0;
         Element bestMatch = null;

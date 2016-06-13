@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,16 +20,12 @@ import static com.android.SdkConstants.TARGET_API;
 import static org.eclipse.jdt.core.dom.ArrayInitializer.EXPRESSIONS_PROPERTY;
 import static org.eclipse.jdt.core.dom.SingleMemberAnnotation.VALUE_PROPERTY;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.sdklib.SdkVersionInfo;
-import com.android.tools.lint.checks.AnnotationDetector;
-import com.android.tools.lint.checks.ApiDetector;
-import com.android.tools.lint.detector.api.Issue;
-import com.android.tools.lint.detector.api.Scope;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -68,9 +61,13 @@ import org.eclipse.ui.IMarkerResolution2;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.sdklib.SdkVersionInfo;
+import com.android.tools.lint.checks.AnnotationDetector;
+import com.android.tools.lint.checks.ApiDetector;
+import com.android.tools.lint.detector.api.Issue;
+import com.android.tools.lint.detector.api.Scope;
 
 /**
  * Marker resolution for adding {@code @SuppressLint} annotations in Java files.
@@ -87,12 +84,8 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
      */
     private final String mTargetApi;
 
-    private AddSuppressAnnotation(
-            @NonNull String id,
-            @NonNull IMarker marker,
-            @NonNull BodyDeclaration node,
-            @NonNull String description,
-            @Nullable String targetApi) {
+    private AddSuppressAnnotation(@NonNull String id, @NonNull IMarker marker, @NonNull BodyDeclaration node,
+            @NonNull String description, @Nullable String targetApi) {
         mId = id;
         mMarker = marker;
         mNode = node;
@@ -149,10 +142,8 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
         }
     }
 
-    @SuppressWarnings({"rawtypes"}) // Java AST API has raw types
-    private MultiTextEdit addSuppressAnnotation(
-            IDocument document,
-            ICompilationUnit compilationUnit,
+    @SuppressWarnings({ "rawtypes" }) // Java AST API has raw types
+    private MultiTextEdit addSuppressAnnotation(IDocument document, ICompilationUnit compilationUnit,
             BodyDeclaration declaration) throws CoreException {
         List modifiers = declaration.modifiers();
         SingleMemberAnnotation existing = null;
@@ -177,8 +168,7 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
             StringLiteral value = ast.newStringLiteral();
             value.setLiteralValue(mId);
             newAnnotation.setValue(value);
-            ListRewrite listRewrite = rewriter.getListRewrite(declaration,
-                    declaration.getModifiersProperty());
+            ListRewrite listRewrite = rewriter.getListRewrite(declaration, declaration.getModifiersProperty());
             listRewrite.insertFirst(newAnnotation, null);
         } else {
             Expression existingValue = existing.getValue();
@@ -204,7 +194,7 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
                 if (expressions != null) {
                     for (Object o : expressions) {
                         if (o instanceof StringLiteral) {
-                            if (mId.equals(((StringLiteral)o).getLiteralValue())) {
+                            if (mId.equals(((StringLiteral) o).getLiteralValue())) {
                                 // Already contains the id
                                 return null;
                             }
@@ -236,10 +226,8 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
         return edit;
     }
 
-    @SuppressWarnings({"rawtypes"}) // Java AST API has raw types
-    private MultiTextEdit addTargetApiAnnotation(
-            IDocument document,
-            ICompilationUnit compilationUnit,
+    @SuppressWarnings({ "rawtypes" }) // Java AST API has raw types
+    private MultiTextEdit addTargetApiAnnotation(IDocument document, ICompilationUnit compilationUnit,
             BodyDeclaration declaration) throws CoreException {
         List modifiers = declaration.modifiers();
         SingleMemberAnnotation existing = null;
@@ -264,8 +252,7 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
             newAnnotation.setTypeName(ast.newSimpleName(local));
             Expression value = createLiteral(ast);
             newAnnotation.setValue(value);
-            ListRewrite listRewrite = rewriter.getListRewrite(declaration,
-                    declaration.getModifiersProperty());
+            ListRewrite listRewrite = rewriter.getListRewrite(declaration, declaration.getModifiersProperty());
             listRewrite.insertFirst(newAnnotation, null);
         } else {
             Expression value = createLiteral(ast);
@@ -288,7 +275,7 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
         if (!isCodeName()) {
             value = ast.newQualifiedName(
                     ast.newQualifiedName(ast.newSimpleName("Build"), //$NON-NLS-1$
-                                ast.newSimpleName("VERSION_CODES")), //$NON-NLS-1$
+                            ast.newSimpleName("VERSION_CODES")), //$NON-NLS-1$
                     ast.newSimpleName(mTargetApi));
         } else {
             value = ast.newNumberLiteral(mTargetApi);
@@ -307,8 +294,7 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
      * @param id the issue id
      * @param resolutions a list to add the created resolutions into, if any
      */
-    public static void createFixes(IMarker marker, String id,
-            List<IMarkerResolution> resolutions) {
+    public static void createFixes(IMarker marker, String id, List<IMarkerResolution> resolutions) {
         ITextEditor textEditor = AdtUtils.getActiveTextEditor();
         IDocumentProvider provider = textEditor.getDocumentProvider();
         IEditorInput editorInput = textEditor.getEditorInput();
@@ -325,15 +311,13 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
         int end = marker.getAttribute(IMarker.CHAR_END, -1);
         offset = start;
         length = end - start;
-        CompilationUnit root = SharedASTProvider.getAST(compilationUnit,
-                SharedASTProvider.WAIT_YES, null);
+        CompilationUnit root = SharedASTProvider.getAST(compilationUnit, SharedASTProvider.WAIT_YES, null);
         if (root == null) {
             return;
         }
 
         int api = -1;
-        if (id.equals(ApiDetector.UNSUPPORTED.getId()) ||
-                id.equals(ApiDetector.INLINED.getId())) {
+        if (id.equals(ApiDetector.UNSUPPORTED.getId()) || id.equals(ApiDetector.INLINED.getId())) {
             String message = marker.getAttribute(IMarker.MESSAGE, null);
             if (message != null) {
                 Pattern pattern = Pattern.compile("\\s(\\d+)\\s"); //$NON-NLS-1$
@@ -345,8 +329,7 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
         }
 
         Issue issue = EclipseLintClient.getRegistry().getIssue(id);
-        boolean isClassDetector = issue != null && issue.getImplementation().getScope().contains(
-                Scope.CLASS_FILE);
+        boolean isClassDetector = issue != null && issue.getImplementation().getScope().contains(Scope.CLASS_FILE);
 
         // Don't offer to suppress (with an annotation) the annotation checks
         if (issue == AnnotationDetector.INSIDE_METHOD) {
@@ -396,10 +379,9 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
 
                 // In class files, detectors can only find annotations on methods
                 // and on classes, not on variable declarations
-                if (isClassDetector && !(body instanceof MethodDeclaration
-                            || body instanceof TypeDeclaration
-//                            || body instanceof AnonymousClassDeclaration
-                            || body instanceof FieldDeclaration)) {
+                if (isClassDetector && !(body instanceof MethodDeclaration || body instanceof TypeDeclaration
+                //                            || body instanceof AnonymousClassDeclaration
+                        || body instanceof FieldDeclaration)) {
                     continue;
                 }
 
@@ -408,15 +390,13 @@ class AddSuppressAnnotation implements IMarkerResolution2 {
 
                 if (api != -1
                         // @TargetApi is only valid on methods and classes, not fields etc
-                        && (body instanceof MethodDeclaration
-                                || body instanceof TypeDeclaration)) {
+                        && (body instanceof MethodDeclaration || body instanceof TypeDeclaration)) {
                     String apiString = SdkVersionInfo.getBuildCode(api);
                     if (apiString == null) {
                         apiString = Integer.toString(api);
                     }
                     desc = String.format("Add @TargetApi(%1$s) to '%2$s'", apiString, target);
-                    resolutions.add(new AddSuppressAnnotation(id, marker, declaration, desc,
-                            apiString));
+                    resolutions.add(new AddSuppressAnnotation(id, marker, declaration, desc, apiString));
                 }
             }
         }

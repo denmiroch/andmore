@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,21 +20,21 @@ import org.eclipse.ui.help.IWorkbenchHelpSystem;
 
 public class OpenOnlineHelpStudioHandler extends AbstractHandler {
 
-	private static final String HREF = "/org.eclipse.andmore.android.tooldocs.studio.helpbase/topics/c_android-studio.html";
+    private static final String HREF = "/org.eclipse.andmore.android.tooldocs.studio.helpbase/topics/c_android-studio.html";
 
-	@Override
-	public final Object execute(final ExecutionEvent event) {
-		try {
-			final IWorkbenchHelpSystem helpSystem = PlatformUI.getWorkbench().getHelpSystem();
+    @Override
+    public final Object execute(final ExecutionEvent event) {
+        try {
+            final IWorkbenchHelpSystem helpSystem = PlatformUI.getWorkbench().getHelpSystem();
 
-			if (helpSystem != null) {
-				helpSystem.displayHelpResource(HREF);
-			}
+            if (helpSystem != null) {
+                helpSystem.displayHelpResource(HREF);
+            }
 
-		} catch (Exception e) {
-			AndmoreLogger.error("Error opening Help Contents through Andmore menu: " + e.getMessage());
-		}
-		return null;
-	}
+        } catch (Exception e) {
+            AndmoreLogger.error("Error opening Help Contents through Andmore menu: " + e.getMessage());
+        }
+        return null;
+    }
 
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,9 @@
  */
 
 package org.eclipse.andmore.internal.wizards.exportgradle;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -25,9 +25,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 
 public class GradleExportWizard extends Wizard implements IExportWizard {
 
@@ -83,12 +80,8 @@ public class GradleExportWizard extends Wizard implements IExportWizard {
                 Collection<GradleModule> modules = mBuilder.getModules();
                 final int count = modules.size();
 
-                SubMonitor localmonitor = SubMonitor.convert(pm, ExportMessages.StatusMessage,
-                        count);
-                BuildFileCreator.createBuildFiles(
-                        mBuilder,
-                        page.getShell(),
-                        localmonitor.newChild(count));
+                SubMonitor localmonitor = SubMonitor.convert(pm, ExportMessages.StatusMessage, count);
+                BuildFileCreator.createBuildFiles(mBuilder, page.getShell(), localmonitor.newChild(count));
             }
         };
 

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,10 +19,8 @@ import static org.eclipse.wst.xml.core.internal.regions.DOMRegionContext.XML_TAG
 import static org.eclipse.wst.xml.core.internal.regions.DOMRegionContext.XML_TAG_NAME;
 import static org.eclipse.wst.xml.core.internal.regions.DOMRegionContext.XML_TAG_OPEN;
 
-import com.android.utils.Pair;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.formatting.EclipseXmlFormatPreferences;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentCommand;
@@ -42,6 +37,8 @@ import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocumentRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegionList;
+
+import com.android.utils.Pair;
 
 /**
  * Edit strategy for Android XML files. It attempts a number of edit
@@ -87,8 +84,7 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
         IStructuredDocument doc = (IStructuredDocument) document;
 
         // Handle newlines/indentation
-        if (c.length == 0 && c.text != null
-                && TextUtilities.endsWith(doc.getLegalLineDelimiters(), c.text) != -1) {
+        if (c.length == 0 && c.text != null && TextUtilities.endsWith(doc.getLegalLineDelimiters(), c.text) != -1) {
 
             IModelManager modelManager = StructuredModelManager.getModelManager();
             IStructuredModel model = modelManager.getModelForRead(doc);
@@ -100,7 +96,7 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
 
                     IStructuredDocumentRegion region = doc.getRegionAtCharacterOffset(textStart);
                     if (region != null && region.getType().equals(XML_TAG_NAME)) {
-                        Pair<Integer,Integer> balance = getBalance(doc, textStart, offset);
+                        Pair<Integer, Integer> balance = getBalance(doc, textStart, offset);
                         int tagBalance = balance.getFirst();
                         int bracketBalance = balance.getSecond();
 
@@ -120,9 +116,8 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
                             //    <foo
                             //        />^
                             ITextRegion left = getRegionAt(doc, offset, true /*biasLeft*/);
-                            if (left != null
-                                    && (left.getType().equals(XML_TAG_CLOSE)
-                                        || left.getType().equals(XML_EMPTY_TAG_CLOSE))) {
+                            if (left != null && (left.getType().equals(XML_TAG_CLOSE)
+                                    || left.getType().equals(XML_EMPTY_TAG_CLOSE))) {
 
                                 // Find the corresponding open tag...
                                 // The org.eclipse.wst.xml.ui.gotoMatchingTag frequently
@@ -134,8 +129,7 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
                                 if (right != null && right.getType().equals(XML_END_TAG_OPEN)) {
                                     targetBalance = -1;
                                 }
-                                int openTag = AndroidXmlCharacterMatcher.findTagBackwards(doc,
-                                        offset, targetBalance);
+                                int openTag = AndroidXmlCharacterMatcher.findTagBackwards(doc, offset, targetBalance);
                                 if (openTag != -1) {
                                     // Look up the indentation of the given line
                                     lineIndent = AndroidXmlEditor.getIndentAtOffset(doc, openTag);
@@ -161,8 +155,7 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
                         //     </foo>
                         ITextRegion left = getRegionAt(doc, offset, true /*biasLeft*/);
                         ITextRegion right = getRegionAt(doc, offset, false /*biasLeft*/);
-                        if (left != null && right != null
-                                && left.getType().equals(XML_TAG_CLOSE)
+                        if (left != null && right != null && left.getType().equals(XML_TAG_CLOSE)
                                 && right.getType().equals(XML_END_TAG_OPEN)) {
                             // Move end tag
                             if (tagBalance > 0 && bracketBalance < 0) {
@@ -211,8 +204,7 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
                             if (previous != null && previous.getType() == XML_TAG_NAME) {
                                 ITextRegionList subRegions = previous.getRegions();
                                 ITextRegion last = subRegions.get(subRegions.size() - 1);
-                                if (last.getType() == XML_TAG_CLOSE ||
-                                        last.getType() == XML_EMPTY_TAG_CLOSE) {
+                                if (last.getType() == XML_TAG_CLOSE || last.getType() == XML_EMPTY_TAG_CLOSE) {
                                     // See if the last tag was a closing tag
                                     boolean wasClose = last.getType() == XML_EMPTY_TAG_CLOSE;
                                     if (!wasClose) {
@@ -235,8 +227,7 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
 
                                     String lineIndent = ""; //$NON-NLS-1$
                                     if (prevTextStart > prevLineStart) {
-                                        lineIndent = doc.get(prevLineStart,
-                                                prevTextStart - prevLineStart);
+                                        lineIndent = doc.get(prevLineStart, prevTextStart - prevLineStart);
                                     }
                                     StringBuilder sb = new StringBuilder(c.text);
                                     sb.append(lineIndent);
@@ -252,8 +243,7 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
                                         }
                                     }
 
-                                    boolean addIndent = (last.getType() == XML_TAG_CLOSE)
-                                            && !wasClose;
+                                    boolean addIndent = (last.getType() == XML_TAG_CLOSE) && !wasClose;
 
                                     // Is there just whitespace left of this text tag
                                     // until we reach an end tag?
@@ -276,8 +266,7 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
                                     }
 
                                     if (addIndent) {
-                                        sb.append(EclipseXmlFormatPreferences.create()
-                                                .getOneIndentUnit());
+                                        sb.append(EclipseXmlFormatPreferences.create().getOneIndentUnit());
                                     }
                                     c.text = sb.toString();
 
@@ -323,8 +312,7 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
      *         whichever is smallest
      * @throws BadLocationException if the offsets are invalid
      */
-    public static int findTextStart(IDocument document, int lineStart, int lineEnd)
-            throws BadLocationException {
+    public static int findTextStart(IDocument document, int lineStart, int lineEnd) throws BadLocationException {
         for (int offset = lineStart; offset < lineEnd; offset++) {
             char c = document.getChar(offset);
             if (c != ' ' && c != '\t') {
@@ -342,8 +330,7 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
      * @param command the document command to customize
      * @throws BadLocationException if the offsets are invalid
      */
-    private void copyPreviousLineIndentation(IDocument doc, DocumentCommand command)
-            throws BadLocationException {
+    private void copyPreviousLineIndentation(IDocument doc, DocumentCommand command) throws BadLocationException {
 
         if (command.offset == -1 || doc.getLength() == 0) {
             return;
@@ -360,7 +347,6 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
         command.text = sb.toString();
     }
 
-
     /**
      * Returns the subregion at the given offset, with a bias to the left or a bias to the
      * right. In other words, if | represents the caret position, in the XML
@@ -372,13 +358,11 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
      * @param biasLeft whether we should look at the token on the left or on the right
      * @return the subregion at the given offset, or null if not found
      */
-    private static ITextRegion getRegionAt(IStructuredDocument doc, int offset,
-            boolean biasLeft) {
+    private static ITextRegion getRegionAt(IStructuredDocument doc, int offset, boolean biasLeft) {
         if (biasLeft) {
             offset--;
         }
-        IStructuredDocumentRegion region =
-                doc.getRegionAtCharacterOffset(offset);
+        IStructuredDocumentRegion region = doc.getRegionAtCharacterOffset(offset);
         if (region != null) {
             return region.getRegionAtCharacterOffset(offset);
         }
@@ -394,8 +378,7 @@ public class AndroidXmlAutoEditStrategy implements IAutoEditStrategy {
      * @param end the offset of the ending character (exclusive)
      * @return the balance of tags and brackets
      */
-    private static Pair<Integer, Integer> getBalance(IStructuredDocument doc,
-            int start, int end) {
+    private static Pair<Integer, Integer> getBalance(IStructuredDocument doc, int start, int end) {
         // Balance of open and closing tags
         // <foo></foo> has tagBalance = 0, <foo> has tagBalance = 1
         int tagBalance = 0;

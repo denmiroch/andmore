@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,14 @@
 
 package org.eclipse.andmore.internal.build;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.IAndroidTarget;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.internal.build.builders.BaseBuilder;
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
@@ -35,14 +36,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * Base class to handle generated java code.
@@ -81,7 +78,7 @@ public abstract class SourceProcessor {
     public static String quote(String path) {
         if (SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_WINDOWS) {
             if (path.endsWith(File.separator)) {
-                path = path.substring(0, path.length() -1);
+                path = path.substring(0, path.length() - 1);
             }
             return "\"" + path + "\"";
         }
@@ -89,11 +86,8 @@ public abstract class SourceProcessor {
         return path;
     }
 
-    protected SourceProcessor(
-            @NonNull IJavaProject javaProject,
-            @NonNull BuildToolInfo buildToolInfo,
-            @NonNull IFolder genFolder,
-            @NonNull DefaultSourceChangeHandler deltaVisitor) {
+    protected SourceProcessor(@NonNull IJavaProject javaProject, @NonNull BuildToolInfo buildToolInfo,
+            @NonNull IFolder genFolder, @NonNull DefaultSourceChangeHandler deltaVisitor) {
         mJavaProject = javaProject;
         mBuildToolInfo = buildToolInfo;
         mGenFolder = genFolder;
@@ -119,9 +113,7 @@ public abstract class SourceProcessor {
         }
     }
 
-    protected SourceProcessor(
-            @NonNull IJavaProject javaProject,
-            @NonNull BuildToolInfo buildToolInfo,
+    protected SourceProcessor(@NonNull IJavaProject javaProject, @NonNull BuildToolInfo buildToolInfo,
             @NonNull IFolder genFolder) {
         this(javaProject, buildToolInfo, genFolder, new DefaultSourceChangeHandler());
     }
@@ -129,7 +121,6 @@ public abstract class SourceProcessor {
     public void setBuildToolInfo(BuildToolInfo buildToolInfo) {
         mBuildToolInfo = buildToolInfo;
     }
-
 
     /**
      * Returns whether the given file is an output of this processor by return the source
@@ -240,10 +231,8 @@ public abstract class SourceProcessor {
      * Compiles the source files and return a status bitmask of the type of file that was generated.
      *
      */
-    public final int compileFiles(BaseBuilder builder,
-            IProject project, IAndroidTarget projectTarget,
-            List<IPath> sourceFolders, List<File> libraryProjectsOut, IProgressMonitor monitor)
-            throws CoreException {
+    public final int compileFiles(BaseBuilder builder, IProject project, IAndroidTarget projectTarget,
+            List<IPath> sourceFolders, List<File> libraryProjectsOut, IProgressMonitor monitor) throws CoreException {
 
         mLastCompilationStatus = COMPILE_STATUS_NONE;
 
@@ -263,8 +252,8 @@ public abstract class SourceProcessor {
         // list of files that have failed compilation.
         List<IFile> stillNeedCompilation = new ArrayList<IFile>();
 
-        doCompileFiles(mToCompile, builder, project, projectTarget, sourceFolders,
-                stillNeedCompilation, libraryProjectsOut, monitor);
+        doCompileFiles(mToCompile, builder, project, projectTarget, sourceFolders, stillNeedCompilation,
+                libraryProjectsOut, monitor);
 
         mToCompile.clear();
         mToCompile.addAll(stillNeedCompilation);
@@ -293,10 +282,8 @@ public abstract class SourceProcessor {
         return mLastCompilationStatus;
     }
 
-    protected abstract void doCompileFiles(
-            List<IFile> filesToCompile, BaseBuilder builder,
-            IProject project, IAndroidTarget projectTarget,
-            List<IPath> sourceFolders, List<IFile> notCompiledOut,
+    protected abstract void doCompileFiles(List<IFile> filesToCompile, BaseBuilder builder, IProject project,
+            IAndroidTarget projectTarget, List<IPath> sourceFolders, List<IFile> notCompiledOut,
             List<File> libraryProjectsOut, IProgressMonitor monitor) throws CoreException;
 
     /**
@@ -319,18 +306,15 @@ public abstract class SourceProcessor {
     }
 
     public final boolean loadState(IProject project) {
-        return ProjectHelper.loadBooleanProperty(project, getSavePropertyName(),
-                true /*defaultValue*/);
+        return ProjectHelper.loadBooleanProperty(project, getSavePropertyName(), true /*defaultValue*/);
     }
 
     public final void saveState(IProject project) {
         // TODO: Optimize by saving only the files that need compilation
-        ProjectHelper.saveStringProperty(project, getSavePropertyName(),
-                Boolean.toString(mToCompile.size() > 0));
+        ProjectHelper.saveStringProperty(project, getSavePropertyName(), Boolean.toString(mToCompile.size() > 0));
     }
 
     protected abstract void loadOutputAndDependencies();
-
 
     protected IPath getSourceFolderFor(IFile file) {
         // find the source folder for the class so that we can infer the package from the
@@ -386,32 +370,30 @@ public abstract class SourceProcessor {
             IResource[] members = folder.members();
             for (IResource r : members) {
                 // get the type of the resource
-               switch (r.getType()) {
-                   case IResource.FILE: {
-                       // if this a file, check that the file actually exist
-                       // and that it's the type of of file that's used in this processor
-                       String extension = r.exists() ? r.getFileExtension() : null;
-                       if (extension != null &&
-                               getExtensions().contains(extension.toLowerCase(Locale.US))) {
-                           mFiles.put((IFile) r, new SourceFileData((IFile) r));
-                       }
-                       break;
-                   }
-                   case IResource.FOLDER:
-                       // recursively go through children
-                       scanFolderForSourceFiles(sourceFolder, (IFolder)r);
-                       break;
-                   default:
-                       // this would mean it's a project or the workspace root
-                       // which is unlikely to happen. we do nothing
-                       break;
-               }
+                switch (r.getType()) {
+                    case IResource.FILE: {
+                        // if this a file, check that the file actually exist
+                        // and that it's the type of of file that's used in this processor
+                        String extension = r.exists() ? r.getFileExtension() : null;
+                        if (extension != null && getExtensions().contains(extension.toLowerCase(Locale.US))) {
+                            mFiles.put((IFile) r, new SourceFileData((IFile) r));
+                        }
+                        break;
+                    }
+                    case IResource.FOLDER:
+                        // recursively go through children
+                        scanFolderForSourceFiles(sourceFolder, (IFolder) r);
+                        break;
+                    default:
+                        // this would mean it's a project or the workspace root
+                        // which is unlikely to happen. we do nothing
+                        break;
+                }
             }
         } catch (CoreException e) {
             // Couldn't get the members list for some reason. Just return.
         }
     }
-
 
     /**
      * Merge the current list of source file to compile/remove with the one coming from the

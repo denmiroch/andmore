@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,40 +26,40 @@ import org.eclipse.jdt.internal.ui.wizards.TypedElementSelectionValidator;
  */
 @SuppressWarnings("restriction")
 class ElementTreeValidator extends TypedElementSelectionValidator {
-	private static Class<?>[] acceptedClasses = new Class[] { IPackageFragmentRoot.class, IJavaProject.class };
+    private static Class<?>[] acceptedClasses = new Class[] { IPackageFragmentRoot.class, IJavaProject.class };
 
-	public ElementTreeValidator() {
-		super(acceptedClasses, false);
-	}
+    public ElementTreeValidator() {
+        super(acceptedClasses, false);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jdt.internal.ui.wizards.TypedElementSelectionValidator#
-	 * isSelectedValid(java.lang.Object)
-	 */
-	@Override
-	public boolean isSelectedValid(Object element) {
-		boolean isValid = false;
-		try {
-			if (element instanceof IJavaProject) {
-				IJavaProject jproject = (IJavaProject) element;
-				IPath path = jproject.getProject().getFullPath();
-				isValid = (jproject.findPackageFragmentRoot(path) != null);
-			} else if (element instanceof IPackageFragmentRoot) {
-				IPackageFragmentRoot packageFragmentRoot = (IPackageFragmentRoot) element;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jdt.internal.ui.wizards.TypedElementSelectionValidator#
+     * isSelectedValid(java.lang.Object)
+     */
+    @Override
+    public boolean isSelectedValid(Object element) {
+        boolean isValid = false;
+        try {
+            if (element instanceof IJavaProject) {
+                IJavaProject jproject = (IJavaProject) element;
+                IPath path = jproject.getProject().getFullPath();
+                isValid = (jproject.findPackageFragmentRoot(path) != null);
+            } else if (element instanceof IPackageFragmentRoot) {
+                IPackageFragmentRoot packageFragmentRoot = (IPackageFragmentRoot) element;
 
-				boolean isSrc = (packageFragmentRoot.getKind() == IPackageFragmentRoot.K_SOURCE);
-				boolean isGen = packageFragmentRoot.getElementName().equals(IAndroidConstants.GEN_SRC_FOLDER)
-						&& (packageFragmentRoot.getParent() instanceof IJavaProject);
+                boolean isSrc = (packageFragmentRoot.getKind() == IPackageFragmentRoot.K_SOURCE);
+                boolean isGen = packageFragmentRoot.getElementName().equals(IAndroidConstants.GEN_SRC_FOLDER)
+                        && (packageFragmentRoot.getParent() instanceof IJavaProject);
 
-				isValid = isSrc && !isGen;
-			} else {
-				isValid = true;
-			}
-		} catch (JavaModelException e) {
-			AndmoreLogger.error(ElementTreeValidator.class, e.getLocalizedMessage(), e);
-		}
-		return isValid;
-	}
+                isValid = isSrc && !isGen;
+            } else {
+                isValid = true;
+            }
+        } catch (JavaModelException e) {
+            AndmoreLogger.error(ElementTreeValidator.class, e.getLocalizedMessage(), e);
+        }
+        return isValid;
+    }
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,7 @@
 
 package org.eclipse.andmore.internal.refactorings.renamepackage;
 
-import com.android.ide.common.xml.ManifestData;
+import java.util.Iterator;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.project.AndroidManifestHelper;
@@ -40,7 +37,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import java.util.Iterator;
+import com.android.ide.common.xml.ManifestData;
 
 /**
  * Refactoring steps:
@@ -62,7 +59,8 @@ import java.util.Iterator;
 public class RenamePackageAction implements IObjectActionDelegate {
 
     private ISelection mSelection;
-    @SuppressWarnings("unused") private IWorkbenchPart mTargetPart; // TODO cleanup
+    @SuppressWarnings("unused")
+    private IWorkbenchPart mTargetPart; // TODO cleanup
 
     /**
      * @see IObjectActionDelegate#setActivePart(IAction, IWorkbenchPart)
@@ -95,7 +93,7 @@ public class RenamePackageAction implements IObjectActionDelegate {
                 if (element instanceof IProject) {
                     project = (IProject) element;
                 } else if (element instanceof IAdaptable) {
-                    project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+                    project = ((IAdaptable) element).getAdapter(IProject.class);
                 }
                 if (project != null) {
                     // It is advisable that the user saves before proceeding,
@@ -136,16 +134,16 @@ public class RenamePackageAction implements IObjectActionDelegate {
                     return "Illegal package name.";
                 }
 
-                if (newText.equals(oldPackageNameString))
+                if (newText.equals(oldPackageNameString)) {
                     return "No change.";
-                else
+                } else {
                     return null;
+                }
             }
         };
 
-        InputDialog dialog = new InputDialog(AndmoreAndroidPlugin.getShell(),
-                "Rename Application Package", "Enter new package name:", oldPackageNameString,
-                validator);
+        InputDialog dialog = new InputDialog(AndmoreAndroidPlugin.getShell(), "Rename Application Package",
+                "Enter new package name:", oldPackageNameString, validator);
 
         if (dialog.open() == Window.OK) {
             Name newPackageName = astValidator.newName(dialog.getValue());
@@ -153,17 +151,13 @@ public class RenamePackageAction implements IObjectActionDelegate {
         }
     }
 
+    private void initiateAndroidPackageRefactoring(final IProject project, Name oldPackageName, Name newPackageName) {
 
-    private void initiateAndroidPackageRefactoring(
-            final IProject project,
-            Name oldPackageName,
-            Name newPackageName) {
+        Refactoring package_name_refactoring = new ApplicationPackageNameRefactoring(project, oldPackageName,
+                newPackageName);
 
-        Refactoring package_name_refactoring =
-            new ApplicationPackageNameRefactoring(project, oldPackageName, newPackageName);
-
-        ApplicationPackageNameRefactoringWizard wizard =
-            new ApplicationPackageNameRefactoringWizard(package_name_refactoring);
+        ApplicationPackageNameRefactoringWizard wizard = new ApplicationPackageNameRefactoringWizard(
+                package_name_refactoring);
         RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
         try {
             op.run(AndmoreAndroidPlugin.getShell(), package_name_refactoring.getName());

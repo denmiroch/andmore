@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,14 +13,14 @@
 
 package org.eclipse.andmore.internal.editors.manifest.descriptors;
 
-import com.android.SdkConstants;
-
 import org.eclipse.andmore.internal.editors.manifest.model.UiClassAttributeNode.IPostTypeCreationAction;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+
+import com.android.SdkConstants;
 
 /**
  * Action to be executed after an BroadcastReceiver class is created.
@@ -50,13 +47,9 @@ class PostReceiverCreationAction implements IPostTypeCreationAction {
     @Override
     public void processNewType(IType newType) {
         try {
-            String methodContent =
-                "    @Override\n" +
-                "    public void onReceive(Context context, Intent intent) {\n" +
-                "        // TODO Auto-generated method stub\n" +
-                "    }";
-            newType.createMethod(methodContent, null /* sibling*/, false /* force */,
-                    new NullProgressMonitor());
+            String methodContent = "    @Override\n" + "    public void onReceive(Context context, Intent intent) {\n"
+                    + "        // TODO Auto-generated method stub\n" + "    }";
+            newType.createMethod(methodContent, null /* sibling*/, false /* force */, new NullProgressMonitor());
 
             // we need to add the import for Bundle, so we need the compilation unit.
             // Since the type could be enclosed in other types, we loop till we find it.
@@ -64,9 +57,9 @@ class PostReceiverCreationAction implements IPostTypeCreationAction {
             IJavaElement element = newType;
             do {
                 IJavaElement parentElement = element.getParent();
-                if (parentElement !=  null) {
+                if (parentElement != null) {
                     if (parentElement.getElementType() == IJavaElement.COMPILATION_UNIT) {
-                        compilationUnit = (ICompilationUnit)parentElement;
+                        compilationUnit = (ICompilationUnit) parentElement;
                     }
 
                     element = parentElement;
@@ -76,10 +69,8 @@ class PostReceiverCreationAction implements IPostTypeCreationAction {
             } while (compilationUnit == null);
 
             if (compilationUnit != null) {
-                compilationUnit.createImport(SdkConstants.CLASS_CONTEXT,
-                        null /* sibling */, new NullProgressMonitor());
-                compilationUnit.createImport(SdkConstants.CLASS_INTENT,
-                        null /* sibling */, new NullProgressMonitor());
+                compilationUnit.createImport(SdkConstants.CLASS_CONTEXT, null /* sibling */, new NullProgressMonitor());
+                compilationUnit.createImport(SdkConstants.CLASS_INTENT, null /* sibling */, new NullProgressMonitor());
             }
         } catch (JavaModelException e) {
             // looks like the class already existed (this happens when the user check to create

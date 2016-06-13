@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +13,12 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.ide.common.api.Point;
-
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+
+import com.android.ide.common.api.Point;
 
 /**
  * A {@link LayoutPoint} is a coordinate in the Android canvas (in other words,
@@ -140,17 +137,22 @@ public final class LayoutPoint {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         LayoutPoint other = (LayoutPoint) obj;
-        if (x != other.x)
+        if (x != other.x) {
             return false;
-        if (y != other.y)
+        }
+        if (y != other.y) {
             return false;
+        }
         return true;
     }
 }

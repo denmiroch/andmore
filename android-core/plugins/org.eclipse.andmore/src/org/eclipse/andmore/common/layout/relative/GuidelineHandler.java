@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,16 +12,7 @@
  */
 package org.eclipse.andmore.common.layout.relative;
 
-import static com.android.ide.common.api.MarginType.NO_MARGIN;
-import static com.android.ide.common.api.MarginType.WITHOUT_MARGIN;
-import static com.android.ide.common.api.MarginType.WITH_MARGIN;
-import static com.android.ide.common.api.SegmentType.BASELINE;
-import static com.android.ide.common.api.SegmentType.BOTTOM;
-import static com.android.ide.common.api.SegmentType.CENTER_HORIZONTAL;
-import static com.android.ide.common.api.SegmentType.CENTER_VERTICAL;
-import static com.android.ide.common.api.SegmentType.LEFT;
-import static com.android.ide.common.api.SegmentType.RIGHT;
-import static com.android.ide.common.api.SegmentType.TOP;
+import static com.android.SdkConstants.ANDROID_URI;
 import static com.android.SdkConstants.ATTR_ID;
 import static com.android.SdkConstants.ATTR_LAYOUT_ABOVE;
 import static com.android.SdkConstants.ATTR_LAYOUT_ALIGN_BASELINE;
@@ -48,19 +36,19 @@ import static com.android.SdkConstants.ATTR_LAYOUT_TO_LEFT_OF;
 import static com.android.SdkConstants.ATTR_LAYOUT_TO_RIGHT_OF;
 import static com.android.SdkConstants.VALUE_N_DP;
 import static com.android.SdkConstants.VALUE_TRUE;
+import static com.android.ide.common.api.MarginType.NO_MARGIN;
+import static com.android.ide.common.api.MarginType.WITHOUT_MARGIN;
+import static com.android.ide.common.api.MarginType.WITH_MARGIN;
+import static com.android.ide.common.api.SegmentType.BASELINE;
+import static com.android.ide.common.api.SegmentType.BOTTOM;
+import static com.android.ide.common.api.SegmentType.CENTER_HORIZONTAL;
+import static com.android.ide.common.api.SegmentType.CENTER_VERTICAL;
+import static com.android.ide.common.api.SegmentType.LEFT;
+import static com.android.ide.common.api.SegmentType.RIGHT;
+import static com.android.ide.common.api.SegmentType.TOP;
 import static java.lang.Math.abs;
 import static org.eclipse.andmore.common.layout.BaseLayoutRule.getMaxMatchDistance;
 import static org.eclipse.andmore.common.layout.relative.ConstraintType.ALIGN_BASELINE;
-
-import static com.android.SdkConstants.ANDROID_URI;
-
-import com.android.ide.common.api.DropFeedback;
-import com.android.ide.common.api.IClientRulesEngine;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.Margins;
-import com.android.ide.common.api.Rect;
-import com.android.ide.common.api.Segment;
-import com.android.ide.common.api.SegmentType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,6 +60,14 @@ import java.util.Set;
 import org.eclipse.andmore.common.layout.BaseLayoutRule;
 import org.eclipse.andmore.common.layout.relative.DependencyGraph.Constraint;
 import org.eclipse.andmore.common.layout.relative.DependencyGraph.ViewData;
+
+import com.android.ide.common.api.DropFeedback;
+import com.android.ide.common.api.IClientRulesEngine;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.Margins;
+import com.android.ide.common.api.Rect;
+import com.android.ide.common.api.Segment;
+import com.android.ide.common.api.SegmentType;
 
 /**
  * The {@link GuidelineHandler} class keeps track of state related to a guideline operation
@@ -245,8 +241,8 @@ public class GuidelineHandler {
      * @return true if the handler has any suggestions to offer
      */
     public boolean haveSuggestions() {
-        return mCurrentLeftMatch != null || mCurrentTopMatch != null
-                || mCurrentRightMatch != null || mCurrentBottomMatch != null;
+        return mCurrentLeftMatch != null || mCurrentTopMatch != null || mCurrentRightMatch != null
+                || mCurrentBottomMatch != null;
     }
 
     /**
@@ -281,8 +277,7 @@ public class GuidelineHandler {
                     } else {
                         mHorizontalCycle = path;
                     }
-                    String desc = Constraint.describePath(path,
-                            match.type.name, match.edge.id);
+                    String desc = Constraint.describePath(path, match.type.name, match.edge.id);
 
                     feedback.errorMessage = "Constraint creates a cycle: " + desc;
                     return true;
@@ -305,70 +300,55 @@ public class GuidelineHandler {
         mVerticalCycle = null;
 
         if (checkCycle(feedback, mCurrentTopMatch, true /* vertical */)
-                || checkCycle(feedback, mCurrentBottomMatch, true)) {
-        }
+                || checkCycle(feedback, mCurrentBottomMatch, true)) {}
 
-        if (checkCycle(feedback, mCurrentLeftMatch, false)
-                || checkCycle(feedback, mCurrentRightMatch, false)) {
-        }
+        if (checkCycle(feedback, mCurrentLeftMatch, false) || checkCycle(feedback, mCurrentRightMatch, false)) {}
     }
 
     /** Records the matchable outside edges for the given node to the potential match list */
-    protected void addBounds(INode node, String id,
-            boolean addHorizontal, boolean addVertical) {
+    protected void addBounds(INode node, String id, boolean addHorizontal, boolean addVertical) {
         Rect b = node.getBounds();
         Margins margins = node.getMargins();
         if (addHorizontal) {
             if (margins.top != 0) {
                 mHorizontalEdges.add(new Segment(b.y, b.x, b.x2(), node, id, TOP, WITHOUT_MARGIN));
-                mHorizontalEdges.add(new Segment(b.y - margins.top, b.x, b.x2(), node, id,
-                        TOP, WITH_MARGIN));
+                mHorizontalEdges.add(new Segment(b.y - margins.top, b.x, b.x2(), node, id, TOP, WITH_MARGIN));
             } else {
                 mHorizontalEdges.add(new Segment(b.y, b.x, b.x2(), node, id, TOP, NO_MARGIN));
             }
             if (margins.bottom != 0) {
-                mHorizontalEdges.add(new Segment(b.y2(), b.x, b.x2(), node, id, BOTTOM,
-                        WITHOUT_MARGIN));
-                mHorizontalEdges.add(new Segment(b.y2() + margins.bottom, b.x, b.x2(), node,
-                        id, BOTTOM, WITH_MARGIN));
+                mHorizontalEdges.add(new Segment(b.y2(), b.x, b.x2(), node, id, BOTTOM, WITHOUT_MARGIN));
+                mHorizontalEdges.add(new Segment(b.y2() + margins.bottom, b.x, b.x2(), node, id, BOTTOM, WITH_MARGIN));
             } else {
-                mHorizontalEdges.add(new Segment(b.y2(), b.x, b.x2(), node, id,
-                        BOTTOM, NO_MARGIN));
+                mHorizontalEdges.add(new Segment(b.y2(), b.x, b.x2(), node, id, BOTTOM, NO_MARGIN));
             }
         }
         if (addVertical) {
             if (margins.left != 0) {
                 mVerticalEdges.add(new Segment(b.x, b.y, b.y2(), node, id, LEFT, WITHOUT_MARGIN));
-                mVerticalEdges.add(new Segment(b.x - margins.left, b.y, b.y2(), node, id, LEFT,
-                        WITH_MARGIN));
+                mVerticalEdges.add(new Segment(b.x - margins.left, b.y, b.y2(), node, id, LEFT, WITH_MARGIN));
             } else {
                 mVerticalEdges.add(new Segment(b.x, b.y, b.y2(), node, id, LEFT, NO_MARGIN));
             }
 
             if (margins.right != 0) {
-                mVerticalEdges.add(new Segment(b.x2(), b.y, b.y2(), node, id,
-                        RIGHT, WITHOUT_MARGIN));
-                mVerticalEdges.add(new Segment(b.x2() + margins.right, b.y, b.y2(), node, id,
-                        RIGHT, WITH_MARGIN));
+                mVerticalEdges.add(new Segment(b.x2(), b.y, b.y2(), node, id, RIGHT, WITHOUT_MARGIN));
+                mVerticalEdges.add(new Segment(b.x2() + margins.right, b.y, b.y2(), node, id, RIGHT, WITH_MARGIN));
             } else {
-                mVerticalEdges.add(new Segment(b.x2(), b.y, b.y2(), node, id,
-                        RIGHT, NO_MARGIN));
+                mVerticalEdges.add(new Segment(b.x2(), b.y, b.y2(), node, id, RIGHT, NO_MARGIN));
             }
         }
     }
 
     /** Records the center edges for the given node to the potential match list */
-    protected void addCenter(INode node, String id,
-            boolean addHorizontal, boolean addVertical) {
+    protected void addCenter(INode node, String id, boolean addHorizontal, boolean addVertical) {
         Rect b = node.getBounds();
 
         if (addHorizontal) {
-            mCenterHorizEdges.add(new Segment(b.centerY(), b.x, b.x2(),
-                node, id, CENTER_HORIZONTAL, NO_MARGIN));
+            mCenterHorizEdges.add(new Segment(b.centerY(), b.x, b.x2(), node, id, CENTER_HORIZONTAL, NO_MARGIN));
         }
         if (addVertical) {
-            mCenterVertEdges.add(new Segment(b.centerX(), b.y, b.y2(),
-                node, id, CENTER_VERTICAL, NO_MARGIN));
+            mCenterVertEdges.add(new Segment(b.centerX(), b.y, b.y2(), node, id, CENTER_VERTICAL, NO_MARGIN));
         }
     }
 
@@ -377,8 +357,7 @@ public class GuidelineHandler {
         int baselineY = node.getBaseline();
         if (baselineY != -1) {
             Rect b = node.getBounds();
-            mHorizontalEdges.add(new Segment(b.y + baselineY, b.x, b.x2(), node, id, BASELINE,
-                    NO_MARGIN));
+            mHorizontalEdges.add(new Segment(b.y + baselineY, b.x, b.x2(), node, id, BASELINE, NO_MARGIN));
         }
 
         return baselineY;
@@ -429,7 +408,8 @@ public class GuidelineHandler {
             case CENTER_HORIZONTAL:
             case CENTER_VERTICAL:
                 return dragged == edge && Math.abs(delta) < getMaxMatchDistance();
-            default: assert false : edge;
+            default:
+                assert false : edge;
         }
         return false;
     }
@@ -444,8 +424,7 @@ public class GuidelineHandler {
         return closest;
     }
 
-    protected void addClosest(Segment draggedEdge, List<Segment> edges,
-            List<Match> closest) {
+    protected void addClosest(Segment draggedEdge, List<Segment> edges, List<Match> closest) {
         int at = draggedEdge.at;
         int closestDelta = closest.size() > 0 ? closest.get(0).delta : Integer.MAX_VALUE;
         int closestDistance = abs(closestDelta);
@@ -463,8 +442,7 @@ public class GuidelineHandler {
             }
 
             boolean withParent = edge.node == layout;
-            ConstraintType type = ConstraintType.forMatch(withParent,
-                    draggedEdge.edgeType, edge.edgeType);
+            ConstraintType type = ConstraintType.forMatch(withParent, draggedEdge.edgeType, edge.edgeType);
             if (type == null) {
                 continue;
             }
@@ -616,10 +594,10 @@ public class GuidelineHandler {
         for (ConstraintType type : ConstraintType.values()) {
             node.setAttribute(ANDROID_URI, type.name, null);
         }
-        node.setAttribute(ANDROID_URI,ATTR_LAYOUT_MARGIN_LEFT, null);
-        node.setAttribute(ANDROID_URI,ATTR_LAYOUT_MARGIN_RIGHT, null);
-        node.setAttribute(ANDROID_URI,ATTR_LAYOUT_MARGIN_TOP, null);
-        node.setAttribute(ANDROID_URI,ATTR_LAYOUT_MARGIN_BOTTOM, null);
+        node.setAttribute(ANDROID_URI, ATTR_LAYOUT_MARGIN_LEFT, null);
+        node.setAttribute(ANDROID_URI, ATTR_LAYOUT_MARGIN_RIGHT, null);
+        node.setAttribute(ANDROID_URI, ATTR_LAYOUT_MARGIN_TOP, null);
+        node.setAttribute(ANDROID_URI, ATTR_LAYOUT_MARGIN_BOTTOM, null);
     }
 
     /**
@@ -637,8 +615,7 @@ public class GuidelineHandler {
 
         if (mCurrentTopMatch != null || mCurrentBottomMatch != null) {
             // Attaching the top: arrange below, and for bottom arrange above
-            node.setAttribute(ANDROID_URI,
-                    mCurrentTopMatch != null ? ATTR_LAYOUT_BELOW : ATTR_LAYOUT_ABOVE, id);
+            node.setAttribute(ANDROID_URI, mCurrentTopMatch != null ? ATTR_LAYOUT_BELOW : ATTR_LAYOUT_ABOVE, id);
             // Apply same left/right constraints as the parent
             if (mCurrentLeftMatch != null) {
                 applyConstraint(node, mCurrentLeftMatch.getConstraint(true));
@@ -648,9 +625,8 @@ public class GuidelineHandler {
                 applyMargin(node, ATTR_LAYOUT_MARGIN_RIGHT, mRightMargin);
             }
         } else if (mCurrentLeftMatch != null || mCurrentRightMatch != null) {
-            node.setAttribute(ANDROID_URI,
-                    mCurrentLeftMatch != null ? ATTR_LAYOUT_TO_RIGHT_OF : ATTR_LAYOUT_TO_LEFT_OF,
-                            id);
+            node.setAttribute(ANDROID_URI, mCurrentLeftMatch != null ? ATTR_LAYOUT_TO_RIGHT_OF : ATTR_LAYOUT_TO_LEFT_OF,
+                    id);
             // Apply same top/bottom constraints as the parent
             if (mCurrentTopMatch != null) {
                 applyConstraint(node, mCurrentTopMatch.getConstraint(true));
@@ -743,12 +719,10 @@ public class GuidelineHandler {
             // unless it's a center bound -- those should always get lowest priority since
             // they overlap with other usually more interesting edges near the center of
             // the layout.
-            if (m1.edge.edgeType == CENTER_HORIZONTAL
-                    || m1.edge.edgeType == CENTER_VERTICAL) {
+            if (m1.edge.edgeType == CENTER_HORIZONTAL || m1.edge.edgeType == CENTER_VERTICAL) {
                 parent1 = 2;
             }
-            if (m2.edge.edgeType == CENTER_HORIZONTAL
-                    || m2.edge.edgeType == CENTER_VERTICAL) {
+            if (m2.edge.edgeType == CENTER_HORIZONTAL || m2.edge.edgeType == CENTER_VERTICAL) {
                 parent2 = 2;
             }
             if (parent1 != parent2) {
@@ -803,10 +777,8 @@ public class GuidelineHandler {
             }
 
             // Prefer matching top/left edges before matching bottom/right edges
-            int orientation1 = (m1.with.edgeType == LEFT ||
-                      m1.with.edgeType == TOP) ? -1 : 1;
-            int orientation2 = (m2.with.edgeType == LEFT ||
-                      m2.with.edgeType == TOP) ? -1 : 1;
+            int orientation1 = (m1.with.edgeType == LEFT || m1.with.edgeType == TOP) ? -1 : 1;
+            int orientation2 = (m2.with.edgeType == LEFT || m2.with.edgeType == TOP) ? -1 : 1;
             if (orientation1 != orientation2) {
                 return orientation1 - orientation2;
             }

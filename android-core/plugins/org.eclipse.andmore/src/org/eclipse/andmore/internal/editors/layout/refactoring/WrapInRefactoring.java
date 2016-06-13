@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,9 +23,9 @@ import static com.android.SdkConstants.VALUE_FILL_PARENT;
 import static com.android.SdkConstants.VALUE_MATCH_PARENT;
 import static com.android.SdkConstants.VALUE_WRAP_CONTENT;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.xml.XmlFormatStyle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
@@ -54,9 +51,9 @@ import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.xml.XmlFormatStyle;
 
 /**
  * Inserts a new layout surrounding the current selection, migrates namespace
@@ -65,8 +62,8 @@ import java.util.Map;
  */
 @SuppressWarnings("restriction") // XML model
 public class WrapInRefactoring extends VisualRefactoring {
-    private static final String KEY_ID = "name";                           //$NON-NLS-1$
-    private static final String KEY_TYPE = "type";                         //$NON-NLS-1$
+    private static final String KEY_ID = "name"; //$NON-NLS-1$
+    private static final String KEY_TYPE = "type"; //$NON-NLS-1$
 
     private String mId;
     private String mTypeFqcn;
@@ -83,10 +80,7 @@ public class WrapInRefactoring extends VisualRefactoring {
         mTypeFqcn = arguments.get(KEY_TYPE);
     }
 
-    public WrapInRefactoring(
-            IFile file,
-            LayoutEditorDelegate delegate,
-            ITextSelection selection,
+    public WrapInRefactoring(IFile file, LayoutEditorDelegate delegate, ITextSelection selection,
             ITreeSelection treeSelection) {
         super(file, delegate, selection, treeSelection);
     }
@@ -97,8 +91,8 @@ public class WrapInRefactoring extends VisualRefactoring {
     }
 
     @Override
-    public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+    public RefactoringStatus checkInitialConditions(IProgressMonitor pm)
+            throws CoreException, OperationCanceledException {
         RefactoringStatus status = new RefactoringStatus();
 
         try {
@@ -142,8 +136,7 @@ public class WrapInRefactoring extends VisualRefactoring {
     @Override
     protected VisualRefactoringDescriptor createDescriptor() {
         String comment = getName();
-        return new Descriptor(
-                mProject.getName(), //project
+        return new Descriptor(mProject.getName(), //project
                 comment, //description
                 comment, //comment
                 createArgumentMap());
@@ -200,7 +193,6 @@ public class WrapInRefactoring extends VisualRefactoring {
         String viewClass = getViewClass(mTypeFqcn);
         String androidNsPrefix = getAndroidNamespacePrefix();
 
-
         IFile file = mDelegate.getEditor().getInputFile();
         List<Change> changes = new ArrayList<Change>();
         if (file == null) {
@@ -219,8 +211,8 @@ public class WrapInRefactoring extends VisualRefactoring {
             try {
                 IStructuredDocument doc = model.getStructuredDocument();
                 if (doc != null) {
-                    List<TextEdit> replaceIds = replaceIds(androidNsPrefix,
-                            doc, mSelectionStart, mSelectionEnd, rootId, id);
+                    List<TextEdit> replaceIds = replaceIds(androidNsPrefix, doc, mSelectionStart, mSelectionEnd, rootId,
+                            id);
                     for (TextEdit edit : replaceIds) {
                         rootEdit.addChild(edit);
                     }
@@ -425,8 +417,7 @@ public class WrapInRefactoring extends VisualRefactoring {
     }
 
     public static class Descriptor extends VisualRefactoringDescriptor {
-        public Descriptor(String project, String description, String comment,
-                Map<String, String> arguments) {
+        public Descriptor(String project, String description, String comment, Map<String, String> arguments) {
             super("org.eclipse.andmore.refactoring.wrapin", //$NON-NLS-1$
                     project, description, comment, arguments);
         }

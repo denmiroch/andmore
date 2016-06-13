@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +13,10 @@
 
 package org.eclipse.andmore.internal.editors.layout.configuration;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.manifest.ManifestInfo;
@@ -35,10 +34,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolItem;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 
 /**
  * The {@linkplain ActivityMenuListener} class is responsible for
@@ -52,10 +49,7 @@ class ActivityMenuListener extends SelectionAdapter {
     private final int mAction;
     private final String mFqcn;
 
-    ActivityMenuListener(
-            @NonNull ConfigurationChooser configChooser,
-            int action,
-            @Nullable String fqcn) {
+    ActivityMenuListener(@NonNull ConfigurationChooser configChooser, int action, @Nullable String fqcn) {
         mConfigChooser = configChooser;
         mAction = action;
         mFqcn = fqcn;
@@ -75,7 +69,8 @@ class ActivityMenuListener extends SelectionAdapter {
                 mConfigChooser.onSelectActivity();
                 break;
             }
-            default: assert false : mAction;
+            default:
+                assert false : mAction;
         }
     }
 
@@ -89,11 +84,10 @@ class ActivityMenuListener extends SelectionAdapter {
         if (current != null) {
             MenuItem item = new MenuItem(menu, SWT.PUSH);
             String label = ConfigurationChooser.getActivityLabel(current, true);
-            item.setText( String.format("Open %1$s...", label));
+            item.setText(String.format("Open %1$s...", label));
             Image image = sharedImages.getImage(ISharedImages.IMG_OBJS_CUNIT);
             item.setImage(image);
-            item.addSelectionListener(
-                    new ActivityMenuListener(chooser, ACTION_OPEN_ACTIVITY, null));
+            item.addSelectionListener(new ActivityMenuListener(chooser, ACTION_OPEN_ACTIVITY, null));
 
             @SuppressWarnings("unused")
             MenuItem separator = new MenuItem(menu, SWT.SEPARATOR);
@@ -138,8 +132,8 @@ class ActivityMenuListener extends SelectionAdapter {
         menu.setVisible(true);
     }
 
-    private static String addActivities(ConfigurationChooser chooser, Menu menu, String current,
-            Image image, List<String> activities) {
+    private static String addActivities(ConfigurationChooser chooser, Menu menu, String current, Image image,
+            List<String> activities) {
         for (final String fqcn : activities) {
             String title = ConfigurationChooser.getActivityLabel(fqcn, false);
             MenuItem item = new MenuItem(menu, SWT.CHECK);
@@ -153,8 +147,7 @@ class ActivityMenuListener extends SelectionAdapter {
                 // such that we don't show it selected again in the full activity list
             }
 
-            item.addSelectionListener(new ActivityMenuListener(chooser,
-                    ACTION_SELECT_ACTIVITY, fqcn));
+            item.addSelectionListener(new ActivityMenuListener(chooser, ACTION_SELECT_ACTIVITY, fqcn));
         }
 
         return current;

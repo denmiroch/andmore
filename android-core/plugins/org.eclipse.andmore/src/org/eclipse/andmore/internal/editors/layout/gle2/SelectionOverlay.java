@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,21 +13,21 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.ide.common.api.DrawingStyle;
-import com.android.ide.common.api.IGraphics;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.Margins;
-import com.android.ide.common.api.Rect;
-
-import org.eclipse.andmore.internal.editors.layout.gre.NodeProxy;
-import org.eclipse.andmore.internal.editors.layout.gre.RulesEngine;
-import org.eclipse.swt.graphics.GC;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.eclipse.andmore.internal.editors.layout.gre.NodeProxy;
+import org.eclipse.andmore.internal.editors.layout.gre.RulesEngine;
+import org.eclipse.swt.graphics.GC;
+
+import com.android.ide.common.api.DrawingStyle;
+import com.android.ide.common.api.IGraphics;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.Margins;
+import com.android.ide.common.api.Rect;
 
 /**
  * The {@link SelectionOverlay} paints the current selection as an overlay.
@@ -68,8 +65,7 @@ public class SelectionOverlay extends Overlay {
      * @param gc The SWT graphics object
      * @param rulesEngine The {@link RulesEngine} holding the rules.
      */
-    public void paint(SelectionManager selectionManager, GCWrapper gcWrapper,
-            GC gc, RulesEngine rulesEngine) {
+    public void paint(SelectionManager selectionManager, GCWrapper gcWrapper, GC gc, RulesEngine rulesEngine) {
         if (mHidden) {
             return;
         }
@@ -98,8 +94,8 @@ public class SelectionOverlay extends Overlay {
                 CanvasViewInfo root = mCanvas.getViewHierarchy().getRoot();
                 if (root != null) {
                     NodeProxy parent = mCanvas.getNodeFactory().create(root);
-                    rulesEngine.callPaintSelectionFeedback(gcWrapper,
-                            parent, Collections.<INode>emptyList(), root.getViewObject());
+                    rulesEngine.callPaintSelectionFeedback(gcWrapper, parent, Collections.<INode> emptyList(),
+                            root.getViewObject());
                 }
             }
 
@@ -113,8 +109,8 @@ public class SelectionOverlay extends Overlay {
             CanvasViewInfo root = mCanvas.getViewHierarchy().getRoot();
             if (root != null) {
                 NodeProxy parent = mCanvas.getNodeFactory().create(root);
-                rulesEngine.callPaintSelectionFeedback(gcWrapper,
-                        parent, Collections.<INode>emptyList(), root.getViewObject());
+                rulesEngine.callPaintSelectionFeedback(gcWrapper, parent, Collections.<INode> emptyList(),
+                        root.getViewObject());
             }
         }
     }
@@ -154,8 +150,7 @@ public class SelectionOverlay extends Overlay {
         }
     }
 
-    private void paintSelectionFeedback(GCWrapper gcWrapper, List<NodeProxy> nodes,
-            RulesEngine rulesEngine) {
+    private void paintSelectionFeedback(GCWrapper gcWrapper, List<NodeProxy> nodes, RulesEngine rulesEngine) {
         // Add fastpath for n=1
 
         // Group nodes into parent/child groups
@@ -179,14 +174,12 @@ public class SelectionOverlay extends Overlay {
             CanvasViewInfo viewInfo = viewHierarchy.findViewInfoFor((NodeProxy) parent);
             Object view = viewInfo != null ? viewInfo.getViewObject() : null;
 
-            rulesEngine.callPaintSelectionFeedback(gcWrapper,
-                    (NodeProxy) parent, children, view);
+            rulesEngine.callPaintSelectionFeedback(gcWrapper, (NodeProxy) parent, children, view);
         }
     }
 
     /** Called by the canvas when a view is being selected. */
-    private void paintSelection(IGraphics gc, GC swtGc, SelectionItem item,
-            boolean isMultipleSelection) {
+    private void paintSelection(IGraphics gc, GC swtGc, SelectionItem item, boolean isMultipleSelection) {
         CanvasViewInfo view = item.getViewInfo();
         if (view.isHidden()) {
             return;

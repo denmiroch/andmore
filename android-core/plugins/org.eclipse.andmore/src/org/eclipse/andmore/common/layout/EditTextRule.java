@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,8 @@ import static com.android.SdkConstants.ANDROID_URI;
 import static com.android.SdkConstants.ATTR_EMS;
 import static com.android.SdkConstants.REQUEST_FOCUS;
 
+import java.util.List;
+
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.ide.common.api.IMenuCallback;
@@ -29,16 +28,13 @@ import com.android.ide.common.api.IViewRule;
 import com.android.ide.common.api.InsertType;
 import com.android.ide.common.api.RuleAction;
 
-import java.util.List;
-
 /**
  * An {@link IViewRule} for android.widget.EditText.
  */
 public class EditTextRule extends BaseViewRule {
 
     @Override
-    public void onCreate(@NonNull INode node, @NonNull INode parent,
-            @NonNull InsertType insertType) {
+    public void onCreate(@NonNull INode node, @NonNull INode parent, @NonNull InsertType insertType) {
         super.onCreate(node, parent, insertType);
 
         if (parent != null) {
@@ -60,8 +56,7 @@ public class EditTextRule extends BaseViewRule {
      * Adds a "Request Focus" menu item.
      */
     @Override
-    public void addContextMenuActions(@NonNull List<RuleAction> actions,
-            final @NonNull INode selectedNode) {
+    public void addContextMenuActions(@NonNull List<RuleAction> actions, final @NonNull INode selectedNode) {
         super.addContextMenuActions(actions, selectedNode);
 
         final boolean hasFocus = hasFocus(selectedNode);
@@ -69,11 +64,8 @@ public class EditTextRule extends BaseViewRule {
 
         IMenuCallback onChange = new IMenuCallback() {
             @Override
-            public void action(
-                    @NonNull RuleAction menuAction,
-                    @NonNull List<? extends INode> selectedNodes,
-                    @Nullable String valueId,
-                    @Nullable Boolean newValue) {
+            public void action(@NonNull RuleAction menuAction, @NonNull List<? extends INode> selectedNodes,
+                    @Nullable String valueId, @Nullable Boolean newValue) {
                 selectedNode.editXml(label, new INodeHandler() {
                     @Override
                     public void handle(@NonNull INode node) {

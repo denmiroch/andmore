@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,9 @@
  */
 
 package org.eclipse.andmore.internal.editors.ui.tree;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -49,9 +49,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * Details page for the {@link UiElementNode} nodes in the tree view.
@@ -101,9 +98,7 @@ class UiElementDetail implements IDetailsPage {
      */
     @Override
     public void selectionChanged(IFormPart part, ISelection selection) {
-        if (part == mMasterPart &&
-                !selection.isEmpty() &&
-                selection instanceof ITreeSelection) {
+        if (part == mMasterPart && !selection.isEmpty() && selection instanceof ITreeSelection) {
             ITreeSelection tree_selection = (ITreeSelection) selection;
 
             Object first = tree_selection.getFirstElement();
@@ -141,7 +136,6 @@ class UiElementDetail implements IDetailsPage {
     public void dispose() {
         // pass
     }
-
 
     /* (non-java doc)
      * Returns true if the part has been modified with respect to the data
@@ -223,9 +217,7 @@ class UiElementDetail implements IDetailsPage {
      *
      * @param managedForm The managed form
      */
-    private void createUiAttributeControls(
-            final IManagedForm managedForm,
-            final UiElementNode ui_node) {
+    private void createUiAttributeControls(final IManagedForm managedForm, final UiElementNode ui_node) {
 
         final ElementDescriptor elem_desc = ui_node.getDescriptor();
         mMasterSection.setText(String.format("Attributes for %1$s", ui_node.getShortDescription()));
@@ -258,38 +250,34 @@ class UiElementDetail implements IDetailsPage {
             }
 
             FormToolkit toolkit = managedForm.getToolkit();
-            Composite masterTable = SectionHelper.createTableLayout(mMasterSection,
-                    toolkit, useSubsections ? 1 : 2 /* numColumns */);
+            Composite masterTable = SectionHelper.createTableLayout(mMasterSection, toolkit,
+                    useSubsections ? 1 : 2 /* numColumns */);
             mCurrentTable = masterTable;
 
             mCurrentUiElementNode = ui_node;
 
             if (elem_desc.getTooltip() != null) {
                 String tooltip;
-                if (Sdk.getCurrent() != null &&
-                        Sdk.getCurrent().getDocumentationBaseUrl() != null) {
-                    tooltip = DescriptorsUtils.formatFormText(elem_desc.getTooltip(),
-                            elem_desc,
+                if (Sdk.getCurrent() != null && Sdk.getCurrent().getDocumentationBaseUrl() != null) {
+                    tooltip = DescriptorsUtils.formatFormText(elem_desc.getTooltip(), elem_desc,
                             Sdk.getCurrent().getDocumentationBaseUrl());
                 } else {
                     tooltip = elem_desc.getTooltip();
                 }
 
                 try {
-                    FormText text = SectionHelper.createFormText(masterTable, toolkit,
-                            true /* isHtml */, tooltip, true /* setupLayoutData */);
+                    FormText text = SectionHelper.createFormText(masterTable, toolkit, true /* isHtml */, tooltip,
+                            true /* setupLayoutData */);
                     text.addHyperlinkListener(mTree.getEditor().createHyperlinkListener());
                     Image icon = elem_desc.getCustomizedIcon();
                     if (icon != null) {
                         text.setImage(DescriptorsUtils.IMAGE_KEY, icon);
                     }
-                } catch(Exception e) {
+                } catch (Exception e) {
                     // The FormText parser is really really basic and will fail as soon as the
                     // HTML javadoc is ever so slightly malformatted.
-                    AndmoreAndroidPlugin.log(e,
-                            "Malformed javadoc, rejected by FormText for node %1$s: '%2$s'", //$NON-NLS-1$
-                            ui_node.getDescriptor().getXmlName(),
-                            tooltip);
+                    AndmoreAndroidPlugin.log(e, "Malformed javadoc, rejected by FormText for node %1$s: '%2$s'", //$NON-NLS-1$
+                            ui_node.getDescriptor().getXmlName(), tooltip);
 
                     // Fallback to a pure text tooltip, no fancy HTML
                     tooltip = DescriptorsUtils.formatTooltip(elem_desc.getTooltip());
@@ -323,24 +311,20 @@ class UiElementDetail implements IDetailsPage {
                 if (ui_attr != null) {
                     ui_attr.createUiControl(table, managedForm);
 
-                    if (ui_attr.getCurrentValue() != null &&
-                            ui_attr.getCurrentValue().length() > 0) {
+                    if (ui_attr.getCurrentValue() != null && ui_attr.getCurrentValue().length() > 0) {
                         ((Section) table.getParent()).setExpanded(true);
                     }
                 } else {
                     // The XML has an extra unknown attribute.
                     // This is not expected to happen so it is ignored.
-                    AndmoreAndroidPlugin.log(IStatus.INFO,
-                            "Attribute %1$s not declared in node %2$s, ignored.", //$NON-NLS-1$
-                            attr_desc.getXmlLocalName(),
-                            ui_node.getDescriptor().getXmlName());
+                    AndmoreAndroidPlugin.log(IStatus.INFO, "Attribute %1$s not declared in node %2$s, ignored.", //$NON-NLS-1$
+                            attr_desc.getXmlLocalName(), ui_node.getDescriptor().getXmlName());
                 }
             }
 
             // Create a sub-section for the unknown attributes.
             // It is initially hidden till there are some attributes to show here.
-            final Composite unknownTable = createSubSectionTable(toolkit, masterTable,
-                    "Unknown XML Attributes");
+            final Composite unknownTable = createSubSectionTable(toolkit, masterTable, "Unknown XML Attributes");
             unknownTable.getParent().setVisible(false); // set section to not visible
             final HashSet<UiAttributeNode> reference = new HashSet<UiAttributeNode>();
 
@@ -348,8 +332,7 @@ class UiElementDetail implements IDetailsPage {
                 @Override
                 public void uiElementNodeUpdated(UiElementNode uiNode, UiUpdateState state) {
                     if (state == UiUpdateState.ATTR_UPDATED) {
-                        updateUnknownAttributesSection(uiNode, unknownTable, managedForm,
-                                reference);
+                        updateUnknownAttributesSection(uiNode, unknownTable, managedForm, reference);
                     }
                 }
             };
@@ -373,8 +356,7 @@ class UiElementDetail implements IDetailsPage {
      * Create a sub Section and its embedding wrapper table with 2 columns.
      * @return The table, child of a new section.
      */
-    private Composite createSubSectionTable(FormToolkit toolkit,
-            Composite masterTable, String title) {
+    private Composite createSubSectionTable(FormToolkit toolkit, Composite masterTable, String title) {
 
         // The Section composite seems to ignore colspan when assigned a TableWrapData so
         // if the parent is a table with more than one column an extra table with one column
@@ -408,8 +390,7 @@ class UiElementDetail implements IDetailsPage {
         });
 
         section.setText(title);
-        section.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB,
-                                                TableWrapData.TOP));
+        section.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
         table = SectionHelper.createTableLayout(section, toolkit, 2 /* numColumns */);
         return table;
     }
@@ -419,7 +400,7 @@ class UiElementDetail implements IDetailsPage {
      * This will recompute the correct size and adjust the scrollbar as needed.
      */
     private void reflowMasterSection() {
-        for(Composite c = mMasterSection; c != null; c = c.getParent()) {
+        for (Composite c = mMasterSection; c != null; c = c.getParent()) {
             if (c instanceof SharedScrolledComposite) {
                 ((SharedScrolledComposite) c).reflow(true /* flushCache */);
                 break;
@@ -430,9 +411,8 @@ class UiElementDetail implements IDetailsPage {
     /**
      * Updates the unknown attributes section for the UI Node.
      */
-    private void updateUnknownAttributesSection(UiElementNode ui_node,
-            final Composite unknownTable, final IManagedForm managedForm,
-            HashSet<UiAttributeNode> reference) {
+    private void updateUnknownAttributesSection(UiElementNode ui_node, final Composite unknownTable,
+            final IManagedForm managedForm, HashSet<UiAttributeNode> reference) {
         Collection<UiAttributeNode> ui_attrs = ui_node.getUnknownUiAttributes();
         Section section = ((Section) unknownTable.getParent());
         boolean needs_reflow = false;
@@ -490,5 +470,3 @@ class UiElementDetail implements IDetailsPage {
         }
     }
 }
-
-

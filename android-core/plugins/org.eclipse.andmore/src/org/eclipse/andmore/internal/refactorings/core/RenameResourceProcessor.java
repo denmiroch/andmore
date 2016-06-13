@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,6 @@
 package org.eclipse.andmore.internal.refactorings.core;
 
 import static com.android.SdkConstants.PREFIX_RESOURCE_REF;
-
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.resources.ResourceType;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.internal.resources.ResourceNameValidator;
@@ -34,6 +27,10 @@ import org.eclipse.ltk.core.refactoring.participants.RefactoringParticipant;
 import org.eclipse.ltk.core.refactoring.participants.RenameArguments;
 import org.eclipse.ltk.core.refactoring.participants.RenameProcessor;
 import org.eclipse.ltk.core.refactoring.participants.SharableParticipants;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.resources.ResourceType;
 
 /**
  * A rename processor for Android resources.
@@ -55,16 +52,13 @@ public class RenameResourceProcessor extends RenameProcessor {
      * @param currentName the current name of the resource
      * @param newName the new name of the resource, or null if not known
      */
-    public RenameResourceProcessor(
-            @NonNull IProject project,
-            @NonNull ResourceType type,
-            @NonNull String currentName,
+    public RenameResourceProcessor(@NonNull IProject project, @NonNull ResourceType type, @NonNull String currentName,
             @Nullable String newName) {
         mProject = project;
         mType = type;
         mCurrentName = currentName;
         mNewName = newName != null ? newName : currentName;
-        mUpdateReferences= true;
+        mUpdateReferences = true;
         mValidator = ResourceNameValidator.create(false, mProject, mType);
     }
 
@@ -158,8 +152,8 @@ public class RenameResourceProcessor extends RenameProcessor {
     }
 
     @Override
-    public RefactoringStatus checkFinalConditions(IProgressMonitor pm,
-            CheckConditionsContext context) throws CoreException {
+    public RefactoringStatus checkFinalConditions(IProgressMonitor pm, CheckConditionsContext context)
+            throws CoreException {
         pm.beginTask("", 1);
         try {
             mRenameArguments = new RenameArguments(getNewName(), isUpdateReferences());
@@ -201,11 +195,11 @@ public class RenameResourceProcessor extends RenameProcessor {
     }
 
     @Override
-    public RefactoringParticipant[] loadParticipants(RefactoringStatus status,
-            SharableParticipants shared) throws CoreException {
+    public RefactoringParticipant[] loadParticipants(RefactoringStatus status, SharableParticipants shared)
+            throws CoreException {
         String[] affectedNatures = new String[] { AndmoreAndroidConstants.NATURE_DEFAULT };
         String url = PREFIX_RESOURCE_REF + mType.getName() + '/' + mCurrentName;
-        return ParticipantManager.loadRenameParticipants(status, this, url, mRenameArguments,
-                null, affectedNatures, shared);
+        return ParticipantManager.loadRenameParticipants(status, this, url, mRenameArguments, null, affectedNatures,
+                shared);
     }
 }

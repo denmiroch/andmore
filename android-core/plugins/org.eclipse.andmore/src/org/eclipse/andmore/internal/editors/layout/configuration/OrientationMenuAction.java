@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,11 +13,7 @@
 
 package org.eclipse.andmore.internal.editors.layout.configuration;
 
-import com.android.resources.NightMode;
-import com.android.resources.ScreenOrientation;
-import com.android.resources.UiMode;
-import com.android.sdklib.devices.Device;
-import com.android.sdklib.devices.State;
+import java.util.List;
 
 import org.eclipse.andmore.internal.editors.layout.gle2.SubmenuAction;
 import org.eclipse.jface.action.Action;
@@ -33,7 +26,11 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolItem;
 
-import java.util.List;
+import com.android.resources.NightMode;
+import com.android.resources.ScreenOrientation;
+import com.android.resources.UiMode;
+import com.android.sdklib.devices.Device;
+import com.android.sdklib.devices.State;
 
 /**
  * Action which creates a submenu that shows the available orientations as well
@@ -69,14 +66,13 @@ class OrientationMenuAction extends SubmenuAction {
             if (states.size() > 1 && current != null) {
                 State flip = configuration.getNextDeviceState(current);
                 String flipName = flip != null ? flip.getName() : current.getName();
-                manager.add(new DeviceConfigAction(configChooser,
-                        String.format("Switch to %1$s", flipName), flip, false, true));
+                manager.add(new DeviceConfigAction(configChooser, String.format("Switch to %1$s", flipName), flip,
+                        false, true));
                 manager.add(new Separator());
             }
 
             for (State config : states) {
-                manager.add(new DeviceConfigAction(configChooser, config.getName(),
-                        config, config == current, false));
+                manager.add(new DeviceConfigAction(configChooser, config.getName(), config, config == current, false));
             }
             manager.add(new Separator());
         }
@@ -116,7 +112,6 @@ class OrientationMenuAction extends SubmenuAction {
             }
         }
     }
-
 
     private class SelectNightModeAction extends Action {
         private final NightMode mMode;
@@ -159,8 +154,8 @@ class OrientationMenuAction extends SubmenuAction {
         private final ConfigurationChooser mConfiguration;
         private final State mState;
 
-        private DeviceConfigAction(ConfigurationChooser configuration, String title,
-                State state, boolean checked, boolean flip) {
+        private DeviceConfigAction(ConfigurationChooser configuration, String title, State state, boolean checked,
+                boolean flip) {
             super(title, IAction.AS_RADIO_BUTTON);
             mConfiguration = configuration;
             mState = state;

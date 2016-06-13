@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,11 +23,10 @@ import static com.android.SdkConstants.TOOLS_URI;
 import static com.android.SdkConstants.VIEW_FRAGMENT;
 import static com.android.SdkConstants.VIEW_TAG;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.ide.common.xml.ManifestData;
-import com.android.resources.ResourceFolderType;
-import com.android.utils.SdkUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -69,10 +65,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.ide.common.xml.ManifestData;
+import com.android.resources.ResourceFolderType;
+import com.android.utils.SdkUtils;
 
 /**
  * A participant to participate in refactorings that move a type in an Android project.
@@ -110,14 +107,12 @@ public class AndroidTypeMoveParticipant extends MoveParticipant {
             IType type = (IType) element;
             IJavaProject javaProject = (IJavaProject) type.getAncestor(IJavaElement.JAVA_PROJECT);
             mProject = javaProject.getProject();
-            IResource manifestResource = mProject.findMember(AndmoreAndroidConstants.WS_SEP
-                    + SdkConstants.FN_ANDROID_MANIFEST_XML);
+            IResource manifestResource = mProject
+                    .findMember(AndmoreAndroidConstants.WS_SEP + SdkConstants.FN_ANDROID_MANIFEST_XML);
 
-            if (manifestResource == null || !manifestResource.exists()
-                    || !(manifestResource instanceof IFile)) {
-                RefactoringUtil.logInfo("Invalid or missing the "
-                        + SdkConstants.FN_ANDROID_MANIFEST_XML + " in the " + mProject.getName()
-                        + " project.");
+            if (manifestResource == null || !manifestResource.exists() || !(manifestResource instanceof IFile)) {
+                RefactoringUtil.logInfo("Invalid or missing the " + SdkConstants.FN_ANDROID_MANIFEST_XML + " in the "
+                        + mProject.getName() + " project.");
                 return false;
             }
             mManifestFile = (IFile) manifestResource;
@@ -153,8 +148,7 @@ public class AndroidTypeMoveParticipant extends MoveParticipant {
     }
 
     @Override
-    public Change createChange(IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+    public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
         if (pm.isCanceled()) {
             return null;
         }
@@ -269,9 +263,7 @@ public class AndroidTypeMoveParticipant extends MoveParticipant {
         return false;
     }
 
-    private void addLayoutReplacements(
-            @NonNull List<TextEdit> edits,
-            @NonNull Element element,
+    private void addLayoutReplacements(@NonNull List<TextEdit> edits, @NonNull Element element,
             @NonNull IStructuredDocument document) {
         String tag = element.getTagName();
         if (tag.equals(mOldFqcn)) {
@@ -321,9 +313,7 @@ public class AndroidTypeMoveParticipant extends MoveParticipant {
         }
     }
 
-    private void addManifestReplacements(
-            @NonNull List<TextEdit> edits,
-            @NonNull Element element,
+    private void addManifestReplacements(@NonNull List<TextEdit> edits, @NonNull Element element,
             @NonNull IStructuredDocument document) {
         NamedNodeMap attributes = element.getAttributes();
         for (int i = 0, n = attributes.getLength(); i < n; i++) {

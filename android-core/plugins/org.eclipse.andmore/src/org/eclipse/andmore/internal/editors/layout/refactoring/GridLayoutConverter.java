@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,10 +50,17 @@ import static com.android.SdkConstants.VALUE_WRAP_CONTENT;
 import static org.eclipse.andmore.common.layout.GravityHelper.GRAVITY_HORIZ_MASK;
 import static org.eclipse.andmore.common.layout.GravityHelper.GRAVITY_VERT_MASK;
 
-import com.android.ide.common.api.IViewMetadata.FillPreference;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.common.layout.BaseLayoutRule;
 import org.eclipse.andmore.common.layout.BaseViewRule;
 import org.eclipse.andmore.common.layout.GravityHelper;
 import org.eclipse.andmore.common.layout.GridLayoutRule;
@@ -79,15 +83,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.ide.common.api.IViewMetadata.FillPreference;
 
 /**
  * Helper class which performs the bulk of the layout conversion to grid layout
@@ -120,8 +116,8 @@ class GridLayoutConverter {
     private int mColumnCount;
 
     /** Creates a new {@link GridLayoutConverter} */
-    GridLayoutConverter(ChangeLayoutRefactoring refactoring,
-            Element layout, boolean flatten, MultiTextEdit rootEdit, CanvasViewInfo rootView) {
+    GridLayoutConverter(ChangeLayoutRefactoring refactoring, Element layout, boolean flatten, MultiTextEdit rootEdit,
+            CanvasViewInfo rootView) {
         mRefactoring = refactoring;
         mLayout = layout;
         mFlatten = flatten;
@@ -161,8 +157,8 @@ class GridLayoutConverter {
         removeUndefinedAttrs();
 
         if (mColumnCount > 0) {
-            mRefactoring.setAttribute(mRootEdit, mLayout, ANDROID_URI,
-                mNamespace, ATTR_COLUMN_COUNT, Integer.toString(mColumnCount));
+            mRefactoring.setAttribute(mRootEdit, mLayout, ANDROID_URI, mNamespace, ATTR_COLUMN_COUNT,
+                    Integer.toString(mColumnCount));
         }
     }
 
@@ -288,8 +284,7 @@ class GridLayoutConverter {
                 if (!defined.contains(name)) {
                     // Remove it
                     try {
-                        mRefactoring.removeAttribute(mRootEdit, child, attribute.getNamespaceURI(),
-                                name);
+                        mRefactoring.removeAttribute(mRootEdit, child, attribute.getNamespaceURI(), name);
                     } catch (MalformedTreeException mte) {
                         // Sometimes refactoring has modified attribute; not
                         // removing
@@ -310,8 +305,7 @@ class GridLayoutConverter {
     private void deleteRemovedElements(List<Element> delete) {
         if (mFlatten && delete.size() > 0) {
             for (Element element : delete) {
-                mRefactoring.removeElementTags(mRootEdit, element, delete,
-                        false /*changeIndentation*/);
+                mRefactoring.removeElementTags(mRootEdit, element, delete, false /*changeIndentation*/);
             }
         }
     }
@@ -321,8 +315,7 @@ class GridLayoutConverter {
      */
     private void assignGridAttributes() {
         // We always convert to horizontal grid layouts for now
-        mRefactoring.setAttribute(mRootEdit, mLayout, ANDROID_URI,
-                mNamespace, ATTR_ORIENTATION, VALUE_HORIZONTAL);
+        mRefactoring.setAttribute(mRootEdit, mLayout, ANDROID_URI, mNamespace, ATTR_ORIENTATION, VALUE_HORIZONTAL);
 
         assignCellAttributes();
     }
@@ -345,16 +338,16 @@ class GridLayoutConverter {
             int column = view.getColumn();
 
             if (column != implicitColumn && (implicitColumn > 0 || implicitRow > 0)) {
-                mRefactoring.setAttribute(mRootEdit, element, ANDROID_URI,
-                        mNamespace, ATTR_LAYOUT_COLUMN, Integer.toString(column));
+                mRefactoring.setAttribute(mRootEdit, element, ANDROID_URI, mNamespace, ATTR_LAYOUT_COLUMN,
+                        Integer.toString(column));
                 if (column < implicitColumn) {
                     implicitRow++;
                 }
                 implicitColumn = column;
             }
             if (row != implicitRow) {
-                mRefactoring.setAttribute(mRootEdit, element, ANDROID_URI,
-                        mNamespace, ATTR_LAYOUT_ROW, Integer.toString(row));
+                mRefactoring.setAttribute(mRootEdit, element, ANDROID_URI, mNamespace, ATTR_LAYOUT_ROW,
+                        Integer.toString(row));
                 implicitRow = row;
             }
 
@@ -363,12 +356,11 @@ class GridLayoutConverter {
             assert columnSpan >= 1;
 
             if (rowSpan > 1) {
-                mRefactoring.setAttribute(mRootEdit, element, ANDROID_URI,
-                        mNamespace, ATTR_LAYOUT_ROW_SPAN, Integer.toString(rowSpan));
+                mRefactoring.setAttribute(mRootEdit, element, ANDROID_URI, mNamespace, ATTR_LAYOUT_ROW_SPAN,
+                        Integer.toString(rowSpan));
             }
             if (columnSpan > 1) {
-                mRefactoring.setAttribute(mRootEdit, element, ANDROID_URI,
-                        mNamespace, ATTR_LAYOUT_COLUMN_SPAN,
+                mRefactoring.setAttribute(mRootEdit, element, ANDROID_URI, mNamespace, ATTR_LAYOUT_COLUMN_SPAN,
                         Integer.toString(columnSpan));
             }
             nextRow = Math.max(nextRow, row + rowSpan);
@@ -409,13 +401,13 @@ class GridLayoutConverter {
             Attr height = element.getAttributeNodeNS(ANDROID_URI, ATTR_LAYOUT_HEIGHT);
             String gravity = element.getAttributeNS(ANDROID_URI, ATTR_LAYOUT_GRAVITY);
             String newGravity = null;
-            if (width != null && (VALUE_MATCH_PARENT.equals(width.getValue()) ||
-                    VALUE_FILL_PARENT.equals(width.getValue()))) {
+            if (width != null
+                    && (VALUE_MATCH_PARENT.equals(width.getValue()) || VALUE_FILL_PARENT.equals(width.getValue()))) {
                 mRefactoring.removeAttribute(mRootEdit, width);
                 newGravity = gravity = GRAVITY_VALUE_FILL_HORIZONTAL;
             }
-            if (height != null && (VALUE_MATCH_PARENT.equals(height.getValue()) ||
-                    VALUE_FILL_PARENT.equals(height.getValue()))) {
+            if (height != null
+                    && (VALUE_MATCH_PARENT.equals(height.getValue()) || VALUE_FILL_PARENT.equals(height.getValue()))) {
                 mRefactoring.removeAttribute(mRootEdit, height);
                 if (newGravity == GRAVITY_VALUE_FILL_HORIZONTAL) {
                     newGravity = GRAVITY_VALUE_FILL;
@@ -439,14 +431,12 @@ class GridLayoutConverter {
             }
 
             if (newGravity != null) {
-                mRefactoring.setAttribute(mRootEdit, element, ANDROID_URI,
-                        mNamespace, ATTR_LAYOUT_GRAVITY, newGravity);
+                mRefactoring.setAttribute(mRootEdit, element, ANDROID_URI, mNamespace, ATTR_LAYOUT_GRAVITY, newGravity);
             }
 
             view.mGravity = newGravity != null ? newGravity : gravity;
         }
     }
-
 
     /** Converts 0dip values in layout_width and layout_height to wrap_content instead */
     private void convert0dipToWrapContent(Element child) {
@@ -501,7 +491,6 @@ class GridLayoutConverter {
 
         return null;
     }
-
 
     /** Holds layout information about an individual view */
     private static class View {
@@ -851,8 +840,8 @@ class GridLayoutConverter {
             List<Collection<View>> columnGroups = new ArrayList<Collection<View>>();
             for (Element parent : parents) {
                 String tagName = parent.getTagName();
-                if (tagName.equals(LINEAR_LAYOUT) || tagName.equals(TABLE_LAYOUT) ||
-                        tagName.equals(TABLE_ROW) || tagName.equals(RADIO_GROUP)) {
+                if (tagName.equals(LINEAR_LAYOUT) || tagName.equals(TABLE_LAYOUT) || tagName.equals(TABLE_ROW)
+                        || tagName.equals(RADIO_GROUP)) {
                     Set<View> group = new HashSet<View>();
                     for (Element child : DomUtilities.getChildren(parent)) {
                         View view = mElementToView.get(child);
@@ -861,8 +850,8 @@ class GridLayoutConverter {
                         }
                     }
                     if (group.size() > 1) {
-                        boolean isVertical = VALUE_VERTICAL.equals(parent.getAttributeNS(
-                                ANDROID_URI, ATTR_ORIENTATION));
+                        boolean isVertical = VALUE_VERTICAL
+                                .equals(parent.getAttributeNS(ANDROID_URI, ATTR_ORIENTATION));
                         if (tagName.equals(TABLE_LAYOUT)) {
                             isVertical = true;
                         } else if (tagName.equals(TABLE_ROW)) {
@@ -886,19 +875,16 @@ class GridLayoutConverter {
                             Attr attr = (Attr) attributes.item(i);
                             String name = attr.getLocalName();
                             if (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)) {
-                                boolean alignVertical =
-                                        name.equals(ATTR_LAYOUT_ALIGN_TOP) ||
-                                        name.equals(ATTR_LAYOUT_ALIGN_BOTTOM) ||
-                                        name.equals(ATTR_LAYOUT_ALIGN_BASELINE);
-                                boolean alignHorizontal =
-                                        name.equals(ATTR_LAYOUT_ALIGN_LEFT) ||
-                                        name.equals(ATTR_LAYOUT_ALIGN_RIGHT);
+                                boolean alignVertical = name.equals(ATTR_LAYOUT_ALIGN_TOP)
+                                        || name.equals(ATTR_LAYOUT_ALIGN_BOTTOM)
+                                        || name.equals(ATTR_LAYOUT_ALIGN_BASELINE);
+                                boolean alignHorizontal = name.equals(ATTR_LAYOUT_ALIGN_LEFT)
+                                        || name.equals(ATTR_LAYOUT_ALIGN_RIGHT);
                                 if (!alignVertical && !alignHorizontal) {
                                     continue;
                                 }
                                 String value = attr.getValue();
-                                if (value.startsWith(ID_PREFIX)
-                                        || value.startsWith(NEW_ID_PREFIX)) {
+                                if (value.startsWith(ID_PREFIX) || value.startsWith(NEW_ID_PREFIX)) {
                                     String targetName = BaseViewRule.stripIdPrefix(value);
                                     Element target = null;
                                     for (Element c : children) {
@@ -939,8 +925,8 @@ class GridLayoutConverter {
                     smallest = Math.min(smallest, iterator.next().mY1);
                 }
                 for (View view : rowGroup) {
-                   view.mY2 -= (view.mY1 - smallest);
-                   view.mY1 = smallest;
+                    view.mY2 -= (view.mY1 - smallest);
+                    view.mY1 = smallest;
                 }
             }
             for (Collection<View> columnGroup : columnGroups) {
@@ -950,8 +936,8 @@ class GridLayoutConverter {
                     smallest = Math.min(smallest, iterator.next().mX1);
                 }
                 for (View view : columnGroup) {
-                   view.mX2 -= (view.mX1 - smallest);
-                   view.mX1 = smallest;
+                    view.mX2 -= (view.mX1 - smallest);
+                    view.mX1 = smallest;
                 }
             }
         }
@@ -970,8 +956,8 @@ class GridLayoutConverter {
 
             ElementDescriptor descriptor = child.getUiViewNode().getDescriptor();
             String name = descriptor.getXmlLocalName();
-            if (name.equals(LINEAR_LAYOUT) || name.equals(RELATIVE_LAYOUT)
-                    || name.equals(TABLE_LAYOUT) || name.equals(TABLE_ROW)) {
+            if (name.equals(LINEAR_LAYOUT) || name.equals(RELATIVE_LAYOUT) || name.equals(TABLE_LAYOUT)
+                    || name.equals(TABLE_ROW)) {
                 // Don't delete layouts that provide a background image or gradient
                 if (element.hasAttributeNS(ANDROID_URI, ATTR_BACKGROUND)) {
                     AndmoreAndroidPlugin.log(IStatus.WARNING,

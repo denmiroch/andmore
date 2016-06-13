@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -69,7 +66,7 @@ public class CanvasTransform {
             public void widgetSelected(SelectionEvent e) {
                 // User requested scrolling. Changes translation and redraw canvas.
                 mTranslate = mScrollbar.getSelection();
-                CanvasTransform.this.mCanvas.redraw();
+                mCanvas.redraw();
             }
         });
         mScrollbar.setIncrement(20);
@@ -148,8 +145,7 @@ public class CanvasTransform {
             mMargin = delta / 2;
 
             ImageOverlay imageOverlay = mCanvas.getImageOverlay();
-            if (imageOverlay != null && imageOverlay.getShowDropShadow()
-                    && delta >= SHADOW_SIZE / 2) {
+            if (imageOverlay != null && imageOverlay.getShowDropShadow() && delta >= SHADOW_SIZE / 2) {
                 mMargin -= SHADOW_SIZE / 2;
                 // Add a little padding on the top too, if there's room. The shadow assets
                 // include enough padding on the bottom to not make this look clipped.
@@ -186,8 +182,8 @@ public class CanvasTransform {
                 }
             }
 
-            mScrollbar.setValues(selection, mScrollbar.getMinimum(), maximum, thumb, mScrollbar
-                    .getIncrement(), mScrollbar.getPageIncrement());
+            mScrollbar.setValues(selection, mScrollbar.getMinimum(), maximum, thumb, mScrollbar.getIncrement(),
+                    mScrollbar.getPageIncrement());
 
             mTranslate = selection;
         }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,11 +20,10 @@ import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.ATT
 import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.ATTR_NAME;
 import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.ATTR_SUGGEST;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.resources.ResourceFolderType;
-import com.android.resources.ResourceType;
-import com.google.common.base.Splitter;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.gle2.DomUtilities;
@@ -45,10 +41,11 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.widgets.Control;
 import org.w3c.dom.Element;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Locale;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.resources.ResourceFolderType;
+import com.android.resources.ResourceType;
+import com.google.common.base.Splitter;
 
 /**
  * A template parameter editable and edited by the user.
@@ -60,10 +57,7 @@ import java.util.Locale;
  */
 class Parameter {
     enum Type {
-        STRING,
-        BOOLEAN,
-        ENUM,
-        SEPARATOR;
+        STRING, BOOLEAN, ENUM, SEPARATOR;
         // TODO: Numbers?
 
         public static Type get(String name) {
@@ -254,15 +248,12 @@ class Parameter {
         }
     }
 
-    Parameter(
-            @NonNull TemplateMetadata template,
-            @NonNull Type type,
-            @NonNull String id,
+    Parameter(@NonNull TemplateMetadata template, @NonNull Type type, @NonNull String id,
             @NonNull String initialValue) {
         this.template = template;
         this.type = type;
         this.id = id;
-        this.value = initialValue;
+        value = initialValue;
         element = null;
         initial = null;
         suggest = null;
@@ -317,14 +308,12 @@ class Parameter {
                 return mValidator;
             } else if (constraints.contains(Constraint.DRAWABLE)) {
                 if (project != null && constraints.contains(Constraint.UNIQUE)) {
-                    mValidator = ResourceNameValidator.create(false, project,
-                            ResourceType.DRAWABLE);
+                    mValidator = ResourceNameValidator.create(false, project, ResourceType.DRAWABLE);
                 } else {
                     mValidator = ResourceNameValidator.create(false, ResourceFolderType.DRAWABLE);
                 }
                 return mValidator;
-            } else if (constraints.contains(Constraint.PACKAGE)
-                    || constraints.contains(Constraint.CLASS)
+            } else if (constraints.contains(Constraint.PACKAGE) || constraints.contains(Constraint.CLASS)
                     || constraints.contains(Constraint.ACTIVITY)) {
                 mValidator = new IInputValidator() {
                     @Override
@@ -367,8 +356,7 @@ class Parameter {
                                     String fqcn = newText;
                                     if (fqcn.indexOf('.') == -1) {
                                         String pkg = null;
-                                        Parameter parameter = template.getParameter(
-                                                ATTR_PACKAGE_NAME);
+                                        Parameter parameter = template.getParameter(ATTR_PACKAGE_NAME);
                                         if (parameter != null && parameter.value != null) {
                                             pkg = parameter.value.toString();
                                         } else {

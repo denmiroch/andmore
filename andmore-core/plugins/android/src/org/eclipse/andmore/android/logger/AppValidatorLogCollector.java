@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,26 +27,26 @@ import org.eclipse.core.runtime.Path;
  */
 public class AppValidatorLogCollector implements ILogFile {
 
-	@Override
-	public String getLogName() {
-		return AndroidNLS.UI_Logger_ApplicationValidatorFolder;
-	}
+    @Override
+    public String getLogName() {
+        return AndroidNLS.UI_Logger_ApplicationValidatorFolder;
+    }
 
-	@Override
-	public List<IPath> getLogFilePath() {
-		ArrayList<IPath> logs = new ArrayList<IPath>();
-		String userHomeProp = System.getProperty("user.home");
-		File userHomeFile = new File(userHomeProp, "appValidator.log");
-		if (userHomeFile.exists()) {
-			IPath path = new Path(userHomeFile.getAbsolutePath());
-			logs.add(path);
-		}
-		return logs;
-	}
+    @Override
+    public List<IPath> getLogFilePath() {
+        ArrayList<IPath> logs = new ArrayList<IPath>();
+        String userHomeProp = System.getProperty("user.home");
+        File userHomeFile = new File(userHomeProp, "appValidator.log");
+        if (userHomeFile.exists()) {
+            IPath path = new Path(userHomeFile.getAbsolutePath());
+            logs.add(path);
+        }
+        return logs;
+    }
 
-	@Override
-	public String getOutputSubfolderName() {
-		return "ApplicationValidator";
-	}
+    @Override
+    public String getOutputSubfolderName() {
+        return "ApplicationValidator";
+    }
 
 }

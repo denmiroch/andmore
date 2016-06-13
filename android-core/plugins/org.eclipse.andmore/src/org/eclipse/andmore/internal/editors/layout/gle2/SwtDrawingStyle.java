@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,10 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.ide.common.api.DrawingStyle;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
+
+import com.android.ide.common.api.DrawingStyle;
 
 /**
  * Description of the drawing styles with specific color, line style and alpha
@@ -84,8 +81,7 @@ public enum SwtDrawingStyle {
     /**
      * The style definition corresponding to {@link DrawingStyle#DROP_RECIPIENT}
      */
-    DROP_RECIPIENT(new RGB(0xFF, 0x99, 0x00), 255, new RGB(0xFF, 0x99, 0x00), 160, 2,
-            SWT.LINE_SOLID),
+    DROP_RECIPIENT(new RGB(0xFF, 0x99, 0x00), 255, new RGB(0xFF, 0x99, 0x00), 160, 2, SWT.LINE_SOLID),
 
     /**
      * The style definition corresponding to {@link DrawingStyle#DROP_ZONE}
@@ -96,8 +92,7 @@ public enum SwtDrawingStyle {
      * The style definition corresponding to
      * {@link DrawingStyle#DROP_ZONE_ACTIVE}
      */
-    DROP_ZONE_ACTIVE(new RGB(0x00, 0xAA, 0x00), 220, new RGB(0x00, 0xAA, 0x00), 128, 2,
-            SWT.LINE_SOLID),
+    DROP_ZONE_ACTIVE(new RGB(0x00, 0xAA, 0x00), 220, new RGB(0x00, 0xAA, 0x00), 128, 2, SWT.LINE_SOLID),
 
     /**
      * The style definition corresponding to {@link DrawingStyle#DROP_PREVIEW}
@@ -171,8 +166,7 @@ public enum SwtDrawingStyle {
      * @param fillAlpha The alpha value of the fill, an integer in the range 0 to 255
      *            where 0 is fully transparent and 255 is fully opaque.
      */
-    private SwtDrawingStyle(RGB stroke, int strokeAlpha, RGB fill, int fillAlpha, int lineWidth,
-            int lineStyle) {
+    private SwtDrawingStyle(RGB stroke, int strokeAlpha, RGB fill, int fillAlpha, int lineWidth, int lineStyle) {
         mStroke = stroke;
         mFill = fill;
         mLineWidth = lineWidth;
@@ -293,7 +287,7 @@ public enum SwtDrawingStyle {
             case CUSTOM2:
                 return CUSTOM2;
 
-                // Internal error
+            // Internal error
             default:
                 throw new IllegalArgumentException("Unknown style " + style);
         }

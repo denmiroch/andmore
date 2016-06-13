@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,19 +30,19 @@ import static org.eclipse.andmore.common.layout.relative.ConstraintType.LAYOUT_B
 import static org.eclipse.andmore.common.layout.relative.ConstraintType.LAYOUT_LEFT_OF;
 import static org.eclipse.andmore.common.layout.relative.ConstraintType.LAYOUT_RIGHT_OF;
 
-import com.android.ide.common.api.DrawingStyle;
-import com.android.ide.common.api.IGraphics;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.Margins;
-import com.android.ide.common.api.Rect;
-import com.android.ide.common.api.SegmentType;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.andmore.common.layout.relative.DependencyGraph.Constraint;
 import org.eclipse.andmore.common.layout.relative.DependencyGraph.ViewData;
+
+import com.android.ide.common.api.DrawingStyle;
+import com.android.ide.common.api.IGraphics;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.Margins;
+import com.android.ide.common.api.Rect;
+import com.android.ide.common.api.SegmentType;
 
 /**
  * The {@link ConstraintPainter} is responsible for painting relative layout constraints -
@@ -70,8 +67,8 @@ public class ConstraintPainter {
         Rect targetBounds = match.edge.node.getBounds();
         ConstraintType type = match.type;
         assert type != null;
-        paintConstraint(graphics, type, match.with.node, sourceBounds, match.edge.node,
-                targetBounds, null /* allConstraints */, true /* highlightTargetEdge */);
+        paintConstraint(graphics, type, match.with.node, sourceBounds, match.edge.node, targetBounds,
+                null /* allConstraints */, true /* highlightTargetEdge */);
     }
 
     /**
@@ -83,8 +80,7 @@ public class ConstraintPainter {
      * @param graphics the graphics context to draw into
      * @param constraint The constraint to be drawn
      */
-    private static void paintConstraint(IGraphics graphics, Constraint constraint,
-            Set<Constraint> allConstraints) {
+    private static void paintConstraint(IGraphics graphics, Constraint constraint, Set<Constraint> allConstraints) {
         ViewData source = constraint.from;
         ViewData target = constraint.to;
 
@@ -97,8 +93,8 @@ public class ConstraintPainter {
 
         Rect sourceBounds = sourceNode.getBounds();
         Rect targetBounds = targetNode.getBounds();
-        paintConstraint(graphics, constraint.type, sourceNode, sourceBounds, targetNode,
-                targetBounds, allConstraints, false /* highlightTargetEdge */);
+        paintConstraint(graphics, constraint.type, sourceNode, sourceBounds, targetNode, targetBounds, allConstraints,
+                false /* highlightTargetEdge */);
     }
 
     /**
@@ -109,8 +105,8 @@ public class ConstraintPainter {
      * @param childNodes the nodes whose constraints should be painted
      * @param showDependents whether incoming constraints should be shown as well
      */
-    public static void paintSelectionFeedback(IGraphics graphics, INode parentNode,
-            List<? extends INode> childNodes, boolean showDependents) {
+    public static void paintSelectionFeedback(IGraphics graphics, INode parentNode, List<? extends INode> childNodes,
+            boolean showDependents) {
 
         DependencyGraph dependencyGraph = new DependencyGraph(parentNode);
         Set<INode> horizontalDeps = dependencyGraph.dependsOn(childNodes, false /* vertical */);
@@ -181,9 +177,8 @@ public class ConstraintPainter {
      * Paints a constraint of the given type from the given source node, to the
      * given target node, with the specified bounds.
      */
-    private static void paintConstraint(IGraphics graphics, ConstraintType type, INode sourceNode,
-            Rect sourceBounds, INode targetNode, Rect targetBounds,
-            Set<Constraint> allConstraints, boolean highlightTargetEdge) {
+    private static void paintConstraint(IGraphics graphics, ConstraintType type, INode sourceNode, Rect sourceBounds,
+            INode targetNode, Rect targetBounds, Set<Constraint> allConstraints, boolean highlightTargetEdge) {
 
         SegmentType sourceSegmentTypeX = type.sourceSegmentTypeX;
         SegmentType sourceSegmentTypeY = type.sourceSegmentTypeY;
@@ -203,26 +198,25 @@ public class ConstraintPainter {
         }
 
         // Corner constraint?
-        if (allConstraints != null
-                && (type == LAYOUT_ABOVE || type == LAYOUT_BELOW
-                        || type == LAYOUT_LEFT_OF || type == LAYOUT_RIGHT_OF)) {
-            if (paintCornerConstraint(graphics, type, sourceNode, sourceBounds, targetNode,
-                    targetBounds, allConstraints)) {
+        if (allConstraints != null && (type == LAYOUT_ABOVE || type == LAYOUT_BELOW || type == LAYOUT_LEFT_OF
+                || type == LAYOUT_RIGHT_OF)) {
+            if (paintCornerConstraint(graphics, type, sourceNode, sourceBounds, targetNode, targetBounds,
+                    allConstraints)) {
                 return;
             }
         }
 
         // Vertical constraint?
         if (sourceSegmentTypeX == UNKNOWN) {
-            paintVerticalConstraint(graphics, type, sourceNode, sourceBounds, targetNode,
-                    targetBounds, highlightTargetEdge);
+            paintVerticalConstraint(graphics, type, sourceNode, sourceBounds, targetNode, targetBounds,
+                    highlightTargetEdge);
             return;
         }
 
         // Horizontal constraint?
         if (sourceSegmentTypeY == UNKNOWN) {
-            paintHorizontalConstraint(graphics, type, sourceNode, sourceBounds, targetNode,
-                    targetBounds, highlightTargetEdge);
+            paintHorizontalConstraint(graphics, type, sourceNode, sourceBounds, targetNode, targetBounds,
+                    highlightTargetEdge);
             return;
         }
 
@@ -275,9 +269,8 @@ public class ConstraintPainter {
      *    matching corner constraint is removed from the set
      * @return true if the constraint was handled and painted as a corner, false otherwise
      */
-    private static boolean paintCornerConstraint(IGraphics graphics, ConstraintType type,
-            INode sourceNode, Rect sourceBounds, INode targetNode, Rect targetBounds,
-            Set<Constraint> allConstraints) {
+    private static boolean paintCornerConstraint(IGraphics graphics, ConstraintType type, INode sourceNode,
+            Rect sourceBounds, INode targetNode, Rect targetBounds, Set<Constraint> allConstraints) {
 
         SegmentType sourceSegmentTypeX = type.sourceSegmentTypeX;
         SegmentType sourceSegmentTypeY = type.sourceSegmentTypeY;
@@ -301,8 +294,8 @@ public class ConstraintPainter {
         }
         Constraint pair = null;
         for (Constraint constraint : allConstraints) {
-            if ((constraint.type == opposite1 || constraint.type == opposite2) &&
-                    constraint.to.node == targetNode && constraint.from.node == sourceNode) {
+            if ((constraint.type == opposite1 || constraint.type == opposite2) && constraint.to.node == targetNode
+                    && constraint.from.node == sourceNode) {
                 pair = constraint;
                 break;
             }
@@ -380,9 +373,8 @@ public class ConstraintPainter {
      *                    +--------+
      * </pre>
      */
-    private static void paintVerticalConstraint(IGraphics graphics, ConstraintType type,
-            INode sourceNode, Rect sourceBounds, INode targetNode, Rect targetBounds,
-            boolean highlightTargetEdge) {
+    private static void paintVerticalConstraint(IGraphics graphics, ConstraintType type, INode sourceNode,
+            Rect sourceBounds, INode targetNode, Rect targetBounds, boolean highlightTargetEdge) {
         SegmentType sourceSegmentTypeY = type.sourceSegmentTypeY;
         SegmentType targetSegmentTypeY = type.targetSegmentTypeY;
         Margins targetMargins = targetNode.getMargins();
@@ -391,13 +383,12 @@ public class ConstraintPainter {
         assert targetBounds != null;
 
         int sourceY = sourceSegmentTypeY.getY(sourceNode, sourceBounds);
-        int targetY = targetSegmentTypeY ==
-            UNKNOWN ? sourceY : targetSegmentTypeY.getY(targetNode, targetBounds);
+        int targetY = targetSegmentTypeY == UNKNOWN ? sourceY : targetSegmentTypeY.getY(targetNode, targetBounds);
 
         if (highlightTargetEdge && type.isRelativeToParentEdge()) {
             graphics.useStyle(DrawingStyle.DROP_ZONE_ACTIVE);
-            graphics.fillRect(targetBounds.x, targetY - PARENT_RECT_SIZE / 2,
-                    targetBounds.x2(), targetY + PARENT_RECT_SIZE / 2);
+            graphics.fillRect(targetBounds.x, targetY - PARENT_RECT_SIZE / 2, targetBounds.x2(),
+                    targetY + PARENT_RECT_SIZE / 2);
         }
 
         // First see if the two views overlap horizontally. If so, we can just draw a direct
@@ -530,8 +521,7 @@ public class ConstraintPainter {
         // them (but this will require me to evaluate margins!)
 
         // Compute overlap region and pick the middle
-        int sharedY = targetSegmentTypeY ==
-            UNKNOWN ? sourceY : targetSegmentTypeY.getY(targetNode, targetBounds);
+        int sharedY = targetSegmentTypeY == UNKNOWN ? sourceY : targetSegmentTypeY.getY(targetNode, targetBounds);
         if (type.relativeToMargin) {
             if (targetSegmentTypeY == TOP) {
                 sharedY -= targetMargins.top;
@@ -573,8 +563,7 @@ public class ConstraintPainter {
         graphics.useStyle(GUIDELINE);
 
         // Draw the line from the source anchor to the shared edge
-        int x = sourceBounds.x + ((sourceSegmentTypeY == BASELINE) ?
-                sourceBounds.w / 2 :  sourceBounds.w / 4);
+        int x = sourceBounds.x + ((sourceSegmentTypeY == BASELINE) ? sourceBounds.w / 2 : sourceBounds.w / 4);
         graphics.drawArrow(x, sourceY, x, sharedY, ARROW_SIZE);
 
         // Draw the line from the target to the horizontal shared edge
@@ -608,9 +597,8 @@ public class ConstraintPainter {
      * Paints a horizontal constraint, handling the various scenarios where there are margins,
      * or where the two nodes overlap horizontally and where they don't, etc.
      */
-    private static void paintHorizontalConstraint(IGraphics graphics, ConstraintType type,
-            INode sourceNode, Rect sourceBounds, INode targetNode, Rect targetBounds,
-            boolean highlightTargetEdge) {
+    private static void paintHorizontalConstraint(IGraphics graphics, ConstraintType type, INode sourceNode,
+            Rect sourceBounds, INode targetNode, Rect targetBounds, boolean highlightTargetEdge) {
         SegmentType sourceSegmentTypeX = type.sourceSegmentTypeX;
         SegmentType targetSegmentTypeX = type.targetSegmentTypeX;
         Margins targetMargins = targetNode.getMargins();
@@ -621,13 +609,12 @@ public class ConstraintPainter {
         // See paintVerticalConstraint for explanations of the various cases.
 
         int sourceX = sourceSegmentTypeX.getX(sourceNode, sourceBounds);
-        int targetX = targetSegmentTypeX == UNKNOWN ?
-                sourceX : targetSegmentTypeX.getX(targetNode, targetBounds);
+        int targetX = targetSegmentTypeX == UNKNOWN ? sourceX : targetSegmentTypeX.getX(targetNode, targetBounds);
 
         if (highlightTargetEdge && type.isRelativeToParentEdge()) {
             graphics.useStyle(DrawingStyle.DROP_ZONE_ACTIVE);
-            graphics.fillRect(targetX - PARENT_RECT_SIZE / 2, targetBounds.y,
-                    targetX + PARENT_RECT_SIZE / 2, targetBounds.y2());
+            graphics.fillRect(targetX - PARENT_RECT_SIZE / 2, targetBounds.y, targetX + PARENT_RECT_SIZE / 2,
+                    targetBounds.y2());
         }
 
         int maxTop = Math.max(sourceBounds.y, targetBounds.y);
@@ -671,7 +658,7 @@ public class ConstraintPainter {
             if (sourceX == targetX) {
                 if (sourceSegmentTypeX == RIGHT) {
                     sourceX -= 2 * ARROW_SIZE;
-                } else if (sourceSegmentTypeX == LEFT ) {
+                } else if (sourceSegmentTypeX == LEFT) {
                     sourceX += 2 * ARROW_SIZE;
                 } else {
                     assert sourceSegmentTypeX == CENTER_VERTICAL : sourceSegmentTypeX;
@@ -687,8 +674,7 @@ public class ConstraintPainter {
         // Segment line
 
         // Compute overlap region and pick the middle
-        int sharedX = targetSegmentTypeX == UNKNOWN ?
-                sourceX : targetSegmentTypeX.getX(targetNode, targetBounds);
+        int sharedX = targetSegmentTypeX == UNKNOWN ? sourceX : targetSegmentTypeX.getX(targetNode, targetBounds);
         if (type.relativeToMargin) {
             if (targetSegmentTypeX == LEFT) {
                 sharedX -= targetMargins.left;
@@ -758,27 +744,21 @@ public class ConstraintPainter {
      * Paints a vertical center constraint. The constraint is shown as a dashed line
      * through the vertical view, and a solid line over the node bounds.
      */
-    private static void paintVerticalCenterConstraint(IGraphics graphics, Rect sourceBounds,
-            Rect targetBounds) {
+    private static void paintVerticalCenterConstraint(IGraphics graphics, Rect sourceBounds, Rect targetBounds) {
         graphics.useStyle(GUIDELINE_DASHED);
-        graphics.drawLine(targetBounds.x, targetBounds.centerY(),
-                targetBounds.x2(), targetBounds.centerY());
+        graphics.drawLine(targetBounds.x, targetBounds.centerY(), targetBounds.x2(), targetBounds.centerY());
         graphics.useStyle(GUIDELINE);
-        graphics.drawLine(sourceBounds.x, sourceBounds.centerY(),
-                sourceBounds.x2(), sourceBounds.centerY());
+        graphics.drawLine(sourceBounds.x, sourceBounds.centerY(), sourceBounds.x2(), sourceBounds.centerY());
     }
 
     /**
      * Paints a horizontal center constraint. The constraint is shown as a dashed line
      * through the horizontal view, and a solid line over the node bounds.
      */
-    private static void paintHorizontalCenterConstraint(IGraphics graphics, Rect sourceBounds,
-            Rect targetBounds) {
+    private static void paintHorizontalCenterConstraint(IGraphics graphics, Rect sourceBounds, Rect targetBounds) {
         graphics.useStyle(GUIDELINE_DASHED);
-        graphics.drawLine(targetBounds.centerX(), targetBounds.y,
-                targetBounds.centerX(), targetBounds.y2());
+        graphics.drawLine(targetBounds.centerX(), targetBounds.y, targetBounds.centerX(), targetBounds.y2());
         graphics.useStyle(GUIDELINE);
-        graphics.drawLine(sourceBounds.centerX(), sourceBounds.y,
-                sourceBounds.centerX(), sourceBounds.y2());
+        graphics.drawLine(sourceBounds.centerX(), sourceBounds.y, sourceBounds.centerX(), sourceBounds.y2());
     }
 }

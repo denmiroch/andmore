@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -92,8 +89,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             if (dependencies != null) {
                 try {
                     JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
-                            new IJavaProject[] { mJavaProject }, new IClasspathContainer[] { dependencies },
-                            monitor);
+                            new IJavaProject[] { mJavaProject }, new IClasspathContainer[] { dependencies }, monitor);
                 } catch (JavaModelException e) {
                     AndmoreAndroidPlugin.log(e, "");
                 }
@@ -105,8 +101,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
     //TODO GRADROID configure dependencies from gradle
 
-    public LibraryClasspathContainerInitializer() {
-    }
+    public LibraryClasspathContainerInitializer() {}
 
     /**
      * Updates the {@link IJavaProject} objects with new library.
@@ -120,8 +115,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             try {
                 if (Gradroid.get().isGradroidProject(project)) {
                     new SetupDependenciesJob(javaProject).schedule();
-                }
-                else {
+                } else {
                     IClasspathContainer[] libraryContainers = new IClasspathContainer[1];
                     IClasspathContainer[] dependencyContainers = new IClasspathContainer[1];
 
@@ -134,8 +128,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
                     JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
                             new IJavaProject[] { javaProject }, dependencyContainers, new NullProgressMonitor());
                 }
-            } catch (CoreException e) {
-            }
+            } catch (CoreException e) {}
         }
 
         return true;
@@ -144,19 +137,19 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             // Allocate a new AndroidClasspathContainer, and associate it to the library
             // container id for each projects.
             int projectCount = androidProjects.length;
-
+        
             IClasspathContainer[] libraryContainers = new IClasspathContainer[projectCount];
             IClasspathContainer[] dependencyContainers = new IClasspathContainer[projectCount];
             for (int i = 0 ; i < projectCount; i++) {
                 libraryContainers[i] = allocateLibraryContainer(androidProjects[i]);
                 dependencyContainers[i] = allocateDependencyContainer(androidProjects[i]);
             }
-
+        
             // give each project their new container in one call.
             JavaCore.setClasspathContainer(
                     new Path(AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES),
                     androidProjects, libraryContainers, new NullProgressMonitor());
-
+        
             JavaCore.setClasspathContainer(
                     new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
                     androidProjects, dependencyContainers, new NullProgressMonitor());
@@ -180,8 +173,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             }
         }
 
-        IJavaProject[] javaProjects = javaProjectList.toArray(
-                new IJavaProject[javaProjectList.size()]);
+        IJavaProject[] javaProjects = javaProjectList.toArray(new IJavaProject[javaProjectList.size()]);
 
         return updateProjects(javaProjects);
     }
@@ -192,27 +184,25 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         IProject project = javaProject.getProject();
 
         if (Gradroid.get().isGradroidProject(project)) {
-            if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES.equals(containerPath.toString())) {
-            } else if (AndmoreAndroidConstants.CONTAINER_DEPENDENCIES.equals(containerPath.toString())) {
+            if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES
+                    .equals(containerPath.toString())) {} else if (AndmoreAndroidConstants.CONTAINER_DEPENDENCIES
+                            .equals(containerPath.toString())) {
                 new SetupDependenciesJob(javaProject).schedule();
             }
-        }
-        else {
+        } else {
             if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES.equals(containerPath.toString())) {
                 IClasspathContainer libraries = allocateLibraryContainer(javaProject);
                 if (libraries != null) {
                     JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES),
-                            new IJavaProject[] { javaProject },
-                            new IClasspathContainer[] { libraries },
+                            new IJavaProject[] { javaProject }, new IClasspathContainer[] { libraries },
                             new NullProgressMonitor());
                 }
 
-            } else if(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES.equals(containerPath.toString())) {
+            } else if (AndmoreAndroidConstants.CONTAINER_DEPENDENCIES.equals(containerPath.toString())) {
                 IClasspathContainer dependencies = allocateDependencyContainer(javaProject);
                 if (dependencies != null) {
                     JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
-                            new IJavaProject[] { javaProject },
-                            new IClasspathContainer[] { dependencies },
+                            new IJavaProject[] { javaProject }, new IClasspathContainer[] { dependencies },
                             new NullProgressMonitor());
                 }
             }
@@ -315,15 +305,13 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
                 "Android Private Libraries");
     }
 
-    private static List<IClasspathEntry> convertJarsToClasspathEntries(final IProject iProject,
-            Set<File> jarFiles) {
+    private static List<IClasspathEntry> convertJarsToClasspathEntries(final IProject iProject, Set<File> jarFiles) {
         List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>(jarFiles.size());
 
         // and process the jar files list, but first sanitize it to remove dups.
         JarListSanitizer sanitizer = new JarListSanitizer(
                 iProject.getFolder(SdkConstants.FD_OUTPUT).getLocation().toFile(),
-                new AndroidPrintStream(iProject, null /*prefix*/,
-                        AndmoreAndroidPlugin.getOutStream()));
+                new AndroidPrintStream(iProject, null /*prefix*/, AndmoreAndroidPlugin.getOutStream()));
 
         String errorMessage = null;
 
@@ -401,8 +389,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             }
         }
 
-        processError(iProject, errorMessage, AndmoreAndroidConstants.MARKER_DEPENDENCY,
-                true /*outputToConsole*/);
+        processError(iProject, errorMessage, AndmoreAndroidConstants.MARKER_DEPENDENCY, true /*outputToConsole*/);
 
         return entries;
     }
@@ -430,9 +417,8 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
             // annotations support for older version of android
             if (state.getTarget() != null && state.getTarget().getVersion().getApiLevel() <= 15) {
-                File annotationsJar = new File(Sdk.getCurrent().getSdkOsLocation(),
-                        SdkConstants.FD_TOOLS + File.separator + SdkConstants.FD_SUPPORT +
-                        File.separator + SdkConstants.FN_ANNOTATIONS_JAR);
+                File annotationsJar = new File(Sdk.getCurrent().getSdkOsLocation(), SdkConstants.FD_TOOLS
+                        + File.separator + SdkConstants.FD_SUPPORT + File.separator + SdkConstants.FN_ANNOTATIONS_JAR);
 
                 jarFiles.add(annotationsJar);
             }
@@ -450,8 +436,8 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
                     }
                 }
 
-                File renderScriptSupportJar = RenderScriptProcessor.getSupportJar(
-                        buildToolInfo.getLocation().getAbsolutePath());
+                File renderScriptSupportJar = RenderScriptProcessor
+                        .getSupportJar(buildToolInfo.getLocation().getAbsolutePath());
 
                 jarFiles.add(renderScriptSupportJar);
             }
@@ -464,8 +450,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
                 IFolder outputFolder = BaseProjectHelper.getAndroidOutputFolder(libProject);
 
                 if (outputFolder != null) { // can happen when closing/deleting a library)
-                    IFile jarIFile = outputFolder.getFile(libProject.getName().toLowerCase() +
-                            SdkConstants.DOT_JAR);
+                    IFile jarIFile = outputFolder.getFile(libProject.getName().toLowerCase() + SdkConstants.DOT_JAR);
 
                     // get the source folder for the library project
                     List<IPath> srcs = BaseProjectHelper.getSourceClasspaths(libProject);
@@ -480,10 +465,8 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
                     }
 
                     // we can directly add a CPE for this jar as there's no risk of a duplicate.
-                    IClasspathEntry entry = JavaCore.newLibraryEntry(
-                            jarIFile.getLocation(),
-                            sourceFolder, // source attachment path
-                            null,         // default source attachment root path.
+                    IClasspathEntry entry = JavaCore.newLibraryEntry(jarIFile.getLocation(), sourceFolder, // source attachment path
+                            null, // default source attachment root path.
                             true /*isExported*/);
 
                     entries.add(entry);
@@ -492,13 +475,12 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
             entries.addAll(convertJarsToClasspathEntries(iProject, jarFiles));
 
-            return allocateContainer(javaProject, entries, new Path(CONTAINER_DEPENDENCIES),
-                    "Android Dependencies");
+            return allocateContainer(javaProject, entries, new Path(CONTAINER_DEPENDENCIES), "Android Dependencies");
         }
     }
 
-    private static IClasspathContainer allocateContainer(IJavaProject javaProject,
-            List<IClasspathEntry> entries, IPath id, String description) {
+    private static IClasspathContainer allocateContainer(IJavaProject javaProject, List<IClasspathEntry> entries,
+            IPath id, String description) {
 
         if (AndmoreAndroidPlugin.getDefault() == null) { // This is totally weird, but I've seen it happen!
             return null;
@@ -541,10 +523,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             return null;
         }
 
-        return new AndroidClasspathContainer(
-                entries.toArray(new IClasspathEntry[entries.size()]),
-                id,
-                description,
+        return new AndroidClasspathContainer(entries.toArray(new IClasspathEntry[entries.size()]), id, description,
                 IClasspathContainer.K_APPLICATION);
     }
 
@@ -568,8 +547,8 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             try {
                 IResource[] members = libsFolder.members();
                 for (IResource member : members) {
-                    if (member.getType() == IResource.FILE &&
-                            SdkConstants.EXT_JAR.equalsIgnoreCase(member.getFileExtension())) {
+                    if (member.getType() == IResource.FILE
+                            && SdkConstants.EXT_JAR.equalsIgnoreCase(member.getFileExtension())) {
                         IPath location = member.getLocation();
                         if (location != null) {
                             jarFiles.add(location.toFile());
@@ -589,15 +568,13 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
      * @param projects the project list to add to
      * @param jarFiles the jar list to add to.
      */
-    private static void processReferencedProjects(IProject project,
-            Set<IProject> projects, Set<File> jarFiles) {
+    private static void processReferencedProjects(IProject project, Set<IProject> projects, Set<File> jarFiles) {
         try {
             IProject[] refs = project.getReferencedProjects();
             for (IProject p : refs) {
                 // ignore if it's an Android project, or if it's not a Java
                 // Project
-                if (p.hasNature(JavaCore.NATURE_ID)
-                        && p.hasNature(AndmoreAndroidConstants.NATURE_DEFAULT) == false) {
+                if (p.hasNature(JavaCore.NATURE_ID) && p.hasNature(AndmoreAndroidConstants.NATURE_DEFAULT) == false) {
 
                     // process this project's dependencies
                     getDependencyListFromClasspath(p, projects, jarFiles, true /*includeJarFiles*/);
@@ -620,8 +597,8 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
      * @param includeJarFiles whether to include jar files or just projects. This is useful when
      *           calling on an Android project (value should be <code>false</code>)
      */
-    private static void getDependencyListFromClasspath(IProject project, Set<IProject> projects,
-            Set<File> jarFiles, boolean includeJarFiles) {
+    private static void getDependencyListFromClasspath(IProject project, Set<IProject> projects, Set<File> jarFiles,
+            boolean includeJarFiles) {
         IJavaProject javaProject = JavaCore.create(project);
         IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
 
@@ -648,8 +625,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
      * @param includeJarFiles whether to include jar files or just projects. This is useful when
      *           calling on an Android project (value should be <code>false</code>)
      */
-    private static void processCPE(IClasspathEntry entry, IJavaProject javaProject,
-            IWorkspaceRoot wsRoot,
+    private static void processCPE(IClasspathEntry entry, IJavaProject javaProject, IWorkspaceRoot wsRoot,
             Set<IProject> projects, Set<File> jarFiles, boolean includeJarFiles) {
 
         // if this is a classpath variable reference, we resolve it.
@@ -661,14 +637,13 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             IProject refProject = wsRoot.getProject(entry.getPath().lastSegment());
             try {
                 // ignore if it's an Android project, or if it's not a Java Project
-                if (refProject.hasNature(JavaCore.NATURE_ID) &&
-                        refProject.hasNature(AndmoreAndroidConstants.NATURE_DEFAULT) == false) {
+                if (refProject.hasNature(JavaCore.NATURE_ID)
+                        && refProject.hasNature(AndmoreAndroidConstants.NATURE_DEFAULT) == false) {
                     // add this project to the list
                     projects.add(refProject);
 
                     // also get the dependency from this project.
-                    getDependencyListFromClasspath(refProject, projects, jarFiles,
-                            true /*includeJarFiles*/);
+                    getDependencyListFromClasspath(refProject, projects, jarFiles, true /*includeJarFiles*/);
                 }
             } catch (CoreException exception) {
                 // can't query the project nature? ignore
@@ -680,12 +655,10 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         } else if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
             // get the container and its content
             try {
-                IClasspathContainer container = JavaCore.getClasspathContainer(
-                        entry.getPath(), javaProject);
+                IClasspathContainer container = JavaCore.getClasspathContainer(entry.getPath(), javaProject);
                 // ignore the system and default_system types as they represent
                 // libraries that are part of the runtime.
-                if (container != null &&
-                        container.getKind() == IClasspathContainer.K_APPLICATION) {
+                if (container != null && container.getKind() == IClasspathContainer.K_APPLICATION) {
                     IClasspathEntry[] entries = container.getClasspathEntries();
                     for (IClasspathEntry cpe : entries) {
                         processCPE(cpe, javaProject, wsRoot, projects, jarFiles, includeJarFiles);
@@ -718,8 +691,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         }
     }
 
-    private static void handleClasspathLibrary(IClasspathEntry e, IWorkspaceRoot wsRoot,
-            Set<File> jarFiles) {
+    private static void handleClasspathLibrary(IClasspathEntry e, IWorkspaceRoot wsRoot, Set<File> jarFiles) {
         // get the IPath
         IPath path = e.getPath();
 
@@ -727,8 +699,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
         if (SdkConstants.EXT_JAR.equalsIgnoreCase(path.getFileExtension())) {
             // case of a jar file (which could be relative to the workspace or a full path)
-            if (resource != null && resource.exists() &&
-                    resource.getType() == IResource.FILE) {
+            if (resource != null && resource.exists() && resource.getType() == IResource.FILE) {
                 jarFiles.add(new CPEFile(resource.getLocation().toFile(), e));
             } else {
                 // if the jar path doesn't match a workspace resource,

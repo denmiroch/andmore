@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,11 +16,11 @@ import static com.android.SdkConstants.ATTR_CONTENT_DESCRIPTION;
 import static com.android.SdkConstants.ATTR_HINT;
 import static com.android.SdkConstants.ATTR_TEXT;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 
 /** Extra metadata about properties not available from the descriptors (yet) */
 class PropertyMetadata {
@@ -63,7 +60,6 @@ class PropertyMetadata {
         //     drawableBottom   (the others, drawableTop, drawableLeft and drawableRight were all
         //                       NOT on the list so keep bottom off for symmetry)
         //     rating     (useful when you deal with a RatingsBar component)
-
 
         // Automatically generated, see above:
         sAdvanced.add("alwaysDrawnWithCache");
@@ -263,9 +259,9 @@ class PropertyMetadata {
         sCategories.put("scrollbarSize", "Scrolling");
         sCategories.put("scrollbarSize", "Scrolling");
         sCategories.put("scrollbarSize", "Scrolling");
-
+    
         // TODO: All the styles: radioButtonStyle, ratingBarStyle, progressBarStyle, ...
-
+    
         sCategories.put("focusable", "Focus");
         sCategories.put("focusableInTouchMode", "Focus");
         sCategories.put("nextFocusLeft", "Focus");
@@ -276,7 +272,7 @@ class PropertyMetadata {
         sCategories.put("selectAllOnFocus", "Focus");
         sCategories.put("nextFocusForward", "Focus");
         sCategories.put("colorFocusedHighlight", "Focus");
-
+    
         sCategories.put("rotation", "Transforms");
         sCategories.put("scrollX", "Transforms");
         sCategories.put("scrollY", "Transforms");
@@ -288,42 +284,42 @@ class PropertyMetadata {
         sCategories.put("translationY", "Transforms");
         sCategories.put("scaleX", "Transforms");
         sCategories.put("scaleY", "Transforms");
-
+    
         sCategories.put("width", "Size");
         sCategories.put("height", "Size");
         sCategories.put("minWidth", "Size");
         sCategories.put("minHeight", "Size");
-
+    
         sCategories.put("longClickable", "Clicks");
         sCategories.put("onClick", "Clicks");
         sCategories.put("clickable", "Clicks");
         sCategories.put("hapticFeedbackEnabled", "Clicks");
-
+    
         sCategories.put("duplicateParentState", "State");
         sCategories.put("addStatesFromChildren", "State");
-
+    
         assert sCategories.size() == CATEGORY_MAP_SIZE : sCategories.size();
     }
     */
 
-//    private static final int PRIO_CLZ_LAYOUT = 1000;
-//    private static final int PRIO_CLZ_TEXT = 2000;
-//    private static final int PRIO_CLZ_DRAWABLE = 3000;
-//    private static final int PRIO_CLZ_ANIMATION = 4000;
-//    private static final int PRIO_CLZ_FOCUS = 5000;
-//
-//    private static final int PRIORITY_MAP_SIZE = 100;
-//    private static final Map<String, Integer> sPriorities =
-//            new HashMap<String, Integer>(PRIORITY_MAP_SIZE);
-//    static {
-//        // TODO: I should put all the properties roughly based on their original order: this
-//        // will correspond to the rough order they came in with
-//        // TODO: How can I make similar complex properties show up adjacent; e.g. min and max
-//        sPriorities.put("min", PRIO_CLZ_LAYOUT);
-//        sPriorities.put("max", PRIO_CLZ_LAYOUT);
-//
-//        assert sPriorities.size() == PRIORITY_MAP_SIZE : sPriorities.size();
-//    }
+    //    private static final int PRIO_CLZ_LAYOUT = 1000;
+    //    private static final int PRIO_CLZ_TEXT = 2000;
+    //    private static final int PRIO_CLZ_DRAWABLE = 3000;
+    //    private static final int PRIO_CLZ_ANIMATION = 4000;
+    //    private static final int PRIO_CLZ_FOCUS = 5000;
+    //
+    //    private static final int PRIORITY_MAP_SIZE = 100;
+    //    private static final Map<String, Integer> sPriorities =
+    //            new HashMap<String, Integer>(PRIORITY_MAP_SIZE);
+    //    static {
+    //        // TODO: I should put all the properties roughly based on their original order: this
+    //        // will correspond to the rough order they came in with
+    //        // TODO: How can I make similar complex properties show up adjacent; e.g. min and max
+    //        sPriorities.put("min", PRIO_CLZ_LAYOUT);
+    //        sPriorities.put("max", PRIO_CLZ_LAYOUT);
+    //
+    //        assert sPriorities.size() == PRIORITY_MAP_SIZE : sPriorities.size();
+    //    }
 
     // TODO: Emit metadata into a file
 }

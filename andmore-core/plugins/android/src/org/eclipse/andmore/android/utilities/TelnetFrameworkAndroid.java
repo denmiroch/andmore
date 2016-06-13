@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,157 +30,157 @@ import org.apache.commons.net.telnet.TelnetClient;
  */
 public class TelnetFrameworkAndroid {
 
-	// private InputStreamReader responseReader;
+    // private InputStreamReader responseReader;
 
-	// private PrintWriter commandWriter;
+    // private PrintWriter commandWriter;
 
-	private TelnetClient telnetClient;
+    private TelnetClient telnetClient;
 
-	private long timeout = 5000L;
+    private long timeout = 5000L;
 
-	/**
-	 * Connect to a device using telnet.
-	 * 
-	 * @param telnetHost
-	 *            the telnet host IP address
-	 * @param telnetPort
-	 *            the telnet port
-	 * 
-	 * @throws AndmoreException
-	 *             when the connection cannot be established
-	 */
-	public synchronized void connect(String telnetHost, int telnetPort) throws IOException {
-		if ((telnetClient == null) || ((telnetClient != null) && (!telnetClient.isConnected()))) {
-			telnetClient = new TelnetClient(telnetHost);
-			telnetClient.connect(telnetHost, telnetPort);
-		}
-	}
+    /**
+     * Connect to a device using telnet.
+     * 
+     * @param telnetHost
+     *            the telnet host IP address
+     * @param telnetPort
+     *            the telnet port
+     * 
+     * @throws AndmoreException
+     *             when the connection cannot be established
+     */
+    public synchronized void connect(String telnetHost, int telnetPort) throws IOException {
+        if ((telnetClient == null) || ((telnetClient != null) && (!telnetClient.isConnected()))) {
+            telnetClient = new TelnetClient(telnetHost);
+            telnetClient.connect(telnetHost, telnetPort);
+        }
+    }
 
-	/**
-	 * Disconnect a telnet connection to a device
-	 * 
-	 * @throws AndmoreException
-	 *             when the disconnection cannot be executed
-	 */
-	public synchronized void disconnect() throws IOException {
-		if ((telnetClient != null) && (telnetClient.isConnected())) {
-			telnetClient.disconnect();
-		}
-	}
+    /**
+     * Disconnect a telnet connection to a device
+     * 
+     * @throws AndmoreException
+     *             when the disconnection cannot be executed
+     */
+    public synchronized void disconnect() throws IOException {
+        if ((telnetClient != null) && (telnetClient.isConnected())) {
+            telnetClient.disconnect();
+        }
+    }
 
-	/**
-	 * @return
-	 *
-	 */
-	public synchronized String write(String telnetInputText, String[] waitFor) throws IOException {
-		PrintWriter commandWriter = null;
-		try {
-			commandWriter = new PrintWriter(telnetClient.getOutputStream());
-			commandWriter.println(telnetInputText);
-			commandWriter.flush();
-			if (waitFor != null) {
-				return waitFor(waitFor);
-			}
-		} finally {
-			if (commandWriter != null) {
-				commandWriter.close();
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Tests if the telnet client instance is connected
-	 * 
-	 * @return true if it is connected; false otherwise
-	 */
-	public boolean isConnected() {
-		boolean connected = false;
-		if (telnetClient != null) {
-			connected = telnetClient.isConnected();
-		}
-		return connected;
-	}
-
-	/**
+    /**
+     * @return
      *
      */
-	public String waitFor(String[] waitForArray) throws IOException {
-		InputStreamReader responseReader = null;
-		StringBuffer answerFromRemoteHost = new StringBuffer();
+    public synchronized String write(String telnetInputText, String[] waitFor) throws IOException {
+        PrintWriter commandWriter = null;
+        try {
+            commandWriter = new PrintWriter(telnetClient.getOutputStream());
+            commandWriter.println(telnetInputText);
+            commandWriter.flush();
+            if (waitFor != null) {
+                return waitFor(waitFor);
+            }
+        } finally {
+            if (commandWriter != null) {
+                commandWriter.close();
+            }
+        }
 
-		try {
-			responseReader = new InputStreamReader(telnetClient.getInputStream());
+        return null;
+    }
 
-			boolean found = false;
+    /**
+     * Tests if the telnet client instance is connected
+     * 
+     * @return true if it is connected; false otherwise
+     */
+    public boolean isConnected() {
+        boolean connected = false;
+        if (telnetClient != null) {
+            connected = telnetClient.isConnected();
+        }
+        return connected;
+    }
 
-			do {
-				char readChar = 0;
-				long currentTime = System.currentTimeMillis();
-				long timeoutTime = currentTime + timeout;
+    /**
+     *
+     */
+    public String waitFor(String[] waitForArray) throws IOException {
+        InputStreamReader responseReader = null;
+        StringBuffer answerFromRemoteHost = new StringBuffer();
 
-				while (readChar == 0) {
-					if (responseReader == null) {
-						// responseReader can only be set to null if method
-						// releaseTelnetInputStreamReader()
-						// has been called, which should happen if host becomes
-						// unavailable.
-						throw new IOException("Telnet host is unavailable; stopped waiting for answer.");
-					}
+        try {
+            responseReader = new InputStreamReader(telnetClient.getInputStream());
 
-					if (responseReader.ready()) {
-						readChar = (char) responseReader.read();
-					} else {
-						try {
-							Thread.sleep(50);
-						} catch (InterruptedException e) {
-							// Do nothing
-						}
-					}
+            boolean found = false;
 
-					currentTime = System.currentTimeMillis();
+            do {
+                char readChar = 0;
+                long currentTime = System.currentTimeMillis();
+                long timeoutTime = currentTime + timeout;
 
-					if ((!responseReader.ready()) && (currentTime > timeoutTime)) {
-						throw new IOException("A timeout has occured when trying to read the telnet stream");
-					}
-				}
+                while (readChar == 0) {
+                    if (responseReader == null) {
+                        // responseReader can only be set to null if method
+                        // releaseTelnetInputStreamReader()
+                        // has been called, which should happen if host becomes
+                        // unavailable.
+                        throw new IOException("Telnet host is unavailable; stopped waiting for answer.");
+                    }
 
-				answerFromRemoteHost.append(readChar);
+                    if (responseReader.ready()) {
+                        readChar = (char) responseReader.read();
+                    } else {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            // Do nothing
+                        }
+                    }
 
-				for (String aWaitFor : waitForArray) {
-					found = answerFromRemoteHost.toString().contains(aWaitFor);
-				}
+                    currentTime = System.currentTimeMillis();
 
-			} while (!found);
-		} finally {
-			if (responseReader != null) {
-				responseReader.close();
-			}
-		}
+                    if ((!responseReader.ready()) && (currentTime > timeoutTime)) {
+                        throw new IOException("A timeout has occured when trying to read the telnet stream");
+                    }
+                }
 
-		return answerFromRemoteHost.toString();
-	}
+                answerFromRemoteHost.append(readChar);
 
-	/**
-	 * Retrieves the input stream associated to this telnet connection
-	 */
-	public InputStream getInputStream() {
-		InputStream s = null;
-		if (telnetClient != null) {
-			s = telnetClient.getInputStream();
-		}
-		return s;
-	}
+                for (String aWaitFor : waitForArray) {
+                    found = answerFromRemoteHost.toString().contains(aWaitFor);
+                }
 
-	/**
-	 * Retrieves the output stream associated to this telnet connection
-	 */
-	public OutputStream getOutputStream() {
-		OutputStream s = null;
-		if (telnetClient != null) {
-			s = telnetClient.getOutputStream();
-		}
-		return s;
-	}
+            } while (!found);
+        } finally {
+            if (responseReader != null) {
+                responseReader.close();
+            }
+        }
+
+        return answerFromRemoteHost.toString();
+    }
+
+    /**
+     * Retrieves the input stream associated to this telnet connection
+     */
+    public InputStream getInputStream() {
+        InputStream s = null;
+        if (telnetClient != null) {
+            s = telnetClient.getInputStream();
+        }
+        return s;
+    }
+
+    /**
+     * Retrieves the output stream associated to this telnet connection
+     */
+    public OutputStream getOutputStream() {
+        OutputStream s = null;
+        if (telnetClient != null) {
+            s = telnetClient.getOutputStream();
+        }
+        return s;
+    }
 }

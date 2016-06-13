@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,17 +16,19 @@ import static com.android.SdkConstants.FD_RES;
 import static com.android.SdkConstants.FD_RES_VALUES;
 import static com.android.SdkConstants.RES_QUALIFIER_SEP;
 
-import com.android.ide.common.rendering.api.ResourceValue;
-import com.android.ide.common.res2.ValueXmlHelper;
-import com.android.ide.common.resources.LocaleManager;
-import com.android.ide.common.resources.ResourceItem;
-import com.android.ide.common.resources.configuration.FolderConfiguration;
-import com.android.resources.ResourceType;
-import com.google.common.base.Charsets;
-import com.google.common.collect.Maps;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.configuration.FlagManager;
 import org.eclipse.andmore.internal.editors.layout.gle2.ImageControl;
 import org.eclipse.andmore.internal.editors.layout.gle2.RenderPreviewManager;
@@ -79,22 +78,19 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
+import com.android.ide.common.rendering.api.ResourceValue;
+import com.android.ide.common.res2.ValueXmlHelper;
+import com.android.ide.common.resources.LocaleManager;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.ide.common.resources.configuration.FolderConfiguration;
+import com.android.resources.ResourceType;
+import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
 
 /**
  * Dialog which adds a new translation to the project
  */
-public class AddTranslationDialog extends Dialog implements ControlListener, SelectionListener,
-        TraverseListener {
+public class AddTranslationDialog extends Dialog implements ControlListener, SelectionListener, TraverseListener {
     private static final int KEY_COLUMN = 0;
     private static final int DEFAULT_TRANSLATION_COLUMN = 1;
     private static final int NEW_TRANSLATION_COLUMN = 2;
@@ -243,8 +239,7 @@ public class AddTranslationDialog extends Dialog implements ControlListener, Sel
                     }
                     case DEFAULT_TRANSLATION_COLUMN: {
                         // Default translation
-                        ResourceValue value = item.getResourceValue(ResourceType.STRING,
-                                mConfiguration, false);
+                        ResourceValue value = item.getResourceValue(ResourceType.STRING, mConfiguration, false);
 
                         if (value != null) {
                             cell.setText(value.getValue());
@@ -291,7 +286,7 @@ public class AddTranslationDialog extends Dialog implements ControlListener, Sel
         // TODO: When you switch languages, offer some "default" usable options. For example,
         // when you choose English, offer the countries that use English, and so on. Unfortunately
         // we don't have good data about this, we'd just need to hardcode a few common cases.
-    	List<String> regionCodes = LocaleManager.getRegionCodes();
+        List<String> regionCodes = LocaleManager.getRegionCodes();
         List<String> labels = new ArrayList<String>();
         for (String code : regionCodes) {
             labels.add(code + ": " + LocaleManager.getRegionName(code)); //$NON-NLS-1$
@@ -377,19 +372,19 @@ public class AddTranslationDialog extends Dialog implements ControlListener, Sel
         Collections.sort(keys);
 
         StringBuilder sb = new StringBuilder(keys.size() * 120);
-        sb.append("<resources>\n\n");          //$NON-NLS-1$
+        sb.append("<resources>\n\n"); //$NON-NLS-1$
         for (String key : keys) {
             String value = mTranslations.get(key);
             if (value == null || value.trim().isEmpty()) {
                 continue;
             }
-            sb.append("    <string name=\"");  //$NON-NLS-1$
+            sb.append("    <string name=\""); //$NON-NLS-1$
             sb.append(key);
-            sb.append("\">");                  //$NON-NLS-1$
+            sb.append("\">"); //$NON-NLS-1$
             sb.append(ValueXmlHelper.escapeResourceString(value));
-            sb.append("</string>\n");          //$NON-NLS-1$
+            sb.append("</string>\n"); //$NON-NLS-1$
         }
-        sb.append("\n</resources>");           //$NON-NLS-1$
+        sb.append("\n</resources>"); //$NON-NLS-1$
 
         IFile file = mProject.getFile(mTarget);
 
@@ -464,8 +459,7 @@ public class AddTranslationDialog extends Dialog implements ControlListener, Sel
                     Image image = sharedImages.getImage(iconName);
 
                     mErrorLabel = new Label(mErrorPanel, SWT.NONE);
-                    mErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false,
-                            1, 1));
+                    mErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
                 }
                 mErrorLabel.setText(error);
             }
@@ -485,8 +479,7 @@ public class AddTranslationDialog extends Dialog implements ControlListener, Sel
     // ---- Implements ControlListener ----
 
     @Override
-    public void controlMoved(ControlEvent e) {
-    }
+    public void controlMoved(ControlEvent e) {}
 
     @Override
     public void controlResized(ControlEvent e) {
@@ -548,8 +541,7 @@ public class AddTranslationDialog extends Dialog implements ControlListener, Sel
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 
     // ---- TraverseListener ----
 

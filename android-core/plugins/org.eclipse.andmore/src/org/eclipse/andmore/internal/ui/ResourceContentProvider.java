@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,17 +13,17 @@
 
 package org.eclipse.andmore.internal.ui;
 
-import com.android.ide.common.resources.ResourceFile;
-import com.android.ide.common.resources.ResourceItem;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.resources.ResourceType;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import com.android.ide.common.resources.ResourceFile;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.resources.ResourceType;
 
 /**
  * Content provider for the Resource Explorer TreeView.
@@ -58,7 +55,7 @@ public class ResourceContentProvider implements ITreeContentProvider {
 
     private boolean mFullLevels;
 
-   /**
+    /**
      * Constructs a new content providers for resource display.
      * @param fullLevels if <code>true</code> the content provider will suppport all 3 levels. If
      * <code>false</code>, only two levels are provided.
@@ -70,12 +67,11 @@ public class ResourceContentProvider implements ITreeContentProvider {
     @Override
     public Object[] getChildren(Object parentElement) {
         if (parentElement instanceof ResourceType) {
-            Object[] array = mResources.getResourceItemsOfType(
-                    (ResourceType)parentElement).toArray();
+            Object[] array = mResources.getResourceItemsOfType((ResourceType) parentElement).toArray();
             Arrays.sort(array);
             return array;
         } else if (mFullLevels && parentElement instanceof ResourceItem) {
-            return ((ResourceItem)parentElement).getSourceFileArray();
+            return ((ResourceItem) parentElement).getSourceFileArray();
         }
         return null;
     }
@@ -89,9 +85,9 @@ public class ResourceContentProvider implements ITreeContentProvider {
     @Override
     public boolean hasChildren(Object element) {
         if (element instanceof ResourceType) {
-            return mResources.hasResourcesOfType((ResourceType)element);
+            return mResources.hasResourcesOfType((ResourceType) element);
         } else if (mFullLevels && element instanceof ResourceItem) {
-            return ((ResourceItem)element).hasAlternates();
+            return ((ResourceItem) element).hasAlternates();
         }
         return false;
     }
@@ -99,7 +95,7 @@ public class ResourceContentProvider implements ITreeContentProvider {
     @Override
     public Object[] getElements(Object inputElement) {
         if (inputElement instanceof ResourceRepository) {
-            if ((ResourceRepository)inputElement == mResources) {
+            if ((ResourceRepository) inputElement == mResources) {
                 // get the top level resources.
                 List<ResourceType> types = mResources.getAvailableResourceTypes();
                 Collections.sort(types);
@@ -118,7 +114,7 @@ public class ResourceContentProvider implements ITreeContentProvider {
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         if (newInput instanceof ResourceRepository) {
-             mResources = (ResourceRepository)newInput;
+            mResources = (ResourceRepository) newInput;
         }
     }
 }

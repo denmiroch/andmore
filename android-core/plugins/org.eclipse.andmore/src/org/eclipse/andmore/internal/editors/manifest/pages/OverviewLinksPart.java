@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,7 +40,8 @@ final class OverviewLinksPart extends ManifestSectionPart {
         mEditor = editor;
         Section section = getSection();
         section.setText("Links");
-        section.setDescription("The content of the Android Manifest is made up of three sections. You can also edit the XML directly.");
+        section.setDescription(
+                "The content of the Android Manifest is made up of three sections. You can also edit the XML directly.");
 
         Composite table = createTableLayout(toolkit, 2 /* numColumns */);
 
@@ -51,7 +49,7 @@ final class OverviewLinksPart extends ManifestSectionPart {
         buf.append(String.format("<form><li style=\"image\" value=\"app_img\"><a href=\"page:%1$s\">", //$NON-NLS-1$
                 ApplicationPage.PAGE_ID));
         buf.append("Application");
-        buf.append("</a>");  //$NON-NLS-1$
+        buf.append("</a>"); //$NON-NLS-1$
         buf.append(": Activities, intent filters, providers, services and receivers.");
         buf.append("</li>"); //$NON-NLS-1$
 
@@ -77,12 +75,12 @@ final class OverviewLinksPart extends ManifestSectionPart {
         buf.append("</li>"); //$NON-NLS-1$
 
         buf.append("<li style=\"image\" value=\"android_img\">"); //$NON-NLS-1$
-        buf.append("<a href=\"http://code.google.com/android/devel/bblocks-manifest.html\">Documentation</a>: Documentation from the Android SDK for AndroidManifest.xml."); //$NON-NLS-1$
+        buf.append(
+                "<a href=\"http://code.google.com/android/devel/bblocks-manifest.html\">Documentation</a>: Documentation from the Android SDK for AndroidManifest.xml."); //$NON-NLS-1$
         buf.append("</li>"); //$NON-NLS-1$
         buf.append("</form>"); //$NON-NLS-1$
 
-        mFormText = createFormText(table, toolkit, true, buf.toString(),
-                false /* setupLayoutData */);
+        mFormText = createFormText(table, toolkit, true, buf.toString(), false /* setupLayoutData */);
 
         AndroidManifestDescriptors manifestDescriptor = editor.getManifestDescriptors();
 

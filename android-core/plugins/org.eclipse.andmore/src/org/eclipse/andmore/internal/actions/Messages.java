@@ -6,22 +6,21 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Kaloyan Raev - initial API and implementation
+ * Kaloyan Raev - initial API and implementation
  *******************************************************************************/
 package org.eclipse.andmore.internal.actions;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.andmore.internal.actions.messages"; //$NON-NLS-1$
-	public static String OpenAndroidPerspectiveAction_dialog_title;
-	public static String OpenAndroidPerspectiveAction_error_open_failed;
+    private static final String BUNDLE_NAME = "org.eclipse.andmore.internal.actions.messages"; //$NON-NLS-1$
+    public static String OpenAndroidPerspectiveAction_dialog_title;
+    public static String OpenAndroidPerspectiveAction_error_open_failed;
 
-	static {
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-	}
+    static {
+        // initialize resource bundle
+        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+    }
 
-	private Messages() {
-	}
+    private Messages() {}
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,15 +13,13 @@
 
 package org.eclipse.andmore.internal.editors.manifest.pages;
 
-import com.android.utils.SdkUtils;
-
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.descriptors.DescriptorsUtils;
 import org.eclipse.andmore.internal.editors.manifest.ManifestEditor;
 import org.eclipse.andmore.internal.editors.ui.UiElementPart;
 import org.eclipse.andmore.internal.editors.uimodel.IUiUpdateListener;
-import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
 import org.eclipse.andmore.internal.editors.uimodel.IUiUpdateListener.UiUpdateState;
+import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
 import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -35,11 +30,12 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+
+import com.android.utils.SdkUtils;
 
 /**
  * Appllication Toogle section part for application page.
@@ -57,9 +53,7 @@ final class ApplicationToggle extends UiElementPart {
 
     public ApplicationToggle(Composite body, FormToolkit toolkit, ManifestEditor editor,
             UiElementNode applicationUiNode) {
-        super(body, toolkit, editor, applicationUiNode,
-                "Application Toggle",
-                null, /* description */
+        super(body, toolkit, editor, applicationUiNode, "Application Toggle", null, /* description */
                 ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED);
     }
 
@@ -82,8 +76,7 @@ final class ApplicationToggle extends UiElementPart {
         updateTooltip();
 
         // Set the state of the checkbox
-        mAppNodeUpdateListener.uiElementNodeUpdated(getUiElementNode(),
-                UiUpdateState.CHILDREN_CHANGED);
+        mAppNodeUpdateListener.uiElementNodeUpdated(getUiElementNode(), UiUpdateState.CHILDREN_CHANGED);
     }
 
     /**
@@ -99,13 +92,10 @@ final class ApplicationToggle extends UiElementPart {
         FormToolkit toolkit = managedForm.getToolkit();
         Composite table = createTableLayout(toolkit, 1 /* numColumns */);
 
-        mTooltipFormText = createFormText(table, toolkit, true, "<form></form>",
-                false /* setupLayoutData */);
+        mTooltipFormText = createFormText(table, toolkit, true, "<form></form>", false /* setupLayoutData */);
         updateTooltip();
 
-        mCheckbox = toolkit.createButton(table,
-                "Define an <application> tag in the AndroidManifest.xml",
-                SWT.CHECK);
+        mCheckbox = toolkit.createButton(table, "Define an <application> tag in the AndroidManifest.xml", SWT.CHECK);
         mCheckbox.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.TOP));
         mCheckbox.setSelection(false);
         mCheckbox.addSelectionListener(new CheckboxSelectionListener());
@@ -114,8 +104,7 @@ final class ApplicationToggle extends UiElementPart {
         getUiElementNode().addUpdateListener(mAppNodeUpdateListener);
 
         // Initialize the state of the checkbox
-        mAppNodeUpdateListener.uiElementNodeUpdated(getUiElementNode(),
-                UiUpdateState.CHILDREN_CHANGED);
+        mAppNodeUpdateListener.uiElementNodeUpdated(getUiElementNode(), UiUpdateState.CHILDREN_CHANGED);
 
         // Tell the section that the layout has changed.
         layoutChanged();
@@ -130,8 +119,7 @@ final class ApplicationToggle extends UiElementPart {
 
         String tooltip = getUiElementNode().getDescriptor().getTooltip();
         if (tooltip != null) {
-            tooltip = DescriptorsUtils.formatFormText(tooltip,
-                    getUiElementNode().getDescriptor(),
+            tooltip = DescriptorsUtils.formatFormText(tooltip, getUiElementNode().getDescriptor(),
                     Sdk.getCurrent().getDocumentationBaseUrl());
 
             mTooltipFormText.setText(tooltip, true /* parseTags */, true /* expandURLs */);
@@ -159,9 +147,7 @@ final class ApplicationToggle extends UiElementPart {
             super.widgetSelected(e);
             if (!mInternalModification && getUiElementNode() != null) {
                 getUiElementNode().getEditor().wrapUndoEditXmlModel(
-                        mCheckbox.getSelection()
-                            ? "Create or restore Application node"
-                            : "Remove Application node",
+                        mCheckbox.getSelection() ? "Create or restore Application node" : "Remove Application node",
                         new Runnable() {
                             @Override
                             public void run() {
@@ -181,7 +167,7 @@ final class ApplicationToggle extends UiElementPart {
                                     removeApplicationNode();
                                 }
                             }
-                });
+                        });
             }
         }
 
@@ -200,7 +186,7 @@ final class ApplicationToggle extends UiElementPart {
             mUndoXmlNextNode = validateNode(mUndoXmlDocument, mUndoXmlNextNode);
             mUndoXmlNextElement = validateNode(mUndoXmlDocument, mUndoXmlNextElement);
 
-            if (mUndoXmlParent == null){
+            if (mUndoXmlParent == null) {
                 // If the parent node doesn't exist, try to find a new manifest node.
                 // If it doesn't exist, create it.
                 mUndoXmlParent = getUiElementNode().getUiParent().prepareCommit();
@@ -222,7 +208,7 @@ final class ApplicationToggle extends UiElementPart {
                 mUndoXmlParent.insertBefore(mUndoXmlNode, next);
                 if (next == null) {
                     Text sep = mUndoXmlDocument.createTextNode(SdkUtils.getLineSeparator());
-                    mUndoXmlParent.insertBefore(sep, null);  // insert separator before end tag
+                    mUndoXmlParent.insertBefore(sep, null); // insert separator before end tag
                 }
                 success = true;
             }
@@ -248,8 +234,7 @@ final class ApplicationToggle extends UiElementPart {
             if (root_node == xml_node) {
                 return xml_node;
             } else {
-                for (Node node = root_node.getFirstChild(); node != null;
-                        node = node.getNextSibling()) {
+                for (Node node = root_node.getFirstChild(); node != null; node = node.getNextSibling()) {
                     if (root_node == xml_node || validateNode(node, xml_node) != null) {
                         return xml_node;
                     }
@@ -275,8 +260,7 @@ final class ApplicationToggle extends UiElementPart {
             mUndoXmlParent = xml_node.getParentNode();
             mUndoXmlNextNode = xml_node.getNextSibling();
             mUndoXmlNextElement = mUndoXmlNextNode;
-            while (mUndoXmlNextElement != null &&
-                    mUndoXmlNextElement.getNodeType() != Node.ELEMENT_NODE) {
+            while (mUndoXmlNextElement != null && mUndoXmlNextElement.getNodeType() != Node.ELEMENT_NODE) {
                 mUndoXmlNextElement = mUndoXmlNextElement.getNextSibling();
             }
 

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,8 @@
  */
 package org.eclipse.andmore.common.layout.relative;
 
+import static com.android.SdkConstants.ANDROID_URI;
+import static com.android.SdkConstants.ATTR_ID;
 import static com.android.ide.common.api.MarginType.NO_MARGIN;
 import static com.android.ide.common.api.SegmentType.BASELINE;
 import static com.android.ide.common.api.SegmentType.BOTTOM;
@@ -23,10 +22,12 @@ import static com.android.ide.common.api.SegmentType.CENTER_VERTICAL;
 import static com.android.ide.common.api.SegmentType.LEFT;
 import static com.android.ide.common.api.SegmentType.RIGHT;
 import static com.android.ide.common.api.SegmentType.TOP;
-import static com.android.SdkConstants.ATTR_ID;
 import static java.lang.Math.abs;
 
-import static com.android.SdkConstants.ANDROID_URI;
+import java.util.Collections;
+import java.util.Set;
+
+import org.eclipse.andmore.common.layout.BaseLayoutRule;
 
 import com.android.ide.common.api.DropFeedback;
 import com.android.ide.common.api.IClientRulesEngine;
@@ -34,11 +35,6 @@ import com.android.ide.common.api.INode;
 import com.android.ide.common.api.Rect;
 import com.android.ide.common.api.Segment;
 import com.android.ide.common.api.SegmentType;
-
-import java.util.Collections;
-import java.util.Set;
-
-import org.eclipse.andmore.common.layout.BaseLayoutRule;
 
 /**
  * A {@link ResizeHandler} is a {@link GuidelineHandler} which handles resizing of individual
@@ -57,9 +53,8 @@ public class ResizeHandler extends GuidelineHandler {
      * @param horizontalEdgeType the type of horizontal edge being resized, or null
      * @param verticalEdgeType the type of vertical edge being resized, or null
      */
-    public ResizeHandler(INode layout, INode resized,
-            IClientRulesEngine rulesEngine,
-            SegmentType horizontalEdgeType, SegmentType verticalEdgeType) {
+    public ResizeHandler(INode layout, INode resized, IClientRulesEngine rulesEngine, SegmentType horizontalEdgeType,
+            SegmentType verticalEdgeType) {
         super(layout, rulesEngine);
 
         assert horizontalEdgeType != null || verticalEdgeType != null;
@@ -94,9 +89,7 @@ public class ResizeHandler extends GuidelineHandler {
         for (INode child : layout.getChildren()) {
             if (child != resized) {
                 String id = child.getStringAttr(ANDROID_URI, ATTR_ID);
-                addBounds(child, id,
-                        !mHorizontalDeps.contains(child),
-                        !mVerticalDeps.contains(child));
+                addBounds(child, id, !mHorizontalDeps.contains(child), !mVerticalDeps.contains(child));
             }
         }
 
@@ -178,8 +171,7 @@ public class ResizeHandler extends GuidelineHandler {
      * @param newBounds the new bounds of the resize rectangle
      * @param modifierMask the keyboard modifiers pressed during the drag
      */
-    public void updateResize(DropFeedback feedback, INode child, Rect newBounds,
-            int modifierMask) {
+    public void updateResize(DropFeedback feedback, INode child, Rect newBounds, int modifierMask) {
         mSnap = (modifierMask & DropFeedback.MODIFIER2) == 0;
         mBounds = newBounds;
         clearSuggestions();
@@ -195,8 +187,7 @@ public class ResizeHandler extends GuidelineHandler {
         if (mHorizontalEdgeType == TOP) {
             hEdge = new Segment(b.y, b.x, b.x2(), child, childId, mHorizontalEdgeType, NO_MARGIN);
         } else if (mHorizontalEdgeType == BOTTOM) {
-            hEdge = new Segment(b.y2(), b.x, b.x2(), child, childId, mHorizontalEdgeType,
-                    NO_MARGIN);
+            hEdge = new Segment(b.y2(), b.x, b.x2(), child, childId, mHorizontalEdgeType, NO_MARGIN);
         } else {
             assert mHorizontalEdgeType == null;
         }
@@ -216,8 +207,7 @@ public class ResizeHandler extends GuidelineHandler {
             mHorizontalSuggestions = findClosest(hEdge, mHorizontalEdges);
 
             Match match = pickBestMatch(mHorizontalSuggestions);
-            if (match != null
-                    && (!mSnap || Math.abs(match.delta) < BaseLayoutRule.getMaxMatchDistance())) {
+            if (match != null && (!mSnap || Math.abs(match.delta) < BaseLayoutRule.getMaxMatchDistance())) {
                 if (mHorizontalDeps.contains(match.edge.node)) {
                     match.cycle = true;
                 }
@@ -229,8 +219,7 @@ public class ResizeHandler extends GuidelineHandler {
                 } else if (hEdge.edgeType == BOTTOM) {
                     mCurrentBottomMatch = match;
                 } else {
-                    assert hEdge.edgeType == CENTER_HORIZONTAL
-                            || hEdge.edgeType == BASELINE : hEdge;
+                    assert hEdge.edgeType == CENTER_HORIZONTAL || hEdge.edgeType == BASELINE : hEdge;
                     mCurrentTopMatch = match;
                 }
             }
@@ -240,8 +229,7 @@ public class ResizeHandler extends GuidelineHandler {
             mVerticalSuggestions = findClosest(vEdge, mVerticalEdges);
 
             Match match = pickBestMatch(mVerticalSuggestions);
-            if (match != null
-                    && (!mSnap || Math.abs(match.delta) < BaseLayoutRule.getMaxMatchDistance())) {
+            if (match != null && (!mSnap || Math.abs(match.delta) < BaseLayoutRule.getMaxMatchDistance())) {
                 if (mVerticalDeps.contains(match.edge.node)) {
                     match.cycle = true;
                 }

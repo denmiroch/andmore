@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,10 +48,7 @@ public class ClassAttributeDescriptor extends TextAttributeDescriptor {
      * @param attrInfo The {@link IAttributeInfo} of this attribute. Can't be null.
      * @param mandatory indicates if the class attribute is mandatory.
      */
-    public ClassAttributeDescriptor(String superClassName,
-            String xmlLocalName,
-            String nsUri,
-            IAttributeInfo attrInfo,
+    public ClassAttributeDescriptor(String superClassName, String xmlLocalName, String nsUri, IAttributeInfo attrInfo,
             boolean mandatory) {
         super(xmlLocalName, nsUri, attrInfo);
         mSuperClassName = superClassName;
@@ -79,12 +73,8 @@ public class ClassAttributeDescriptor extends TextAttributeDescriptor {
      * @param defaultToProjectOnly True if only classes from the sources of this project should
      *         be shown by default in the class browser.
      */
-    public ClassAttributeDescriptor(String superClassName,
-            IPostTypeCreationAction postCreationAction,
-            String xmlLocalName,
-            String nsUri,
-            IAttributeInfo attrInfo,
-            boolean mandatory,
+    public ClassAttributeDescriptor(String superClassName, IPostTypeCreationAction postCreationAction,
+            String xmlLocalName, String nsUri, IAttributeInfo attrInfo, boolean mandatory,
             boolean defaultToProjectOnly) {
         super(xmlLocalName, nsUri, attrInfo);
         mSuperClassName = superClassName;
@@ -101,7 +91,7 @@ public class ClassAttributeDescriptor extends TextAttributeDescriptor {
      */
     @Override
     public UiAttributeNode createUiNode(UiElementNode uiParent) {
-        return new UiClassAttributeNode(mSuperClassName, mPostCreationAction,
-                mMandatory, this, uiParent, mDefaultToProjectOnly);
+        return new UiClassAttributeNode(mSuperClassName, mPostCreationAction, mMandatory, this, uiParent,
+                mDefaultToProjectOnly);
     }
 }

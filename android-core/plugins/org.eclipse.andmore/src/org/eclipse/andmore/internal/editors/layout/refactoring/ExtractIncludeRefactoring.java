@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,10 +32,11 @@ import static com.android.SdkConstants.XMLNS_PREFIX;
 import static com.android.resources.ResourceType.LAYOUT;
 import static org.eclipse.andmore.AndmoreAndroidConstants.WS_SEP;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.xml.XmlFormatStyle;
-import com.android.utils.XmlUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.formatting.EclipseXmlFormatPreferences;
@@ -86,11 +84,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.xml.XmlFormatStyle;
+import com.android.utils.XmlUtils;
 
 /**
  * Extracts the selection and writes it out as a separate layout file, then adds an
@@ -99,8 +96,8 @@ import java.util.Map;
  */
 @SuppressWarnings("restriction") // XML model
 public class ExtractIncludeRefactoring extends VisualRefactoring {
-    private static final String KEY_NAME = "name";                      //$NON-NLS-1$
-    private static final String KEY_OCCURRENCES = "all-occurrences";    //$NON-NLS-1$
+    private static final String KEY_NAME = "name"; //$NON-NLS-1$
+    private static final String KEY_OCCURRENCES = "all-occurrences"; //$NON-NLS-1$
     private String mLayoutName;
     private boolean mReplaceOccurrences;
 
@@ -112,26 +109,22 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
     ExtractIncludeRefactoring(Map<String, String> arguments) {
         super(arguments);
         mLayoutName = arguments.get(KEY_NAME);
-        mReplaceOccurrences  = Boolean.parseBoolean(arguments.get(KEY_OCCURRENCES));
+        mReplaceOccurrences = Boolean.parseBoolean(arguments.get(KEY_OCCURRENCES));
     }
 
-    public ExtractIncludeRefactoring(
-            IFile file,
-            LayoutEditorDelegate delegate,
-            ITextSelection selection,
+    public ExtractIncludeRefactoring(IFile file, LayoutEditorDelegate delegate, ITextSelection selection,
             ITreeSelection treeSelection) {
         super(file, delegate, selection, treeSelection);
     }
 
     @VisibleForTesting
-	public
-    ExtractIncludeRefactoring(List<Element> selectedElements, LayoutEditorDelegate editor) {
+    public ExtractIncludeRefactoring(List<Element> selectedElements, LayoutEditorDelegate editor) {
         super(selectedElements, editor);
     }
 
     @Override
-    public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+    public RefactoringStatus checkInitialConditions(IProgressMonitor pm)
+            throws CoreException, OperationCanceledException {
         RefactoringStatus status = new RefactoringStatus();
 
         try {
@@ -189,8 +182,7 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
     @Override
     protected VisualRefactoringDescriptor createDescriptor() {
         String comment = getName();
-        return new Descriptor(
-                mProject.getName(), //project
+        return new Descriptor(mProject.getName(), //project
                 comment, //description
                 comment, //comment
                 createArgumentMap());
@@ -222,7 +214,7 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
 
     @Override
     @NonNull
-	public List<Change> computeChanges(IProgressMonitor monitor) {
+    public List<Change> computeChanges(IProgressMonitor monitor) {
         String extractedText = getExtractedText();
 
         String namespaceDeclarations = computeNamespaceDeclarations();
@@ -245,8 +237,7 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
         }
 
         // Replace extracted elements by <include> tag
-        handleIncludingFile(changes, sourceFile, mSelectionStart, mSelectionEnd,
-                getDomDocument(), getPrimaryElement());
+        handleIncludingFile(changes, sourceFile, mSelectionStart, mSelectionEnd, getDomDocument(), getPrimaryElement());
 
         // Also extract in other variations of the same file (landscape/portrait, etc)
         boolean haveVariations = false;
@@ -257,8 +248,7 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
                 IStructuredModel model = null;
                 // We could enhance this with a SubMonitor to make the progress bar move as
                 // well.
-                monitor.subTask(String.format("Looking for duplicates in %1$s",
-                        file.getProjectRelativePath()));
+                monitor.subTask(String.format("Looking for duplicates in %1$s", file.getProjectRelativePath()));
                 if (monitor.isCanceled()) {
                     throw new OperationCanceledException();
                 }
@@ -272,8 +262,7 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
                         Element otherPrimary = null;
 
                         for (Element element : getElements()) {
-                            Element other = DomUtilities.findCorresponding(element,
-                                    otherDocument);
+                            Element other = DomUtilities.findCorresponding(element, otherDocument);
                             if (other != null) {
                                 // See if the structure is similar to what we have in this
                                 // document
@@ -288,8 +277,7 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
 
                         // Only perform extract in the other file if we find a match for
                         // ALL of elements being extracted, and if they too are contiguous
-                        if (otherElements.size() == getElements().size() &&
-                                DomUtilities.isContiguous(otherElements)) {
+                        if (otherElements.size() == getElements().size() && DomUtilities.isContiguous(otherElements)) {
                             // Find the range
                             int begin = Integer.MAX_VALUE;
                             int end = Integer.MIN_VALUE;
@@ -299,8 +287,7 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
                                 end = Math.max(end, region.getEndOffset());
                                 begin = Math.min(begin, region.getStartOffset());
                             }
-                            handleIncludingFile(changes, file, begin,
-                                    end, otherDocument, otherPrimary);
+                            handleIncludingFile(changes, file, begin, end, otherDocument, otherPrimary);
                             haveVariations = true;
                         }
                     }
@@ -332,9 +319,8 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
 
         String newFile = sb.toString();
         if (AdtPrefs.getPrefs().getFormatGuiXml()) {
-            newFile = EclipseXmlPrettyPrinter.prettyPrint(newFile,
-                    EclipseXmlFormatPreferences.create(), XmlFormatStyle.LAYOUT,
-                    null /*lineSeparator*/);
+            newFile = EclipseXmlPrettyPrinter.prettyPrint(newFile, EclipseXmlFormatPreferences.create(),
+                    XmlFormatStyle.LAYOUT, null /*lineSeparator*/);
         }
         addFile.setEdit(new InsertEdit(0, newFile));
 
@@ -344,8 +330,8 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
         return changes;
     }
 
-    private void handleIncludingFile(List<Change> changes,
-            IFile sourceFile, int begin, int end, Document document, Element primary) {
+    private void handleIncludingFile(List<Change> changes, IFile sourceFile, int begin, int end, Document document,
+            Element primary) {
         TextFileChange change = new TextFileChange(sourceFile.getName(), sourceFile);
         MultiTextEdit rootEdit = new MultiTextEdit();
         change.setTextType(EXT_XML);
@@ -367,15 +353,13 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
                 model = StructuredModelManager.getModelManager().getModelForRead(sourceFile);
                 IStructuredDocument doc = model.getStructuredDocument();
                 if (doc != null && rootId != null) {
-                    List<TextEdit> replaceIds = replaceIds(androidNsPrefix, doc, begin,
-                            end, rootId, referenceId);
+                    List<TextEdit> replaceIds = replaceIds(androidNsPrefix, doc, begin, end, rootId, referenceId);
                     for (TextEdit edit : replaceIds) {
                         rootEdit.addChild(edit);
                     }
 
                     if (AdtPrefs.getPrefs().getFormatGuiXml()) {
-                        MultiTextEdit formatted = reformat(doc.get(), rootEdit,
-                                XmlFormatStyle.LAYOUT);
+                        MultiTextEdit formatted = reformat(doc.get(), rootEdit, XmlFormatStyle.LAYOUT);
                         if (formatted != null) {
                             rootEdit = formatted;
                         }
@@ -405,12 +389,10 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
         IFolder resources = mProject.getFolder(FD_RESOURCES);
         try {
             for (IResource folder : resources.members()) {
-                if (folder.getName().startsWith(FD_RES_LAYOUT) &&
-                        folder instanceof IFolder) {
+                if (folder.getName().startsWith(FD_RES_LAYOUT) && folder instanceof IFolder) {
                     IFolder layoutFolder = (IFolder) folder;
                     for (IResource file : layoutFolder.members()) {
-                        if (file.getName().endsWith(EXT_XML)
-                                && file instanceof IFile) {
+                        if (file.getName().endsWith(EXT_XML) && file instanceof IFile) {
                             if (!file.getProjectRelativePath().equals(sourcePath)) {
                                 layouts.add((IFile) file);
                             }
@@ -537,8 +519,8 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
      * Compute the actual {@code <include>} string to be inserted in place of the old
      * selection
      */
-    private static String computeIncludeString(Element primaryNode, String newName,
-            String androidNsPrefix, String referenceId) {
+    private static String computeIncludeString(Element primaryNode, String newName, String androidNsPrefix,
+            String referenceId) {
         StringBuilder sb = new StringBuilder();
         sb.append("<include layout=\"@layout/"); //$NON-NLS-1$
         sb.append(newName);
@@ -607,8 +589,7 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
             for (int i = 0, n = attributes.getLength(); i < n; i++) {
                 Node attr = attributes.item(i);
                 String name = attr.getLocalName();
-                if (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)
-                        && ANDROID_URI.equals(attr.getNamespaceURI())) {
+                if (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX) && ANDROID_URI.equals(attr.getNamespaceURI())) {
                     if (name.equals(ATTR_LAYOUT_WIDTH) || name.equals(ATTR_LAYOUT_HEIGHT)) {
                         // Already handled
                         continue;
@@ -658,8 +639,7 @@ public class ExtractIncludeRefactoring extends VisualRefactoring {
     }
 
     public static class Descriptor extends VisualRefactoringDescriptor {
-        public Descriptor(String project, String description, String comment,
-                Map<String, String> arguments) {
+        public Descriptor(String project, String description, String comment, Map<String, String> arguments) {
             super("org.eclipse.andmore.refactoring.extract.include", //$NON-NLS-1$
                     project, description, comment, arguments);
         }

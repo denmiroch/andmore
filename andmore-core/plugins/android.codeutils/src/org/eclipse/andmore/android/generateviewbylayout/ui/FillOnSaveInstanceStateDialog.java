@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,60 +31,60 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class FillOnSaveInstanceStateDialog extends AbstractLayoutItemsDialog {
 
-	public FillOnSaveInstanceStateDialog(Shell parentShell) {
-		super(parentShell, CodeUtilsNLS.FillOnSaveInstanceStateDialog_DialogDescription,
-				CodeUtilsNLS.FillOnSaveInstanceStateDialog_DialogTitle,
-				CodeUtilsNLS.FillOnSaveInstanceStateDialog_ShellTitle, null);
-	}
+    public FillOnSaveInstanceStateDialog(Shell parentShell) {
+        super(parentShell, CodeUtilsNLS.FillOnSaveInstanceStateDialog_DialogDescription,
+                CodeUtilsNLS.FillOnSaveInstanceStateDialog_DialogTitle,
+                CodeUtilsNLS.FillOnSaveInstanceStateDialog_ShellTitle, null);
+    }
 
-	@Override
-	protected void createCustomContentArea(Composite mainComposite) {
-		// default implementation does nothing
-	}
+    @Override
+    protected void createCustomContentArea(Composite mainComposite) {
+        // default implementation does nothing
+    }
 
-	@Override
-	protected boolean isResizable() {
-		return true;
-	}
+    @Override
+    protected boolean isResizable() {
+        return true;
+    }
 
-	@Override
-	protected List<LayoutNode> getGuiItemsList() {
-		List<LayoutNode> alreadyDeclared = new ArrayList<LayoutNode>();
-		if (getCodeGeneratorData() != null) {
-			List<LayoutNode> allNodes = getCodeGeneratorData().getGUIItems(false);
+    @Override
+    protected List<LayoutNode> getGuiItemsList() {
+        List<LayoutNode> alreadyDeclared = new ArrayList<LayoutNode>();
+        if (getCodeGeneratorData() != null) {
+            List<LayoutNode> allNodes = getCodeGeneratorData().getGUIItems(false);
 
-			for (LayoutNode node : allNodes) {
-				if (node.isAlreadyDeclaredInCode() && !node.isAlreadySaved() && canSaveState(node)) {
-					alreadyDeclared.add(node);
-				}
-			}
-		}
-		return alreadyDeclared;
-	}
+            for (LayoutNode node : allNodes) {
+                if (node.isAlreadyDeclaredInCode() && !node.isAlreadySaved() && canSaveState(node)) {
+                    alreadyDeclared.add(node);
+                }
+            }
+        }
+        return alreadyDeclared;
+    }
 
-	private boolean canSaveState(LayoutNode node) {
-		int i = 0;
-		boolean canSaveState = false;
-		while (!canSaveState && (i < SaveStateCodeGenerator.saveStateNodeTypes.length)) {
-			if (SaveStateCodeGenerator.saveStateNodeTypes[i].getNodeType().equals(node.getNodeType())) {
-				canSaveState = true;
-			}
-			i++;
-		}
+    private boolean canSaveState(LayoutNode node) {
+        int i = 0;
+        boolean canSaveState = false;
+        while (!canSaveState && (i < SaveStateCodeGenerator.saveStateNodeTypes.length)) {
+            if (SaveStateCodeGenerator.saveStateNodeTypes[i].getNodeType().equals(node.getNodeType())) {
+                canSaveState = true;
+            }
+            i++;
+        }
 
-		return canSaveState;
-	}
+        return canSaveState;
+    }
 
-	@Override
-	protected void okPressed() {
-		for (TableItem item : getViewer().getTable().getItems()) {
-			if (item.getData() instanceof LayoutNode) {
-				LayoutNode node = (LayoutNode) item.getData();
-				node.setSaveState(item.getChecked());
-			}
-		}
-		getModifier().setCodeGeneratorData(getCodeGeneratorData());
-		super.okPressed();
-	}
+    @Override
+    protected void okPressed() {
+        for (TableItem item : getViewer().getTable().getItems()) {
+            if (item.getData() instanceof LayoutNode) {
+                LayoutNode node = (LayoutNode) item.getData();
+                node.setSaveState(item.getChecked());
+            }
+        }
+        getModifier().setCodeGeneratorData(getCodeGeneratorData());
+        super.okPressed();
+    }
 
 }

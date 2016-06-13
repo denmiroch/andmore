@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +12,6 @@
  */
 
 package org.eclipse.andmore.common.resources.platform;
-
 
 /**
  * Information needed to represent a View or ViewGroup (aka Layout) item
@@ -46,8 +42,8 @@ public class ViewClassInfo {
         /** Layout Data Attributes for layout classes. Can be empty but not null. */
         private AttributeInfo[] mAttributes;
 
-        public LayoutParamsInfo(ViewClassInfo enclosingViewClassInfo,
-                String shortClassName, LayoutParamsInfo superClassInfo) {
+        public LayoutParamsInfo(ViewClassInfo enclosingViewClassInfo, String shortClassName,
+                LayoutParamsInfo superClassInfo) {
             mShortClassName = shortClassName;
             mViewLayoutClass = enclosingViewClassInfo;
             mSuperClass = superClassInfo;
@@ -58,18 +54,22 @@ public class ViewClassInfo {
         public String getShortClassName() {
             return mShortClassName;
         }
+
         /** Returns the ViewLayout class info enclosing this layout data. Cannot null. */
         public ViewClassInfo getViewLayoutClass() {
             return mViewLayoutClass;
         }
+
         /** Returns the super class info. Can be null. */
         public LayoutParamsInfo getSuperClass() {
             return mSuperClass;
         }
+
         /** Returns the LayoutData attributes. Can be empty but not null. */
         public AttributeInfo[] getAttributes() {
             return mAttributes;
         }
+
         /** Sets the LayoutData attributes. Can be empty but not null. */
         public void setAttributes(AttributeInfo[] attributes) {
             mAttributes = attributes;

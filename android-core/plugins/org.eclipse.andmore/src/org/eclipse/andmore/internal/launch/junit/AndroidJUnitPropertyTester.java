@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +25,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.junit.util.CoreTestSearchEngine;
-import org.eclipse.jdt.internal.junit.util.TestSearchEngine;
 
 /**
  * A {@link PropertyTester} that checks if selected elements can be run as Android
@@ -39,7 +35,7 @@ import org.eclipse.jdt.internal.junit.util.TestSearchEngine;
  */
 @SuppressWarnings("restriction")
 public class AndroidJUnitPropertyTester extends PropertyTester {
-    private static final String PROPERTY_IS_TEST = "isTest";  //$NON-NLS-1$
+    private static final String PROPERTY_IS_TEST = "isTest"; //$NON-NLS-1$
 
     private static final String PROPERTY_CAN_LAUNCH_AS_JUNIT_TEST = "canLaunchAsJUnit"; //$NON-NLS-1$
 
@@ -50,10 +46,9 @@ public class AndroidJUnitPropertyTester extends PropertyTester {
     public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
         if (!(receiver instanceof IAdaptable)) {
             final String elementName = (receiver == null ? "null" : //$NON-NLS-1$
-                receiver.getClass().getName());
-            throw new IllegalArgumentException(
-                    String.format("Element must be of type IAdaptable, is %s", //$NON-NLS-1$
-                            elementName));
+                    receiver.getClass().getName());
+            throw new IllegalArgumentException(String.format("Element must be of type IAdaptable, is %s", //$NON-NLS-1$
+                    elementName));
         }
 
         IJavaElement element;
@@ -65,10 +60,9 @@ public class AndroidJUnitPropertyTester extends PropertyTester {
                 return false;
             }
         } else { // is IAdaptable
-            element= (IJavaElement) ((IAdaptable) receiver).getAdapter(IJavaElement.class);
+            element = ((IAdaptable) receiver).getAdapter(IJavaElement.class);
             if (element == null) {
-                IResource resource = (IResource) ((IAdaptable) receiver).getAdapter(
-                        IResource.class);
+                IResource resource = ((IAdaptable) receiver).getAdapter(IResource.class);
                 element = JavaCore.create(resource);
                 if (element == null) {
                     return false;
@@ -80,8 +74,7 @@ public class AndroidJUnitPropertyTester extends PropertyTester {
         } else if (PROPERTY_CAN_LAUNCH_AS_JUNIT_TEST.equals(property)) {
             return canLaunchAsJUnitTest(element);
         }
-        throw new IllegalArgumentException(
-                String.format("Unknown test property '%s'", property)); //$NON-NLS-1$
+        throw new IllegalArgumentException(String.format("Unknown test property '%s'", property)); //$NON-NLS-1$
     }
 
     private boolean canLaunchAsJUnitTest(IJavaElement element) {

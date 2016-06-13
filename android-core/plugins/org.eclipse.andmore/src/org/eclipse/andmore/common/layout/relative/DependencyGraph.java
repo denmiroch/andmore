@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,16 +12,10 @@
  */
 package org.eclipse.andmore.common.layout.relative;
 
+import static com.android.SdkConstants.ANDROID_URI;
 import static com.android.SdkConstants.ATTR_ID;
 import static com.android.SdkConstants.ATTR_LAYOUT_RESOURCE_PREFIX;
 import static com.android.SdkConstants.VALUE_TRUE;
-
-import static com.android.SdkConstants.ANDROID_URI;
-
-import com.android.ide.common.api.IDragElement;
-import com.android.ide.common.api.IDragElement.IDragAttribute;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.INode.IAttribute;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,8 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.andmore.common.layout.BaseLayoutRule;
 import org.eclipse.andmore.common.layout.BaseViewRule;
+
+import com.android.ide.common.api.IDragElement;
+import com.android.ide.common.api.IDragElement.IDragAttribute;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.INode.IAttribute;
 
 /**
  * Data structure about relative layout relationships which makes it possible to:
@@ -180,16 +175,15 @@ class DependencyGraph {
         return dependents;
     }
 
-    private void findBackwards(ViewData view,
-            Set<ViewData> visiting, List<ViewData> reachable,
-            boolean vertical, ViewData start) {
+    private void findBackwards(ViewData view, Set<ViewData> visiting, List<ViewData> reachable, boolean vertical,
+            ViewData start) {
         visiting.add(view);
         reachable.add(view);
 
         for (Constraint constraint : view.dependedOnBy) {
             if (vertical && !constraint.type.verticalEdge) {
                 continue;
-            } else  if (!vertical && !constraint.type.horizontalEdge) {
+            } else if (!vertical && !constraint.type.horizontalEdge) {
                 continue;
             }
 
@@ -224,14 +218,14 @@ class DependencyGraph {
         return null;
     }
 
-    private List<Constraint> findForwards(ViewData view, Set<ViewData> visiting,
-            List<Constraint> path, boolean vertical, INode target) {
+    private List<Constraint> findForwards(ViewData view, Set<ViewData> visiting, List<Constraint> path,
+            boolean vertical, INode target) {
         visiting.add(view);
 
         for (Constraint constraint : view.dependsOn) {
             if (vertical && !constraint.type.verticalEdge) {
                 continue;
-            } else  if (!vertical && !constraint.type.horizontalEdge) {
+            } else if (!vertical && !constraint.type.horizontalEdge) {
                 continue;
             }
 
@@ -303,7 +297,7 @@ class DependencyGraph {
             String s = "";
             for (int i = path.size() - 1; i >= 0; i--) {
                 Constraint constraint = path.get(i);
-                String suffix = (i == path.size() -1) ? constraint.to.id : s;
+                String suffix = (i == path.size() - 1) ? constraint.to.id : s;
                 s = String.format(DEPENDENCY_FORMAT, constraint.from.id,
                         stripLayoutAttributePrefix(constraint.type.name), suffix);
             }

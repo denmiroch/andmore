@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,9 +19,18 @@ import static com.android.SdkConstants.NEW_ID_PREFIX;
 import static com.android.SdkConstants.TOOLS_URI;
 import static org.eclipse.wst.xml.core.internal.provisional.contenttype.ContentTypeIdForXML.ContentTypeID_XML;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.utils.Pair;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -48,18 +54,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.utils.Pair;
 
 /**
  * Various utility methods for manipulating DOM nodes.
@@ -172,8 +169,7 @@ public class DomUtilities {
                     IDOMModel domModel = (IDOMModel) model;
                     return domModel.getDocument();
                 }
-                try {
-                } finally {
+                try {} finally {
                     model.releaseFromRead();
                 }
             }
@@ -207,7 +203,6 @@ public class DomUtilities {
 
         return null;
     }
-
 
     /**
      * Returns the XML DOM node corresponding to the given offset of the given
@@ -295,8 +290,7 @@ public class DomUtilities {
                             // we have the special case where the caret is pointing at
                             // a -potential- text node, e.g. <foo>^</foo>
                             IStructuredDocument doc = model.getStructuredDocument();
-                            IStructuredDocumentRegion region =
-                                doc.getRegionAtCharacterOffset(offset);
+                            IStructuredDocumentRegion region = doc.getRegionAtCharacterOffset(offset);
 
                             ITextRegion subRegion = region.getRegionAtCharacterOffset(offset);
                             String type = subRegion.getType();
@@ -388,8 +382,7 @@ public class DomUtilities {
      * @return a pair of begin+end elements, or null
      */
     @Nullable
-    public static Pair<Element, Element> getElementRange(@NonNull IDocument document,
-            int beginOffset, int endOffset) {
+    public static Pair<Element, Element> getElementRange(@NonNull IDocument document, int beginOffset, int endOffset) {
         Element beginElement = null;
         Element endElement = null;
         Node beginNode = getNode(document, beginOffset, true);
@@ -519,9 +512,7 @@ public class DomUtilities {
      * @return a unique id, never null, which does not include the {@code @id/} prefix
      * @see DescriptorsUtils#getFreeWidgetId
      */
-    public static String getFreeWidgetId(
-            @NonNull Element element,
-            @Nullable Set<String> reserved,
+    public static String getFreeWidgetId(@NonNull Element element, @Nullable Set<String> reserved,
             @Nullable String prefix) {
         Set<String> ids = new HashSet<String>();
         if (reserved != null) {
@@ -541,7 +532,7 @@ public class DomUtilities {
         String generated;
         int num = 1;
         do {
-            generated = String.format("%1$s%2$d", prefix, num++);   //$NON-NLS-1$
+            generated = String.format("%1$s%2$d", prefix, num++); //$NON-NLS-1$
         } while (ids.contains(generated.toLowerCase(Locale.US)));
 
         return generated;
@@ -699,20 +690,18 @@ public class DomUtilities {
         int nextIndex1 = 0;
         int nextIndex2 = 0;
         while (true) {
-            while (nextIndex1 < children1.getLength() &&
-                    children1.item(nextIndex1).getNodeType() != Node.ELEMENT_NODE) {
+            while (nextIndex1 < children1.getLength()
+                    && children1.item(nextIndex1).getNodeType() != Node.ELEMENT_NODE) {
                 nextIndex1++;
             }
 
-            while (nextIndex2 < children2.getLength() &&
-                    children2.item(nextIndex2).getNodeType() != Node.ELEMENT_NODE) {
+            while (nextIndex2 < children2.getLength()
+                    && children2.item(nextIndex2).getNodeType() != Node.ELEMENT_NODE) {
                 nextIndex2++;
             }
 
-            Element nextElement1 = (Element) (nextIndex1 < children1.getLength()
-                    ? children1.item(nextIndex1) : null);
-            Element nextElement2 = (Element) (nextIndex2 < children2.getLength()
-                    ? children2.item(nextIndex2) : null);
+            Element nextElement1 = (Element) (nextIndex1 < children1.getLength() ? children1.item(nextIndex1) : null);
+            Element nextElement2 = (Element) (nextIndex2 < children2.getLength() ? children2.item(nextIndex2) : null);
             if (nextElement1 == null) {
                 return nextElement2 == null;
             } else if (nextElement2 == null) {

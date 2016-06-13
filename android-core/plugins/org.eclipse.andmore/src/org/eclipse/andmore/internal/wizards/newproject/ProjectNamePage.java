@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,9 +18,8 @@ import static com.android.utils.SdkUtils.stripWhitespace;
 import static org.eclipse.andmore.AdtUtils.capitalize;
 import static org.eclipse.andmore.internal.wizards.newproject.ApplicationInfoPage.ACTIVITY_NAME_SUFFIX;
 
-import com.android.SdkConstants;
-import com.android.ide.common.xml.ManifestData;
-import com.android.ide.common.xml.ManifestData.Activity;
+import java.io.File;
+import java.net.URI;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.VersionCheck;
@@ -58,8 +54,9 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkingSet;
 
-import java.io.File;
-import java.net.URI;
+import com.android.SdkConstants;
+import com.android.ide.common.xml.ManifestData;
+import com.android.ide.common.xml.ManifestData.Activity;
 
 /**
  * Initial page shown when creating projects which asks for the project name,
@@ -70,7 +67,7 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
     /** Flag used when setting button/text state manually to ignore listener updates */
     private boolean mIgnore;
     /** Last user-browsed location, static so that it be remembered for the whole session */
-    private static String sCustomLocationOsPath = "";  //$NON-NLS-1$
+    private static String sCustomLocationOsPath = ""; //$NON-NLS-1$
     private static boolean sAutoComputeCustomLocation = true;
 
     private Text mProjectNameText;
@@ -134,8 +131,7 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
             // TBD: Should we hide this completely, and make samples something you only invoke
             // from the "New Sample Project" wizard?
             mCreateSampleRadioButton = new Button(container, SWT.RADIO);
-            mCreateSampleRadioButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false,
-                    3, 1));
+            mCreateSampleRadioButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
             mCreateSampleRadioButton.setText("Create project from existing sample");
             mCreateSampleRadioButton.addSelectionListener(this);
         }
@@ -173,7 +169,7 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
             try {
                 mIgnore = true;
                 if (mValues.projectName != null) {
-                        mProjectNameText.setText(mValues.projectName);
+                    mProjectNameText.setText(mValues.projectName);
                     mProjectNameText.setFocus();
                 }
                 if (mValues.mode == Mode.ANY || mValues.mode == Mode.TEST) {
@@ -232,8 +228,7 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
         if (!mValues.applicationNameModifiedByUser) {
             mValues.applicationName = capitalize(mValues.projectName);
             if (!mValues.testApplicationNameModified) {
-                mValues.testApplicationName =
-                        ApplicationInfoPage.suggestTestApplicationName(mValues.applicationName);
+                mValues.testApplicationName = ApplicationInfoPage.suggestTestApplicationName(mValues.applicationName);
             }
         }
         if (!mValues.activityNameModifiedByUser) {
@@ -241,8 +236,7 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
             mValues.activityName = stripWhitespace(name) + ACTIVITY_NAME_SUFFIX;
         }
         if (!mValues.testProjectModified) {
-            mValues.testProjectName =
-                    ApplicationInfoPage.suggestTestProjectName(mValues.projectName);
+            mValues.testProjectName = ApplicationInfoPage.suggestTestProjectName(mValues.projectName);
         }
         if (!mValues.projectLocationModifiedByUser) {
             updateLocationPathField(null);
@@ -257,8 +251,7 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
 
         Object source = e.getSource();
 
-        if (source == mCreateNewButton && mCreateNewButton != null
-                && mCreateNewButton.getSelection()) {
+        if (source == mCreateNewButton && mCreateNewButton != null && mCreateNewButton.getSelection()) {
             mValues.useExisting = false;
             if (mValues.mode == Mode.SAMPLE) {
                 // Only reset the mode if we're toggling from sample back to create new
@@ -291,24 +284,24 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
         validatePage();
     }
 
-   /**
+    /**
     * Enables or disable the location widgets depending on the user selection:
     * the location path is enabled when using the "existing source" mode (i.e. not new project)
     * or in new project mode with the "use default location" turned off.
     */
-   private void updateLocationState() {
-       boolean isNewProject = !mValues.useExisting;
-       boolean isCreateFromSample = mValues.mode == Mode.SAMPLE;
-       boolean useDefault = mValues.useDefaultLocation && !isCreateFromSample;
-       boolean locationEnabled = (!isNewProject || !useDefault) && !isCreateFromSample;
+    private void updateLocationState() {
+        boolean isNewProject = !mValues.useExisting;
+        boolean isCreateFromSample = mValues.mode == Mode.SAMPLE;
+        boolean useDefault = mValues.useDefaultLocation && !isCreateFromSample;
+        boolean locationEnabled = (!isNewProject || !useDefault) && !isCreateFromSample;
 
-       mUseDefaultCheckBox.setEnabled(isNewProject);
-       mLocationLabel.setEnabled(locationEnabled);
-       mLocationText.setEnabled(locationEnabled);
-       mBrowseButton.setEnabled(locationEnabled);
+        mUseDefaultCheckBox.setEnabled(isNewProject);
+        mLocationLabel.setEnabled(locationEnabled);
+        mLocationText.setEnabled(locationEnabled);
+        mBrowseButton.setEnabled(locationEnabled);
 
-       updateLocationPathField(null);
-   }
+        updateLocationPathField(null);
+    }
 
     /**
      * Display a directory browser and update the location path field with the selected path
@@ -339,8 +332,7 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 
     /**
      * Returns the working sets to which the new project should be added.
@@ -386,11 +378,10 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
                         // We get here if the user selected a directory with the "Browse" button.
                         // Disable auto-compute of the custom location unless the user selected
                         // the exact same path.
-                        sAutoComputeCustomLocation = sAutoComputeCustomLocation &&
-                                                     absDir.equals(sCustomLocationOsPath);
+                        sAutoComputeCustomLocation = sAutoComputeCustomLocation && absDir.equals(sCustomLocationOsPath);
                         sCustomLocationOsPath = TextProcessor.process(absDir);
-                    } else  if (sAutoComputeCustomLocation ||
-                                (!isNewProject && !new File(sCustomLocationOsPath).isDirectory())) {
+                    } else if (sAutoComputeCustomLocation
+                            || (!isNewProject && !new File(sCustomLocationOsPath).isDirectory())) {
                         // As a default import location, just suggest the home directory; the user
                         // needs to point to a project to import.
                         // TODO: Open file chooser automatically?
@@ -413,8 +404,8 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
             }
         }
 
-        if (mValues.useExisting && mValues.projectLocation != null
-                && mValues.projectLocation.exists() && mValues.mode != Mode.SAMPLE) {
+        if (mValues.useExisting && mValues.projectLocation != null && mValues.projectLocation.exists()
+                && mValues.mode != Mode.SAMPLE) {
             mValues.extractFromAndroidManifest(new Path(mValues.projectLocation.getPath()));
             if (!mValues.projectNameModifiedByUser && mValues.projectName != null) {
                 try {
@@ -446,12 +437,12 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
         if (!mCheckedSdkUptodate) {
             // Ensure that we have a recent enough version of the Tools that the right templates
             // are available
-            File file = new File(AndmoreAndroidPlugin.getOsSdkFolder(), OS_SDK_TOOLS_LIB_FOLDER
-                    + File.separator + FN_PROJECT_PROGUARD_FILE);
+            File file = new File(AndmoreAndroidPlugin.getOsSdkFolder(),
+                    OS_SDK_TOOLS_LIB_FOLDER + File.separator + FN_PROJECT_PROGUARD_FILE);
             if (!file.exists()) {
                 status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
                         String.format("You do not have the latest version of the "
-                        + "SDK Tools installed: Please update. (Missing %1$s)", file.getPath()));
+                                + "SDK Tools installed: Please update. (Missing %1$s)", file.getPath()));
             } else {
                 mCheckedSdkUptodate = true;
             }
@@ -461,8 +452,7 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
         setPageComplete(status == null || status.getSeverity() != IStatus.ERROR);
         if (status != null) {
             setMessage(status.getMessage(),
-                    status.getSeverity() == IStatus.ERROR
-                        ? IMessageProvider.ERROR : IMessageProvider.WARNING);
+                    status.getSeverity() == IStatus.ERROR ? IMessageProvider.ERROR : IMessageProvider.WARNING);
         } else {
             setErrorMessage(null);
             setMessage(null);
@@ -516,7 +506,7 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
                     return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
                             String.format(
                                     "There is already a file or directory named \"%1$s\" in the selected location.",
-                            mValues.projectName));
+                                    mValues.projectName));
                 }
             }
         } else {
@@ -532,9 +522,7 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
             File manifestFile = new File(osPath);
             if (!manifestFile.isFile()) {
                 return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                        String.format(
-                                "Choose a valid Android code directory\n" +
-                                "(%1$s not found in %2$s.)",
+                        String.format("Choose a valid Android code directory\n" + "(%1$s not found in %2$s.)",
                                 SdkConstants.FN_ANDROID_MANIFEST_XML, f.getName()));
             }
 
@@ -560,10 +548,10 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
             }
 
             // If there's already a .project, tell the user to use import instead.
-            if (path.append(".project").toFile().exists()) {  //$NON-NLS-1$
+            if (path.append(".project").toFile().exists()) { //$NON-NLS-1$
                 return new Status(IStatus.WARNING, AndmoreAndroidPlugin.PLUGIN_ID,
-                        "An Eclipse project already exists in this directory.\n" +
-                        "Consider using File > Import > Existing Project instead.");
+                        "An Eclipse project already exists in this directory.\n"
+                                + "Consider using File > Import > Existing Project instead.");
             }
         }
 
@@ -572,8 +560,7 @@ public class ProjectNamePage extends WizardPage implements SelectionListener, Mo
 
     public static IStatus validateProjectName(String projectName) {
         if (projectName == null || projectName.length() == 0) {
-            return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    "Project name must be specified");
+            return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, "Project name must be specified");
         } else {
             IWorkspace workspace = ResourcesPlugin.getWorkspace();
             IStatus nameStatus = workspace.validateName(projectName, IResource.PROJECT);

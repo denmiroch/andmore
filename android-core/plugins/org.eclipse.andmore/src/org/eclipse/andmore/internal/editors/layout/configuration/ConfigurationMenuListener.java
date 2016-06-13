@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,20 +21,17 @@ import static org.eclipse.andmore.internal.editors.layout.gle2.RenderPreviewMode
 import static org.eclipse.andmore.internal.editors.layout.gle2.RenderPreviewMode.SCREENS;
 import static org.eclipse.andmore.internal.editors.layout.gle2.RenderPreviewMode.VARIATIONS;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.resources.ResourceFolder;
-import com.android.ide.common.resources.configuration.FolderConfiguration;
+import java.util.List;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.gle2.IncludeFinder;
+import org.eclipse.andmore.internal.editors.layout.gle2.IncludeFinder.Reference;
 import org.eclipse.andmore.internal.editors.layout.gle2.LayoutCanvas;
 import org.eclipse.andmore.internal.editors.layout.gle2.RenderPreviewManager;
 import org.eclipse.andmore.internal.editors.layout.gle2.RenderPreviewMode;
-import org.eclipse.andmore.internal.editors.layout.gle2.IncludeFinder.Reference;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
 import org.eclipse.andmore.internal.resources.manager.ResourceManager;
 import org.eclipse.core.resources.IFile;
@@ -54,14 +48,17 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
 
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.resources.ResourceFolder;
+import com.android.ide.common.resources.configuration.FolderConfiguration;
 
 /**
  * The {@linkplain ConfigurationMenuListener} class is responsible for
  * generating the configuration menu in the {@link ConfigurationChooser}.
  */
 class ConfigurationMenuListener extends SelectionAdapter {
-    private static final String ICON_NEW_CONFIG = "newConfig";    //$NON-NLS-1$
+    private static final String ICON_NEW_CONFIG = "newConfig"; //$NON-NLS-1$
     private static final int ACTION_SELECT_CONFIG = 1;
     private static final int ACTION_CREATE_CONFIG_FILE = 2;
     private static final int ACTION_ADD = 3;
@@ -73,10 +70,7 @@ class ConfigurationMenuListener extends SelectionAdapter {
     private final IFile mResource;
     private final RenderPreviewMode mMode;
 
-    ConfigurationMenuListener(
-            @NonNull ConfigurationChooser configChooser,
-            int action,
-            @Nullable IFile resource,
+    ConfigurationMenuListener(@NonNull ConfigurationChooser configChooser, int action, @Nullable IFile resource,
             @Nullable RenderPreviewMode mode) {
         mConfigChooser = configChooser;
         mAction = action;
@@ -113,8 +107,7 @@ class ConfigurationMenuListener extends SelectionAdapter {
         }
         // (Only do this when the two files are in the same project)
         IProject project = delegate.getEditor().getProject();
-        if (project == null ||
-                !project.equals(editedFile.getProject())) {
+        if (project == null || !project.equals(editedFile.getProject())) {
             return;
         }
         LayoutCanvas canvas = delegate.getGraphicalEditor().getCanvasControl();
@@ -133,7 +126,8 @@ class ConfigurationMenuListener extends SelectionAdapter {
                 previewManager.deleteManualPreviews();
                 break;
             }
-            default: assert false : mAction;
+            default:
+                assert false : mAction;
         }
         canvas.setFitScale(true /*onlyZoomOut*/, false /*allowZoomIn*/);
         canvas.redraw();
@@ -144,13 +138,11 @@ class ConfigurationMenuListener extends SelectionAdapter {
         RenderPreviewMode mode = AdtPrefs.getPrefs().getRenderPreviewMode();
 
         // Configuration Previews
-        create(menu, "Add As Thumbnail...",
-                new ConfigurationMenuListener(chooser, ACTION_ADD, null, null),
-                SWT.PUSH, false);
+        create(menu, "Add As Thumbnail...", new ConfigurationMenuListener(chooser, ACTION_ADD, null, null), SWT.PUSH,
+                false);
         if (mode == RenderPreviewMode.CUSTOM) {
             MenuItem item = create(menu, "Delete All Thumbnails",
-                new ConfigurationMenuListener(chooser, ACTION_DELETE_ALL, null, null),
-                SWT.PUSH, false);
+                    new ConfigurationMenuListener(chooser, ACTION_DELETE_ALL, null, null), SWT.PUSH, false);
             IEditorPart activeEditor = AdtUtils.getActiveEditor();
             LayoutEditorDelegate delegate = LayoutEditorDelegate.fromEditor(activeEditor);
             if (delegate != null) {
@@ -163,15 +155,12 @@ class ConfigurationMenuListener extends SelectionAdapter {
         }
 
         create(menu, "Preview Representative Sample",
-                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null,
-                        DEFAULT), SWT.RADIO, mode == DEFAULT);
+                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null, DEFAULT), SWT.RADIO, mode == DEFAULT);
         create(menu, "Preview All Screen Sizes",
-                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null,
-                        SCREENS), SWT.RADIO, mode == SCREENS);
+                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null, SCREENS), SWT.RADIO, mode == SCREENS);
 
         MenuItem localeItem = create(menu, "Preview All Locales",
-                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null,
-                        LOCALES), SWT.RADIO, mode == LOCALES);
+                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null, LOCALES), SWT.RADIO, mode == LOCALES);
         if (chooser.getLocaleList().size() <= 1) {
             localeItem.setEnabled(false);
         }
@@ -187,8 +176,8 @@ class ConfigurationMenuListener extends SelectionAdapter {
         //    canPreviewIncluded = false;
         //}
         MenuItem includedItem = create(menu, "Preview Included",
-                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null,
-                        INCLUDES), SWT.RADIO, mode == INCLUDES);
+                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null, INCLUDES), SWT.RADIO,
+                mode == INCLUDES);
         if (!canPreviewIncluded) {
             includedItem.setEnabled(false);
         }
@@ -196,18 +185,16 @@ class ConfigurationMenuListener extends SelectionAdapter {
         IFile file = chooser.getEditedFile();
         List<IFile> variations = AdtUtils.getResourceVariations(file, true);
         MenuItem variationsItem = create(menu, "Preview Layout Versions",
-                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null,
-                        VARIATIONS), SWT.RADIO, mode == VARIATIONS);
+                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null, VARIATIONS), SWT.RADIO,
+                mode == VARIATIONS);
         if (variations.size() <= 1) {
             variationsItem.setEnabled(false);
         }
 
-        create(menu, "Manual Previews",
-                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null,
-                        CUSTOM), SWT.RADIO, mode == CUSTOM);
-        create(menu, "None",
-                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null,
-                        NONE), SWT.RADIO, mode == NONE);
+        create(menu, "Manual Previews", new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null, CUSTOM),
+                SWT.RADIO, mode == CUSTOM);
+        create(menu, "None", new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null, NONE), SWT.RADIO,
+                mode == NONE);
 
         if (variations.size() > 1) {
             @SuppressWarnings("unused")
@@ -221,9 +208,7 @@ class ConfigurationMenuListener extends SelectionAdapter {
                 String title = configuration.toDisplayString();
 
                 MenuItem item = create(menu, title,
-                        new ConfigurationMenuListener(chooser, ACTION_SELECT_CONFIG,
-                                resource, null),
-                        SWT.CHECK, false);
+                        new ConfigurationMenuListener(chooser, ACTION_SELECT_CONFIG, resource, null), SWT.CHECK, false);
 
                 if (file != null) {
                     boolean selected = file.equals(resource);
@@ -236,8 +221,8 @@ class ConfigurationMenuListener extends SelectionAdapter {
         }
 
         Configuration configuration = chooser.getConfiguration();
-        if (configuration.getEditedConfig() != null &&
-                !configuration.getEditedConfig().equals(configuration.getFullConfig())) {
+        if (configuration.getEditedConfig() != null
+                && !configuration.getEditedConfig().equals(configuration.getFullConfig())) {
             if (variations.size() > 0) {
                 @SuppressWarnings("unused")
                 MenuItem separator = new MenuItem(menu, SWT.SEPARATOR);
@@ -245,9 +230,7 @@ class ConfigurationMenuListener extends SelectionAdapter {
 
             // Add action for creating a new configuration
             MenuItem item = create(menu, "Create New...",
-                    new ConfigurationMenuListener(chooser, ACTION_CREATE_CONFIG_FILE,
-                            null, null),
-                    SWT.PUSH, false);
+                    new ConfigurationMenuListener(chooser, ACTION_CREATE_CONFIG_FILE, null, null), SWT.PUSH, false);
             item.setImage(IconFactory.getInstance().getIcon(ICON_NEW_CONFIG));
         }
 
@@ -259,8 +242,8 @@ class ConfigurationMenuListener extends SelectionAdapter {
     }
 
     @NonNull
-    public static MenuItem create(@NonNull Menu menu, String title,
-            ConfigurationMenuListener listener, int style, boolean selected) {
+    public static MenuItem create(@NonNull Menu menu, String title, ConfigurationMenuListener listener, int style,
+            boolean selected) {
         MenuItem item = new MenuItem(menu, style);
         item.setText(title);
         item.addSelectionListener(listener);
@@ -271,17 +254,13 @@ class ConfigurationMenuListener extends SelectionAdapter {
     }
 
     @NonNull
-    static MenuItem addTogglePreviewModeAction(
-            @NonNull Menu menu,
-            @NonNull String title,
-            @NonNull ConfigurationChooser chooser,
-            @NonNull RenderPreviewMode mode) {
+    static MenuItem addTogglePreviewModeAction(@NonNull Menu menu, @NonNull String title,
+            @NonNull ConfigurationChooser chooser, @NonNull RenderPreviewMode mode) {
         boolean selected = AdtPrefs.getPrefs().getRenderPreviewMode() == mode;
         if (selected) {
             mode = RenderPreviewMode.NONE;
         }
-        return create(menu, title,
-                new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null, mode),
-                SWT.CHECK, selected);
+        return create(menu, title, new ConfigurationMenuListener(chooser, ACTION_PREVIEW_MODE, null, mode), SWT.CHECK,
+                selected);
     }
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,9 @@
  */
 
 package org.eclipse.andmore.internal.editors;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.core.internal.filebuffers.SynchronizableDocument;
@@ -59,9 +59,6 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.part.WorkbenchPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Multi-page form editor for Android text files.
@@ -224,7 +221,7 @@ public abstract class AndroidTextEditor extends FormEditor implements IResourceC
      */
     protected void removePages() {
         int count = getPageCount();
-        for (int i = count - 1 ; i >= 0 ; i--) {
+        for (int i = count - 1; i >= 0; i--) {
             removePage(i);
         }
     }
@@ -246,7 +243,6 @@ public abstract class AndroidTextEditor extends FormEditor implements IResourceC
             return super.setActivePage(pageId);
         }
     }
-
 
     /**
      * Notifies this multi-page editor that the page with the given id has been
@@ -292,11 +288,9 @@ public abstract class AndroidTextEditor extends FormEditor implements IResourceC
                     @SuppressWarnings("hiding")
                     IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
                     for (int i = 0; i < pages.length; i++) {
-                        if (((FileEditorInput)mTextEditor.getEditorInput())
-                                .getFile().getProject().equals(
-                                        event.getResource())) {
-                            IEditorPart editorPart = pages[i].findEditor(mTextEditor
-                                    .getEditorInput());
+                        if (((FileEditorInput) mTextEditor.getEditorInput()).getFile().getProject()
+                                .equals(event.getResource())) {
+                            IEditorPart editorPart = pages[i].findEditor(mTextEditor.getEditorInput());
                             pages[i].closeEditor(editorPart, true);
                         }
                     }
@@ -314,8 +308,9 @@ public abstract class AndroidTextEditor extends FormEditor implements IResourceC
      */
     @Override
     public void init(IEditorSite site, IEditorInput editorInput) throws PartInitException {
-        if (!(editorInput instanceof IFileEditorInput))
+        if (!(editorInput instanceof IFileEditorInput)) {
             throw new PartInitException("Invalid Input: Must be IFileEditorInput");
+        }
         super.init(site, editorInput);
     }
 
@@ -429,7 +424,6 @@ public abstract class AndroidTextEditor extends FormEditor implements IResourceC
 
     // ---- Local methods ----
 
-
     /**
      * Helper method that creates a new hyper-link Listener.
      * Used by derived classes which need active links in {@link FormText}.
@@ -454,10 +448,10 @@ public abstract class AndroidTextEditor extends FormEditor implements IResourceC
             public void linkActivated(HyperlinkEvent e) {
                 super.linkActivated(e);
                 String link = e.data.toString();
-                if (link.startsWith("http") ||          //$NON-NLS-1$
-                        link.startsWith("file:/")) {    //$NON-NLS-1$
+                if (link.startsWith("http") || //$NON-NLS-1$
+                link.startsWith("file:/")) { //$NON-NLS-1$
                     openLinkInBrowser(link);
-                } else if (link.startsWith("page:")) {  //$NON-NLS-1$
+                } else if (link.startsWith("page:")) { //$NON-NLS-1$
                     // Switch to an internal page
                     setActivePage(link.substring(5 /* strlen("page:") */));
                 }
@@ -515,10 +509,8 @@ public abstract class AndroidTextEditor extends FormEditor implements IResourceC
                 }
             });
 
-
         } catch (PartInitException e) {
-            ErrorDialog.openError(getSite().getShell(),
-                    "Android Text Editor Error", null, e.getStatus());
+            ErrorDialog.openError(getSite().getShell(), "Android Text Editor Error", null, e.getStatus());
         }
     }
 
@@ -542,7 +534,7 @@ public abstract class AndroidTextEditor extends FormEditor implements IResourceC
         if (mTextEditor != null) {
             IEditorInput input = mTextEditor.getEditorInput();
             if (input instanceof FileEditorInput) {
-                FileEditorInput fileInput = (FileEditorInput)input;
+                FileEditorInput fileInput = (FileEditorInput) input;
                 IFile inputFile = fileInput.getFile();
 
                 if (inputFile != null) {
@@ -572,7 +564,7 @@ public abstract class AndroidTextEditor extends FormEditor implements IResourceC
                 session = doc4.startRewriteSession(DocumentRewriteSessionType.UNRESTRICTED_SMALL);
 
                 operation.run();
-            } catch(IllegalStateException e) {
+            } catch (IllegalStateException e) {
                 AndmoreAndroidPlugin.log(e, "wrapRewriteSession failed");
                 e.printStackTrace();
             } finally {

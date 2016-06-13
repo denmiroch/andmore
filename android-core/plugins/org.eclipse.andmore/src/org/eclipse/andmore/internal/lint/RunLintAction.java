@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,10 +15,11 @@ package org.eclipse.andmore.internal.lint;
 
 import static com.android.SdkConstants.DOT_XML;
 
-import com.android.tools.lint.detector.api.LintUtils;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
 import org.eclipse.core.resources.IFile;
@@ -48,16 +46,14 @@ import org.eclipse.ui.IWorkbenchWindowPulldownDelegate;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.tools.lint.detector.api.LintUtils;
 
 /**
  * Action which runs Lint on the currently projects (and also provides a
  * pulldown menu in the toolbar for selecting specifically which projects to
  * check)
  */
-public class RunLintAction implements IObjectActionDelegate, IMenuCreator,
-        IWorkbenchWindowPulldownDelegate {
+public class RunLintAction implements IObjectActionDelegate, IMenuCreator, IWorkbenchWindowPulldownDelegate {
 
     private ISelection mSelection;
     private Menu mMenu;
@@ -89,8 +85,7 @@ public class RunLintAction implements IObjectActionDelegate, IMenuCreator,
     }
 
     @Override
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-    }
+    public void setActivePart(IAction action, IWorkbenchPart targetPart) {}
 
     @Override
     public void dispose() {
@@ -100,8 +95,7 @@ public class RunLintAction implements IObjectActionDelegate, IMenuCreator,
     }
 
     @Override
-    public void init(IWorkbenchWindow window) {
-    }
+    public void init(IWorkbenchWindow window) {}
 
     // ---- IMenuCreator ----
 
@@ -111,14 +105,12 @@ public class RunLintAction implements IObjectActionDelegate, IMenuCreator,
 
         IconFactory iconFactory = IconFactory.getInstance();
         ImageDescriptor allIcon = iconFactory.getImageDescriptor("lintrun"); //$NON-NLS-1$
-        LintMenuAction allAction = new LintMenuAction("Check All Projects", allIcon,
-                ACTION_RUN, null);
+        LintMenuAction allAction = new LintMenuAction("Check All Projects", allIcon, ACTION_RUN, null);
 
         addAction(allAction);
         addSeparator();
         IJavaProject[] projects = AdtUtils.getOpenAndroidProjects();
-        ILabelProvider provider = new JavaElementLabelProvider(
-                JavaElementLabelProvider.SHOW_DEFAULT);
+        ILabelProvider provider = new JavaElementLabelProvider(JavaElementLabelProvider.SHOW_DEFAULT);
         for (IJavaProject project : projects) {
             IProject p = project.getProject();
             ImageDescriptor icon = ImageDescriptor.createFromImage(provider.getImage(p));
@@ -133,8 +125,7 @@ public class RunLintAction implements IObjectActionDelegate, IMenuCreator,
             // Currently only supported for XML files
             if (file != null && LintUtils.endsWith(file.getName(), DOT_XML)) {
                 ImageDescriptor icon = ImageDescriptor.createFromImage(provider.getImage(file));
-                IAction fileAction = new LintMenuAction("Check Current File", icon, ACTION_RUN,
-                        file);
+                IAction fileAction = new LintMenuAction("Check Current File", icon, ACTION_RUN, file);
 
                 addSeparator();
                 addAction(fileAction);
@@ -143,13 +134,12 @@ public class RunLintAction implements IObjectActionDelegate, IMenuCreator,
 
         ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
         ImageDescriptor clear = images.getImageDescriptor(ISharedImages.IMG_ELCL_REMOVEALL);
-        LintMenuAction clearAction = new LintMenuAction("Clear Lint Warnings", clear, ACTION_CLEAR,
-                null);
+        LintMenuAction clearAction = new LintMenuAction("Clear Lint Warnings", clear, ACTION_CLEAR, null);
         addSeparator();
         addAction(clearAction);
 
-        LintMenuAction excludeAction = new LintMenuAction("Skip Library Project Dependencies",
-                allIcon, ACTION_TOGGLE_EXCLUDE, null);
+        LintMenuAction excludeAction = new LintMenuAction("Skip Library Project Dependencies", allIcon,
+                ACTION_TOGGLE_EXCLUDE, null);
         addSeparator();
         addAction(excludeAction);
         excludeAction.setChecked(AdtPrefs.getPrefs().getSkipLibrariesFromLint());
@@ -192,8 +182,7 @@ public class RunLintAction implements IObjectActionDelegate, IMenuCreator,
          * @param resource the resource to check or clear markers for, where
          *            null means all projects
          */
-        private LintMenuAction(String text, ImageDescriptor descriptor, int action,
-                IResource resource) {
+        private LintMenuAction(String text, ImageDescriptor descriptor, int action, IResource resource) {
             super(text, action == ACTION_TOGGLE_EXCLUDE ? AS_CHECK_BOX : AS_PUSH_BUTTON);
             if (descriptor != null) {
                 setImageDescriptor(descriptor);
@@ -224,8 +213,7 @@ public class RunLintAction implements IObjectActionDelegate, IMenuCreator,
                 EclipseLintClient.clearMarkers(resources);
             } else {
                 assert mAction == ACTION_RUN;
-                EclipseLintRunner.startLint(resources, null, null, false /*fatalOnly*/,
-                        true /*show*/);
+                EclipseLintRunner.startLint(resources, null, null, false /*fatalOnly*/, true /*show*/);
             }
         }
     }

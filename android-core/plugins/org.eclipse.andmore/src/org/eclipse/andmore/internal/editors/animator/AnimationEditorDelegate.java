@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,10 +14,6 @@
 package org.eclipse.andmore.internal.editors.animator;
 
 import static org.eclipse.andmore.AndmoreAndroidConstants.EDITORS_NAMESPACE;
-
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.resources.ResourceFolderType;
 
 import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.common.CommonXmlDelegate;
@@ -33,6 +26,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.resources.ResourceFolderType;
+
 /**
  * Editor for /res/animator XML files.
  */
@@ -42,8 +39,7 @@ public class AnimationEditorDelegate extends CommonXmlDelegate {
     public static class Creator implements IDelegateCreator {
         @Override
         @SuppressWarnings("unchecked")
-        public AnimationEditorDelegate createForFile(
-                @NonNull CommonXmlEditor delegator,
+        public AnimationEditorDelegate createForFile(@NonNull CommonXmlEditor delegator,
                 @Nullable ResourceFolderType type) {
             if (ResourceFolderType.ANIM == type || ResourceFolderType.ANIMATOR == type) {
                 return new AnimationEditorDelegate(delegator);
@@ -57,8 +53,7 @@ public class AnimationEditorDelegate extends CommonXmlDelegate {
      * Old standalone-editor ID.
      * Use {@link CommonXmlEditor#ID} instead.
      */
-    public static final String LEGACY_EDITOR_ID =
-        EDITORS_NAMESPACE + ".animator.AnimationEditor"; //$NON-NLS-1$
+    public static final String LEGACY_EDITOR_ID = EDITORS_NAMESPACE + ".animator.AnimationEditor"; //$NON-NLS-1$
 
     /** The tag used at the root */
     private String mRootTag;
@@ -95,8 +90,7 @@ public class AnimationEditorDelegate extends CommonXmlDelegate {
         // create the ui root node on demand.
         delegateInitUiRootNode(false /*force*/);
 
-        if (mRootTag != null
-                && !mRootTag.equals(getUiRootNode().getDescriptor().getXmlLocalName())) {
+        if (mRootTag != null && !mRootTag.equals(getUiRootNode().getDescriptor().getXmlLocalName())) {
             AndroidTargetData data = getEditor().getTargetData();
             if (data != null) {
                 ElementDescriptor descriptor;

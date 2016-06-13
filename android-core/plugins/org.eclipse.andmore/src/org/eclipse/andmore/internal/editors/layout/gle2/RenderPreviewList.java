@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,14 +12,14 @@
  */
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.annotations.NonNull;
-import com.android.sdklib.devices.Device;
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.formatting.EclipseXmlPrettyPrinter;
 import org.eclipse.andmore.internal.editors.layout.configuration.Configuration;
 import org.eclipse.andmore.internal.editors.layout.configuration.ConfigurationChooser;
@@ -33,11 +30,11 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.android.sdklib.devices.Device;
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 /** A list of render previews */
 class RenderPreviewList {
@@ -45,8 +42,7 @@ class RenderPreviewList {
     private static final String PREVIEW_FILE_NAME = "previews.xml"; //$NON-NLS-1$
 
     /** Qualified name for the per-project persistent property include-map */
-    private final static QualifiedName PREVIEW_LIST = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID,
-            "previewlist");//$NON-NLS-1$
+    private final static QualifiedName PREVIEW_LIST = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "previewlist");//$NON-NLS-1$
 
     private final IProject mProject;
     private final List<ConfigurationDescription> mList = Lists.newArrayList();
@@ -123,8 +119,7 @@ class RenderPreviewList {
         }
         List<Element> elements = DomUtilities.getChildren(document.getDocumentElement());
         for (Element element : elements) {
-            ConfigurationDescription description = ConfigurationDescription.fromXml(
-                    mProject, element, deviceList);
+            ConfigurationDescription description = ConfigurationDescription.fromXml(mProject, element, deviceList);
             if (description != null) {
                 mList.add(description);
             }
@@ -145,35 +140,24 @@ class RenderPreviewList {
         }
         List<RenderPreview> previews = Lists.newArrayList();
         RenderPreviewManager manager = canvas.getPreviewManager();
-        ConfigurationChooser chooser = canvas.getEditorDelegate().getGraphicalEditor()
-                .getConfigurationChooser();
+        ConfigurationChooser chooser = canvas.getEditorDelegate().getGraphicalEditor().getConfigurationChooser();
 
         Configuration chooserConfig = chooser.getConfiguration();
         for (ConfigurationDescription description : mList) {
             Configuration configuration = Configuration.create(chooser);
             configuration.setDisplayName(description.displayName);
             configuration.setActivity(description.activity);
-            configuration.setLocale(
-                    description.locale != null ? description.locale : chooserConfig.getLocale(),
-                            true);
+            configuration.setLocale(description.locale != null ? description.locale : chooserConfig.getLocale(), true);
             // TODO: Make sure this layout isn't in some v-folder which is incompatible
             // with this target!
-            configuration.setTarget(
-                    description.target != null ? description.target : chooserConfig.getTarget(),
-                            true);
-            configuration.setTheme(
-                description.theme != null ? description.theme : chooserConfig.getTheme());
-            configuration.setDevice(
-                description.device != null ? description.device : chooserConfig.getDevice(),
-                        true);
-            configuration.setDeviceState(
-                description.state != null ? description.state : chooserConfig.getDeviceState(),
-                        true);
+            configuration.setTarget(description.target != null ? description.target : chooserConfig.getTarget(), true);
+            configuration.setTheme(description.theme != null ? description.theme : chooserConfig.getTheme());
+            configuration.setDevice(description.device != null ? description.device : chooserConfig.getDevice(), true);
+            configuration.setDeviceState(description.state != null ? description.state : chooserConfig.getDeviceState(),
+                    true);
             configuration.setNightMode(
-                description.nightMode != null ? description.nightMode
-                        : chooserConfig.getNightMode(), true);
-            configuration.setUiMode(
-                description.uiMode != null ? description.uiMode : chooserConfig.getUiMode(), true);
+                    description.nightMode != null ? description.nightMode : chooserConfig.getNightMode(), true);
+            configuration.setUiMode(description.uiMode != null ? description.uiMode : chooserConfig.getUiMode(), true);
 
             //configuration.syncFolderConfig();
             configuration.getFullConfig().set(description.folder);
@@ -200,8 +184,7 @@ class RenderPreviewList {
 
     void add(@NonNull RenderPreview preview) {
         Configuration configuration = preview.getConfiguration();
-        ConfigurationDescription description =
-                ConfigurationDescription.fromConfiguration(mProject, configuration);
+        ConfigurationDescription description = ConfigurationDescription.fromConfiguration(mProject, configuration);
         // RenderPreviews can have display names that aren't reflected in the configuration
         description.displayName = preview.getDisplayName();
         mList.add(description);

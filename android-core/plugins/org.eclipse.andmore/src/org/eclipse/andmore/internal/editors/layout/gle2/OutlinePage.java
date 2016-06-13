@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,14 +31,13 @@ import static com.android.SdkConstants.URI_PREFIX;
 import static org.eclipse.jface.viewers.StyledString.COUNTER_STYLER;
 import static org.eclipse.jface.viewers.StyledString.QUALIFIER_STYLER;
 
-import com.android.SdkConstants;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.InsertType;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.common.layout.BaseLayoutRule;
 import org.eclipse.andmore.common.layout.GridLayoutRule;
 import org.eclipse.andmore.internal.editors.IconFactory;
@@ -120,10 +116,11 @@ import org.eclipse.wb.internal.core.editor.structure.PageSiteComposite;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.InsertType;
+import com.android.utils.Pair;
 
 /**
  * An outline page for the layout canvas view.
@@ -137,8 +134,7 @@ import java.util.Set;
  * and as such it will broadcast selection changes to the site's selection service
  * (on which both the layout editor part and the property sheet page listen.)
  */
-public class OutlinePage extends ContentOutlinePage
-    implements INullSelectionListener, IPage {
+public class OutlinePage extends ContentOutlinePage implements INullSelectionListener, IPage {
 
     /** Label which separates outline text from additional attributes like text prefix or url */
     private static final String LABEL_SEPARATOR = " - ";
@@ -186,8 +182,7 @@ public class OutlinePage extends ContentOutlinePage
     };
 
     /** Action for moving items up in the tree */
-    private Action mMoveUpAction = new Action("Move Up\t-",
-            IconFactory.getInstance().getImageDescriptor("up")) { //$NON-NLS-1$
+    private Action mMoveUpAction = new Action("Move Up\t-", IconFactory.getInstance().getImageDescriptor("up")) { //$NON-NLS-2$
 
         @Override
         public String getId() {
@@ -206,8 +201,7 @@ public class OutlinePage extends ContentOutlinePage
     };
 
     /** Action for moving items down in the tree */
-    private Action mMoveDownAction = new Action("Move Down\t+",
-            IconFactory.getInstance().getImageDescriptor("down")) { //$NON-NLS-1$
+    private Action mMoveDownAction = new Action("Move Down\t+", IconFactory.getInstance().getImageDescriptor("down")) { //$NON-NLS-2$
 
         @Override
         public String getId() {
@@ -325,8 +319,7 @@ public class OutlinePage extends ContentOutlinePage
                 }
 
                 @Override
-                public void dispose() {
-                }
+                public void dispose() {}
 
                 @Override
                 public Control getControl() {
@@ -393,9 +386,7 @@ public class OutlinePage extends ContentOutlinePage
         tv.expandToLevel(mRootWrapper.getRoot(), 2);
 
         int supportedOperations = DND.DROP_COPY | DND.DROP_MOVE;
-        Transfer[] transfers = new Transfer[] {
-            SimpleXmlTransfer.getInstance()
-        };
+        Transfer[] transfers = new Transfer[] { SimpleXmlTransfer.getInstance() };
 
         tv.addDropSupport(supportedOperations, transfers, new OutlineDropListener(this, tv));
         tv.addDragSupport(supportedOperations, transfers, new OutlineDragListener(this, tv));
@@ -488,8 +479,7 @@ public class OutlinePage extends ContentOutlinePage
             }
 
             @Override
-            public void keyReleased(KeyEvent e) {
-            }
+            public void keyReleased(KeyEvent e) {}
         });
 
         setupTooltip();
@@ -520,8 +510,7 @@ public class OutlinePage extends ContentOutlinePage
                 }
 
                 @Override
-                public void mouseDoubleClick(MouseEvent e) {
-                }
+                public void mouseDoubleClick(MouseEvent e) {}
             });
         }
     }
@@ -700,7 +689,7 @@ public class OutlinePage extends ContentOutlinePage
         @Override
         public Object[] getChildren(Object element) {
             if (element instanceof RootWrapper) {
-                CanvasViewInfo root = ((RootWrapper)element).getRoot();
+                CanvasViewInfo root = ((RootWrapper) element).getRoot();
                 if (root != null) {
                     return new Object[] { root };
                 }
@@ -804,9 +793,8 @@ public class OutlinePage extends ContentOutlinePage
                     if (GridLayoutRule.sDebugGridLayout) {
 
                         String namespace;
-                        if (e.getNodeName().equals(GRID_LAYOUT) ||
-                                e.getParentNode() != null
-                                && e.getParentNode().getNodeName().equals(GRID_LAYOUT)) {
+                        if (e.getNodeName().equals(GRID_LAYOUT)
+                                || e.getParentNode() != null && e.getParentNode().getNodeName().equals(GRID_LAYOUT)) {
                             namespace = ANDROID_URI;
                         } else {
                             // Else: probably a v7 gridlayout
@@ -835,9 +823,8 @@ public class OutlinePage extends ContentOutlinePage
                             styledString.append(columnCount, QUALIFIER_STYLER);
                             styledString.append(", rowCount=", QUALIFIER_STYLER);
                             styledString.append(rowCount, QUALIFIER_STYLER);
-                        } else if (e.getParentNode() != null
-                            && e.getParentNode().getNodeName() != null
-                            && e.getParentNode().getNodeName().endsWith(GRID_LAYOUT)) {
+                        } else if (e.getParentNode() != null && e.getParentNode().getNodeName() != null
+                                && e.getParentNode().getNodeName().endsWith(GRID_LAYOUT)) {
                             // Attach row/column info
                             String row = e.getAttributeNS(namespace, ATTR_LAYOUT_ROW);
                             if (row.length() == 0) {
@@ -848,17 +835,15 @@ public class OutlinePage extends ContentOutlinePage
                             if (column.length() == 0) {
                                 column = "?";
                             } else {
-                                String colCount = ((Element) e.getParentNode()).getAttributeNS(
-                                        namespace, ATTR_COLUMN_COUNT);
-                                if (colCount.length() > 0 && Integer.parseInt(colCount) <=
-                                        Integer.parseInt(column)) {
-                                    colStyle = StyledString.createColorRegistryStyler(
-                                        JFacePreferences.ERROR_COLOR, null);
+                                String colCount = ((Element) e.getParentNode()).getAttributeNS(namespace,
+                                        ATTR_COLUMN_COUNT);
+                                if (colCount.length() > 0 && Integer.parseInt(colCount) <= Integer.parseInt(column)) {
+                                    colStyle = StyledString.createColorRegistryStyler(JFacePreferences.ERROR_COLOR,
+                                            null);
                                 }
                             }
                             String rowSpan = e.getAttributeNS(namespace, ATTR_LAYOUT_ROW_SPAN);
-                            String columnSpan = e.getAttributeNS(namespace,
-                                    ATTR_LAYOUT_COLUMN_SPAN);
+                            String columnSpan = e.getAttributeNS(namespace, ATTR_LAYOUT_COLUMN_SPAN);
                             if (rowSpan.length() == 0) {
                                 rowSpan = "1";
                             }
@@ -890,16 +875,14 @@ public class OutlinePage extends ContentOutlinePage
                     if (e.hasAttributeNS(ANDROID_URI, ATTR_TEXT)) {
                         // Show the text attribute
                         String text = e.getAttributeNS(ANDROID_URI, ATTR_TEXT);
-                        if (text != null && text.length() > 0
-                                && !text.contains(node.getDescriptor().getUiName())) {
+                        if (text != null && text.length() > 0 && !text.contains(node.getDescriptor().getUiName())) {
                             if (text.charAt(0) == '@') {
                                 String resolved = mGraphicalEditorPart.findString(text);
                                 if (resolved != null) {
                                     text = resolved;
                                 }
                             }
-                            if (styledString.length() < LABEL_MAX_WIDTH - LABEL_SEPARATOR.length()
-                                    - 2) {
+                            if (styledString.length() < LABEL_MAX_WIDTH - LABEL_SEPARATOR.length() - 2) {
                                 styledString.append(LABEL_SEPARATOR, QUALIFIER_STYLER);
 
                                 styledString.append('"', QUALIFIER_STYLER);
@@ -946,11 +929,11 @@ public class OutlinePage extends ContentOutlinePage
                 styledString.append(element == null ? "(null)" : element.toString());
             }
 
-           cell.setText(styledString.toString());
-           cell.setStyleRanges(styledString.getStyleRanges());
-           cell.setImage(image);
-           super.update(cell);
-       }
+            cell.setText(styledString.toString());
+            cell.setStyleRanges(styledString.getStyleRanges());
+            cell.setImage(image);
+            super.update(cell);
+        }
 
         @Override
         public boolean isLabelProperty(Object element, String property) {
@@ -1001,9 +984,7 @@ public class OutlinePage extends ContentOutlinePage
             }
         });
 
-        new DynamicContextMenu(
-                mGraphicalEditorPart.getEditorDelegate(),
-                mGraphicalEditorPart.getCanvasControl(),
+        new DynamicContextMenu(mGraphicalEditorPart.getEditorDelegate(), mGraphicalEditorPart.getCanvasControl(),
                 mMenuManager);
 
         getTreeViewer().getTree().setMenu(mMenuManager.createContextMenu(getControl()));
@@ -1159,8 +1140,7 @@ public class OutlinePage extends ContentOutlinePage
                         children.add(node);
                     }
 
-                    String label = MoveGesture.computeUndoLabel(targetNode,
-                            elements, DND.DROP_MOVE);
+                    String label = MoveGesture.computeUndoLabel(targetNode, elements, DND.DROP_MOVE);
                     canvas.getEditorDelegate().getEditor().wrapUndoEditXmlModel(label, new Runnable() {
                         @Override
                         public void run() {
@@ -1205,7 +1185,6 @@ public class OutlinePage extends ContentOutlinePage
 
         return null;
     }
-
 
     /** Returns the pair [parent,index] of the next node (when iterating forward) */
     @VisibleForTesting
@@ -1349,84 +1328,84 @@ public class OutlinePage extends ContentOutlinePage
         // This is based on SWT Snippet 125
         final Listener listener = new Listener() {
             Shell mTip = null;
-            Label mLabel  = null;
+            Label mLabel = null;
 
             @Override
             public void handleEvent(Event event) {
-                switch(event.type) {
-                case SWT.Dispose:
-                case SWT.KeyDown:
-                case SWT.MouseExit:
-                case SWT.MouseDown:
-                case SWT.MouseMove:
-                    if (mTip != null) {
-                        mTip.dispose();
-                        mTip = null;
-                        mLabel = null;
-                    }
-                    break;
-                case SWT.MouseHover:
-                    if (mTip != null) {
-                        mTip.dispose();
-                        mTip = null;
-                        mLabel = null;
-                    }
-
-                    String tooltip = null;
-
-                    TreeItem item = tree.getItem(new Point(event.x, event.y));
-                    if (item != null) {
-                        Rectangle rect = item.getBounds(0);
-                        if (event.x - rect.x > 16) { // 16: Standard width of our outline icons
-                            return;
+                switch (event.type) {
+                    case SWT.Dispose:
+                    case SWT.KeyDown:
+                    case SWT.MouseExit:
+                    case SWT.MouseDown:
+                    case SWT.MouseMove:
+                        if (mTip != null) {
+                            mTip.dispose();
+                            mTip = null;
+                            mLabel = null;
+                        }
+                        break;
+                    case SWT.MouseHover:
+                        if (mTip != null) {
+                            mTip.dispose();
+                            mTip = null;
+                            mLabel = null;
                         }
 
-                        Object data = item.getData();
-                        if (data != null && data instanceof CanvasViewInfo) {
-                            LayoutEditorDelegate editor = mGraphicalEditorPart.getEditorDelegate();
-                            CanvasViewInfo vi = (CanvasViewInfo) data;
-                            IMarker marker = editor.getIssueForNode(vi.getUiViewNode());
-                            if (marker != null) {
-                                tooltip = marker.getAttribute(IMarker.MESSAGE, null);
+                        String tooltip = null;
+
+                        TreeItem item = tree.getItem(new Point(event.x, event.y));
+                        if (item != null) {
+                            Rectangle rect = item.getBounds(0);
+                            if (event.x - rect.x > 16) { // 16: Standard width of our outline icons
+                                return;
+                            }
+
+                            Object data = item.getData();
+                            if (data != null && data instanceof CanvasViewInfo) {
+                                LayoutEditorDelegate editor = mGraphicalEditorPart.getEditorDelegate();
+                                CanvasViewInfo vi = (CanvasViewInfo) data;
+                                IMarker marker = editor.getIssueForNode(vi.getUiViewNode());
+                                if (marker != null) {
+                                    tooltip = marker.getAttribute(IMarker.MESSAGE, null);
+                                }
+                            }
+
+                            if (tooltip != null) {
+                                Shell shell = tree.getShell();
+                                Display display = tree.getDisplay();
+
+                                Color fg = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+                                Color bg = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+                                mTip = new Shell(shell, SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
+                                mTip.setBackground(bg);
+                                FillLayout layout = new FillLayout();
+                                layout.marginWidth = 1;
+                                layout.marginHeight = 1;
+                                mTip.setLayout(layout);
+                                mLabel = new Label(mTip, SWT.WRAP);
+                                mLabel.setForeground(fg);
+                                mLabel.setBackground(bg);
+                                mLabel.setText(tooltip);
+                                mLabel.addListener(SWT.MouseExit, this);
+                                mLabel.addListener(SWT.MouseDown, this);
+
+                                Point pt = tree.toDisplay(rect.x, rect.y + rect.height);
+                                Rectangle displayBounds = display.getBounds();
+                                // -10: Don't extend -all- the way to the edge of the screen
+                                // which would make it look like it has been cropped
+                                int availableWidth = displayBounds.x + displayBounds.width - pt.x - 10;
+                                if (availableWidth < 80) {
+                                    availableWidth = 80;
+                                }
+                                Point size = mTip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+                                if (size.x > availableWidth) {
+                                    size = mTip.computeSize(availableWidth, SWT.DEFAULT);
+                                }
+                                mTip.setBounds(pt.x, pt.y, size.x, size.y);
+
+                                mTip.setVisible(true);
                             }
                         }
-
-                        if (tooltip != null) {
-                            Shell shell = tree.getShell();
-                            Display display = tree.getDisplay();
-
-                            Color fg = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-                            Color bg = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-                            mTip = new Shell(shell, SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
-                            mTip.setBackground(bg);
-                            FillLayout layout = new FillLayout();
-                            layout.marginWidth = 1;
-                            layout.marginHeight = 1;
-                            mTip.setLayout(layout);
-                            mLabel = new Label(mTip, SWT.WRAP);
-                            mLabel.setForeground(fg);
-                            mLabel.setBackground(bg);
-                            mLabel.setText(tooltip);
-                            mLabel.addListener(SWT.MouseExit, this);
-                            mLabel.addListener(SWT.MouseDown, this);
-
-                            Point pt = tree.toDisplay(rect.x, rect.y + rect.height);
-                            Rectangle displayBounds = display.getBounds();
-                            // -10: Don't extend -all- the way to the edge of the screen
-                            // which would make it look like it has been cropped
-                            int availableWidth = displayBounds.x + displayBounds.width - pt.x - 10;
-                            if (availableWidth < 80) {
-                                availableWidth = 80;
-                            }
-                            Point size = mTip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-                            if (size.x > availableWidth) {
-                                size = mTip.computeSize(availableWidth, SWT.DEFAULT);
-                            }
-                            mTip.setBounds(pt.x, pt.y, size.x, size.y);
-
-                            mTip.setVisible(true);
-                        }
-                    }
                 }
             }
         };

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,19 +18,19 @@ import static com.android.SdkConstants.FQCN_GRID_LAYOUT_V7;
 import static com.android.SdkConstants.FQCN_SPACE;
 import static com.android.SdkConstants.FQCN_SPACE_V7;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-
 import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.actions.AddSupportJarAction;
 import org.eclipse.andmore.internal.editors.manifest.ManifestInfo;
 import org.eclipse.andmore.internal.sdk.ProjectState;
-import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.andmore.internal.sdk.ProjectState.LibraryState;
+import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 
 /**
  * Helper class for the Android Support Library. The support library provides
@@ -94,36 +91,23 @@ public class SupportLibraryHelper {
                 }
 
                 // Ask user to install it
-                String message = String.format(
-                        "%1$s requires API level 14 or higher, or a compatibility "
-                                + "library for older versions.\n\n"
-                                + " Do you want to install the compatibility library?", tag);
-                MessageDialog dialog =
-                        new MessageDialog(
-                                Display.getCurrent().getActiveShell(),
-                                "Warning",
-                                null,
-                                message,
-                                MessageDialog.QUESTION,
-                                new String[] {
-                                        "Install", "Cancel"
-                                },
-                                1 /* default button: Cancel */);
+                String message = String.format("%1$s requires API level 14 or higher, or a compatibility "
+                        + "library for older versions.\n\n" + " Do you want to install the compatibility library?",
+                        tag);
+                MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(), "Warning", null,
+                        message, MessageDialog.QUESTION, new String[] { "Install", "Cancel" },
+                        1 /* default button: Cancel */);
                 int answer = dialog.open();
                 if (answer == 0) {
                     if (supportProject != null) {
                         // Just add library dependency
-                        if (!AddSupportJarAction.addLibraryDependency(
-                                supportProject,
-                                project,
+                        if (!AddSupportJarAction.addLibraryDependency(supportProject, project,
                                 true /* waitForFinish */)) {
                             return tag;
                         }
                     } else {
                         // Install library AND add dependency
-                        if (!AddSupportJarAction.installGridLayoutLibrary(
-                                project,
-                                true /* waitForFinish */)) {
+                        if (!AddSupportJarAction.installGridLayoutLibrary(project, true /* waitForFinish */)) {
                             return tag;
                         }
                     }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +13,10 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.annotations.NonNull;
-import com.android.ide.common.api.DrawingStyle;
-import com.android.ide.common.api.IColor;
-import com.android.ide.common.api.IGraphics;
-import com.android.ide.common.api.IViewRule;
-import com.android.ide.common.api.Point;
-import com.android.ide.common.api.Rect;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -31,10 +25,13 @@ import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.ide.common.api.DrawingStyle;
+import com.android.ide.common.api.IColor;
+import com.android.ide.common.api.IGraphics;
+import com.android.ide.common.api.IViewRule;
+import com.android.ide.common.api.Point;
+import com.android.ide.common.api.Rect;
 
 /**
  * Wraps an SWT {@link GC} into an {@link IGraphics} interface so that {@link IViewRule} objects
@@ -78,15 +75,13 @@ public class GCWrapper implements IGraphics {
      * A map of the {@link SwtDrawingStyle} stroke colors that we have actually
      * used (to be disposed)
      */
-    private final Map<DrawingStyle, Color> mStyleStrokeMap = new EnumMap<DrawingStyle, Color>(
-            DrawingStyle.class);
+    private final Map<DrawingStyle, Color> mStyleStrokeMap = new EnumMap<DrawingStyle, Color>(DrawingStyle.class);
 
     /**
      * A map of the {@link SwtDrawingStyle} fill colors that we have actually
      * used (to be disposed)
      */
-    private final Map<DrawingStyle, Color> mStyleFillMap = new EnumMap<DrawingStyle, Color>(
-            DrawingStyle.class);
+    private final Map<DrawingStyle, Color> mStyleFillMap = new EnumMap<DrawingStyle, Color>(DrawingStyle.class);
 
     /** The cached pixel height of the default current font. */
     private int mFontHeight = 0;
@@ -142,10 +137,8 @@ public class GCWrapper implements IGraphics {
         Integer key = Integer.valueOf(rgb);
         ColorWrapper c = mColorMap.get(key);
         if (c == null) {
-            c = new ColorWrapper(new Color(getGc().getDevice(),
-                    (rgb >> 16) & 0xFF,
-                    (rgb >>  8) & 0xFF,
-                    (rgb >>  0) & 0xFF));
+            c = new ColorWrapper(
+                    new Color(getGc().getDevice(), (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb >> 0) & 0xFF));
             mColorMap.put(key, c);
         }
 
@@ -207,24 +200,24 @@ public class GCWrapper implements IGraphics {
     public void setLineStyle(@NonNull LineStyle style) {
         int swtStyle = 0;
         switch (style) {
-        case LINE_SOLID:
-            swtStyle = SWT.LINE_SOLID;
-            break;
-        case LINE_DASH:
-            swtStyle = SWT.LINE_DASH;
-            break;
-        case LINE_DOT:
-            swtStyle = SWT.LINE_DOT;
-            break;
-        case LINE_DASHDOT:
-            swtStyle = SWT.LINE_DASHDOT;
-            break;
-        case LINE_DASHDOTDOT:
-            swtStyle = SWT.LINE_DASHDOTDOT;
-            break;
-        default:
-            assert false : style;
-            break;
+            case LINE_SOLID:
+                swtStyle = SWT.LINE_SOLID;
+                break;
+            case LINE_DASH:
+                swtStyle = SWT.LINE_DASH;
+                break;
+            case LINE_DOT:
+                swtStyle = SWT.LINE_DOT;
+                break;
+            case LINE_DASHDOT:
+                swtStyle = SWT.LINE_DASHDOT;
+                break;
+            case LINE_DASHDOTDOT:
+                swtStyle = SWT.LINE_DASHDOTDOT;
+                break;
+            default:
+                assert false : style;
+                break;
         }
 
         if (swtStyle != 0) {
@@ -365,7 +358,6 @@ public class GCWrapper implements IGraphics {
         getGc().fillOval(x, y, w, h);
     }
 
-
     // strings
 
     @Override
@@ -441,9 +433,7 @@ public class GCWrapper implements IGraphics {
         mGc.setLineWidth(swtStyle.getLineWidth());
         mGc.setLineStyle(swtStyle.getLineStyle());
         if (swtStyle.getLineStyle() == SWT.LINE_CUSTOM) {
-            mGc.setLineDash(new int[] {
-                    8, 4
-            });
+            mGc.setLineDash(new int[] { 8, 4 });
         }
         mCurrentStyle = swtStyle;
     }
@@ -500,8 +490,7 @@ public class GCWrapper implements IGraphics {
      * @param map The color map to use
      * @return The color object
      */
-    private Color getStyleColor(DrawingStyle style, RGB defaultColorDesc,
-            Map<DrawingStyle, Color> map) {
+    private Color getStyleColor(DrawingStyle style, RGB defaultColorDesc, Map<DrawingStyle, Color> map) {
         Color color = map.get(style);
         if (color == null) {
             color = new Color(getGc().getDevice(), defaultColorDesc);
@@ -527,7 +516,6 @@ public class GCWrapper implements IGraphics {
 
     private static final int MIN_LENGTH = 10;
 
-
     @Override
     public void drawArrow(int x1, int y1, int x2, int y2, int size) {
         int arrowWidth = size;
@@ -549,7 +537,7 @@ public class GCWrapper implements IGraphics {
                 y2 += delta;
             } else {
                 y1 += delta;
-                y2-= delta;
+                y2 -= delta;
             }
 
         } else if (y1 == y2 && Math.abs(x1 - x2) < MIN_LENGTH) {
@@ -559,7 +547,7 @@ public class GCWrapper implements IGraphics {
                 x2 += delta;
             } else {
                 x1 += delta;
-                x2-= delta;
+                x2 -= delta;
             }
         }
 
@@ -599,13 +587,13 @@ public class GCWrapper implements IGraphics {
             // below this line and paint the lines to it:
             double ax = x1 + lineLength - arrowHeight;
             double ay = y1 - arrowWidth;
-            int rx = (int) (Math.cos(angle) * (ax-x1) - Math.sin(angle) * (ay-y1) + x1);
-            int ry = (int) (Math.sin(angle) * (ax-x1) + Math.cos(angle) * (ay-y1) + y1);
+            int rx = (int) (Math.cos(angle) * (ax - x1) - Math.sin(angle) * (ay - y1) + x1);
+            int ry = (int) (Math.sin(angle) * (ax - x1) + Math.cos(angle) * (ay - y1) + y1);
             graphics.drawLine(x2, y2, rx, ry);
 
             ay = y1 + arrowWidth;
-            rx = (int) (Math.cos(angle) * (ax-x1) - Math.sin(angle) * (ay-y1) + x1);
-            ry = (int) (Math.sin(angle) * (ax-x1) + Math.cos(angle) * (ay-y1) + y1);
+            rx = (int) (Math.cos(angle) * (ax - x1) - Math.sin(angle) * (ay - y1) + x1);
+            ry = (int) (Math.sin(angle) * (ax - x1) + Math.cos(angle) * (ay - y1) + y1);
             graphics.drawLine(x2, y2, rx, ry);
         }
 

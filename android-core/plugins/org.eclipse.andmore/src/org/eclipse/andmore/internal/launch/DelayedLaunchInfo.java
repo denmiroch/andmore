@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,11 +13,11 @@
 
 package org.eclipse.andmore.internal.launch;
 
-import com.android.ddmlib.IDevice;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+
+import com.android.ddmlib.IDevice;
 
 /**
  * A delayed launch waiting for a device to be present or ready before the
@@ -90,8 +87,8 @@ public final class DelayedLaunchInfo {
      * @param monitor progress monitor for launch
      */
     public DelayedLaunchInfo(IProject project, String packageName, String debugPackageName,
-            IAndroidLaunchAction launchAction, IFile pack, Boolean debuggable,
-            String requiredApiVersionNumber, AndroidLaunch launch, IProgressMonitor monitor) {
+            IAndroidLaunchAction launchAction, IFile pack, Boolean debuggable, String requiredApiVersionNumber,
+            AndroidLaunch launch, IProgressMonitor monitor) {
         mProject = project;
         mPackageName = packageName;
         mDebugPackageName = debugPackageName;
@@ -169,7 +166,7 @@ public final class DelayedLaunchInfo {
      * @param retryMode the install retry mode to set
      */
     public void setRetryMode(InstallRetryMode retryMode) {
-        this.mRetryMode = retryMode;
+        mRetryMode = retryMode;
     }
 
     /**
@@ -204,7 +201,7 @@ public final class DelayedLaunchInfo {
      * @param debugMode the debug mode to set
      */
     public void setDebugMode(boolean debugMode) {
-        this.mDebugMode = debugMode;
+        mDebugMode = debugMode;
     }
 
     /**
@@ -232,7 +229,7 @@ public final class DelayedLaunchInfo {
      * Set if launch has been cancelled
      */
     public void setCancelled(boolean cancelled) {
-        this.mCancelled = cancelled;
+        mCancelled = cancelled;
     }
 
     /**

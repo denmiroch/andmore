@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +13,8 @@
 
 package org.eclipse.andmore.internal.wizards.exportgradle;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.ibm.icu.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -48,8 +44,9 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.ibm.icu.text.MessageFormat;
 
 /**
  * Displays a wizard page that lets the user choose the projects for which to create Gradle build
@@ -79,8 +76,7 @@ public class ProjectSelectionPage extends WizardPage {
         setControl(workArea);
 
         workArea.setLayout(new GridLayout());
-        workArea.setLayoutData(new GridData(GridData.FILL_BOTH
-                | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
+        workArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
         Label title = new Label(workArea, SWT.NONE);
         title.setText(ExportMessages.SelectProjects);
@@ -92,11 +88,10 @@ public class ProjectSelectionPage extends WizardPage {
         layout.makeColumnsEqualWidth = false;
         listComposite.setLayout(layout);
 
-        listComposite.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
-                | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
+        listComposite
+                .setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
 
-        Table table = new Table(listComposite,
-                SWT.CHECK | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+        Table table = new Table(listComposite, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         mTableViewer = new CheckboxTableViewer(table);
         table.setLayout(new TableLayout());
         GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -141,8 +136,7 @@ public class ProjectSelectionPage extends WizardPage {
         layout.marginHeight = 0;
         buttonsComposite.setLayout(layout);
 
-        buttonsComposite.setLayoutData(new GridData(
-                GridData.VERTICAL_ALIGN_BEGINNING));
+        buttonsComposite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
         Button selectAll = new Button(buttonsComposite, SWT.PUSH);
         selectAll.setText(ExportMessages.SelectAll);
@@ -186,8 +180,8 @@ public class ProjectSelectionPage extends WizardPage {
         mTableViewer.setInput(javaProjects);
         // Check any necessary projects
         if (mSelectedJavaProjects != null) {
-            mTableViewer.setCheckedElements(mSelectedJavaProjects.toArray(
-                    new IJavaProject[mSelectedJavaProjects.size()]));
+            mTableViewer
+                    .setCheckedElements(mSelectedJavaProjects.toArray(new IJavaProject[mSelectedJavaProjects.size()]));
         }
     }
 
@@ -258,14 +252,11 @@ public class ProjectSelectionPage extends WizardPage {
      * <p>
      * See {@link org.eclipse.jdt.core.tests.model.ClasspathTests.numberOfCycleMarkers}
      */
-    private static boolean hasCyclicDependency(IJavaProject javaProject)
-            throws CoreException {
-        IMarker[] markers = javaProject.getProject().findMarkers(
-                IJavaModelMarker.BUILDPATH_PROBLEM_MARKER, false,
+    private static boolean hasCyclicDependency(IJavaProject javaProject) throws CoreException {
+        IMarker[] markers = javaProject.getProject().findMarkers(IJavaModelMarker.BUILDPATH_PROBLEM_MARKER, false,
                 IResource.DEPTH_ONE);
         for (IMarker marker : markers) {
-            String cycleAttr = (String) marker
-                    .getAttribute(IJavaModelMarker.CYCLE_DETECTED);
+            String cycleAttr = (String) marker.getAttribute(IJavaModelMarker.CYCLE_DETECTED);
             if (cycleAttr != null && cycleAttr.equals("true")) { //$NON-NLS-1$
                 return true;
             }

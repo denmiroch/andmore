@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,13 +20,15 @@ import static com.android.SdkConstants.NEW_ID_PREFIX;
 import static org.eclipse.andmore.internal.editors.layout.gle2.SelectionHandle.PIXEL_MARGIN;
 import static org.eclipse.andmore.internal.editors.layout.gle2.SelectionHandle.PIXEL_RADIUS;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.RuleAction;
-import com.android.resources.ResourceType;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.common.layout.BaseViewRule;
@@ -68,15 +67,13 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.RuleAction;
+import com.android.resources.ResourceType;
+import com.android.utils.Pair;
 
 /**
  * The {@link SelectionManager} manages the selection in the canvas editor.
@@ -99,8 +96,7 @@ public class SelectionManager implements ISelectionProvider {
     private final LinkedList<SelectionItem> mSelections = new LinkedList<SelectionItem>();
 
     /** An unmodifiable view of {@link #mSelections}. */
-    private final List<SelectionItem> mUnmodifiableSelection =
-        Collections.unmodifiableList(mSelections);
+    private final List<SelectionItem> mUnmodifiableSelection = Collections.unmodifiableList(mSelections);
 
     /** Barrier set when updating the selection to prevent from recursively
      * invoking ourselves. */
@@ -337,10 +333,9 @@ public class SelectionManager implements ISelectionProvider {
      */
     public void select(MouseEvent e) {
         boolean isMultiClick = (e.stateMask & SWT.SHIFT) != 0 ||
-            // On Mac, the Command key is the normal toggle accelerator
-            ((SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_DARWIN) &&
-                    (e.stateMask & SWT.COMMAND) != 0);
-        boolean isCycleClick   = (e.stateMask & SWT.ALT)   != 0;
+        // On Mac, the Command key is the normal toggle accelerator
+                ((SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_DARWIN) && (e.stateMask & SWT.COMMAND) != 0);
+        boolean isCycleClick = (e.stateMask & SWT.ALT) != 0;
 
         LayoutPoint p = ControlPoint.create(mCanvas, e).toLayout();
 
@@ -410,8 +405,7 @@ public class SelectionManager implements ISelectionProvider {
             // create one. If there's one but not for the same origin object, create a new
             // one too.
             if (mAltSelection == null || mAltSelection.getOriginatingView() != vi) {
-                mAltSelection = new CanvasAlternateSelection(
-                        vi, mCanvas.getViewHierarchy().findAltViewInfoAt(p));
+                mAltSelection = new CanvasAlternateSelection(vi, mCanvas.getViewHierarchy().findAltViewInfoAt(p));
 
                 // deselect them all, in case they were partially selected
                 deselectAll(mAltSelection.getAltViews());
@@ -573,8 +567,7 @@ public class SelectionManager implements ISelectionProvider {
      * @param toggled A set of {@link CanvasViewInfo}s that should be toggled
      *            rather than just added.
      */
-    public void selectWithin(LayoutPoint topLeft, LayoutPoint bottomRight,
-            Collection<CanvasViewInfo> toggled) {
+    public void selectWithin(LayoutPoint topLeft, LayoutPoint bottomRight, Collection<CanvasViewInfo> toggled) {
         // reset alternate selection if any
         mAltSelection = null;
 
@@ -709,7 +702,7 @@ public class SelectionManager implements ISelectionProvider {
             return false;
         }
 
-        for (ListIterator<SelectionItem> it = mSelections.listIterator(); it.hasNext(); ) {
+        for (ListIterator<SelectionItem> it = mSelections.listIterator(); it.hasNext();) {
             SelectionItem s = it.next();
             if (canvasViewInfo == s.getViewInfo()) {
                 it.remove();
@@ -725,7 +718,7 @@ public class SelectionManager implements ISelectionProvider {
      * Callers are responsible for calling redraw() and updateOulineSelection() after.
      */
     private void deselectAll(List<CanvasViewInfo> canvasViewInfos) {
-        for (ListIterator<SelectionItem> it = mSelections.listIterator(); it.hasNext(); ) {
+        for (ListIterator<SelectionItem> it = mSelections.listIterator(); it.hasNext();) {
             SelectionItem s = it.next();
             if (canvasViewInfos.contains(s.getViewInfo())) {
                 it.remove();
@@ -737,7 +730,7 @@ public class SelectionManager implements ISelectionProvider {
     void sync() {
         // Check if the selection is still the same (based on the object keys)
         // and eventually recompute their bounds.
-        for (ListIterator<SelectionItem> it = mSelections.listIterator(); it.hasNext(); ) {
+        for (ListIterator<SelectionItem> it = mSelections.listIterator(); it.hasNext();) {
             SelectionItem s = it.next();
 
             // Check if the selected object still exists
@@ -860,7 +853,7 @@ public class SelectionManager implements ISelectionProvider {
             return;
         }
 
-        for (Iterator<SelectionItem> it = selection.iterator(); it.hasNext(); ) {
+        for (Iterator<SelectionItem> it = selection.iterator(); it.hasNext();) {
             SelectionItem cs = it.next();
             CanvasViewInfo vi = cs.getViewInfo();
             UiViewElementNode key = vi == null ? null : vi.getUiViewNode();
@@ -872,8 +865,7 @@ public class SelectionManager implements ISelectionProvider {
             }
 
             if (vi != null) {
-                for (Iterator<SelectionItem> it2 = selection.iterator();
-                     it2.hasNext(); ) {
+                for (Iterator<SelectionItem> it2 = selection.iterator(); it2.hasNext();) {
                     SelectionItem cs2 = it2.next();
                     if (cs != cs2) {
                         CanvasViewInfo vi2 = cs2.getViewInfo();
@@ -946,8 +938,8 @@ public class SelectionManager implements ISelectionProvider {
                     // Skip spacers - unless you're dropping just one
                     continue;
                 }
-                if (GridLayoutRule.sDebugGridLayout && (viewInfo.getName().equals(FQCN_SPACE)
-                        || viewInfo.getName().equals(FQCN_SPACE_V7))) {
+                if (GridLayoutRule.sDebugGridLayout
+                        && (viewInfo.getName().equals(FQCN_SPACE) || viewInfo.getName().equals(FQCN_SPACE_V7))) {
                     // In debug mode they might not be marked as hidden but we never never
                     // want to select these guys
                     continue;
@@ -1157,23 +1149,21 @@ public class SelectionManager implements ISelectionProvider {
                     }
                 }
                 final RuleAction action = matching;
-                mCanvas.getEditorDelegate().getEditor().wrapUndoEditXmlModel(action.getTitle(),
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            action.getCallback().action(action, selectedNodes,
-                                    action.getId(), null);
-                            LayoutCanvas canvas = mCanvas;
-                            CanvasViewInfo root = canvas.getViewHierarchy().getRoot();
-                            if (root != null) {
-                                UiViewElementNode uiViewNode = root.getUiViewNode();
-                                NodeFactory nodeFactory = canvas.getNodeFactory();
-                                NodeProxy rootNode = nodeFactory.create(uiViewNode);
-                                if (rootNode != null) {
-                                    rootNode.applyPendingChanges();
-                                }
+                mCanvas.getEditorDelegate().getEditor().wrapUndoEditXmlModel(action.getTitle(), new Runnable() {
+                    @Override
+                    public void run() {
+                        action.getCallback().action(action, selectedNodes, action.getId(), null);
+                        LayoutCanvas canvas = mCanvas;
+                        CanvasViewInfo root = canvas.getViewHierarchy().getRoot();
+                        if (root != null) {
+                            UiViewElementNode uiViewNode = root.getUiViewNode();
+                            NodeFactory nodeFactory = canvas.getNodeFactory();
+                            NodeProxy rootNode = nodeFactory.create(uiViewNode);
+                            if (rootNode != null) {
+                                rootNode.applyPendingChanges();
                             }
                         }
+                    }
                 });
             }
         }
@@ -1200,15 +1190,12 @@ public class SelectionManager implements ISelectionProvider {
      * @return the result of the renaming operation
      */
     @NonNull
-    public RenameResult performRename(
-            final @NonNull INode primary,
-            final @Nullable List<SelectionItem> selections) {
+    public RenameResult performRename(final @NonNull INode primary, final @Nullable List<SelectionItem> selections) {
         String id = primary.getStringAttr(ANDROID_URI, ATTR_ID);
         if (id != null && !id.isEmpty()) {
-            RenameResult result = RenameResourceWizard.renameResource(
-                    mCanvas.getShell(),
-                    mCanvas.getEditorDelegate().getGraphicalEditor().getProject(),
-                    ResourceType.ID, BaseViewRule.stripIdPrefix(id), null, true /*canClear*/);
+            RenameResult result = RenameResourceWizard.renameResource(mCanvas.getShell(),
+                    mCanvas.getEditorDelegate().getGraphicalEditor().getProject(), ResourceType.ID,
+                    BaseViewRule.stripIdPrefix(id), null, true /*canClear*/);
             if (result.isCanceled()) {
                 return result;
             } else if (!result.isUnavailable()) {
@@ -1217,16 +1204,11 @@ public class SelectionManager implements ISelectionProvider {
         }
         String currentId = primary.getStringAttr(ANDROID_URI, ATTR_ID);
         currentId = BaseViewRule.stripIdPrefix(currentId);
-        InputDialog d = new InputDialog(
-                    AndmoreAndroidPlugin.getDisplay().getActiveShell(),
-                    "Set ID",
-                    "New ID:",
-                    currentId,
-                    ResourceNameValidator.create(false, (IProject) null, ResourceType.ID));
+        InputDialog d = new InputDialog(AndmoreAndroidPlugin.getDisplay().getActiveShell(), "Set ID", "New ID:",
+                currentId, ResourceNameValidator.create(false, (IProject) null, ResourceType.ID));
         if (d.open() == Window.OK) {
             final String s = d.getValue();
-            mCanvas.getEditorDelegate().getEditor().wrapUndoEditXmlModel("Set ID",
-                    new Runnable() {
+            mCanvas.getEditorDelegate().getEditor().wrapUndoEditXmlModel("Set ID", new Runnable() {
                 @Override
                 public void run() {
                     String newId = s;

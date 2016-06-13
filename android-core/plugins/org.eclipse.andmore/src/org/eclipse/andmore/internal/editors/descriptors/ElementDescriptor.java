@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,15 +16,15 @@ package org.eclipse.andmore.internal.editors.descriptors;
 import static com.android.SdkConstants.ANDROID_NS_NAME_PREFIX;
 import static com.android.SdkConstants.ANDROID_URI;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * {@link ElementDescriptor} describes the properties expected for a given XML element node.
@@ -58,9 +55,7 @@ public class ElementDescriptor implements Comparable<ElementDescriptor> {
     private final Mandatory mMandatory;
 
     public enum Mandatory {
-        NOT_MANDATORY,
-        MANDATORY,
-        MANDATORY_LAST
+        NOT_MANDATORY, MANDATORY, MANDATORY_LAST
     }
 
     /**
@@ -79,16 +74,14 @@ public class ElementDescriptor implements Comparable<ElementDescriptor> {
      *  ceases to exist.
      */
     public ElementDescriptor(String xml_name, String ui_name, String tooltip, String sdk_url,
-            AttributeDescriptor[] attributes,
-            ElementDescriptor[] children,
-            Mandatory mandatory) {
+            AttributeDescriptor[] attributes, ElementDescriptor[] children, Mandatory mandatory) {
         mMandatory = mandatory;
         mXmlName = xml_name;
         mUiName = ui_name;
         mTooltip = (tooltip != null && tooltip.length() > 0) ? tooltip : null;
         mSdkUrl = (sdk_url != null && sdk_url.length() > 0) ? sdk_url : null;
-        setAttributes(attributes != null ? attributes : new AttributeDescriptor[]{});
-        mChildren = children != null ? children : new ElementDescriptor[]{};
+        setAttributes(attributes != null ? attributes : new AttributeDescriptor[] {});
+        mChildren = children != null ? children : new ElementDescriptor[] {};
     }
 
     /**
@@ -107,16 +100,14 @@ public class ElementDescriptor implements Comparable<ElementDescriptor> {
      *  ceases to exist.
      */
     public ElementDescriptor(String xml_name, String ui_name, String tooltip, String sdk_url,
-            AttributeDescriptor[] attributes,
-            ElementDescriptor[] children,
-            boolean mandatory) {
+            AttributeDescriptor[] attributes, ElementDescriptor[] children, boolean mandatory) {
         mMandatory = mandatory ? Mandatory.MANDATORY : Mandatory.NOT_MANDATORY;
         mXmlName = xml_name;
         mUiName = ui_name;
         mTooltip = (tooltip != null && tooltip.length() > 0) ? tooltip : null;
         mSdkUrl = (sdk_url != null && sdk_url.length() > 0) ? sdk_url : null;
-        setAttributes(attributes != null ? attributes : new AttributeDescriptor[]{});
-        mChildren = children != null ? children : new ElementDescriptor[]{};
+        setAttributes(attributes != null ? attributes : new AttributeDescriptor[] {});
+        mChildren = children != null ? children : new ElementDescriptor[] {};
     }
 
     /**
@@ -165,13 +156,11 @@ public class ElementDescriptor implements Comparable<ElementDescriptor> {
 
     @Override
     public String toString() {
-        return String.format("%s [%s, attr %d, children %d%s]",    //$NON-NLS-1$
-                this.getClass().getSimpleName(),
-                mXmlName,
-                mAttributes != null ? mAttributes.length : 0,
+        return String.format("%s [%s, attr %d, children %d%s]", //$NON-NLS-1$
+                this.getClass().getSimpleName(), mXmlName, mAttributes != null ? mAttributes.length : 0,
                 mChildren != null ? mChildren.length : 0,
                 mMandatory != Mandatory.NOT_MANDATORY ? ", " + mMandatory.toString() : "" //$NON-NLS-1$ //$NON-NLS-2$
-                );
+        );
     }
 
     /**
@@ -180,7 +169,7 @@ public class ElementDescriptor implements Comparable<ElementDescriptor> {
     public final String getXmlLocalName() {
         int pos = mXmlName.indexOf(':');
         if (pos != -1) {
-            return mXmlName.substring(pos+1);
+            return mXmlName.substring(pos + 1);
         }
         return mXmlName;
     }
@@ -218,7 +207,6 @@ public class ElementDescriptor implements Comparable<ElementDescriptor> {
         return ""; //$NON-NLs-1$
     }
 
-
     /** Returns the XML element name for the user interface, typically capitalized. */
     public String getUiName() {
         return mUiName;
@@ -250,10 +238,8 @@ public class ElementDescriptor implements Comparable<ElementDescriptor> {
      */
     public Image getCustomizedIcon() {
         IconFactory factory = IconFactory.getInstance();
-        int color = hasChildren() ? IconFactory.COLOR_BLUE
-                : IconFactory.COLOR_GREEN;
-        int shape = hasChildren() ? IconFactory.SHAPE_RECT
-                : IconFactory.SHAPE_CIRCLE;
+        int color = hasChildren() ? IconFactory.COLOR_BLUE : IconFactory.COLOR_GREEN;
+        int shape = hasChildren() ? IconFactory.SHAPE_RECT : IconFactory.SHAPE_CIRCLE;
         String name = mXmlName;
 
         int pos = name.lastIndexOf('.');
@@ -395,8 +381,7 @@ public class ElementDescriptor implements Comparable<ElementDescriptor> {
         return findChildrenDescriptorInternal(element_name, recursive, null);
     }
 
-    private ElementDescriptor findChildrenDescriptorInternal(String element_name,
-            boolean recursive,
+    private ElementDescriptor findChildrenDescriptorInternal(String element_name, boolean recursive,
             Set<ElementDescriptor> visited) {
         if (recursive && visited == null) {
             visited = new HashSet<ElementDescriptor>();
@@ -415,12 +400,11 @@ public class ElementDescriptor implements Comparable<ElementDescriptor> {
         if (recursive) {
             for (ElementDescriptor e : getChildren()) {
                 if (visited != null) {
-                    if (!visited.add(e)) {  // Set.add() returns false if element is already present
+                    if (!visited.add(e)) { // Set.add() returns false if element is already present
                         continue;
                     }
                 }
-                ElementDescriptor f = e.findChildrenDescriptorInternal(element_name,
-                        recursive, visited);
+                ElementDescriptor f = e.findChildrenDescriptorInternal(element_name, recursive, visited);
                 if (f != null) {
                     return f;
                 }
@@ -442,7 +426,7 @@ public class ElementDescriptor implements Comparable<ElementDescriptor> {
         if (c.length > 0) {
             c[0] = Character.toUpperCase(c[0]);
         }
-        return new String(c).replace("-", " ");  //$NON-NLS-1$  //$NON-NLS-2$
+        return new String(c).replace("-", " "); //$NON-NLS-1$  //$NON-NLS-2$
     }
 
     /**
@@ -454,8 +438,7 @@ public class ElementDescriptor implements Comparable<ElementDescriptor> {
      */
     public boolean definesAttribute(String namespaceUri, String attributeName) {
         for (AttributeDescriptor desc : mAttributes) {
-            if (desc.getXmlLocalName().equals(attributeName) &&
-                    desc.getNamespaceUri().equals(namespaceUri)) {
+            if (desc.getXmlLocalName().equals(attributeName) && desc.getNamespaceUri().equals(namespaceUri)) {
                 return true;
             }
         }

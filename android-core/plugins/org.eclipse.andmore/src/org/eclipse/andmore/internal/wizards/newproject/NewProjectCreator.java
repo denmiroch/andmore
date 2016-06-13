@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -104,112 +101,89 @@ import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
  * It is however an internal class. Its API may change without notice.
  * It should semantically be considered as a private final class.
  */
-public class NewProjectCreator  {
+public class NewProjectCreator {
 
-    private static final String PARAM_SDK_TOOLS_DIR = "ANDROID_SDK_TOOLS";          //$NON-NLS-1$
-    private static final String PARAM_ACTIVITY = "ACTIVITY_NAME";                   //$NON-NLS-1$
-    private static final String PARAM_APPLICATION = "APPLICATION_NAME";             //$NON-NLS-1$
-    private static final String PARAM_PACKAGE = "PACKAGE";                          //$NON-NLS-1$
+    private static final String PARAM_SDK_TOOLS_DIR = "ANDROID_SDK_TOOLS"; //$NON-NLS-1$
+    private static final String PARAM_ACTIVITY = "ACTIVITY_NAME"; //$NON-NLS-1$
+    private static final String PARAM_APPLICATION = "APPLICATION_NAME"; //$NON-NLS-1$
+    private static final String PARAM_PACKAGE = "PACKAGE"; //$NON-NLS-1$
     private static final String PARAM_IMPORT_RESOURCE_CLASS = "IMPORT_RESOURCE_CLASS"; //$NON-NLS-1$
-    private static final String PARAM_PROJECT = "PROJECT_NAME";                     //$NON-NLS-1$
-    private static final String PARAM_STRING_NAME = "STRING_NAME";                  //$NON-NLS-1$
-    private static final String PARAM_STRING_CONTENT = "STRING_CONTENT";            //$NON-NLS-1$
-    private static final String PARAM_IS_NEW_PROJECT = "IS_NEW_PROJECT";            //$NON-NLS-1$
-    private static final String PARAM_SAMPLE_LOCATION = "SAMPLE_LOCATION";          //$NON-NLS-1$
-    private static final String PARAM_SOURCE = "SOURCE";                            //$NON-NLS-1$
-    private static final String PARAM_SRC_FOLDER = "SRC_FOLDER";                    //$NON-NLS-1$
-    private static final String PARAM_SDK_TARGET = "SDK_TARGET";                    //$NON-NLS-1$
-    private static final String PARAM_IS_LIBRARY = "IS_LIBRARY";                    //$NON-NLS-1$
-    private static final String PARAM_MIN_SDK_VERSION = "MIN_SDK_VERSION";          //$NON-NLS-1$
+    private static final String PARAM_PROJECT = "PROJECT_NAME"; //$NON-NLS-1$
+    private static final String PARAM_STRING_NAME = "STRING_NAME"; //$NON-NLS-1$
+    private static final String PARAM_STRING_CONTENT = "STRING_CONTENT"; //$NON-NLS-1$
+    private static final String PARAM_IS_NEW_PROJECT = "IS_NEW_PROJECT"; //$NON-NLS-1$
+    private static final String PARAM_SAMPLE_LOCATION = "SAMPLE_LOCATION"; //$NON-NLS-1$
+    private static final String PARAM_SOURCE = "SOURCE"; //$NON-NLS-1$
+    private static final String PARAM_SRC_FOLDER = "SRC_FOLDER"; //$NON-NLS-1$
+    private static final String PARAM_SDK_TARGET = "SDK_TARGET"; //$NON-NLS-1$
+    private static final String PARAM_IS_LIBRARY = "IS_LIBRARY"; //$NON-NLS-1$
+    private static final String PARAM_MIN_SDK_VERSION = "MIN_SDK_VERSION"; //$NON-NLS-1$
     // Warning: The expanded string PARAM_TEST_TARGET_PACKAGE must not contain the
     // string "PACKAGE" since it collides with the replacement of PARAM_PACKAGE.
-    private static final String PARAM_TEST_TARGET_PACKAGE = "TEST_TARGET_PCKG";     //$NON-NLS-1$
-    private static final String PARAM_TARGET_SELF = "TARGET_SELF";                  //$NON-NLS-1$
-    private static final String PARAM_TARGET_MAIN = "TARGET_MAIN";                  //$NON-NLS-1$
-    private static final String PARAM_TARGET_EXISTING = "TARGET_EXISTING";          //$NON-NLS-1$
-    private static final String PARAM_REFERENCE_PROJECT = "REFERENCE_PROJECT";      //$NON-NLS-1$
+    private static final String PARAM_TEST_TARGET_PACKAGE = "TEST_TARGET_PCKG"; //$NON-NLS-1$
+    private static final String PARAM_TARGET_SELF = "TARGET_SELF"; //$NON-NLS-1$
+    private static final String PARAM_TARGET_MAIN = "TARGET_MAIN"; //$NON-NLS-1$
+    private static final String PARAM_TARGET_EXISTING = "TARGET_EXISTING"; //$NON-NLS-1$
+    private static final String PARAM_REFERENCE_PROJECT = "REFERENCE_PROJECT"; //$NON-NLS-1$
 
-    private static final String PH_ACTIVITIES = "ACTIVITIES";                       //$NON-NLS-1$
-    private static final String PH_USES_SDK = "USES-SDK";                           //$NON-NLS-1$
-    private static final String PH_INTENT_FILTERS = "INTENT_FILTERS";               //$NON-NLS-1$
-    private static final String PH_STRINGS = "STRINGS";                             //$NON-NLS-1$
-    private static final String PH_TEST_USES_LIBRARY = "TEST-USES-LIBRARY";         //$NON-NLS-1$
-    private static final String PH_TEST_INSTRUMENTATION = "TEST-INSTRUMENTATION";   //$NON-NLS-1$
+    private static final String PH_ACTIVITIES = "ACTIVITIES"; //$NON-NLS-1$
+    private static final String PH_USES_SDK = "USES-SDK"; //$NON-NLS-1$
+    private static final String PH_INTENT_FILTERS = "INTENT_FILTERS"; //$NON-NLS-1$
+    private static final String PH_STRINGS = "STRINGS"; //$NON-NLS-1$
+    private static final String PH_TEST_USES_LIBRARY = "TEST-USES-LIBRARY"; //$NON-NLS-1$
+    private static final String PH_TEST_INSTRUMENTATION = "TEST-INSTRUMENTATION"; //$NON-NLS-1$
 
-    private static final String BIN_DIRECTORY =
-            SdkConstants.FD_OUTPUT + AndmoreAndroidConstants.WS_SEP;
-    private static final String BIN_CLASSES_DIRECTORY =
-            SdkConstants.FD_OUTPUT + AndmoreAndroidConstants.WS_SEP +
-            SdkConstants.FD_CLASSES_OUTPUT + AndmoreAndroidConstants.WS_SEP;
-    private static final String RES_DIRECTORY =
-            SdkConstants.FD_RESOURCES + AndmoreAndroidConstants.WS_SEP;
-    private static final String ASSETS_DIRECTORY =
-            SdkConstants.FD_ASSETS + AndmoreAndroidConstants.WS_SEP;
-    private static final String DRAWABLE_DIRECTORY =
-            SdkConstants.FD_RES_DRAWABLE + AndmoreAndroidConstants.WS_SEP;
-    private static final String DRAWABLE_XHDPI_DIRECTORY =
-            SdkConstants.FD_RES_DRAWABLE + '-' + Density.XHIGH.getResourceValue() +
-            AndmoreAndroidConstants.WS_SEP;
-    private static final String DRAWABLE_HDPI_DIRECTORY =
-            SdkConstants.FD_RES_DRAWABLE + '-' + Density.HIGH.getResourceValue() +
-            AndmoreAndroidConstants.WS_SEP;
-    private static final String DRAWABLE_MDPI_DIRECTORY =
-            SdkConstants.FD_RES_DRAWABLE + '-' + Density.MEDIUM.getResourceValue() +
-            AndmoreAndroidConstants.WS_SEP;
-    private static final String DRAWABLE_LDPI_DIRECTORY =
-            SdkConstants.FD_RES_DRAWABLE + '-' + Density.LOW.getResourceValue() +
-            AndmoreAndroidConstants.WS_SEP;
-    private static final String LAYOUT_DIRECTORY =
-            SdkConstants.FD_RES_LAYOUT + AndmoreAndroidConstants.WS_SEP;
-    private static final String VALUES_DIRECTORY =
-            SdkConstants.FD_RES_VALUES + AndmoreAndroidConstants.WS_SEP;
-    private static final String GEN_SRC_DIRECTORY =
-            SdkConstants.FD_GEN_SOURCES + AndmoreAndroidConstants.WS_SEP;
+    private static final String BIN_DIRECTORY = SdkConstants.FD_OUTPUT + AndmoreAndroidConstants.WS_SEP;
+    private static final String BIN_CLASSES_DIRECTORY = SdkConstants.FD_OUTPUT + AndmoreAndroidConstants.WS_SEP
+            + SdkConstants.FD_CLASSES_OUTPUT + AndmoreAndroidConstants.WS_SEP;
+    private static final String RES_DIRECTORY = SdkConstants.FD_RESOURCES + AndmoreAndroidConstants.WS_SEP;
+    private static final String ASSETS_DIRECTORY = SdkConstants.FD_ASSETS + AndmoreAndroidConstants.WS_SEP;
+    private static final String DRAWABLE_DIRECTORY = SdkConstants.FD_RES_DRAWABLE + AndmoreAndroidConstants.WS_SEP;
+    private static final String DRAWABLE_XHDPI_DIRECTORY = SdkConstants.FD_RES_DRAWABLE + '-'
+            + Density.XHIGH.getResourceValue() + AndmoreAndroidConstants.WS_SEP;
+    private static final String DRAWABLE_HDPI_DIRECTORY = SdkConstants.FD_RES_DRAWABLE + '-'
+            + Density.HIGH.getResourceValue() + AndmoreAndroidConstants.WS_SEP;
+    private static final String DRAWABLE_MDPI_DIRECTORY = SdkConstants.FD_RES_DRAWABLE + '-'
+            + Density.MEDIUM.getResourceValue() + AndmoreAndroidConstants.WS_SEP;
+    private static final String DRAWABLE_LDPI_DIRECTORY = SdkConstants.FD_RES_DRAWABLE + '-'
+            + Density.LOW.getResourceValue() + AndmoreAndroidConstants.WS_SEP;
+    private static final String LAYOUT_DIRECTORY = SdkConstants.FD_RES_LAYOUT + AndmoreAndroidConstants.WS_SEP;
+    private static final String VALUES_DIRECTORY = SdkConstants.FD_RES_VALUES + AndmoreAndroidConstants.WS_SEP;
+    private static final String GEN_SRC_DIRECTORY = SdkConstants.FD_GEN_SOURCES + AndmoreAndroidConstants.WS_SEP;
 
     private static final String TEMPLATES_DIRECTORY = "templates/"; //$NON-NLS-1$
-    private static final String TEMPLATE_MANIFEST = TEMPLATES_DIRECTORY
-            + "AndroidManifest.template"; //$NON-NLS-1$
-    private static final String TEMPLATE_ACTIVITIES = TEMPLATES_DIRECTORY
-            + "activity.template"; //$NON-NLS-1$
-    private static final String TEMPLATE_USES_SDK = TEMPLATES_DIRECTORY
-            + "uses-sdk.template"; //$NON-NLS-1$
-    private static final String TEMPLATE_INTENT_LAUNCHER = TEMPLATES_DIRECTORY
-            + "launcher_intent_filter.template"; //$NON-NLS-1$
-    private static final String TEMPLATE_TEST_USES_LIBRARY = TEMPLATES_DIRECTORY
-            + "test_uses-library.template"; //$NON-NLS-1$
-    private static final String TEMPLATE_TEST_INSTRUMENTATION = TEMPLATES_DIRECTORY
-            + "test_instrumentation.template"; //$NON-NLS-1$
+    private static final String TEMPLATE_MANIFEST = TEMPLATES_DIRECTORY + "AndroidManifest.template"; //$NON-NLS-1$
+    private static final String TEMPLATE_ACTIVITIES = TEMPLATES_DIRECTORY + "activity.template"; //$NON-NLS-1$
+    private static final String TEMPLATE_USES_SDK = TEMPLATES_DIRECTORY + "uses-sdk.template"; //$NON-NLS-1$
+    private static final String TEMPLATE_INTENT_LAUNCHER = TEMPLATES_DIRECTORY + "launcher_intent_filter.template"; //$NON-NLS-1$
+    private static final String TEMPLATE_TEST_USES_LIBRARY = TEMPLATES_DIRECTORY + "test_uses-library.template"; //$NON-NLS-1$
+    private static final String TEMPLATE_TEST_INSTRUMENTATION = TEMPLATES_DIRECTORY + "test_instrumentation.template"; //$NON-NLS-1$
 
-
-
-    private static final String TEMPLATE_STRINGS = TEMPLATES_DIRECTORY
-            + "strings.template"; //$NON-NLS-1$
-    private static final String TEMPLATE_STRING = TEMPLATES_DIRECTORY
-            + "string.template"; //$NON-NLS-1$
+    private static final String TEMPLATE_STRINGS = TEMPLATES_DIRECTORY + "strings.template"; //$NON-NLS-1$
+    private static final String TEMPLATE_STRING = TEMPLATES_DIRECTORY + "string.template"; //$NON-NLS-1$
     private static final String PROJECT_ICON = "ic_launcher.png"; //$NON-NLS-1$
     private static final String ICON_XHDPI = "ic_launcher_xhdpi.png"; //$NON-NLS-1$
     private static final String ICON_HDPI = "ic_launcher_hdpi.png"; //$NON-NLS-1$
     private static final String ICON_MDPI = "ic_launcher_mdpi.png"; //$NON-NLS-1$
     private static final String ICON_LDPI = "ic_launcher_ldpi.png"; //$NON-NLS-1$
 
-    private static final String STRINGS_FILE = "strings.xml";       //$NON-NLS-1$
+    private static final String STRINGS_FILE = "strings.xml"; //$NON-NLS-1$
 
     private static final String STRING_RSRC_PREFIX = SdkConstants.STRING_PREFIX;
-    private static final String STRING_APP_NAME = "app_name";       //$NON-NLS-1$
-    private static final String STRING_HELLO_WORLD = "hello";       //$NON-NLS-1$
+    private static final String STRING_APP_NAME = "app_name"; //$NON-NLS-1$
+    private static final String STRING_HELLO_WORLD = "hello"; //$NON-NLS-1$
 
-    private static final String[] DEFAULT_DIRECTORIES = new String[] {
-            BIN_DIRECTORY, BIN_CLASSES_DIRECTORY, RES_DIRECTORY, ASSETS_DIRECTORY };
-    private static final String[] RES_DIRECTORIES = new String[] {
-            DRAWABLE_DIRECTORY, LAYOUT_DIRECTORY, VALUES_DIRECTORY };
-    private static final String[] RES_DENSITY_ENABLED_DIRECTORIES = new String[] {
-            DRAWABLE_XHDPI_DIRECTORY,
-            DRAWABLE_HDPI_DIRECTORY, DRAWABLE_MDPI_DIRECTORY, DRAWABLE_LDPI_DIRECTORY,
-            LAYOUT_DIRECTORY, VALUES_DIRECTORY };
+    private static final String[] DEFAULT_DIRECTORIES = new String[] { BIN_DIRECTORY, BIN_CLASSES_DIRECTORY,
+            RES_DIRECTORY, ASSETS_DIRECTORY };
+    private static final String[] RES_DIRECTORIES = new String[] { DRAWABLE_DIRECTORY, LAYOUT_DIRECTORY,
+            VALUES_DIRECTORY };
+    private static final String[] RES_DENSITY_ENABLED_DIRECTORIES = new String[] { DRAWABLE_XHDPI_DIRECTORY,
+            DRAWABLE_HDPI_DIRECTORY, DRAWABLE_MDPI_DIRECTORY, DRAWABLE_LDPI_DIRECTORY, LAYOUT_DIRECTORY,
+            VALUES_DIRECTORY };
 
-    private static final String JAVA_ACTIVITY_TEMPLATE = "java_file.template";  //$NON-NLS-1$
-    private static final String LAYOUT_TEMPLATE = "layout.template";            //$NON-NLS-1$
-    private static final String MAIN_LAYOUT_XML = "main.xml";                   //$NON-NLS-1$
+    private static final String JAVA_ACTIVITY_TEMPLATE = "java_file.template"; //$NON-NLS-1$
+    private static final String LAYOUT_TEMPLATE = "layout.template"; //$NON-NLS-1$
+    private static final String MAIN_LAYOUT_XML = "main.xml"; //$NON-NLS-1$
 
     private final NewProjectWizardState mValues;
     private final IRunnableContext mRunnableContext;
@@ -256,9 +230,7 @@ public class NewProjectCreator  {
         private final Map<String, Object> mParameters;
         private final HashMap<String, String> mDictionary;
 
-        public ProjectInfo(IProject project,
-                IProjectDescription description,
-                Map<String, Object> parameters,
+        public ProjectInfo(IProject project, IProjectDescription description, Map<String, Object> parameters,
                 HashMap<String, String> dictionary) {
             mProject = project;
             mDescription = description;
@@ -355,8 +327,7 @@ public class NewProjectCreator  {
             String minSdk = manifest.getMinSdkVersionString();
 
             final IProject project = workspace.getRoot().getProject(projectName);
-            final IProjectDescription description =
-                    workspace.newProjectDescription(project.getName());
+            final IProjectDescription description = workspace.newProjectDescription(project.getName());
 
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put(PARAM_PROJECT, projectName);
@@ -442,13 +413,12 @@ public class NewProjectCreator  {
 
         IPath path = new Path(mValues.projectLocation.getPath());
         IPath defaultLocation = Platform.getLocation();
-        if ((!mValues.useDefaultLocation || mValues.useExisting)
-                && !defaultLocation.isPrefixOf(path)) {
+        if ((!mValues.useDefaultLocation || mValues.useExisting) && !defaultLocation.isPrefixOf(path)) {
             description.setLocation(path);
         }
 
-        if (mValues.mode == Mode.ANY && !mValues.useExisting && !mValues.useDefaultLocation &&
-                !validateNewProjectLocationIsEmpty(path)) {
+        if (mValues.mode == Mode.ANY && !mValues.useExisting && !mValues.useDefaultLocation
+                && !validateNewProjectLocationIsEmpty(path)) {
             return null;
         }
 
@@ -468,15 +438,13 @@ public class NewProjectCreator  {
         }
 
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        String projectName =
-                mValues.mode == Mode.TEST ? mValues.projectName : mValues.testProjectName;
+        String projectName = mValues.mode == Mode.TEST ? mValues.projectName : mValues.testProjectName;
         final IProject project = workspace.getRoot().getProject(projectName);
         final IProjectDescription description = workspace.newProjectDescription(project.getName());
 
         final Map<String, Object> parameters = new HashMap<String, Object>();
 
-        String pkg =
-                mValues.mode == Mode.TEST ? mValues.packageName : mValues.testPackageName;
+        String pkg = mValues.mode == Mode.TEST ? mValues.packageName : mValues.testPackageName;
 
         parameters.put(PARAM_PACKAGE, pkg);
         parameters.put(PARAM_APPLICATION, STRING_RSRC_PREFIX + STRING_APP_NAME);
@@ -487,8 +455,7 @@ public class NewProjectCreator  {
         parameters.put(PARAM_MIN_SDK_VERSION, mValues.minSdk);
 
         // Test-specific parameters
-        String testedPkg = mValues.createPairProject
-                ? mValues.packageName : mValues.testTargetPackageName;
+        String testedPkg = mValues.createPairProject ? mValues.packageName : mValues.testTargetPackageName;
         if (testedPkg == null) {
             assert mValues.testingSelf;
             testedPkg = pkg;
@@ -517,13 +484,11 @@ public class NewProjectCreator  {
         IPath path = new Path(mValues.projectLocation.getPath());
         path = path.removeLastSegments(1).append(mValues.testProjectName);
         IPath defaultLocation = Platform.getLocation();
-        if ((!mValues.useDefaultLocation || mValues.useExisting)
-                && !path.equals(defaultLocation)) {
+        if ((!mValues.useDefaultLocation || mValues.useExisting) && !path.equals(defaultLocation)) {
             description.setLocation(path);
         }
 
-        if (!mValues.useExisting && !mValues.useDefaultLocation &&
-                !validateNewProjectLocationIsEmpty(path)) {
+        if (!mValues.useExisting && !mValues.useDefaultLocation && !validateNewProjectLocationIsEmpty(path)) {
             return null;
         }
 
@@ -550,11 +515,10 @@ public class NewProjectCreator  {
                 if (core.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS) {
                     // The error indicates the file system is not case sensitive
                     // and there's a resource with a similar name.
-                    MessageDialog.openError(AndmoreAndroidPlugin.getShell(),
-                            "Error", "Error: Case Variant Exists");
+                    MessageDialog.openError(AndmoreAndroidPlugin.getShell(), "Error", "Error: Case Variant Exists");
                 } else {
-                    ErrorDialog.openError(AndmoreAndroidPlugin.getShell(),
-                            "Error", core.getMessage(), core.getStatus());
+                    ErrorDialog.openError(AndmoreAndroidPlugin.getShell(), "Error", core.getMessage(),
+                            core.getStatus());
                 }
             } else {
                 // Some other kind of exception
@@ -586,30 +550,20 @@ public class NewProjectCreator  {
      *         return it to the calling thread. The method can fail if it fails
      *         to create or modify the project or if it is canceled by the user.
      */
-    private void createProjectAsync(IProgressMonitor monitor,
-            ProjectInfo mainData,
-            ProjectInfo testData,
-            List<ProjectInfo> importData,
-            boolean isAndroidProject)
-                    throws InvocationTargetException {
+    private void createProjectAsync(IProgressMonitor monitor, ProjectInfo mainData, ProjectInfo testData,
+            List<ProjectInfo> importData, boolean isAndroidProject) throws InvocationTargetException {
         monitor.beginTask("Create Android Project", 100);
         try {
             IProject mainProject = null;
 
             if (mainData != null) {
-                mainProject = createEclipseProject(
-                        new SubProgressMonitor(monitor, 50),
-                        mainData.getProject(),
-                        mainData.getDescription(),
-                        mainData.getParameters(),
-                        mainData.getDictionary(),
-                        null,
+                mainProject = createEclipseProject(new SubProgressMonitor(monitor, 50), mainData.getProject(),
+                        mainData.getDescription(), mainData.getParameters(), mainData.getDictionary(), null,
                         isAndroidProject);
 
                 if (mainProject != null) {
                     final IJavaProject javaProject = JavaCore.create(mainProject);
-                    Display.getDefault().syncExec(new WorksetAdder(javaProject,
-                            mValues.workingSets));
+                    Display.getDefault().syncExec(new WorksetAdder(javaProject, mValues.workingSets));
                 }
             }
 
@@ -619,18 +573,11 @@ public class NewProjectCreator  {
                     parameters.put(PARAM_REFERENCE_PROJECT, mainProject);
                 }
 
-                IProject testProject = createEclipseProject(
-                        new SubProgressMonitor(monitor, 50),
-                        testData.getProject(),
-                        testData.getDescription(),
-                        parameters,
-                        testData.getDictionary(),
-                        null,
-                        isAndroidProject);
+                IProject testProject = createEclipseProject(new SubProgressMonitor(monitor, 50), testData.getProject(),
+                        testData.getDescription(), parameters, testData.getDictionary(), null, isAndroidProject);
                 if (testProject != null) {
                     final IJavaProject javaProject = JavaCore.create(testProject);
-                    Display.getDefault().syncExec(new WorksetAdder(javaProject,
-                            mValues.workingSets));
+                    Display.getDefault().syncExec(new WorksetAdder(javaProject, mValues.workingSets));
                 }
             }
 
@@ -644,8 +591,7 @@ public class NewProjectCreator  {
                                 // Copy
                                 IFileSystem fileSystem = EFS.getLocalFileSystem();
                                 File source = (File) data.getParameters().get(PARAM_SOURCE);
-                                IFileStore sourceDir = new ReadWriteFileStore(
-                                        fileSystem.getStore(source.toURI()));
+                                IFileStore sourceDir = new ReadWriteFileStore(fileSystem.getStore(source.toURI()));
                                 IFileStore destDir = new ReadWriteFileStore(
                                         fileSystem.getStore(AdtUtils.getAbsolutePath(project)));
                                 try {
@@ -656,18 +602,12 @@ public class NewProjectCreator  {
                             }
                         };
                     }
-                    IProject project = createEclipseProject(
-                            new SubProgressMonitor(monitor, 50),
-                            data.getProject(),
-                            data.getDescription(),
-                            data.getParameters(),
-                            data.getDictionary(),
-                            projectPopulator,
+                    IProject project = createEclipseProject(new SubProgressMonitor(monitor, 50), data.getProject(),
+                            data.getDescription(), data.getParameters(), data.getDictionary(), projectPopulator,
                             isAndroidProject);
                     if (project != null) {
                         final IJavaProject javaProject = JavaCore.create(project);
-                        Display.getDefault().syncExec(new WorksetAdder(javaProject,
-                                mValues.workingSets));
+                        Display.getDefault().syncExec(new WorksetAdder(javaProject, mValues.workingSets));
                         ProjectHelper.enforcePreferredCompilerCompliance(javaProject);
                     }
                 }
@@ -708,16 +648,10 @@ public class NewProjectCreator  {
      * @return The project newly created
      * @throws StreamException
      */
-    private IProject createEclipseProject(
-            @NonNull IProgressMonitor monitor,
-            @NonNull IProject project,
-            @NonNull IProjectDescription description,
-            @NonNull Map<String, Object> parameters,
-            @Nullable Map<String, String> dictionary,
-            @Nullable ProjectPopulator projectPopulator,
-            boolean isAndroidProject)
-                    throws CoreException, IOException, StreamException {
-
+    private IProject createEclipseProject(@NonNull IProgressMonitor monitor, @NonNull IProject project,
+            @NonNull IProjectDescription description, @NonNull Map<String, Object> parameters,
+            @Nullable Map<String, String> dictionary, @Nullable ProjectPopulator projectPopulator,
+            boolean isAndroidProject) throws CoreException, IOException, StreamException {
 
         // get the project target
         IAndroidTarget target = (IAndroidTarget) parameters.get(PARAM_SDK_TARGET);
@@ -738,14 +672,9 @@ public class NewProjectCreator  {
         addDefaultDirectories(project, AndmoreAndroidConstants.WS_ROOT, DEFAULT_DIRECTORIES, monitor);
         String[] sourceFolders;
         if (isAndroidProject) {
-            sourceFolders = new String[] {
-                    (String) parameters.get(PARAM_SRC_FOLDER),
-                    GEN_SRC_DIRECTORY
-            };
+            sourceFolders = new String[] { (String) parameters.get(PARAM_SRC_FOLDER), GEN_SRC_DIRECTORY };
         } else {
-            sourceFolders = new String[] {
-                    (String) parameters.get(PARAM_SRC_FOLDER)
-            };
+            sourceFolders = new String[] { (String) parameters.get(PARAM_SRC_FOLDER) };
         }
         addDefaultDirectories(project, AndmoreAndroidConstants.WS_ROOT, sourceFolders, monitor);
 
@@ -797,8 +726,7 @@ public class NewProjectCreator  {
             //                    monitor);
 
             // Set output location
-            javaProject.setOutputLocation(project.getFolder(BIN_CLASSES_DIRECTORY).getFullPath(),
-                    monitor);
+            javaProject.setOutputLocation(project.getFolder(BIN_CLASSES_DIRECTORY).getFullPath(), monitor);
         }
 
         File sampleDir = (File) parameters.get(PARAM_SAMPLE_LOCATION);
@@ -819,17 +747,15 @@ public class NewProjectCreator  {
                 // the currently-empty current list.
                 desc.setReferencedProjects(new IProject[] { refProject });
 
-                project.setDescription(desc, IResource.KEEP_HISTORY,
-                        new SubProgressMonitor(monitor, 10));
+                project.setDescription(desc, IResource.KEEP_HISTORY, new SubProgressMonitor(monitor, 10));
 
-                IClasspathEntry entry = JavaCore.newProjectEntry(
-                        refProject.getFullPath(), //path
+                IClasspathEntry entry = JavaCore.newProjectEntry(refProject.getFullPath(), //path
                         new IAccessRule[0], //accessRules
                         false, //combineAccessRules
                         new IClasspathAttribute[0], //extraAttributes
                         false //isExported
 
-                        );
+                );
                 ProjectHelper.addEntryToClasspath(javaProject, entry);
             }
         }
@@ -843,13 +769,12 @@ public class NewProjectCreator  {
         ProjectHelper.fixProject(project, monitor, false);
 
         Boolean isLibraryProject = (Boolean) parameters.get(PARAM_IS_LIBRARY);
-        if (isLibraryProject != null && isLibraryProject.booleanValue()
-                && Sdk.getCurrent() != null && project.isOpen()) {
+        if (isLibraryProject != null && isLibraryProject.booleanValue() && Sdk.getCurrent() != null
+                && project.isOpen()) {
             ProjectState state = Sdk.getProjectState(project);
             if (state != null) {
                 // make a working copy of the properties
-                ProjectPropertiesWorkingCopy properties =
-                        state.getProperties().makeWorkingCopy();
+                ProjectPropertiesWorkingCopy properties = state.getProperties().makeWorkingCopy();
 
                 properties.setProperty(PROPERTY_LIBRARY, Boolean.TRUE.toString());
                 try {
@@ -859,8 +784,7 @@ public class NewProjectCreator  {
                         projectProp.refreshLocal(DEPTH_ZERO, new NullProgressMonitor());
                     }
                 } catch (Exception e) {
-                    String msg = String.format(
-                            "Failed to save %1$s for project %2$s",
+                    String msg = String.format("Failed to save %1$s for project %2$s",
                             SdkConstants.FN_PROJECT_PROPERTIES, project.getName());
                     AndmoreAndroidPlugin.log(e, msg);
                 }
@@ -882,15 +806,9 @@ public class NewProjectCreator  {
      * @param workingSets Eclipse working sets, if any, to add the project to
      * @throws CoreException if anything goes wrong
      */
-    public static void create(
-            @NonNull IProgressMonitor monitor,
-            @NonNull final IProject project,
-            @NonNull IAndroidTarget target,
-            @Nullable final ProjectPopulator projectPopulator,
-            boolean isLibrary,
-            @NonNull String projectLocation,
-            @NonNull final IWorkingSet[] workingSets)
-                    throws CoreException {
+    public static void create(@NonNull IProgressMonitor monitor, @NonNull final IProject project,
+            @NonNull IAndroidTarget target, @Nullable final ProjectPopulator projectPopulator, boolean isLibrary,
+            @NonNull String projectLocation, @NonNull final IWorkingSet[] workingSets) throws CoreException {
         final NewProjectCreator creator = new NewProjectCreator(null, null);
 
         final Map<String, String> dictionary = null;
@@ -917,8 +835,8 @@ public class NewProjectCreator  {
             @Override
             public void run(IProgressMonitor submonitor) throws CoreException {
                 try {
-                    creator.createEclipseProject(submonitor, project, description, parameters,
-                            dictionary, projectPopulator, true);
+                    creator.createEclipseProject(submonitor, project, description, parameters, dictionary,
+                            projectPopulator, true);
                 } catch (IOException e) {
                     throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
                             "Unexpected error while creating project", e));
@@ -929,8 +847,7 @@ public class NewProjectCreator  {
                 if (workingSets != null && workingSets.length > 0) {
                     IJavaProject javaProject = BaseProjectHelper.getJavaProject(project);
                     if (javaProject != null) {
-                        Display.getDefault().syncExec(new WorksetAdder(javaProject,
-                                workingSets));
+                        Display.getDefault().syncExec(new WorksetAdder(javaProject, workingSets));
                     }
                 }
             }
@@ -950,14 +867,13 @@ public class NewProjectCreator  {
      * @throws CoreException if the method fails to create the directories in
      *         the project.
      */
-    private void addDefaultDirectories(IProject project, String parentFolder,
-            String[] folders, IProgressMonitor monitor) throws CoreException {
+    private void addDefaultDirectories(IProject project, String parentFolder, String[] folders,
+            IProgressMonitor monitor) throws CoreException {
         for (String name : folders) {
             if (name.length() > 0) {
                 IFolder folder = project.getFolder(parentFolder + name);
                 if (!folder.exists()) {
-                    folder.create(true /* force */, true /* local */,
-                            new SubProgressMonitor(monitor, 10));
+                    folder.create(true /* force */, true /* local */, new SubProgressMonitor(monitor, 10));
                 }
             }
         }
@@ -975,9 +891,8 @@ public class NewProjectCreator  {
      * @throws IOException if the method fails to create the files in the
      *         project.
      */
-    private void addManifest(IProject project, Map<String, Object> parameters,
-            Map<String, String> dictionary, IProgressMonitor monitor)
-                    throws CoreException, IOException {
+    private void addManifest(IProject project, Map<String, Object> parameters, Map<String, String> dictionary,
+            IProgressMonitor monitor) throws CoreException, IOException {
 
         // get IFile to the manifest and check if it's not already there.
         IFile file = project.getFile(SdkConstants.FN_ANDROID_MANIFEST_XML);
@@ -992,8 +907,7 @@ public class NewProjectCreator  {
             if (manifestTemplate == null) {
                 // Inform the user there will be not manifest.
                 AndmoreAndroidPlugin.logAndPrintError(null, "Create Project" /*TAG*/,
-                        "Failed to generate the Android manifest. Missing template %s",
-                        TEMPLATE_MANIFEST);
+                        "Failed to generate the Android manifest. Missing template %s", TEMPLATE_MANIFEST);
                 // Abort now, there's no need to continue
                 return;
             }
@@ -1028,7 +942,7 @@ public class NewProjectCreator  {
                 }
             } else {
                 // remove the activity(ies) from the manifest
-                manifestTemplate = manifestTemplate.replaceAll(PH_ACTIVITIES, "");  //$NON-NLS-1$
+                manifestTemplate = manifestTemplate.replaceAll(PH_ACTIVITIES, ""); //$NON-NLS-1$
             }
 
             // Handle the case of the test projects
@@ -1036,15 +950,13 @@ public class NewProjectCreator  {
                 // Set the uses-library needed by the test project
                 String usesLibrary = AndmoreAndroidPlugin.readEmbeddedTextFile(TEMPLATE_TEST_USES_LIBRARY);
                 if (usesLibrary != null) {
-                    manifestTemplate = manifestTemplate.replaceAll(
-                            PH_TEST_USES_LIBRARY, usesLibrary);
+                    manifestTemplate = manifestTemplate.replaceAll(PH_TEST_USES_LIBRARY, usesLibrary);
                 }
 
                 // Set the instrumentation element needed by the test project
                 String instru = AndmoreAndroidPlugin.readEmbeddedTextFile(TEMPLATE_TEST_INSTRUMENTATION);
                 if (instru != null) {
-                    manifestTemplate = manifestTemplate.replaceAll(
-                            PH_TEST_INSTRUMENTATION, instru);
+                    manifestTemplate = manifestTemplate.replaceAll(PH_TEST_INSTRUMENTATION, instru);
                 }
 
                 // Replace PARAM_TEST_TARGET_PACKAGE itself now
@@ -1052,8 +964,8 @@ public class NewProjectCreator  {
 
             } else {
                 // remove the unused entries
-                manifestTemplate = manifestTemplate.replaceAll(PH_TEST_USES_LIBRARY, "");     //$NON-NLS-1$
-                manifestTemplate = manifestTemplate.replaceAll(PH_TEST_INSTRUMENTATION, "");  //$NON-NLS-1$
+                manifestTemplate = manifestTemplate.replaceAll(PH_TEST_USES_LIBRARY, ""); //$NON-NLS-1$
+                manifestTemplate = manifestTemplate.replaceAll(PH_TEST_INSTRUMENTATION, ""); //$NON-NLS-1$
             }
 
             String minSdkVersion = (String) parameters.get(PARAM_MIN_SDK_VERSION);
@@ -1071,8 +983,7 @@ public class NewProjectCreator  {
             manifestTemplate = reformat(XmlFormatStyle.MANIFEST, manifestTemplate);
 
             // Save in the project as UTF-8
-            InputStream stream = new ByteArrayInputStream(
-                    manifestTemplate.getBytes("UTF-8")); //$NON-NLS-1$
+            InputStream stream = new ByteArrayInputStream(manifestTemplate.getBytes("UTF-8")); //$NON-NLS-1$
             file.create(stream, false /* force */, new SubProgressMonitor(monitor, 10));
         }
     }
@@ -1087,13 +998,12 @@ public class NewProjectCreator  {
      * @throws IOException if the method fails to create the files in the
      *         project.
      */
-    private void addStringDictionaryFile(IProject project,
-            Map<String, String> strings, IProgressMonitor monitor)
-                    throws CoreException, IOException {
+    private void addStringDictionaryFile(IProject project, Map<String, String> strings, IProgressMonitor monitor)
+            throws CoreException, IOException {
 
         // create the IFile object and check if the file doesn't already exist.
-        IFile file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP
-                + VALUES_DIRECTORY + AndmoreAndroidConstants.WS_SEP + STRINGS_FILE);
+        IFile file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP + VALUES_DIRECTORY
+                + AndmoreAndroidConstants.WS_SEP + STRINGS_FILE);
         if (!file.exists()) {
             // get the Strings.xml template
             String stringDefinitionTemplate = AndmoreAndroidPlugin.readEmbeddedTextFile(TEMPLATE_STRINGS);
@@ -1125,15 +1035,13 @@ public class NewProjectCreator  {
             }
 
             // put the string nodes in the Strings.xml template
-            stringDefinitionTemplate = stringDefinitionTemplate.replace(PH_STRINGS,
-                    stringNodes.toString());
+            stringDefinitionTemplate = stringDefinitionTemplate.replace(PH_STRINGS, stringNodes.toString());
 
             // reformat the file according to the user's formatting settings
             stringDefinitionTemplate = reformat(XmlFormatStyle.RESOURCE, stringDefinitionTemplate);
 
             // write the file as UTF-8
-            InputStream stream = new ByteArrayInputStream(
-                    stringDefinitionTemplate.getBytes("UTF-8")); //$NON-NLS-1$
+            InputStream stream = new ByteArrayInputStream(stringDefinitionTemplate.getBytes("UTF-8")); //$NON-NLS-1$
             file.create(stream, false /* force */, new SubProgressMonitor(monitor, 10));
         }
     }
@@ -1142,8 +1050,7 @@ public class NewProjectCreator  {
     private String reformat(XmlFormatStyle style, String contents) {
         if (AdtPrefs.getPrefs().getUseCustomXmlFormatter()) {
             EclipseXmlFormatPreferences formatPrefs = EclipseXmlFormatPreferences.create();
-            return EclipseXmlPrettyPrinter.prettyPrint(contents, formatPrefs, style,
-                    null /*lineSeparator*/);
+            return EclipseXmlPrettyPrinter.prettyPrint(contents, formatPrefs, style, null /*lineSeparator*/);
         } else {
             return contents;
         }
@@ -1157,12 +1064,11 @@ public class NewProjectCreator  {
      * @param monitor An existing monitor.
      * @throws CoreException if the method fails to update the project.
      */
-    private void addIcon(IProject project, boolean legacy, IProgressMonitor monitor)
-            throws CoreException {
+    private void addIcon(IProject project, boolean legacy, IProgressMonitor monitor) throws CoreException {
         if (legacy) { // density support
             // do medium density icon only, in the default drawable folder.
-            IFile file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP
-                    + DRAWABLE_DIRECTORY + AndmoreAndroidConstants.WS_SEP + PROJECT_ICON);
+            IFile file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP + DRAWABLE_DIRECTORY
+                    + AndmoreAndroidConstants.WS_SEP + PROJECT_ICON);
             if (!file.exists()) {
                 addFile(file, AndmoreAndroidPlugin.readEmbeddedFile(TEMPLATES_DIRECTORY + ICON_MDPI), monitor);
             }
@@ -1171,29 +1077,29 @@ public class NewProjectCreator  {
             IFile file;
 
             // extra high density
-            file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP
-                    + DRAWABLE_XHDPI_DIRECTORY + AndmoreAndroidConstants.WS_SEP + PROJECT_ICON);
+            file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP + DRAWABLE_XHDPI_DIRECTORY
+                    + AndmoreAndroidConstants.WS_SEP + PROJECT_ICON);
             if (!file.exists()) {
                 addFile(file, AndmoreAndroidPlugin.readEmbeddedFile(TEMPLATES_DIRECTORY + ICON_XHDPI), monitor);
             }
 
             // high density
-            file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP
-                    + DRAWABLE_HDPI_DIRECTORY + AndmoreAndroidConstants.WS_SEP + PROJECT_ICON);
+            file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP + DRAWABLE_HDPI_DIRECTORY
+                    + AndmoreAndroidConstants.WS_SEP + PROJECT_ICON);
             if (!file.exists()) {
                 addFile(file, AndmoreAndroidPlugin.readEmbeddedFile(TEMPLATES_DIRECTORY + ICON_HDPI), monitor);
             }
 
             // medium density
-            file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP
-                    + DRAWABLE_MDPI_DIRECTORY + AndmoreAndroidConstants.WS_SEP + PROJECT_ICON);
+            file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP + DRAWABLE_MDPI_DIRECTORY
+                    + AndmoreAndroidConstants.WS_SEP + PROJECT_ICON);
             if (!file.exists()) {
                 addFile(file, AndmoreAndroidPlugin.readEmbeddedFile(TEMPLATES_DIRECTORY + ICON_MDPI), monitor);
             }
 
             // low density
-            file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP
-                    + DRAWABLE_LDPI_DIRECTORY + AndmoreAndroidConstants.WS_SEP + PROJECT_ICON);
+            file = project.getFile(RES_DIRECTORY + AndmoreAndroidConstants.WS_SEP + DRAWABLE_LDPI_DIRECTORY
+                    + AndmoreAndroidConstants.WS_SEP + PROJECT_ICON);
             if (!file.exists()) {
                 addFile(file, AndmoreAndroidPlugin.readEmbeddedFile(TEMPLATES_DIRECTORY + ICON_LDPI), monitor);
             }
@@ -1227,9 +1133,8 @@ public class NewProjectCreator  {
      * @throws IOException if the method fails to create the files in the
      *         project.
      */
-    private void addSampleCode(IProject project, String sourceFolder,
-            Map<String, Object> parameters, Map<String, String> dictionary,
-            IProgressMonitor monitor) throws CoreException, IOException {
+    private void addSampleCode(IProject project, String sourceFolder, Map<String, Object> parameters,
+            Map<String, String> dictionary, IProgressMonitor monitor) throws CoreException, IOException {
         // create the java package directories.
         IFolder pkgFolder = project.getFolder(sourceFolder);
         String packageName = (String) parameters.get(PARAM_PACKAGE);
@@ -1239,7 +1144,7 @@ public class NewProjectCreator  {
         String activityName = (String) parameters.get(PARAM_ACTIVITY);
 
         Map<String, Object> java_activity_parameters = new HashMap<String, Object>(parameters);
-        java_activity_parameters.put(PARAM_IMPORT_RESOURCE_CLASS, "");  //$NON-NLS-1$
+        java_activity_parameters.put(PARAM_IMPORT_RESOURCE_CLASS, ""); //$NON-NLS-1$
 
         if (activityName != null) {
 
@@ -1257,7 +1162,7 @@ public class NewProjectCreator  {
                 }
 
                 // Package name
-                if (activityName.startsWith(".")) {  //$NON-NLS-1$
+                if (activityName.startsWith(".")) { //$NON-NLS-1$
                     packageName += activityName.substring(0, lastDotIndex);
                 } else {
                     packageName = activityName.substring(0, lastDotIndex);
@@ -1270,7 +1175,7 @@ public class NewProjectCreator  {
             java_activity_parameters.put(PARAM_ACTIVITY, activityName);
             java_activity_parameters.put(PARAM_PACKAGE, packageName);
             if (resourcePackageClass != null) {
-                String importResourceClass = "\nimport " + resourcePackageClass + ";";  //$NON-NLS-1$ // $NON-NLS-2$
+                String importResourceClass = "\nimport " + resourcePackageClass + ";"; //$NON-NLS-1$ // $NON-NLS-2$
                 java_activity_parameters.put(PARAM_IMPORT_RESOURCE_CLASS, importResourceClass);
             }
         }
@@ -1279,8 +1184,7 @@ public class NewProjectCreator  {
         for (String component : components) {
             pkgFolder = pkgFolder.getFolder(component);
             if (!pkgFolder.exists()) {
-                pkgFolder.create(true /* force */, true /* local */,
-                        new SubProgressMonitor(monitor, 10));
+                pkgFolder.create(true /* force */, true /* local */, new SubProgressMonitor(monitor, 10));
             }
         }
 
@@ -1297,21 +1201,17 @@ public class NewProjectCreator  {
             file = layoutfolder.getFile(MAIN_LAYOUT_XML);
             if (!file.exists()) {
                 copyFile(LAYOUT_TEMPLATE, file, parameters, monitor, true);
-                dictionary.put(STRING_HELLO_WORLD, String.format("Hello World, %1$s!",
-                        activityName));
+                dictionary.put(STRING_HELLO_WORLD, String.format("Hello World, %1$s!", activityName));
             }
         }
     }
 
-    private void copySampleCode(IProject project, File sampleDir,
-            Map<String, Object> parameters, Map<String, String> dictionary,
-            IProgressMonitor monitor) throws CoreException {
+    private void copySampleCode(IProject project, File sampleDir, Map<String, Object> parameters,
+            Map<String, String> dictionary, IProgressMonitor monitor) throws CoreException {
         // Copy the sampleDir into the project directory recursively
         IFileSystem fileSystem = EFS.getLocalFileSystem();
-        IFileStore sourceDir = new ReadWriteFileStore(
-                fileSystem.getStore(sampleDir.toURI()));
-        IFileStore destDir   = new ReadWriteFileStore(
-                fileSystem.getStore(AdtUtils.getAbsolutePath(project)));
+        IFileStore sourceDir = new ReadWriteFileStore(fileSystem.getStore(sampleDir.toURI()));
+        IFileStore destDir = new ReadWriteFileStore(fileSystem.getStore(AdtUtils.getAbsolutePath(project)));
         sourceDir.copy(destDir, EFS.OVERWRITE, null);
     }
 
@@ -1335,8 +1235,7 @@ public class NewProjectCreator  {
 
         // Override when writing attributes
         @Override
-        public void putInfo(IFileInfo info, int options, IProgressMonitor storeMonitor)
-                throws CoreException {
+        public void putInfo(IFileInfo info, int options, IProgressMonitor storeMonitor) throws CoreException {
             info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, false);
             super.putInfo(info, options, storeMonitor);
         }
@@ -1366,8 +1265,8 @@ public class NewProjectCreator  {
      * @throws FileNotFoundException if the file to be added does not exist
      * @throws CoreException if writing the file does not work
      */
-    public static void addLocalFile(IProject project, File source, String destName,
-            IProgressMonitor monitor) throws FileNotFoundException, CoreException {
+    public static void addLocalFile(IProject project, File source, String destName, IProgressMonitor monitor)
+            throws FileNotFoundException, CoreException {
         IFile dest = project.getFile(destName);
         if (dest.exists() == false) {
             FileInputStream stream = new FileInputStream(source);
@@ -1383,8 +1282,8 @@ public class NewProjectCreator  {
      * @param monitor An existing monitor.
      * @throws JavaModelException if the classpath could not be set.
      */
-    private void setupSourceFolders(IJavaProject javaProject, String[] sourceFolders,
-            IProgressMonitor monitor) throws JavaModelException {
+    private void setupSourceFolders(IJavaProject javaProject, String[] sourceFolders, IProgressMonitor monitor)
+            throws JavaModelException {
         IProject project = javaProject.getProject();
 
         // get the list of entries.
@@ -1399,13 +1298,11 @@ public class NewProjectCreator  {
 
             // remove it first in case.
             entries = removeSourceClasspath(entries, srcFolder);
-            entries = ProjectHelper.addEntryToClasspath(entries,
-                    JavaCore.newSourceEntry(srcFolder.getFullPath()));
+            entries = ProjectHelper.addEntryToClasspath(entries, JavaCore.newSourceEntry(srcFolder.getFullPath()));
         }
 
         javaProject.setRawClasspath(entries, new SubProgressMonitor(monitor, 10));
     }
-
 
     /**
      * Removes the corresponding source folder from the class path entries if
@@ -1437,7 +1334,6 @@ public class NewProjectCreator  {
         return entries;
     }
 
-
     /**
      * Copies the given file from our resource folder to the new project.
      * Expects the file to the US-ASCII or UTF-8 encoded.
@@ -1448,21 +1344,18 @@ public class NewProjectCreator  {
      * @throws IOException from RandomAccessFile.length() if can't determine the
      *         length.
      */
-    private void copyFile(String resourceFilename, IFile destFile,
-            Map<String, Object> parameters, IProgressMonitor monitor, boolean reformat)
-                    throws CoreException, IOException {
+    private void copyFile(String resourceFilename, IFile destFile, Map<String, Object> parameters,
+            IProgressMonitor monitor, boolean reformat) throws CoreException, IOException {
 
         // Read existing file.
-        String template = AndmoreAndroidPlugin.readEmbeddedTextFile(
-                TEMPLATES_DIRECTORY + resourceFilename);
+        String template = AndmoreAndroidPlugin.readEmbeddedTextFile(TEMPLATES_DIRECTORY + resourceFilename);
 
         // Replace all keyword parameters
         template = replaceParameters(template, parameters);
 
         if (reformat) {
             // Guess the formatting style based on the file location
-            XmlFormatStyle style = EclipseXmlPrettyPrinter
-                    .getForFile(destFile.getProjectRelativePath());
+            XmlFormatStyle style = EclipseXmlPrettyPrinter.getForFile(destFile.getProjectRelativePath());
             if (style != null) {
                 template = reformat(style, template);
             }
@@ -1483,12 +1376,10 @@ public class NewProjectCreator  {
     private String replaceParameters(String str, Map<String, Object> parameters) {
 
         if (parameters == null) {
-            AndmoreAndroidPlugin.log(IStatus.ERROR,
-                    "NPW replace parameters: null parameter map. String: '%s'", str);  //$NON-NLS-1$
+            AndmoreAndroidPlugin.log(IStatus.ERROR, "NPW replace parameters: null parameter map. String: '%s'", str); //$NON-NLS-1$
             return str;
         } else if (str == null) {
-            AndmoreAndroidPlugin.log(IStatus.ERROR,
-                    "NPW replace parameters: null template string");  //$NON-NLS-1$
+            AndmoreAndroidPlugin.log(IStatus.ERROR, "NPW replace parameters: null template string"); //$NON-NLS-1$
             return str;
         }
 
@@ -1497,9 +1388,8 @@ public class NewProjectCreator  {
                 Object value = entry.getValue();
                 if (value == null) {
                     AndmoreAndroidPlugin.log(IStatus.ERROR,
-                            "NPW replace parameters: null value for key '%s' in template '%s'",  //$NON-NLS-1$
-                            entry.getKey(),
-                            str);
+                            "NPW replace parameters: null value for key '%s' in template '%s'", //$NON-NLS-1$
+                            entry.getKey(), str);
                 } else {
                     str = str.replaceAll(entry.getKey(), (String) value);
                 }
@@ -1520,10 +1410,8 @@ public class NewProjectCreator  {
 
         @Override
         public void run() {
-            if (mWorkingSets.length > 0 && mProject != null
-                    && mProject.exists()) {
-                PlatformUI.getWorkbench().getWorkingSetManager()
-                .addToWorkingSets(mProject, mWorkingSets);
+            if (mWorkingSets.length > 0 && mProject != null && mProject.exists()) {
+                PlatformUI.getWorkbench().getWorkingSetManager().addToWorkingSets(mProject, mWorkingSets);
             }
         }
     }

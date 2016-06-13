@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,7 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.google.common.collect.Lists;
+import java.util.Collection;
 
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
@@ -28,7 +25,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.w3c.dom.Node;
 
-import java.util.Collection;
+import com.google.common.collect.Lists;
 
 /**
  * The {@link LintOverlay} paints an icon over each view that contains at least one
@@ -132,7 +129,7 @@ public class LintOverlay extends Overlay {
 
     private Image getErrorIcon() {
         if (mErrorImage == null) {
-            mErrorImage = IconFactory.getInstance().getIcon("error-badge");     //$NON-NLS-1$
+            mErrorImage = IconFactory.getInstance().getIcon("error-badge"); //$NON-NLS-1$
         }
 
         return mErrorImage;

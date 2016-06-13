@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,7 +43,7 @@ final class ManifestEditorContributor extends MultiPageEditorActionBarContributo
      * @deprecated
      */
     @Deprecated
-	private ManifestEditorContributor() {
+    private ManifestEditorContributor() {
         super();
     }
 
@@ -66,16 +63,16 @@ final class ManifestEditorContributor extends MultiPageEditorActionBarContributo
 
     @Override
     public void setActivePage(IEditorPart part) {
-        if (mActiveEditorPart == part)
+        if (mActiveEditorPart == part) {
             return;
+        }
 
         mActiveEditorPart = part;
 
         IActionBars actionBars = getActionBars();
         if (actionBars != null) {
 
-            ITextEditor editor =
-                (part instanceof ITextEditor) ? (ITextEditor)part : null;
+            ITextEditor editor = (part instanceof ITextEditor) ? (ITextEditor) part : null;
 
             actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(),
                     getAction(editor, ITextEditorActionConstants.DELETE));
@@ -93,9 +90,8 @@ final class ManifestEditorContributor extends MultiPageEditorActionBarContributo
                     getAction(editor, ITextEditorActionConstants.SELECT_ALL));
             actionBars.setGlobalActionHandler(ActionFactory.FIND.getId(),
                     getAction(editor, ITextEditorActionConstants.FIND));
-            actionBars.setGlobalActionHandler(
-                    IDEActionFactory.BOOKMARK.getId(), getAction(editor,
-                            IDEActionFactory.BOOKMARK.getId()));
+            actionBars.setGlobalActionHandler(IDEActionFactory.BOOKMARK.getId(),
+                    getAction(editor, IDEActionFactory.BOOKMARK.getId()));
             actionBars.updateActionBars();
         }
     }

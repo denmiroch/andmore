@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,11 +55,9 @@ public class ErrorImageComposite extends CompositeImageDescriptor {
     public ErrorImageComposite(Image baseImage, boolean warning) {
         mBaseImage = baseImage;
         ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
-        mErrorImageDescriptor = sharedImages.getImageDescriptor(
-                warning ? IMG_DEC_FIELD_WARNING : IMG_DEC_FIELD_ERROR);
+        mErrorImageDescriptor = sharedImages.getImageDescriptor(warning ? IMG_DEC_FIELD_WARNING : IMG_DEC_FIELD_ERROR);
         if (mErrorImageDescriptor == null) {
-            mErrorImageDescriptor = sharedImages.getImageDescriptor(
-                    warning ? IMG_OBJS_WARN_TSK : IMG_OBJS_ERROR_TSK);
+            mErrorImageDescriptor = sharedImages.getImageDescriptor(warning ? IMG_OBJS_WARN_TSK : IMG_OBJS_ERROR_TSK);
         }
         mSize = new Point(baseImage.getBounds().width, baseImage.getBounds().height);
     }

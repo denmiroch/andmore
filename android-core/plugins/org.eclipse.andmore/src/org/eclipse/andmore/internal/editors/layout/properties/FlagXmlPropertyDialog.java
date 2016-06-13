@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,8 @@
  */
 package org.eclipse.andmore.internal.editors.layout.properties;
 
-import com.android.annotations.NonNull;
-import com.google.common.base.Splitter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -41,11 +38,11 @@ import org.eclipse.wb.internal.core.utils.execution.ExecutionUtils;
 import org.eclipse.wb.internal.core.utils.execution.RunnableEx;
 import org.eclipse.wb.internal.core.utils.ui.dialogs.ResizableDialog;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.google.common.base.Splitter;
 
 class FlagXmlPropertyDialog extends ResizableDialog
-implements IStructuredContentProvider, ICheckStateListener, SelectionListener, KeyListener {
+        implements IStructuredContentProvider, ICheckStateListener, SelectionListener, KeyListener {
     private final String mTitle;
     private final XmlProperty mProperty;
     private final String[] mFlags;
@@ -54,11 +51,7 @@ implements IStructuredContentProvider, ICheckStateListener, SelectionListener, K
     private Table mTable;
     private CheckboxTableViewer mViewer;
 
-    FlagXmlPropertyDialog(
-            @NonNull Shell parentShell,
-            @NonNull String title,
-            boolean isRadio,
-            @NonNull String[] flags,
+    FlagXmlPropertyDialog(@NonNull Shell parentShell, @NonNull String title, boolean isRadio, @NonNull String[] flags,
             @NonNull XmlProperty property) {
         super(parentShell, AndmoreAndroidPlugin.getDefault());
         mTitle = title;
@@ -77,8 +70,7 @@ implements IStructuredContentProvider, ICheckStateListener, SelectionListener, K
     protected Control createDialogArea(Composite parent) {
         Composite container = (Composite) super.createDialogArea(parent);
 
-        mViewer = CheckboxTableViewer.newCheckList(container,
-                SWT.BORDER | SWT.FULL_SELECTION | SWT.HIDE_SELECTION);
+        mViewer = CheckboxTableViewer.newCheckList(container, SWT.BORDER | SWT.FULL_SELECTION | SWT.HIDE_SELECTION);
         mTable = mViewer.getTable();
         mTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
@@ -155,16 +147,14 @@ implements IStructuredContentProvider, ICheckStateListener, SelectionListener, K
 
     @Override
     public Object[] getElements(Object inputElement) {
-        return (Object []) inputElement;
+        return (Object[]) inputElement;
     }
 
     @Override
-    public void dispose() {
-    }
+    public void dispose() {}
 
     @Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-    }
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
     // ---- Implements ICheckStateListener ----
 
@@ -187,8 +177,7 @@ implements IStructuredContentProvider, ICheckStateListener, SelectionListener, K
     // ---- Implements SelectionListener ----
 
     @Override
-    public void widgetSelected(SelectionEvent e) {
-    }
+    public void widgetSelected(SelectionEvent e) {}
 
     @Override
     public void widgetDefaultSelected(SelectionEvent e) {
@@ -212,6 +201,5 @@ implements IStructuredContentProvider, ICheckStateListener, SelectionListener, K
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-    }
+    public void keyReleased(KeyEvent e) {}
 }

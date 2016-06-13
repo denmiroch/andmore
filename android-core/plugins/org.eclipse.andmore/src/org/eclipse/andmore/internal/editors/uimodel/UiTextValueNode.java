@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,14 +44,13 @@ public class UiTextValueNode extends UiTextAttributeNode {
         // The argument xml_attribute_node is not used here. It should always be
         // null since this is not an attribute. What we want is the "text value" of
         // the parent element, which is actually the first text node of the element.
-        
+
         UiElementNode parent = getUiParent();
         if (parent != null) {
             Node xml_node = parent.getXmlNode();
             if (xml_node != null) {
-                for (Node xml_child = xml_node.getFirstChild();
-                    xml_child != null;
-                    xml_child = xml_child.getNextSibling()) {
+                for (Node xml_child = xml_node.getFirstChild(); xml_child != null; xml_child = xml_child
+                        .getNextSibling()) {
                     if (xml_child.getNodeType() == Node.TEXT_NODE) {
                         setCurrentValue(xml_child.getNodeValue());
                         break;
@@ -90,9 +86,8 @@ public class UiTextValueNode extends UiTextAttributeNode {
                 // Try to find an existing text child to update.
                 boolean updated = false;
 
-                for (Node xml_child = element.getFirstChild();
-                        xml_child != null;
-                        xml_child = xml_child.getNextSibling()) {
+                for (Node xml_child = element.getFirstChild(); xml_child != null; xml_child = xml_child
+                        .getNextSibling()) {
                     if (xml_child.getNodeType() == Node.TEXT_NODE) {
                         xml_child.setNodeValue(value);
                         updated = true;
@@ -108,7 +103,7 @@ public class UiTextValueNode extends UiTextAttributeNode {
                         element.appendChild(text);
                     }
                 }
-                
+
                 setCurrentValue(value);
             }
         }

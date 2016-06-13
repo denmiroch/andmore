@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -99,7 +96,7 @@ public final class ProjectCallback extends LayoutlibCallback {
     private ILayoutPullParser mLayoutEmbeddedParser;
     private ResourceResolver mResourceResolver;
     private GraphicalEditorPart mEditor;
-    
+
     private ParserFactory parserFactory;
 
     /**
@@ -110,8 +107,7 @@ public final class ProjectCallback extends LayoutlibCallback {
      * @param project the project.
      * @param credential the sandbox credential
      */
-    public ProjectCallback(LayoutLibrary layoutLib,
-            ProjectResources projectRes, IProject project, Object credential,
+    public ProjectCallback(LayoutLibrary layoutLib, ProjectResources projectRes, IProject project, Object credential,
             GraphicalEditorPart editor) {
         mLayoutLib = layoutLib;
         mParentClassLoader = layoutLib.getClassLoader();
@@ -119,13 +115,13 @@ public final class ProjectCallback extends LayoutlibCallback {
         mProject = project;
         mCredential = credential;
         mEditor = editor;
-		parserFactory = new ParserFactory() {
-			@Override
-			@NonNull
-			public XmlPullParser createParser(@Nullable String debugName) throws XmlPullParserException {
-				return new KXmlParser();
-			}
-		};
+        parserFactory = new ParserFactory() {
+            @Override
+            @NonNull
+            public XmlPullParser createParser(@Nullable String debugName) throws XmlPullParserException {
+                return new KXmlParser();
+            }
+        };
     }
 
     public Set<String> getMissingClasses() {
@@ -162,8 +158,7 @@ public final class ProjectCallback extends LayoutlibCallback {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Object loadView(String className, Class[] constructorSignature,
-            Object[] constructorParameters)
+    public Object loadView(String className, Class[] constructorSignature, Object[] constructorParameters)
             throws ClassNotFoundException, Exception {
         mUsed = true;
 
@@ -186,7 +181,7 @@ public final class ProjectCallback extends LayoutlibCallback {
                 // RenderSecurityManager
                 boolean token = RenderSecurityManager.enterSafeRegion(mCredential);
                 try {
-                  mLoader = new ProjectClassLoader(mParentClassLoader, mProject);
+                    mLoader = new ProjectClassLoader(mParentClassLoader, mProject);
                 } finally {
                     RenderSecurityManager.exitSafeRegion(token);
                 }
@@ -233,12 +228,10 @@ public final class ProjectCallback extends LayoutlibCallback {
             Object view = instantiateClass(clazz, constructorSignature, constructorParameters);
 
             // Set the text of the mock view to the simplified name of the custom class
-            Method m = view.getClass().getMethod("setText",
-                                                 new Class<?>[] { CharSequence.class });
+            Method m = view.getClass().getMethod("setText", new Class<?>[] { CharSequence.class });
             String label = getShortClassName(className);
             if (label.equals(VIEW_FRAGMENT)) {
-                label = "<fragment>\n"
-                        + "Pick preview layout from the \"Fragment Layout\" context menu";
+                label = "<fragment>\n" + "Pick preview layout from the \"Fragment Layout\" context menu";
             } else if (label.equals(VIEW_INCLUDE)) {
                 label = "Text";
             }
@@ -251,13 +244,11 @@ public final class ProjectCallback extends LayoutlibCallback {
             try {
                 // Look up android.view.Gravity#CENTER - or can we just hard-code
                 // the value (17) here?
-                Class<?> gravity =
-                    Class.forName("android.view.Gravity", //$NON-NLS-1$
-                            true, view.getClass().getClassLoader());
+                Class<?> gravity = Class.forName("android.view.Gravity", //$NON-NLS-1$
+                        true, view.getClass().getClassLoader());
                 Field centerField = gravity.getField("CENTER"); //$NON-NLS-1$
                 int center = centerField.getInt(null);
-                m = view.getClass().getMethod("setGravity",
-                        new Class<?>[] { Integer.TYPE });
+                m = view.getClass().getMethod("setGravity", new Class<?>[] { Integer.TYPE });
                 // Center
                 //int center = (0x0001 << 4) | (0x0001 << 0);
                 m.invoke(view, Integer.valueOf(center));
@@ -276,12 +267,12 @@ public final class ProjectCallback extends LayoutlibCallback {
     private String getShortClassName(String fqcn) {
         // The name is typically a fully-qualified class name. Let's make it a tad shorter.
 
-        if (fqcn.startsWith("android.")) {                                      //$NON-NLS-1$
+        if (fqcn.startsWith("android.")) { //$NON-NLS-1$
             // For android classes, convert android.foo.Name to android...Name
             int first = fqcn.indexOf('.');
             int last = fqcn.lastIndexOf('.');
             if (last > first) {
-                return fqcn.substring(0, first) + ".." + fqcn.substring(last);   //$NON-NLS-1$
+                return fqcn.substring(0, first) + ".." + fqcn.substring(last); //$NON-NLS-1$
             }
         } else {
             // For custom non-android classes, it's best to keep the 2 first segments of
@@ -290,7 +281,7 @@ public final class ProjectCallback extends LayoutlibCallback {
             first = fqcn.indexOf('.', first + 1);
             int last = fqcn.lastIndexOf('.');
             if (last > first) {
-                return fqcn.substring(0, first) + ".." + fqcn.substring(last);   //$NON-NLS-1$
+                return fqcn.substring(0, first) + ".." + fqcn.substring(last); //$NON-NLS-1$
             }
         }
 
@@ -371,9 +362,8 @@ public final class ProjectCallback extends LayoutlibCallback {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    private Object instantiateClass(Class<?> clazz,
-            Class[] constructorSignature,
-            Object[] constructorParameters) throws Exception {
+    private Object instantiateClass(Class<?> clazz, Class[] constructorSignature, Object[] constructorParameters)
+            throws Exception {
         Constructor<?> constructor = null;
 
         try {
@@ -411,13 +401,13 @@ public final class ProjectCallback extends LayoutlibCallback {
                 for (k++; k <= i; k++) {
                     if (k == 2) {
                         // Parameter 2 is the AttributeSet
-                        sig[k-1] = clazz.getClassLoader().loadClass("android.util.AttributeSet");
-                        params[k-1] = null;
+                        sig[k - 1] = clazz.getClassLoader().loadClass("android.util.AttributeSet");
+                        params[k - 1] = null;
 
                     } else if (k == 3) {
                         // Parameter 3 is the int defstyle
-                        sig[k-1] = int.class;
-                        params[k-1] = 0;
+                        sig[k - 1] = int.class;
+                        params[k - 1] = 0;
                     }
                 }
 
@@ -434,9 +424,11 @@ public final class ProjectCallback extends LayoutlibCallback {
                         // are not found)
                         if (constructorSignature.length < 2 && mLogger != null) {
                             mLogger.warning("wrongconstructor", //$NON-NLS-1$
-                                String.format("Custom view %1$s is not using the 2- or 3-argument "
-                                    + "View constructors; XML attributes will not work",
-                                    clazz.getSimpleName()), null /*data*/);
+                                    String.format(
+                                            "Custom view %1$s is not using the 2- or 3-argument "
+                                                    + "View constructors; XML attributes will not work",
+                                            clazz.getSimpleName()),
+                                    null /*data*/);
                         }
                         break;
                     }
@@ -467,8 +459,7 @@ public final class ProjectCallback extends LayoutlibCallback {
             // Try to compute the ResourceValue for this layout since layoutlib
             // must be an older version which doesn't pass the value:
             if (mResourceResolver != null) {
-                ResourceValue value = mResourceResolver.getProjectResource(ResourceType.LAYOUT,
-                        layoutName);
+                ResourceValue value = mResourceResolver.getProjectResource(ResourceType.LAYOUT, layoutName);
                 if (value != null) {
                     return getParser(value);
                 }
@@ -484,8 +475,7 @@ public final class ProjectCallback extends LayoutlibCallback {
     public ILayoutPullParser getParser(ResourceValue layoutResource) {
         boolean token = RenderSecurityManager.enterSafeRegion(mCredential);
         try {
-            return getParser(layoutResource.getName(),
-                    new File(layoutResource.getValue()));
+            return getParser(layoutResource.getName(), new File(layoutResource.getValue()));
         } finally {
             RenderSecurityManager.exitSafeRegion(token);
         }
@@ -524,14 +514,12 @@ public final class ProjectCallback extends LayoutlibCallback {
     }
 
     @Override
-    public Object getAdapterItemValue(ResourceReference adapterView, Object adapterCookie,
-            ResourceReference itemRef,
-            int fullPosition, int typePosition, int fullChildPosition, int typeChildPosition,
-            ResourceReference viewRef, ViewAttribute viewAttribute, Object defaultValue) {
+    public Object getAdapterItemValue(ResourceReference adapterView, Object adapterCookie, ResourceReference itemRef,
+            int fullPosition, int typePosition, int fullChildPosition, int typeChildPosition, ResourceReference viewRef,
+            ViewAttribute viewAttribute, Object defaultValue) {
 
         // Special case for the palette preview
-        if (viewAttribute == ViewAttribute.TEXT
-                && adapterView.getName().startsWith("android_widget_")) { //$NON-NLS-1$
+        if (viewAttribute == ViewAttribute.TEXT && adapterView.getName().startsWith("android_widget_")) { //$NON-NLS-1$
             String name = adapterView.getName();
             if (viewRef.getName().equals("text2")) { //$NON-NLS-1$
                 return "Sub Item";
@@ -608,7 +596,7 @@ public final class ProjectCallback extends LayoutlibCallback {
             if (result.isSuccess()) {
                 Object parent = result.getData();
                 if (parent != null) {
-                    return isWithinIllegalParent(parent, depth -1);
+                    return isWithinIllegalParent(parent, depth - 1);
                 }
             }
         }
@@ -617,8 +605,8 @@ public final class ProjectCallback extends LayoutlibCallback {
     }
 
     @Override
-    public AdapterBinding getAdapterBinding(final ResourceReference adapterView,
-            final Object adapterCookie, final Object viewObject) {
+    public AdapterBinding getAdapterBinding(final ResourceReference adapterView, final Object adapterCookie,
+            final Object viewObject) {
         // Look for user-recorded preference for layout to be used for previews
         if (adapterCookie instanceof UiViewElementNode) {
             UiViewElementNode uiNode = (UiViewElementNode) adapterCookie;
@@ -626,7 +614,7 @@ public final class ProjectCallback extends LayoutlibCallback {
             if (binding != null) {
                 return binding;
             }
-        } else if (adapterCookie instanceof Map<?,?>) {
+        } else if (adapterCookie instanceof Map<?, ?>) {
             @SuppressWarnings("unchecked")
             Map<String, String> map = (Map<String, String>) adapterCookie;
             AdapterBinding binding = LayoutMetadata.getNodeBinding(viewObject, map);
@@ -660,14 +648,12 @@ public final class ProjectCallback extends LayoutlibCallback {
         int count = listFqcn.endsWith(GRID_VIEW) ? 24 : 12;
         AdapterBinding binding = new AdapterBinding(count);
         if (listFqcn.endsWith(EXPANDABLE_LIST_VIEW)) {
-            binding.addItem(new DataBindingItem(LayoutMetadata.DEFAULT_EXPANDABLE_LIST_ITEM,
-                    true /* isFramework */, 1));
+            binding.addItem(
+                    new DataBindingItem(LayoutMetadata.DEFAULT_EXPANDABLE_LIST_ITEM, true /* isFramework */, 1));
         } else if (listFqcn.equals(SPINNER)) {
-            binding.addItem(new DataBindingItem(LayoutMetadata.DEFAULT_SPINNER_ITEM,
-                    true /* isFramework */, 1));
+            binding.addItem(new DataBindingItem(LayoutMetadata.DEFAULT_SPINNER_ITEM, true /* isFramework */, 1));
         } else {
-            binding.addItem(new DataBindingItem(LayoutMetadata.DEFAULT_LIST_ITEM,
-                    true /* isFramework */, 1));
+            binding.addItem(new DataBindingItem(LayoutMetadata.DEFAULT_LIST_ITEM, true /* isFramework */, 1));
         }
 
         return binding;
@@ -684,7 +670,7 @@ public final class ProjectCallback extends LayoutlibCallback {
 
     // Append the given message to the ADT log. Bypass the sandbox if necessary
     // such that we can write to the log file.
-    private void appendToIdeLog(Throwable exception, String format, Object ... args) {
+    private void appendToIdeLog(Throwable exception, String format, Object... args) {
         boolean token = RenderSecurityManager.enterSafeRegion(mCredential);
         try {
             AndmoreAndroidPlugin.log(exception, format, args);
@@ -697,19 +683,19 @@ public final class ProjectCallback extends LayoutlibCallback {
     public ActionBarCallback getActionBarCallback() {
         return new ActionBarHandler(mEditor);
     }
-    
+
     @Override
     public ParserFactory getParserFactory() {
-    	return parserFactory;
+        return parserFactory;
     }
 
     @Override
     public boolean supports(int ideFeature) {
-        switch(ideFeature) {
+        switch (ideFeature) {
             case Features.ACTION_BAR:
             case Features.ADAPTER_BINDING:
             case Features.ANIMATED_VIEW_MANIPULATION:
-            // Duplicate ID - case Features.FULL_ANIMATED_VIEW_MANIPULATION:
+                // Duplicate ID - case Features.FULL_ANIMATED_VIEW_MANIPULATION:
             case Features.CUSTOM_BACKGROUND_COLOR:
             case Features.EMBEDDED_LAYOUT:
             case Features.EXTENDED_VIEWINFO:

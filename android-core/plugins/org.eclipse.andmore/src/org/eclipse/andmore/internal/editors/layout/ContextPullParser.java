@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,17 +28,17 @@ import static com.android.SdkConstants.VIEW_FRAGMENT;
 import static com.android.SdkConstants.VIEW_INCLUDE;
 import static org.eclipse.andmore.internal.editors.layout.gle2.LayoutMetadata.KEY_FRAGMENT_LAYOUT;
 
+import java.io.File;
+import java.util.Map;
+
+import org.eclipse.andmore.internal.editors.layout.gle2.LayoutMetadata;
+import org.kxml2.io.KXmlParser;
+
 import com.android.SdkConstants;
 import com.android.ide.common.rendering.api.ILayoutPullParser;
 import com.android.ide.common.rendering.api.IProjectCallback;
 import com.android.ide.common.res2.ValueXmlHelper;
 import com.google.common.collect.Maps;
-
-import org.eclipse.andmore.internal.editors.layout.gle2.LayoutMetadata;
-import org.kxml2.io.KXmlParser;
-
-import java.io.File;
-import java.util.Map;
 
 /**
  * Modified {@link KXmlParser} that adds the methods of {@link ILayoutPullParser}, and
@@ -95,9 +92,7 @@ public class ContextPullParser extends KXmlParser implements ILayoutPullParser {
 
         // Store tools attributes if this looks like a layout we'll need adapter view
         // bindings for in the ProjectCallback.
-        if (LIST_VIEW.equals(name)
-                || EXPANDABLE_LIST_VIEW.equals(name)
-                || GRID_VIEW.equals(name)
+        if (LIST_VIEW.equals(name) || EXPANDABLE_LIST_VIEW.equals(name) || GRID_VIEW.equals(name)
                 || SPINNER.equals(name)) {
             Map<String, String> map = null;
             int count = getAttributeCount();
@@ -137,7 +132,6 @@ public class ContextPullParser extends KXmlParser implements ILayoutPullParser {
             mFragmentLayout = null;
         }
 
-
         return name;
     }
 
@@ -151,10 +145,9 @@ public class ContextPullParser extends KXmlParser implements ILayoutPullParser {
 
         // on the fly convert match_parent to fill_parent for compatibility with older
         // platforms.
-        if (VALUE_MATCH_PARENT.equals(value) &&
-                (ATTR_LAYOUT_WIDTH.equals(localName) ||
-                        ATTR_LAYOUT_HEIGHT.equals(localName)) &&
-                SdkConstants.NS_RESOURCES.equals(namespace)) {
+        if (VALUE_MATCH_PARENT.equals(value)
+                && (ATTR_LAYOUT_WIDTH.equals(localName) || ATTR_LAYOUT_HEIGHT.equals(localName))
+                && SdkConstants.NS_RESOURCES.equals(namespace)) {
             return VALUE_FILL_PARENT;
         }
 

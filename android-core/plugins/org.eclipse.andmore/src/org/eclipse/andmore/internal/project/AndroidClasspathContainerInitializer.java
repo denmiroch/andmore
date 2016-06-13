@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,11 +67,9 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
 
     public static final String SOURCES_ZIP = "/sources.zip"; //$NON-NLS-1$
 
-    public static final String COM_ANDROID_IDE_ECLIPSE_ADT_SOURCE =
-        "org.eclipse.andmore.source"; //$NON-NLS-1$
+    public static final String COM_ANDROID_IDE_ECLIPSE_ADT_SOURCE = "org.eclipse.andmore.source"; //$NON-NLS-1$
 
-    private static final String ANDROID_API_REFERENCE =
-        "http://developer.android.com/reference/"; //$NON-NLS-1$
+    private static final String ANDROID_API_REFERENCE = "http://developer.android.com/reference/"; //$NON-NLS-1$
 
     private final static String PROPERTY_ANDROID_API = "androidApi"; //$NON-NLS-1$
 
@@ -112,8 +107,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
             IClasspathContainer container = allocateAndroidContainer(project);
             if (container != null) {
                 JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_FRAMEWORK),
-                        new IJavaProject[] { project },
-                        new IClasspathContainer[] { container },
+                        new IJavaProject[] { project }, new IClasspathContainer[] { container },
                         new NullProgressMonitor());
             }
         }
@@ -136,14 +130,13 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
             int projectCount = androidProjects.length;
 
             IClasspathContainer[] containers = new IClasspathContainer[projectCount];
-            for (int i = 0 ; i < projectCount; i++) {
+            for (int i = 0; i < projectCount; i++) {
                 containers[i] = allocateAndroidContainer(androidProjects[i]);
             }
 
             // give each project their new container in one call.
-            JavaCore.setClasspathContainer(
-                    new Path(AndmoreAndroidConstants.CONTAINER_FRAMEWORK),
-                    androidProjects, containers, new NullProgressMonitor());
+            JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_FRAMEWORK), androidProjects,
+                    containers, new NullProgressMonitor());
 
             return true;
         } catch (JavaModelException e) {
@@ -176,8 +169,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
                 ProjectState state = Sdk.getProjectState(iProject);
                 if (state == null) {
                     // looks like the project state (project.properties) couldn't be read!
-                    markerMessage = String.format(
-                            "Project has no %1$s file! Edit the project properties to set one.",
+                    markerMessage = String.format("Project has no %1$s file! Edit the project properties to set one.",
                             SdkConstants.FN_PROJECT_PROPERTIES);
                 } else {
                     // this might be null if the sdk is not yet loaded.
@@ -188,17 +180,14 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
                     if (sdkIsLoaded && target != null) {
                         // check the renderscript support mode. If support mode is enabled,
                         // target API must be 18+
-                        if (!state.getRenderScriptSupportMode() ||
-                                target.getVersion().getApiLevel() >= 18) {
+                        if (!state.getRenderScriptSupportMode() || target.getVersion().getApiLevel() >= 18) {
                             // first make sure the target has loaded its data
                             Sdk.getCurrent().checkAndLoadTargetData(target, null /*project*/);
 
                             String targetName = target.getClasspathName();
 
-                            return new AndroidClasspathContainer(
-                                    createClasspathEntries(iProject, target, targetName),
-                                    new Path(AndmoreAndroidConstants.CONTAINER_FRAMEWORK),
-                                    targetName,
+                            return new AndroidClasspathContainer(createClasspathEntries(iProject, target, targetName),
+                                    new Path(AndmoreAndroidConstants.CONTAINER_FRAMEWORK), targetName,
                                     IClasspathContainer.K_DEFAULT_SYSTEM);
                         } else {
                             markerMessage = "Renderscript support mode requires compilation target API to be 18+.";
@@ -216,18 +205,16 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
                             // finished loading.
                             // By testing the sdk is loaded, we only show this once in the console.
                             if (sdkIsLoaded) {
-                                markerMessage = String.format(
-                                        "Project has no target set. Edit the project properties to set one.");
+                                markerMessage = String
+                                        .format("Project has no target set. Edit the project properties to set one.");
                             }
                         } else if (sdkIsLoaded) {
-                            markerMessage = String.format(
-                                    "Unable to resolve target '%s'", hashString);
+                            markerMessage = String.format("Unable to resolve target '%s'", hashString);
                         } else {
                             // this is the case where there is a hashString but the SDK is not yet
                             // loaded and therefore we can't get the target yet.
                             // We check if there is a cache of the needed information.
-                            AndroidClasspathContainer container = getContainerFromCache(iProject,
-                                    target);
+                            AndroidClasspathContainer container = getContainerFromCache(iProject, target);
 
                             if (container == null) {
                                 // either the cache was wrong (ie folder does not exists anymore), or
@@ -235,8 +222,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
                                 // is resolved again after the SDK is loaded.
                                 plugin.setProjectToResolve(javaProject);
 
-                                markerMessage = String.format(
-                                        "Unable to resolve target '%s' until the SDK is loaded.",
+                                markerMessage = String.format("Unable to resolve target '%s' until the SDK is loaded.",
                                         hashString);
 
                                 // let's not log this one to the console as it will happen at
@@ -281,7 +267,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
                 };
             }
         } finally {
-           processError(iProject, markerMessage, AndmoreAndroidConstants.MARKER_TARGET, outputToConsole);
+            processError(iProject, markerMessage, AndmoreAndroidConstants.MARKER_TARGET, outputToConsole);
         }
     }
 
@@ -299,8 +285,8 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
      * @param target The target that contains the libraries.
      * @param targetName
      */
-    private static IClasspathEntry[] createClasspathEntries(IProject project,
-            IAndroidTarget target, String targetName) {
+    private static IClasspathEntry[] createClasspathEntries(IProject project, IAndroidTarget target,
+            String targetName) {
 
         // get the path from the target
         String[] paths = getTargetPaths(target);
@@ -327,8 +313,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
     /**
      * Generates an {@link AndroidClasspathContainer} from the project cache, if possible.
      */
-    private static AndroidClasspathContainer getContainerFromCache(IProject project,
-            IAndroidTarget target) {
+    private static AndroidClasspathContainer getContainerFromCache(IProject project, IAndroidTarget target) {
         // get the cached info from the project persistent properties.
         String cache = ProjectHelper.loadStringProperty(project, PROPERTY_CONTAINER_CACHE);
         String targetNameCache = ProjectHelper.loadStringProperty(project, PROPERTY_TARGET_NAME);
@@ -359,8 +344,8 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
         // Also paths[CACHE_INDEX_DOCS_URI] is a URI to the javadoc, so we test it a
         // bit differently.
         try {
-            if (new File(paths[CACHE_INDEX_JAR]).exists() == false ||
-                    new File(new URI(paths[CACHE_INDEX_DOCS_URI])).exists() == false) {
+            if (new File(paths[CACHE_INDEX_JAR]).exists() == false
+                    || new File(new URI(paths[CACHE_INDEX_DOCS_URI])).exists() == false) {
                 return null;
             }
 
@@ -368,7 +353,8 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
             if (paths.length > CACHE_INDEX_ADD_ON_START) {
 
                 // check the docs path separately from the rest of the paths as it's a URI.
-                if (paths[CACHE_INDEX_OPT_DOCS_URI].length() != 0 && new File(new URI(paths[CACHE_INDEX_OPT_DOCS_URI])).exists() == false) {
+                if (paths[CACHE_INDEX_OPT_DOCS_URI].length() != 0
+                        && new File(new URI(paths[CACHE_INDEX_OPT_DOCS_URI])).exists() == false) {
                     return null;
                 }
 
@@ -389,8 +375,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
 
         IClasspathEntry[] entries = createClasspathEntriesFromPaths(paths, target);
 
-        return new AndroidClasspathContainer(entries,
-                new Path(AndmoreAndroidConstants.CONTAINER_FRAMEWORK),
+        return new AndroidClasspathContainer(entries, new Path(AndmoreAndroidConstants.CONTAINER_FRAMEWORK),
                 targetNameCache, IClasspathContainer.K_DEFAULT_SYSTEM);
     }
 
@@ -398,8 +383,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
      * Generates an array of {@link IClasspathEntry} from a set of paths.
      * @see #getTargetPaths(IAndroidTarget)
      */
-    private static IClasspathEntry[] createClasspathEntriesFromPaths(String[] paths,
-            IAndroidTarget target) {
+    private static IClasspathEntry[] createClasspathEntriesFromPaths(String[] paths, IAndroidTarget target) {
         ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>();
 
         // First, we create the IClasspathEntry for the framework.
@@ -411,8 +395,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
         String androidSrcOsPath = null;
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
         if (target != null) {
-            androidSrcOsPath =
-                ProjectHelper.loadStringProperty(root, getAndroidSourceProperty(target));
+            androidSrcOsPath = ProjectHelper.loadStringProperty(root, getAndroidSourceProperty(target));
         }
         if (androidSrcOsPath != null && androidSrcOsPath.trim().length() > 0) {
             androidSrc = new Path(androidSrcOsPath);
@@ -437,8 +420,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
                     URL url = null;
                     try {
                         url = FileLocator.resolve(sourceURL);
-                    } catch (IOException ignore) {
-                    }
+                    } catch (IOException ignore) {}
                     if (url != null) {
                         androidSrcOsPath = url.getFile();
                         if (new File(androidSrcOsPath).isFile()) {
@@ -464,24 +446,19 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
 
         IClasspathAttribute[] attributes = null;
         if (apiURL != null && !NULL_API_URL.equals(apiURL)) {
-            IClasspathAttribute cpAttribute = JavaCore.newClasspathAttribute(
-                    IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, apiURL);
-            attributes = new IClasspathAttribute[] {
-                cpAttribute
-            };
+            IClasspathAttribute cpAttribute = JavaCore
+                    .newClasspathAttribute(IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, apiURL);
+            attributes = new IClasspathAttribute[] { cpAttribute };
         }
         // create the access rule to restrict access to classes in
         // com.android.internal
         IAccessRule accessRule = JavaCore.newAccessRule(new Path("com/android/internal/**"), //$NON-NLS-1$
                 IAccessRule.K_NON_ACCESSIBLE);
 
-        IClasspathEntry frameworkClasspathEntry = JavaCore.newLibraryEntry(androidLib,
-                androidSrc, // source attachment path
+        IClasspathEntry frameworkClasspathEntry = JavaCore.newLibraryEntry(androidLib, androidSrc, // source attachment path
                 null, // default source attachment root path.
-                new IAccessRule[] { accessRule },
-                attributes,
-                false // not exported.
-                );
+                new IAccessRule[] { accessRule }, attributes, false // not exported.
+        );
 
         list.add(frameworkClasspathEntry);
 
@@ -494,20 +471,14 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
 
                 attributes = null;
                 if (docPath.length() > 0) {
-                    attributes = new IClasspathAttribute[] {
-                        JavaCore.newClasspathAttribute(
-                                IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, docPath)
-                    };
+                    attributes = new IClasspathAttribute[] { JavaCore
+                            .newClasspathAttribute(IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, docPath) };
                 }
 
-                IClasspathEntry entry = JavaCore.newLibraryEntry(
-                        jarPath,
-                        null, // source attachment path
+                IClasspathEntry entry = JavaCore.newLibraryEntry(jarPath, null, // source attachment path
                         null, // default source attachment root path.
-                        null,
-                        attributes,
-                        false // not exported.
-                        );
+                        null, attributes, false // not exported.
+                );
                 list.add(entry);
             }
         }
@@ -516,15 +487,13 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
             ProjectHelper.saveStringProperty(root, PROPERTY_ANDROID_API, apiURL);
         }
         if (androidSrc != null && target != null) {
-            ProjectHelper.saveStringProperty(root, getAndroidSourceProperty(target),
-                    androidSrc.toOSString());
+            ProjectHelper.saveStringProperty(root, getAndroidSourceProperty(target), androidSrc.toOSString());
         }
         return list.toArray(new IClasspathEntry[list.size()]);
     }
 
     private static Bundle getSourceBundle() {
-        String bundleId = System.getProperty(COM_ANDROID_IDE_ECLIPSE_ADT_SOURCE,
-                COM_ANDROID_IDE_ECLIPSE_ADT_SOURCE);
+        String bundleId = System.getProperty(COM_ANDROID_IDE_ECLIPSE_ADT_SOURCE, COM_ANDROID_IDE_ECLIPSE_ADT_SOURCE);
         Bundle bundle = Platform.getBundle(bundleId);
         return bundle;
     }
@@ -533,8 +502,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
         if (target == null) {
             return null;
         }
-        String androidSourceProperty = PROPERTY_ANDROID_SOURCE + "_"
-                + target.getVersion().getApiString();
+        String androidSourceProperty = PROPERTY_ANDROID_SOURCE + "_" + target.getVersion().getApiString();
         return androidSourceProperty;
     }
 
@@ -542,8 +510,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
      * Cache results for testURL: Some are expensive to compute, and this is
      * called repeatedly (perhaps for each open project)
      */
-    private static final Map<String, Boolean> sRecentUrlValidCache =
-            Maps.newHashMapWithExpectedSize(4);
+    private static final Map<String, Boolean> sRecentUrlValidCache = Maps.newHashMapWithExpectedSize(4);
 
     @SuppressWarnings("resource") // Eclipse does not handle Closeables#closeQuietly
     private static boolean testURL(String androidApiURL) {
@@ -561,8 +528,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
             connection.setReadTimeout(5000);
             is = connection.getInputStream();
             valid = true;
-        } catch (Exception ignore) {
-        } finally {
+        } catch (Exception ignore) {} finally {
             Closeables.closeQuietly(is);
         }
 
@@ -578,7 +544,8 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
     public static void checkProjectsCache(ArrayList<IJavaProject> projects) {
         Sdk currentSdk = Sdk.getCurrent();
         int i = 0;
-        projectLoop: while (i < projects.size()) {
+        projectLoop:
+        while (i < projects.size()) {
             IJavaProject javaProject = projects.get(i);
             IProject iProject = javaProject.getProject();
 
@@ -594,8 +561,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
             // project that have been resolved before the sdk was loaded
             // will have a ProjectState where the IAndroidTarget is null
             // so we load the target now that the SDK is loaded.
-            IAndroidTarget target = currentSdk.loadTargetAndBuildTools(
-                    Sdk.getProjectState(iProject));
+            IAndroidTarget target = currentSdk.loadTargetAndBuildTools(Sdk.getProjectState(iProject));
             if (target == null) {
                 // this is really not supposed to happen. This would mean there are cached paths,
                 // but project.properties was deleted. Keep the project in the list to force
@@ -631,12 +597,10 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
             }
 
             // compare the main paths (android.jar, main sources, main javadoc)
-            if (new File(targetPaths[CACHE_INDEX_JAR]).equals(
-                            new File(cachedPaths[CACHE_INDEX_JAR])) == false ||
-                    new File(targetPaths[CACHE_INDEX_SRC]).equals(
-                            new File(cachedPaths[CACHE_INDEX_SRC])) == false ||
-                    new File(targetPaths[CACHE_INDEX_DOCS_URI]).equals(
-                            new File(cachedPaths[CACHE_INDEX_DOCS_URI])) == false) {
+            if (new File(targetPaths[CACHE_INDEX_JAR]).equals(new File(cachedPaths[CACHE_INDEX_JAR])) == false
+                    || new File(targetPaths[CACHE_INDEX_SRC]).equals(new File(cachedPaths[CACHE_INDEX_SRC])) == false
+                    || new File(targetPaths[CACHE_INDEX_DOCS_URI])
+                            .equals(new File(cachedPaths[CACHE_INDEX_DOCS_URI])) == false) {
                 // different paths, force resolve again.
                 i++;
                 continue;
@@ -644,8 +608,8 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
 
             if (cachedPaths.length > CACHE_INDEX_OPT_DOCS_URI) {
                 // compare optional libraries javadoc
-                if (new File(targetPaths[CACHE_INDEX_OPT_DOCS_URI]).equals(
-                        new File(cachedPaths[CACHE_INDEX_OPT_DOCS_URI])) == false) {
+                if (new File(targetPaths[CACHE_INDEX_OPT_DOCS_URI])
+                        .equals(new File(cachedPaths[CACHE_INDEX_OPT_DOCS_URI])) == false) {
                     // different paths, force resolve again.
                     i++;
                     continue;
@@ -656,11 +620,12 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
                 // From a previous test, we do know however that there is the same number.
                 // The number of libraries should be low enough that we can simply go through the
                 // lists manually.
-                targetLoop: for (int tpi = 4 ; tpi < targetPaths.length; tpi++) {
+                targetLoop:
+                for (int tpi = 4; tpi < targetPaths.length; tpi++) {
                     String targetPath = targetPaths[tpi];
 
                     // look for a match in the other array
-                    for (int cpi = 4 ; cpi < cachedPaths.length; cpi++) {
+                    for (int cpi = 4; cpi < cachedPaths.length; cpi++) {
                         if (new File(targetPath).equals(new File(cachedPaths[cpi]))) {
                             // found a match. Try the next targetPath
                             continue targetLoop;
@@ -763,17 +728,14 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
                                 IPath entrySrcPath = entry.getSourceAttachmentPath();
                                 IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
                                 if (entrySrcPath != null) {
-                                    ProjectHelper.saveStringProperty(root,
-                                            getAndroidSourceProperty(target),
+                                    ProjectHelper.saveStringProperty(root, getAndroidSourceProperty(target),
                                             entrySrcPath.toString());
                                 } else {
-                                    ProjectHelper.saveStringProperty(root,
-                                            getAndroidSourceProperty(target), null);
+                                    ProjectHelper.saveStringProperty(root, getAndroidSourceProperty(target), null);
                                 }
                                 IClasspathAttribute[] extraAttributtes = entry.getExtraAttributes();
                                 if (extraAttributtes.length == 0) {
-                                    ProjectHelper.saveStringProperty(root, PROPERTY_ANDROID_API,
-                                            NULL_API_URL);
+                                    ProjectHelper.saveStringProperty(root, PROPERTY_ANDROID_API, NULL_API_URL);
                                 }
                                 for (int j = 0; j < extraAttributtes.length; j++) {
                                     IClasspathAttribute extraAttribute = extraAttributtes[j];
@@ -785,8 +747,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
                                     }
                                     if (IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME
                                             .equals(extraAttribute.getName())) {
-                                        ProjectHelper.saveStringProperty(root,
-                                                PROPERTY_ANDROID_API, value);
+                                        ProjectHelper.saveStringProperty(root, PROPERTY_ANDROID_API, value);
 
                                     }
                                 }
@@ -799,8 +760,7 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
         }
     }
 
-    private static void rebindClasspathEntries(IJavaModel model, IPath containerPath)
-            throws JavaModelException {
+    private static void rebindClasspathEntries(IJavaModel model, IPath containerPath) throws JavaModelException {
         ArrayList<IJavaProject> affectedProjects = new ArrayList<IJavaProject>();
 
         IJavaProject[] projects = model.getJavaProjects();
@@ -809,15 +769,13 @@ public class AndroidClasspathContainerInitializer extends BaseClasspathContainer
             IClasspathEntry[] entries = project.getRawClasspath();
             for (int k = 0; k < entries.length; k++) {
                 IClasspathEntry curr = entries[k];
-                if (curr.getEntryKind() == IClasspathEntry.CPE_CONTAINER
-                        && containerPath.equals(curr.getPath())) {
+                if (curr.getEntryKind() == IClasspathEntry.CPE_CONTAINER && containerPath.equals(curr.getPath())) {
                     affectedProjects.add(project);
                 }
             }
         }
         if (!affectedProjects.isEmpty()) {
-            IJavaProject[] affected = affectedProjects
-                    .toArray(new IJavaProject[affectedProjects.size()]);
+            IJavaProject[] affected = affectedProjects.toArray(new IJavaProject[affectedProjects.size()]);
             updateProjects(affected);
         }
     }

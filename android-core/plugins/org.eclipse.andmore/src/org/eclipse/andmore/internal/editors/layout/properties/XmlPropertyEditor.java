@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,14 +23,15 @@ import static com.android.SdkConstants.PREFIX_RESOURCE_REF;
 import static com.android.SdkConstants.PREFIX_THEME_REF;
 import static org.eclipse.andmore.common.layout.BaseViewRule.stripIdPrefix;
 
-import com.android.annotations.NonNull;
-import com.android.ide.common.api.IAttributeInfo;
-import com.android.ide.common.api.IAttributeInfo.Format;
-import com.android.ide.common.rendering.api.ResourceValue;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.ide.common.resources.ResourceResolver;
-import com.android.resources.ResourceType;
-import com.google.common.collect.Maps;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.common.layout.BaseViewRule;
@@ -76,15 +74,14 @@ import org.eclipse.wb.internal.core.model.property.editor.presentation.PropertyE
 import org.eclipse.wb.internal.core.model.property.table.PropertyTable;
 import org.eclipse.wb.internal.core.utils.ui.DrawUtils;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.imageio.ImageIO;
+import com.android.annotations.NonNull;
+import com.android.ide.common.api.IAttributeInfo;
+import com.android.ide.common.api.IAttributeInfo.Format;
+import com.android.ide.common.rendering.api.ResourceValue;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.ide.common.resources.ResourceResolver;
+import com.android.resources.ResourceType;
+import com.google.common.collect.Maps;
 
 /**
  * Special property editor used for the {@link XmlProperty} instances which handles
@@ -95,11 +92,9 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
     private static final int SAMPLE_SIZE = 10;
     private static final int SAMPLE_MARGIN = 3;
 
-    protected XmlPropertyEditor() {
-    }
+    protected XmlPropertyEditor() {}
 
-    private final PropertyEditorPresentation mPresentation =
-            new ButtonPropertyEditorPresentation() {
+    private final PropertyEditorPresentation mPresentation = new ButtonPropertyEditorPresentation() {
         @Override
         protected void onClick(PropertyTable propertyTable, Property property) throws Exception {
             openDialog(propertyTable, property);
@@ -126,8 +121,7 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
     }
 
     @Override
-    public void paint(Property property, GC gc, int x, int y, int width, int height)
-            throws Exception {
+    public void paint(Property property, GC gc, int x, int y, int width, int height) throws Exception {
         String text = getText(property);
         if (text != null) {
             ResourceValue resValue = null;
@@ -140,16 +134,13 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
                 GraphicalEditorPart graphicalEditor = xmlProperty.getGraphicalEditor();
                 if (graphicalEditor != null) {
                     ResourceResolver resolver = graphicalEditor.getResourceResolver();
-                    boolean isFramework = text.startsWith(ANDROID_PREFIX)
-                            || text.startsWith(ANDROID_THEME_PREFIX);
+                    boolean isFramework = text.startsWith(ANDROID_PREFIX) || text.startsWith(ANDROID_THEME_PREFIX);
                     resValue = resolver.findResValue(text, isFramework);
                     while (resValue != null && resValue.getValue() != null) {
                         String value = resValue.getValue();
-                        if (value.startsWith(PREFIX_RESOURCE_REF)
-                                || value.startsWith(PREFIX_THEME_REF)) {
+                        if (value.startsWith(PREFIX_RESOURCE_REF) || value.startsWith(PREFIX_THEME_REF)) {
                             // TODO: do I have to strip off the @ too?
-                            isFramework = isFramework
-                                    || value.startsWith(ANDROID_PREFIX)
+                            isFramework = isFramework || value.startsWith(ANDROID_PREFIX)
                                     || value.startsWith(ANDROID_THEME_PREFIX);
                             ResourceValue v = resolver.findResValue(text, isFramework);
                             if (v != null && !value.equals(v.getValue())) {
@@ -216,8 +207,7 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
                             service.setOverrideRenderSize(SAMPLE_SIZE, SAMPLE_SIZE);
                             BufferedImage drawable = service.renderDrawable(resValue);
                             if (drawable != null) {
-                                swtImage = SwtUtils.convertToSwt(gc.getDevice(), drawable,
-                                        true /*transferAlpha*/, -1);
+                                swtImage = SwtUtils.convertToSwt(gc.getDevice(), drawable, true /*transferAlpha*/, -1);
                                 cache.put(value, swtImage);
                             }
                         }
@@ -236,8 +226,7 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
                             if (file.exists()) {
                                 try {
                                     BufferedImage awtImage = ImageIO.read(file);
-                                    if (awtImage != null && awtImage.getWidth() > 0
-                                            && awtImage.getHeight() > 0) {
+                                    if (awtImage != null && awtImage.getWidth() > 0 && awtImage.getHeight() > 0) {
                                         awtImage = ImageUtils.cropBlank(awtImage, null);
                                         if (awtImage != null) {
                                             // Scale image
@@ -251,11 +240,10 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
                                                 if (scaledWidth > maxWidth) {
                                                     scale = maxWidth / (double) imageWidth;
                                                 }
-                                                awtImage = ImageUtils.scale(awtImage, scale,
-                                                        scale);
+                                                awtImage = ImageUtils.scale(awtImage, scale, scale);
                                             }
-                                            swtImage = SwtUtils.convertToSwt(gc.getDevice(),
-                                                    awtImage, true /*transferAlpha*/, -1);
+                                            swtImage = SwtUtils.convertToSwt(gc.getDevice(), awtImage,
+                                                    true /*transferAlpha*/, -1);
                                         }
                                     }
                                 } catch (IOException e) {
@@ -325,28 +313,19 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
 
         // Handle id refactoring: if you change an id, may want to update references too.
         // Ask user.
-        if (isId && property instanceof XmlProperty
-                && old != null && !old.isEmpty()
-                && text != null && !text.isEmpty()
+        if (isId && property instanceof XmlProperty && old != null && !old.isEmpty() && text != null && !text.isEmpty()
                 && !text.equals(old)) {
             XmlProperty xmlProperty = (XmlProperty) property;
             IPreferenceStore store = AndmoreAndroidPlugin.getDefault().getPreferenceStore();
             String refactorPref = store.getString(AdtPrefs.PREFS_REFACTOR_IDS);
             boolean performRefactor = false;
             Shell shell = AndmoreAndroidPlugin.getShell();
-            if (refactorPref == null
-                    || refactorPref.isEmpty()
-                    || refactorPref.equals(MessageDialogWithToggle.PROMPT)) {
-                MessageDialogWithToggle dialog =
-                        MessageDialogWithToggle.openYesNoCancelQuestion(
-                    shell,
-                    "Update References?",
-                    "Update all references as well? " +
-                    "This will update all XML references and Java R field references.",
-                    "Do not show again",
-                    false,
-                    store,
-                    AdtPrefs.PREFS_REFACTOR_IDS);
+            if (refactorPref == null || refactorPref.isEmpty() || refactorPref.equals(MessageDialogWithToggle.PROMPT)) {
+                MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoCancelQuestion(shell,
+                        "Update References?",
+                        "Update all references as well? "
+                                + "This will update all XML references and Java R field references.",
+                        "Do not show again", false, store, AdtPrefs.PREFS_REFACTOR_IDS);
                 switch (dialog.getReturnCode()) {
                     case IDialogConstants.CANCEL_ID:
                         return false;
@@ -365,8 +344,8 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
                 if (xmlEditor != null) {
                     IProject project = xmlEditor.getProject();
                     if (project != null && shell != null) {
-                        RenameResourceWizard.renameResource(shell, project,
-                                ResourceType.ID, stripIdPrefix(old), stripIdPrefix(text), false);
+                        RenameResourceWizard.renameResource(shell, project, ResourceType.ID, stripIdPrefix(old),
+                                stripIdPrefix(text), false);
                     }
                 }
             }
@@ -422,10 +401,8 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
             if (formats.contains(Format.FLAG)) {
                 String[] flagValues = attributeInfo.getFlagValues();
                 if (flagValues != null) {
-                    FlagXmlPropertyDialog dialog =
-                        new FlagXmlPropertyDialog(propertyTable.getShell(),
-                                "Select Flag Values", false /* radio */,
-                                flagValues, xmlProperty);
+                    FlagXmlPropertyDialog dialog = new FlagXmlPropertyDialog(propertyTable.getShell(),
+                            "Select Flag Values", false /* radio */, flagValues, xmlProperty);
 
                     dialog.open();
                     return;
@@ -433,10 +410,8 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
             } else if (formats.contains(Format.ENUM)) {
                 String[] enumValues = attributeInfo.getEnumValues();
                 if (enumValues != null) {
-                    FlagXmlPropertyDialog dialog =
-                        new FlagXmlPropertyDialog(propertyTable.getShell(),
-                                "Select Enum Value", true /* radio */,
-                                enumValues, xmlProperty);
+                    FlagXmlPropertyDialog dialog = new FlagXmlPropertyDialog(propertyTable.getShell(),
+                            "Select Enum Value", true /* radio */, enumValues, xmlProperty);
                     dialog.open();
                     return;
                 }
@@ -466,13 +441,10 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
                     IProject project = delegate.getEditor().getProject();
                     if (project != null) {
                         // get the resource repository for this project and the system resources.
-                        ResourceRepository projectRepository =
-                            ResourceManager.getInstance().getProjectResources(project);
+                        ResourceRepository projectRepository = ResourceManager.getInstance()
+                                .getProjectResources(project);
                         Shell shell = AndmoreAndroidPlugin.getShell();
-                        ReferenceChooserDialog dlg = new ReferenceChooserDialog(
-                                project,
-                                projectRepository,
-                                shell);
+                        ReferenceChooserDialog dlg = new ReferenceChooserDialog(project, projectRepository, shell);
                         dlg.setPreviewHelper(new ResourcePreviewHelper(dlg, graphicalEditor));
 
                         String currentValue = (String) property.getValue();
@@ -499,8 +471,8 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
                 if (graphicalEditor != null) {
                     String currentValue = (String) property.getValue();
                     // TODO: Add validator factory?
-                    String resource = ResourceChooser.chooseResource(graphicalEditor,
-                            type, currentValue, null /* validator */);
+                    String resource = ResourceChooser.chooseResource(graphicalEditor, type, currentValue,
+                            null /* validator */);
                     // Returns null for cancel, "" for clear and otherwise a new value
                     if (resource != null) {
                         if (resource.length() > 0) {
@@ -516,8 +488,7 @@ class XmlPropertyEditor extends AbstractTextPropertyEditor {
         }
 
         // Fallback: Just use a plain string editor
-        StringXmlPropertyDialog dialog =
-                new StringXmlPropertyDialog(propertyTable.getShell(), property);
+        StringXmlPropertyDialog dialog = new StringXmlPropertyDialog(propertyTable.getShell(), property);
         if (dialog.open() == Window.OK) {
             // TODO: Do I need to activate?
         }

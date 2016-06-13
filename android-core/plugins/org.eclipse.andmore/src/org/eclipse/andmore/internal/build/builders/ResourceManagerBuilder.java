@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,8 @@
 
 package org.eclipse.andmore.internal.build.builders;
 
-import com.android.SdkConstants;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -48,8 +43,10 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
-import java.util.List;
-import java.util.Map;
+import com.android.SdkConstants;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
 
 /**
  * Resource manager builder whose only purpose is to refresh the resource folder
@@ -77,8 +74,7 @@ public class ResourceManagerBuilder extends BaseBuilder {
     // build() returns a list of project from which this project depends for future compilation.
     @SuppressWarnings("unchecked")
     @Override
-    protected IProject[] build(int kind, Map args, IProgressMonitor monitor)
-            throws CoreException {
+    protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
         // Get the project.
         final IProject project = getProject();
         IJavaProject javaProject = JavaCore.create(project);
@@ -111,8 +107,7 @@ public class ResourceManagerBuilder extends BaseBuilder {
         }
 
         if (errorMessage != null) {
-            errorMessage = String.format(errorMessage,
-                    result.getSecond() == null ? "(no value)" : result.getSecond());
+            errorMessage = String.format(errorMessage, result.getSecond() == null ? "(no value)" : result.getSecond());
 
             if (JavaCore.VERSION_1_7.equals(result.getSecond())) {
                 // If the user is trying to target 1.7 but compiling with something older,
@@ -122,8 +117,8 @@ public class ResourceManagerBuilder extends BaseBuilder {
                 if (currentSdk != null) {
                     IAndroidTarget target = currentSdk.getTarget(project.getProject());
                     if (target != null && target.getVersion().getApiLevel() < 19) {
-                        errorMessage = "Using 1.7 requires compiling with Android 4.4 " +
-                                "(KitKat); currently using " + target.getVersion();
+                        errorMessage = "Using 1.7 requires compiling with Android 4.4 " + "(KitKat); currently using "
+                                + target.getVersion();
                     }
 
                     ProjectState projectState = Sdk.getProjectState(project);
@@ -133,9 +128,8 @@ public class ResourceManagerBuilder extends BaseBuilder {
                             buildToolInfo = currentSdk.getLatestBuildTool();
                         }
                         if (buildToolInfo != null && buildToolInfo.getRevision().getMajor() < 19) {
-                            errorMessage = "Using 1.7 requires using Android Build Tools " +
-                                    "version 19 or later; currently using " +
-                                    buildToolInfo.getRevision();
+                            errorMessage = "Using 1.7 requires using Android Build Tools "
+                                    + "version 19 or later; currently using " + buildToolInfo.getRevision();
                         }
                     }
                 }
@@ -152,8 +146,7 @@ public class ResourceManagerBuilder extends BaseBuilder {
 
         if (osSdkFolder == null || osSdkFolder.length() == 0) {
             AndmoreAndroidPlugin.printErrorToConsole(project, Messages.No_SDK_Setup_Error);
-            markProject(AndmoreAndroidConstants.MARKER_ADT, Messages.No_SDK_Setup_Error,
-                    IMarker.SEVERITY_ERROR);
+            markProject(AndmoreAndroidConstants.MARKER_ADT, Messages.No_SDK_Setup_Error, IMarker.SEVERITY_ERROR);
 
             return null;
         }
@@ -166,8 +159,7 @@ public class ResourceManagerBuilder extends BaseBuilder {
             for (IClasspathEntry e : classpaths) {
                 if (e.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
                     IPath path = e.getPath();
-                    if (path.segmentCount() == 2 &&
-                            path.segment(1).equals(SdkConstants.FD_GEN_SOURCES)) {
+                    if (path.segmentCount() == 2 && path.segment(1).equals(SdkConstants.FD_GEN_SOURCES)) {
                         hasGenSrcFolder = true;
                         break;
                     }
@@ -186,7 +178,8 @@ public class ResourceManagerBuilder extends BaseBuilder {
             if (resource.getType() == IResource.FOLDER) {
                 // folder exists already! This is an error. If the folder had been created
                 // by the NewProjectWizard, it'd be a source folder.
-                message = String.format("%1$s already exists but is not a source folder. Convert to a source folder or rename it.",
+                message = String.format(
+                        "%1$s already exists but is not a source folder. Convert to a source folder or rename it.",
                         resource.getFullPath().toString());
             } else {
                 // resource exists but is not a folder.
@@ -219,15 +212,13 @@ public class ResourceManagerBuilder extends BaseBuilder {
             if (genFolderPresent == false) {
                 AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project,
                         "Creating 'gen' source folder for generated Java files");
-                genFolder.create(true /* force */, true /* local */,
-                        new SubProgressMonitor(monitor, 10));
+                genFolder.create(true /* force */, true /* local */, new SubProgressMonitor(monitor, 10));
             }
 
             // add it to the source folder list, if needed only (or it will throw)
             if (hasGenSrcFolder == false) {
                 IClasspathEntry[] entries = javaProject.getRawClasspath();
-                entries = ProjectHelper.addEntryToClasspath(entries,
-                        JavaCore.newSourceEntry(genFolder.getFullPath()));
+                entries = ProjectHelper.addEntryToClasspath(entries, JavaCore.newSourceEntry(genFolder.getFullPath()));
                 javaProject.setRawClasspath(entries, new SubProgressMonitor(monitor, 10));
             }
 
@@ -258,8 +249,8 @@ public class ResourceManagerBuilder extends BaseBuilder {
         // using bin/classes
         IFolder androidOutput = BaseProjectHelper.getAndroidOutputFolder(project);
         IFolder javaOutput = BaseProjectHelper.getJavaOutputFolder(project);
-        if (androidOutput.exists() == false || javaOutput == null ||
-                javaOutput.getParent().equals(androidOutput) == false) {
+        if (androidOutput.exists() == false || javaOutput == null
+                || javaOutput.getParent().equals(androidOutput) == false) {
             // get what we want as the new java output.
             IFolder newJavaOutput = androidOutput.getFolder(SdkConstants.FD_CLASSES_OUTPUT);
 
@@ -292,8 +283,7 @@ public class ResourceManagerBuilder extends BaseBuilder {
         // check that we have bin/res/
         IFolder binResFolder = androidOutput.getFolder(SdkConstants.FD_RESOURCES);
         if (binResFolder.exists() == false) {
-            binResFolder.create(true /* force */, true /* local */,
-                    new SubProgressMonitor(monitor, 10));
+            binResFolder.create(true /* force */, true /* local */, new SubProgressMonitor(monitor, 10));
             project.refreshLocal(IResource.DEPTH_ONE, new SubProgressMonitor(monitor, 10));
         }
 

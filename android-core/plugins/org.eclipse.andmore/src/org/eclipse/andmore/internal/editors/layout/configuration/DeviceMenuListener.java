@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,11 +20,12 @@ import static com.android.ide.common.rendering.HardwareConfigHelper.isGeneric;
 import static com.android.ide.common.rendering.HardwareConfigHelper.isNexus;
 import static com.android.ide.common.rendering.HardwareConfigHelper.sortNexusList;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.sdklib.devices.Device;
-import com.android.sdklib.internal.avd.AvdInfo;
-import com.android.sdklib.internal.avd.AvdManager;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.andmore.internal.editors.layout.gle2.RenderPreviewMode;
 import org.eclipse.andmore.internal.sdk.Sdk;
@@ -40,12 +38,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolItem;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.sdklib.devices.Device;
+import com.android.sdklib.internal.avd.AvdInfo;
+import com.android.sdklib.internal.avd.AvdManager;
 
 /**
  * The {@linkplain DeviceMenuListener} class is responsible for generating the device
@@ -55,9 +52,7 @@ class DeviceMenuListener extends SelectionAdapter {
     private final ConfigurationChooser mConfigChooser;
     private final Device mDevice;
 
-    DeviceMenuListener(
-            @NonNull ConfigurationChooser configChooser,
-            @Nullable Device device) {
+    DeviceMenuListener(@NonNull ConfigurationChooser configChooser, @Nullable Device device) {
         mConfigChooser = configChooser;
         mDevice = device;
     }
@@ -186,9 +181,8 @@ class DeviceMenuListener extends SelectionAdapter {
         @SuppressWarnings("unused")
         MenuItem separator = new MenuItem(menu, SWT.SEPARATOR);
 
-        ConfigurationMenuListener.addTogglePreviewModeAction(menu,
-                "Preview All Screens", chooser, RenderPreviewMode.SCREENS);
-
+        ConfigurationMenuListener.addTogglePreviewModeAction(menu, "Preview All Screens", chooser,
+                RenderPreviewMode.SCREENS);
 
         Rectangle bounds = combo.getBounds();
         Point location = new Point(bounds.x, bounds.y + bounds.height);

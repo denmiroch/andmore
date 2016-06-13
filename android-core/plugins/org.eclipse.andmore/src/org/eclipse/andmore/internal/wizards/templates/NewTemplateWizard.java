@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,10 +18,12 @@ import static org.eclipse.andmore.internal.wizards.templates.NewProjectWizard.AT
 import static org.eclipse.andmore.internal.wizards.templates.NewProjectWizard.ATTR_PACKAGE_NAME;
 import static org.eclipse.andmore.internal.wizards.templates.NewProjectWizard.ATTR_TARGET_API;
 
-import com.android.annotations.NonNull;
+import java.io.File;
+import java.util.List;
+import java.util.Set;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -36,18 +35,16 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
-import java.io.File;
-import java.util.List;
-import java.util.Set;
+import com.android.annotations.NonNull;
 
 /**
  * Template wizard which creates parameterized templates
  */
 public class NewTemplateWizard extends TemplateWizard {
     /** Template name and location under $sdk/templates for the default activity */
-    static final String BLANK_ACTIVITY = "activities/BlankActivity";           //$NON-NLS-1$
+    static final String BLANK_ACTIVITY = "activities/BlankActivity"; //$NON-NLS-1$
     /** Template name and location under $sdk/templates for the custom view template */
-    static final String CUSTOM_VIEW = "other/CustomView";                      //$NON-NLS-1$
+    static final String CUSTOM_VIEW = "other/CustomView"; //$NON-NLS-1$
 
     protected NewTemplatePage mMainPage;
     protected NewTemplateWizardState mValues;
@@ -110,8 +107,7 @@ public class NewTemplateWizard extends TemplateWizard {
             WizardPage iconPage = getIconPage(mValues.getIconState());
             mValues.updateIconState(mMainPage.getEvaluator());
             return iconPage;
-        } else if (page == mMainPage
-                || shouldAddIconPage() && page == getIconPage(mValues.getIconState())) {
+        } else if (page == mMainPage || shouldAddIconPage() && page == getIconPage(mValues.getIconState())) {
             if (template != null) {
                 if (InstallDependencyPage.isInstalled(template.getDependencies())) {
                     return getPreviewPage(mValues);
@@ -158,9 +154,7 @@ public class NewTemplateWizard extends TemplateWizard {
      * @param relativePaths the paths to files to open
      * @param mWorkbench the workbench to open the files in
      */
-    public static void openFiles(
-            @NonNull final IProject project,
-            @NonNull final List<String> relativePaths,
+    public static void openFiles(@NonNull final IProject project, @NonNull final List<String> relativePaths,
             @NonNull final IWorkbench mWorkbench) {
         if (!relativePaths.isEmpty()) {
             // This has to be delayed in order for focus handling to work correctly
@@ -178,11 +172,10 @@ public class NewTemplateWizard extends TemplateWizard {
                                             resource.getFullPath().toString());
                                 }
                             }
-                            boolean isLast = relativePaths.size() == 1 ||
-                                    path.equals(relativePaths.get(relativePaths.size() - 1));
+                            boolean isLast = relativePaths.size() == 1
+                                    || path.equals(relativePaths.get(relativePaths.size() - 1));
                             if (isLast) {
-                                BasicNewResourceWizard.selectAndReveal(resource,
-                                        mWorkbench.getActiveWorkbenchWindow());
+                                BasicNewResourceWizard.selectAndReveal(resource, mWorkbench.getActiveWorkbenchWindow());
                             }
                         }
                     }

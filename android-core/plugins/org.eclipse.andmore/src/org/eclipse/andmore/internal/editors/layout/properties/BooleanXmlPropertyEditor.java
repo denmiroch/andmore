@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,17 +35,13 @@ public class BooleanXmlPropertyEditor extends XmlPropertyEditor {
 
     private static final Image mTrueImage = DesignerPlugin.getImage("properties/true.png");
     private static final Image mFalseImage = DesignerPlugin.getImage("properties/false.png");
-    private static final Image mNullImage =
-            DesignerPlugin.getImage("properties/BooleanNull.png");
-    private static final Image mUnknownImage =
-            DesignerPlugin.getImage("properties/BooleanUnknown.png");
+    private static final Image mNullImage = DesignerPlugin.getImage("properties/BooleanNull.png");
+    private static final Image mUnknownImage = DesignerPlugin.getImage("properties/BooleanUnknown.png");
 
-    private BooleanXmlPropertyEditor() {
-    }
+    private BooleanXmlPropertyEditor() {}
 
     @Override
-    public void paint(Property property, GC gc, int x, int y, int width, int height)
-            throws Exception {
+    public void paint(Property property, GC gc, int x, int y, int width, int height) throws Exception {
         Object value = property.getValue();
         assert value == null || value instanceof String;
         if (value == null || value instanceof String) {
@@ -81,8 +74,7 @@ public class BooleanXmlPropertyEditor extends XmlPropertyEditor {
     }
 
     @Override
-    public boolean activate(PropertyTable propertyTable, Property property, Point location)
-            throws Exception {
+    public boolean activate(PropertyTable propertyTable, Property property, Point location) throws Exception {
         // check that user clicked on image
         if (location == null || location.x < mTrueImage.getBounds().width + 2) {
             cycleValue(property);

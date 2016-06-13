@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +13,8 @@
 
 package org.eclipse.andmore.internal.build.builders;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
@@ -26,8 +23,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
 
 /**
  * Helper class to generate {@link ChangedFileSet} for given projects.
@@ -41,14 +38,12 @@ class ChangedFileSetHelper {
     final static ChangedFileSet NATIVE_LIBS;
 
     static {
-        MANIFEST = new ChangedFileSet("manifest",                                  //$NON-NLS-1$
+        MANIFEST = new ChangedFileSet("manifest", //$NON-NLS-1$
                 SdkConstants.FN_ANDROID_MANIFEST_XML);
 
         // FIXME: move compiled native libs to bin/libs/
-        NATIVE_LIBS = new ChangedFileSet(
-                "nativeLibs",
-                SdkConstants.FD_NATIVE_LIBS + "/*/*.so",                           //$NON-NLS-1$
-                SdkConstants.FD_NATIVE_LIBS + "/*/" + SdkConstants.FN_GDBSERVER);  //$NON-NLS-1$
+        NATIVE_LIBS = new ChangedFileSet("nativeLibs", SdkConstants.FD_NATIVE_LIBS + "/*/*.so", //$NON-NLS-2$
+                SdkConstants.FD_NATIVE_LIBS + "/*/" + SdkConstants.FN_GDBSERVER); //$NON-NLS-1$
     }
 
     /**
@@ -67,11 +62,11 @@ class ChangedFileSetHelper {
 
         // create a pattern for each of them.
         for (IPath path : srcPaths) {
-            paths.add(path.makeRelativeTo(projectPath).toString() + "/**");        //$NON-NLS-1$
+            paths.add(path.makeRelativeTo(projectPath).toString() + "/**"); //$NON-NLS-1$
         }
 
         // custom ChangedFileSet to ignore .java files.
-        return new JavaResChangedSet("javaRes",                                    //$NON-NLS-1$
+        return new JavaResChangedSet("javaRes", //$NON-NLS-1$
                 paths.toArray(new String[paths.size()]));
     }
 
@@ -85,11 +80,10 @@ class ChangedFileSetHelper {
         // generated res is inside the project's android output folder
         String path = getRelativeAndroidOut(project);
 
-        ChangedFileSet set = new ChangedFileSet(
-                "resources",                                                       //$NON-NLS-1$
-                SdkConstants.FD_RES + "/**",                                       //$NON-NLS-1$
-                SdkConstants.FD_ASSETS + "/**",                                    //$NON-NLS-1$
-                path + '/' + AndmoreAndroidConstants.WS_BIN_RELATIVE_BC + "/**");             //$NON-NLS-1$
+        ChangedFileSet set = new ChangedFileSet("resources", //$NON-NLS-1$
+                SdkConstants.FD_RES + "/**", //$NON-NLS-1$
+                SdkConstants.FD_ASSETS + "/**", //$NON-NLS-1$
+                path + '/' + AndmoreAndroidConstants.WS_BIN_RELATIVE_BC + "/**"); //$NON-NLS-1$
 
         // output file is based on the project's android output folder
         set.setOutput(path + '/' + AndmoreAndroidConstants.FN_RESOURCES_AP_);
@@ -107,8 +101,7 @@ class ChangedFileSetHelper {
         // input path is inside the project's android output folder
         String path = getRelativeAndroidOut(project);
 
-        ChangedFileSet set = new ChangedFileSet(
-                "mergedManifest",                                                 //$NON-NLS-1$
+        ChangedFileSet set = new ChangedFileSet("mergedManifest", //$NON-NLS-1$
                 path + '/' + SdkConstants.FN_ANDROID_MANIFEST_XML);
 
         return set;
@@ -123,8 +116,7 @@ class ChangedFileSetHelper {
         // input path is inside the project's android output folder
         String path = getRelativeAndroidOut(project);
 
-        ChangedFileSet set = new ChangedFileSet(
-                "textSymbols",                                                   //$NON-NLS-1$
+        ChangedFileSet set = new ChangedFileSet("textSymbols", //$NON-NLS-1$
                 path + '/' + SdkConstants.FN_RESOURCE_TEXT);
 
         return set;
@@ -139,8 +131,8 @@ class ChangedFileSetHelper {
         // input pattern is based on the project's Java compiler's output folder
         String path = getRelativeJavaCOut(project);
 
-        ChangedFileSet set = new ChangedFileSet("compiledCode",                   //$NON-NLS-1$
-                path + "/**/*" + SdkConstants.DOT_CLASS);                         //$NON-NLS-1$
+        ChangedFileSet set = new ChangedFileSet("compiledCode", //$NON-NLS-1$
+                path + "/**/*" + SdkConstants.DOT_CLASS); //$NON-NLS-1$
 
         return set;
     }
@@ -155,9 +147,9 @@ class ChangedFileSetHelper {
         // generated res are in the project's android output folder
         String path = getRelativeAndroidOut(project);
 
-        ChangedFileSet set = new ChangedFileSet("libResources",                   //$NON-NLS-1$
-                SdkConstants.FD_RES + "/**",                                      //$NON-NLS-1$
-                path + '/' + SdkConstants.FD_RES + "/**");                        //$NON-NLS-1$
+        ChangedFileSet set = new ChangedFileSet("libResources", //$NON-NLS-1$
+                SdkConstants.FD_RES + "/**", //$NON-NLS-1$
+                path + '/' + SdkConstants.FD_RES + "/**"); //$NON-NLS-1$
 
         return set;
     }
@@ -173,9 +165,9 @@ class ChangedFileSetHelper {
         // input pattern is based on the project's Java compiler's output folder
         String path = getRelativeJavaCOut(project);
 
-        ChangedFileSet set = new ChangedFileSet("classAndJars",                    //$NON-NLS-1$
-                path + "/**/*" + SdkConstants.DOT_CLASS,                           //$NON-NLS-1$
-                SdkConstants.FD_NATIVE_LIBS + "/*" + SdkConstants.DOT_JAR);        //$NON-NLS-1$
+        ChangedFileSet set = new ChangedFileSet("classAndJars", //$NON-NLS-1$
+                path + "/**/*" + SdkConstants.DOT_CLASS, //$NON-NLS-1$
+                SdkConstants.FD_NATIVE_LIBS + "/*" + SdkConstants.DOT_JAR); //$NON-NLS-1$
 
         // output file is based on the project's android output folder
         path = getRelativeAndroidOut(project);

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,49 +26,49 @@ public interface SyncIssue {
     int SEVERITY_ERROR = 2;
 
     // Generic error with no data payload, and no expected quick fix in IDE.
-    int TYPE_GENERIC                     = 0;
+    int TYPE_GENERIC = 0;
 
     // data is expiration data
-    int TYPE_PLUGIN_OBSOLETE          = 1;
+    int TYPE_PLUGIN_OBSOLETE = 1;
 
     // data is dependency coordinate
-    int TYPE_UNRESOLVED_DEPENDENCY    = 2;
+    int TYPE_UNRESOLVED_DEPENDENCY = 2;
 
     // data is dependency coordinate
-    int TYPE_DEPENDENCY_IS_APK        = 3;
+    int TYPE_DEPENDENCY_IS_APK = 3;
 
     // data is dependency coordinate
-    int TYPE_DEPENDENCY_IS_APKLIB     = 4;
+    int TYPE_DEPENDENCY_IS_APKLIB = 4;
 
     // data is local file
-    int TYPE_NON_JAR_LOCAL_DEP        = 5;
+    int TYPE_NON_JAR_LOCAL_DEP = 5;
 
     // data is dependency coordinate/path
-    int TYPE_NON_JAR_PACKAGE_DEP      = 6;
+    int TYPE_NON_JAR_PACKAGE_DEP = 6;
 
     // data is dependency coordinate/path
-    int TYPE_NON_JAR_PROVIDED_DEP     = 7;
+    int TYPE_NON_JAR_PROVIDED_DEP = 7;
 
     // data is dependency coordinate/path
-    int TYPE_JAR_DEPEND_ON_AAR        = 8;
+    int TYPE_JAR_DEPEND_ON_AAR = 8;
 
     /**
      * Mismatch dependency version between tested and test
      * app. Data is dep coordinate without the version (groupId:artifactId)
      */
-    int TYPE_MISMATCH_DEP             = 9;
+    int TYPE_MISMATCH_DEP = 9;
 
     // data is dependency coordinate
-    int TYPE_OPTIONAL_LIB_NOT_FOUND   = 10;
+    int TYPE_OPTIONAL_LIB_NOT_FOUND = 10;
 
     // data is the component that does not support Jack. Data is variant name.
-    int TYPE_JACK_IS_NOT_SUPPORTED    = 11;
+    int TYPE_JACK_IS_NOT_SUPPORTED = 11;
 
     // data is the min version of Gradle
-    int TYPE_GRADLE_TOO_OLD           = 12;
+    int TYPE_GRADLE_TOO_OLD = 12;
 
     // data is the required min build tools version, parsable by Revision
-    int TYPE_BUILD_TOOLS_TOO_LOW      = 13;
+    int TYPE_BUILD_TOOLS_TOO_LOW = 13;
 
     // found dependency that's the maven published android.jar
     // data is the maven artifact coordinates.
@@ -87,7 +84,7 @@ public interface SyncIssue {
     // Clashes between variants involving multiple Json originated NativeConfigValues
     int TYPE_EXTERNAL_NATIVE_BUILD_COMBINED_CONFIGURATION = 17;
 
-    int TYPE_MAX                      = 17; // increment when adding new types.
+    int TYPE_MAX = 17; // increment when adding new types.
 
     /**
      * Returns the severity of the issue.

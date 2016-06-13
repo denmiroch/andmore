@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,8 +11,6 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.lint;
-
-import com.android.tools.lint.checks.UselessViewDetector;
 
 import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
@@ -35,6 +30,8 @@ import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.android.tools.lint.checks.UselessViewDetector;
+
 @SuppressWarnings("restriction") // DOM model
 final class RemoveUselessViewFix extends DocumentFix {
     private RemoveUselessViewFix(String id, IMarker marker) {
@@ -52,8 +49,7 @@ final class RemoveUselessViewFix extends DocumentFix {
     }
 
     @Override
-    protected void apply(IDocument document, IStructuredModel model, Node node, int start,
-            int end) {
+    protected void apply(IDocument document, IStructuredModel model, Node node, int start, int end) {
         if (node instanceof Element && node.getParentNode() instanceof Element) {
             Element element = (Element) node;
             Element parent = (Element) node.getParentNode();
@@ -63,24 +59,18 @@ final class RemoveUselessViewFix extends DocumentFix {
             } else {
                 assert mId.equals(UselessViewDetector.USELESS_PARENT.getId());
                 // Invoke refactoring
-                LayoutEditorDelegate delegate =
-                    LayoutEditorDelegate.fromEditor(AdtUtils.getActiveEditor());
+                LayoutEditorDelegate delegate = LayoutEditorDelegate.fromEditor(AdtUtils.getActiveEditor());
 
                 if (delegate != null) {
                     IFile file = (IFile) mMarker.getResource();
-                    ITextSelection textSelection = new TextSelection(start,
-                            end - start);
-                    UnwrapRefactoring refactoring =
-                            new UnwrapRefactoring(file, delegate, textSelection, null);
+                    ITextSelection textSelection = new TextSelection(start, end - start);
+                    UnwrapRefactoring refactoring = new UnwrapRefactoring(file, delegate, textSelection, null);
                     RefactoringWizard wizard = refactoring.createWizard();
-                    RefactoringWizardOpenOperation op =
-                            new RefactoringWizardOpenOperation(wizard);
+                    RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
                     try {
-                        IWorkbenchWindow window = PlatformUI.getWorkbench().
-                                getActiveWorkbenchWindow();
+                        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                         op.run(window.getShell(), wizard.getDefaultPageTitle());
-                    } catch (InterruptedException e) {
-                    }
+                    } catch (InterruptedException e) {}
                 }
             }
         }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,6 @@
  */
 package org.eclipse.andmore.internal.editors.layout.configuration;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -29,7 +24,6 @@ import com.android.annotations.Nullable;
 import com.android.ide.common.resources.LocaleManager;
 import com.android.ide.common.resources.configuration.FolderConfiguration;
 import com.android.ide.common.resources.configuration.LocaleQualifier;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
 /**
@@ -60,8 +54,7 @@ public class FlagManager {
     }
 
     /** Use the {@link #get()} factory method */
-    private FlagManager() {
-    }
+    private FlagManager() {}
 
     /** Map from region to flag icon */
     private Map<String, Image> mImageMap = Maps.newHashMap();
@@ -72,7 +65,7 @@ public class FlagManager {
      * @return the globe icon used to indicate an unknown country
      */
     public static Image getEmptyIcon() {
-      return DesignerPlugin.getImage("nls/flags/flag_empty.png"); //$NON-NLS-1$
+        return DesignerPlugin.getImage("nls/flags/flag_empty.png"); //$NON-NLS-1$
     }
 
     /**
@@ -113,12 +106,12 @@ public class FlagManager {
             }
 
             // Special cases where we have a dedicated flag available:
-            if (language.equals("ca")) {        //$NON-NLS-1$
-                region = "catalonia";           //$NON-NLS-1$
+            if (language.equals("ca")) { //$NON-NLS-1$
+                region = "catalonia"; //$NON-NLS-1$
             } else if (language.equals("gd")) { //$NON-NLS-1$
-                region = "scotland";            //$NON-NLS-1$
+                region = "scotland"; //$NON-NLS-1$
             } else if (language.equals("cy")) { //$NON-NLS-1$
-                region = "wales";               //$NON-NLS-1$
+                region = "wales"; //$NON-NLS-1$
             } else {
                 // Attempt to look up the country from the language
                 region = LocaleManager.getLanguageRegion(language);
@@ -173,8 +166,7 @@ public class FlagManager {
      */
     @Nullable
     public Image getFlag(@NonNull String region) {
-        assert region.length() == 2
-                && Character.isUpperCase(region.charAt(0))
+        assert region.length() == 2 && Character.isUpperCase(region.charAt(0))
                 && Character.isUpperCase(region.charAt(1)) : region;
 
         return getIcon(region);
@@ -182,17 +174,17 @@ public class FlagManager {
 
     private Image getIcon(@NonNull String base) {
         Image flagImage = mImageMap.get(base);
-          if (flagImage == null) {
-              // TODO: Special case locale currently running on system such
-              // that the current country matches the current locale
-              if (mImageMap.containsKey(base)) {
-                  // Already checked: there's just no image there
-                  return null;
-              }
-              String flagFileName = base.toLowerCase(Locale.US) + ".png"; //$NON-NLS-1$
-              flagImage = DesignerPlugin.getImage("nls/flags/" + flagFileName); //$NON-NLS-1$
-              mImageMap.put(base, flagImage);
-          }
+        if (flagImage == null) {
+            // TODO: Special case locale currently running on system such
+            // that the current country matches the current locale
+            if (mImageMap.containsKey(base)) {
+                // Already checked: there's just no image there
+                return null;
+            }
+            String flagFileName = base.toLowerCase(Locale.US) + ".png"; //$NON-NLS-1$
+            flagImage = DesignerPlugin.getImage("nls/flags/" + flagFileName); //$NON-NLS-1$
+            mImageMap.put(base, flagImage);
+        }
 
         return flagImage;
     }

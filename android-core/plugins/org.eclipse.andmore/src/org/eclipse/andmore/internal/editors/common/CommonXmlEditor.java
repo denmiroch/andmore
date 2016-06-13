@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +13,9 @@
 
 package org.eclipse.andmore.internal.editors.common;
 
-import com.android.ide.common.resources.ResourceFolder;
-import com.android.resources.ResourceFolderType;
-
+import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.animator.AnimationEditorDelegate;
 import org.eclipse.andmore.internal.editors.color.ColorEditorDelegate;
@@ -52,6 +46,9 @@ import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.ide.IDE;
 import org.w3c.dom.Document;
 
+import com.android.ide.common.resources.ResourceFolder;
+import com.android.resources.ResourceFolderType;
+
 /**
  * Multi-page form editor for ALL /res XML files.
  * <p/>
@@ -68,28 +65,18 @@ public class CommonXmlEditor extends AndroidXmlEditor implements IShowEditorInpu
      * once here statically. All the creators are invoked in the order they
      * are defined and the first one to return a non-null delegate is used.
      */
-    private static final IDelegateCreator[] DELEGATES = {
-            new LayoutEditorDelegate.Creator(),
-            new ValuesEditorDelegate.Creator(),
-            new AnimationEditorDelegate.Creator(),
-            new ColorEditorDelegate.Creator(),
-            new DrawableEditorDelegate.Creator(),
-            new MenuEditorDelegate.Creator(),
-            new OtherXmlEditorDelegate.Creator(),
-    };
+    private static final IDelegateCreator[] DELEGATES = { new LayoutEditorDelegate.Creator(),
+            new ValuesEditorDelegate.Creator(), new AnimationEditorDelegate.Creator(),
+            new ColorEditorDelegate.Creator(), new DrawableEditorDelegate.Creator(), new MenuEditorDelegate.Creator(),
+            new OtherXmlEditorDelegate.Creator(), };
 
     /**
      * IDs of legacy editors replaced by the {@link CommonXmlEditor}.
      */
-    public static final String[] LEGACY_EDITOR_IDS = {
-        LayoutEditorDelegate.LEGACY_EDITOR_ID,
-        ValuesEditorDelegate.LEGACY_EDITOR_ID,
-        AnimationEditorDelegate.LEGACY_EDITOR_ID,
-        ColorEditorDelegate.LEGACY_EDITOR_ID,
-        DrawableEditorDelegate.LEGACY_EDITOR_ID,
-        MenuEditorDelegate.LEGACY_EDITOR_ID,
-        OtherXmlEditorDelegate.LEGACY_EDITOR_ID,
-    };
+    public static final String[] LEGACY_EDITOR_IDS = { LayoutEditorDelegate.LEGACY_EDITOR_ID,
+            ValuesEditorDelegate.LEGACY_EDITOR_ID, AnimationEditorDelegate.LEGACY_EDITOR_ID,
+            ColorEditorDelegate.LEGACY_EDITOR_ID, DrawableEditorDelegate.LEGACY_EDITOR_ID,
+            MenuEditorDelegate.LEGACY_EDITOR_ID, OtherXmlEditorDelegate.LEGACY_EDITOR_ID, };
 
     private CommonXmlDelegate mDelegate = null;
 
@@ -101,8 +88,7 @@ public class CommonXmlEditor extends AndroidXmlEditor implements IShowEditorInpu
     }
 
     @Override
-    public void init(IEditorSite site, final IEditorInput editorInput)
-            throws PartInitException {
+    public void init(IEditorSite site, final IEditorInput editorInput) throws PartInitException {
         if (editorInput instanceof IFileEditorInput) {
 
             IFileEditorInput fileInput = (IFileEditorInput) editorInput;
@@ -112,25 +98,20 @@ public class CommonXmlEditor extends AndroidXmlEditor implements IShowEditorInpu
 
             IEditorDescriptor file_desc = IDE.getDefaultEditor(file);
             String id = file_desc == null ? null : file_desc.getId();
-            boolean mustChange = id != null &&
-                                 !id.equals(ID) &&
-                                 id.startsWith(AndmoreAndroidConstants.EDITORS_NAMESPACE);
+            boolean mustChange = id != null && !id.equals(ID)
+                    && id.startsWith(AndmoreAndroidConstants.EDITORS_NAMESPACE);
             if (!mustChange) {
                 // Maybe this was opened by a manual Open With with a legacy ID?
                 id = site.getId();
-                mustChange = id != null &&
-                             !id.equals(ID) &&
-                             id.startsWith(AndmoreAndroidConstants.EDITORS_NAMESPACE);
+                mustChange = id != null && !id.equals(ID) && id.startsWith(AndmoreAndroidConstants.EDITORS_NAMESPACE);
             }
 
             if (mustChange) {
                 // It starts by our editor namespace but it's not the right ID.
                 // This is an old Android XML ID. Change it to our new ID.
                 IDE.setDefaultEditor(file, ID);
-                AndmoreAndroidPlugin.log(IStatus.INFO,
-                        "Changed legacy editor ID %s for %s",   //$NON-NLS-1$
-                        id,
-                        file.getFullPath());
+                AndmoreAndroidPlugin.log(IStatus.INFO, "Changed legacy editor ID %s for %s", //$NON-NLS-1$
+                        id, file.getFullPath());
             }
 
             // Now find the delegate for the file.
@@ -159,9 +140,7 @@ public class CommonXmlEditor extends AndroidXmlEditor implements IShowEditorInpu
                 // We'll use the PlainXmlEditorDelegate as a catch-all editor.
                 AndmoreAndroidPlugin.log(IStatus.INFO,
                         "No valid Android XML Editor Delegate found for file %1$s [Res %2$s, type %3$s]",
-                        file.getFullPath(),
-                        resFolder,
-                        type);
+                        file.getFullPath(), resFolder, type);
                 mDelegate = new PlainXmlEditorDelegate(this);
             }
         } else if (editorInput instanceof IURIEditorInput) {
@@ -186,18 +165,15 @@ public class CommonXmlEditor extends AndroidXmlEditor implements IShowEditorInpu
                 // We'll use the PlainXmlEditorDelegate as a catch-all editor.
                 AndmoreAndroidPlugin.log(IStatus.INFO,
                         "No valid Android XML Editor Delegate found for file %1$s [Res %2$s, type %3$s]",
-                        ((IURIEditorInput) editorInput).getURI().toString(),
-                        folderName,
-                        type);
+                        ((IURIEditorInput) editorInput).getURI().toString(), folderName, type);
                 mDelegate = new PlainXmlEditorDelegate(this);
             }
         }
 
         if (mDelegate == null) {
             // We can't do anything if we don't have a valid file.
-            AndmoreAndroidPlugin.log(IStatus.INFO,
-                    "Android XML Editor cannot process non-file input %1$s",   //$NON-NLS-1$
-                    (editorInput == null ? "null" : editorInput.toString()));   //$NON-NLS-1$
+            AndmoreAndroidPlugin.log(IStatus.INFO, "Android XML Editor cannot process non-file input %1$s", //$NON-NLS-1$
+                    (editorInput == null ? "null" : editorInput.toString())); //$NON-NLS-1$
             throw new PartInitException("Android XML Editor cannot process this input.");
         } else {
             // Invoke the editor's init after setting up the delegate. This will call setInput().
@@ -293,8 +269,7 @@ public class CommonXmlEditor extends AndroidXmlEditor implements IShowEditorInpu
         ISourceViewer ssv = getStructuredSourceViewer();
         if (mDelegate != null && ssv instanceof ISourceViewerExtension2) {
             ((ISourceViewerExtension2) ssv).unconfigure();
-            ssv.configure(new CommonSourceViewerConfig(
-                    mDelegate.getAndroidContentAssistProcessor()));
+            ssv.configure(new CommonSourceViewerConfig(mDelegate.getAndroidContentAssistProcessor()));
         }
     }
 

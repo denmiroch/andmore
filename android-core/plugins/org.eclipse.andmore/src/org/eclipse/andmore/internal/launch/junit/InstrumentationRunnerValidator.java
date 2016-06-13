@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,13 +12,6 @@
  */
 package org.eclipse.andmore.internal.launch.junit;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.xml.ManifestData;
-import com.android.ide.common.xml.ManifestData.Instrumentation;
-import com.android.ide.common.xml.ManifestData.UsesLibrary;
-
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.internal.launch.LaunchMessages;
 import org.eclipse.andmore.internal.project.AndroidManifestHelper;
@@ -29,6 +19,13 @@ import org.eclipse.andmore.internal.project.BaseProjectHelper;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
+
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.xml.ManifestData;
+import com.android.ide.common.xml.ManifestData.Instrumentation;
+import com.android.ide.common.xml.ManifestData.UsesLibrary;
 
 /**
  * Provides validation for Android instrumentation test runner
@@ -95,12 +92,12 @@ class InstrumentationRunnerValidator {
      * @return true if test runner library found, false otherwise
      */
     private boolean hasTestRunnerLibrary(ManifestData manifestData) {
-       for (UsesLibrary lib : manifestData.getUsesLibraries()) {
-           if (AndmoreAndroidConstants.LIBRARY_TEST_RUNNER.equals(lib.getName())) {
-               return true;
-           }
-       }
-       return false;
+        for (UsesLibrary lib : manifestData.getUsesLibraries()) {
+            if (AndmoreAndroidConstants.LIBRARY_TEST_RUNNER.equals(lib.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -146,13 +143,12 @@ class InstrumentationRunnerValidator {
             // Ideally, we'd check if the class extends instrumentation test runner.
             // However, the Google Instrumentation Test Runner extends Google Instrumentation, and not a test runner,
             // so we just check that the super class is Instrumentation.
-            String result = BaseProjectHelper.testClassForManifest(mJavaProject,
-                    instrumentation, SdkConstants.CLASS_INSTRUMENTATION, true);
-             if (result != BaseProjectHelper.TEST_CLASS_OK) {
-                return String.format(
-                        LaunchMessages.InstrValidator_WrongRunnerTypeMsg_s,
+            String result = BaseProjectHelper.testClassForManifest(mJavaProject, instrumentation,
+                    SdkConstants.CLASS_INSTRUMENTATION, true);
+            if (result != BaseProjectHelper.TEST_CLASS_OK) {
+                return String.format(LaunchMessages.InstrValidator_WrongRunnerTypeMsg_s,
                         SdkConstants.CLASS_INSTRUMENTATION);
-             }
+            }
         }
         return INSTRUMENTATION_OK;
     }

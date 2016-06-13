@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,16 +30,15 @@ import static com.android.ide.common.api.IAttributeInfo.Format.FRACTION;
 import static com.android.ide.common.api.IAttributeInfo.Format.INTEGER;
 import static com.android.ide.common.api.IAttributeInfo.Format.STRING;
 
+import java.util.EnumSet;
+import java.util.regex.Pattern;
+
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.ide.common.api.IAttributeInfo;
 import com.android.ide.common.resources.ResourceRepository;
 import com.android.resources.ResourceType;
 import com.google.common.base.Splitter;
-
-import java.util.EnumSet;
-import java.util.regex.Pattern;
-
 
 /**
  * Information about an attribute as gathered from the attrs.xml file where
@@ -111,27 +107,32 @@ public class AttributeInfo implements IAttributeInfo {
     public @NonNull String getName() {
         return mName;
     }
+
     /** Returns the formats of the attribute. Cannot be null.
      *  Should have at least one format. */
     @Override
     public @NonNull EnumSet<Format> getFormats() {
         return mFormats;
     }
+
     /** Returns the values for enums. null for other types. */
     @Override
     public String[] getEnumValues() {
         return mEnumValues;
     }
+
     /** Returns the values for flags. null for other types. */
     @Override
     public String[] getFlagValues() {
         return mFlagValues;
     }
+
     /** Returns a short javadoc, .i.e. the first sentence. */
     @Override
     public @NonNull String getJavaDoc() {
         return mJavaDoc;
     }
+
     /** Returns the documentation for deprecated attributes. Null if not deprecated. */
     @Override
     public String getDeprecatedDoc() {
@@ -184,10 +185,8 @@ public class AttributeInfo implements IAttributeInfo {
     }
 
     private final static Pattern INTEGER_PATTERN = Pattern.compile("-?[0-9]+"); //$NON-NLS-1$
-    private final static Pattern FLOAT_PATTERN =
-            Pattern.compile("-?[0-9]?(\\.[0-9]+)?"); //$NON-NLS-1$
-    private final static Pattern DIMENSION_PATTERN =
-            Pattern.compile("-?[0-9]+(\\.[0-9]+)?(dp|dip|sp|px|pt|in|mm)"); //$NON-NLS-1$
+    private final static Pattern FLOAT_PATTERN = Pattern.compile("-?[0-9]?(\\.[0-9]+)?"); //$NON-NLS-1$
+    private final static Pattern DIMENSION_PATTERN = Pattern.compile("-?[0-9]+(\\.[0-9]+)?(dp|dip|sp|px|pt|in|mm)"); //$NON-NLS-1$
 
     /**
      * Checks the given value and returns true only if it is a valid XML value
@@ -200,9 +199,7 @@ public class AttributeInfo implements IAttributeInfo {
      *            with, if any
      * @return true if the value is valid, false otherwise
      */
-    public boolean isValid(
-            @NonNull String value,
-            @Nullable ResourceRepository projectResources,
+    public boolean isValid(@NonNull String value, @Nullable ResourceRepository projectResources,
             @Nullable ResourceRepository frameworkResources) {
 
         if (mFormats.contains(STRING) || mFormats.isEmpty()) {

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,13 +16,12 @@ package org.eclipse.andmore.internal.editors.animator;
 import static com.android.SdkConstants.ANDROID_NS_NAME_PREFIX;
 import static com.android.SdkConstants.ANDROID_PKG;
 
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.api.IAttributeInfo.Format;
-import com.android.ide.common.resources.ResourceItem;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.resources.ResourceFolderType;
-import com.android.resources.ResourceType;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.AndroidContentAssist;
@@ -37,12 +33,13 @@ import org.eclipse.andmore.internal.sdk.AndroidTargetData;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.api.IAttributeInfo.Format;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.resources.ResourceFolderType;
+import com.android.resources.ResourceType;
+import com.android.utils.Pair;
 
 /**
  * Content Assist Processor for /res/drawable XML files
@@ -50,7 +47,7 @@ import java.util.Map;
 @VisibleForTesting
 public final class AnimationContentAssist extends AndroidContentAssist {
     private static final String OBJECT_ANIMATOR = "objectAnimator"; //$NON-NLS-1$
-    private static final String PROPERTY_NAME = "propertyName";  //$NON-NLS-1$
+    private static final String PROPERTY_NAME = "propertyName"; //$NON-NLS-1$
     private static final String INTERPOLATOR_PROPERTY_NAME = "interpolator"; //$NON-NLS-1$
     private static final String INTERPOLATOR_NAME_SUFFIX = "_interpolator"; //$NON-NLS-1$
 
@@ -70,9 +67,8 @@ public final class AnimationContentAssist extends AndroidContentAssist {
     }
 
     @Override
-    protected boolean computeAttributeValues(List<ICompletionProposal> proposals, int offset,
-            String parentTagName, String attributeName, Node node, String wordPrefix,
-            boolean skipEndTag, int replaceLength) {
+    protected boolean computeAttributeValues(List<ICompletionProposal> proposals, int offset, String parentTagName,
+            String attributeName, Node node, String wordPrefix, boolean skipEndTag, int replaceLength) {
 
         // Add value completion for the interpolator and propertyName attributes
 
@@ -90,15 +86,13 @@ public final class AnimationContentAssist extends AndroidContentAssist {
                     }
                 }
                 addMatchingProposals(proposals, interpolators.toArray(), offset, node, wordPrefix,
-                        (char) 0 /* needTag */, true /* isAttribute */, false /* isNew */,
-                        skipEndTag /* skipEndTag */, replaceLength);
+                        (char) 0 /* needTag */, true /* isAttribute */, false /* isNew */, skipEndTag /* skipEndTag */,
+                        replaceLength);
             }
 
-
-            return super.computeAttributeValues(proposals, offset, parentTagName, attributeName,
-                    node, wordPrefix, skipEndTag, replaceLength);
-        } else if (parentTagName.equals(OBJECT_ANIMATOR)
-                && attributeName.endsWith(PROPERTY_NAME)) {
+            return super.computeAttributeValues(proposals, offset, parentTagName, attributeName, node, wordPrefix,
+                    skipEndTag, replaceLength);
+        } else if (parentTagName.equals(OBJECT_ANIMATOR) && attributeName.endsWith(PROPERTY_NAME)) {
 
             // Special case: the user is code completing inside
             //    <objectAnimator propertyName="^">
@@ -112,13 +106,11 @@ public final class AnimationContentAssist extends AndroidContentAssist {
 
             AndroidTargetData data = mEditor.getTargetData();
             if (data != null) {
-                IDescriptorProvider descriptorProvider =
-                    data.getDescriptorProvider(AndroidTargetData.DESCRIPTOR_LAYOUT);
+                IDescriptorProvider descriptorProvider = data
+                        .getDescriptorProvider(AndroidTargetData.DESCRIPTOR_LAYOUT);
                 if (descriptorProvider != null) {
-                    ElementDescriptor[] rootElementDescriptors =
-                        descriptorProvider.getRootElementDescriptors();
-                    Map<String, AttributeDescriptor> matches =
-                        new HashMap<String, AttributeDescriptor>(180);
+                    ElementDescriptor[] rootElementDescriptors = descriptorProvider.getRootElementDescriptors();
+                    Map<String, AttributeDescriptor> matches = new HashMap<String, AttributeDescriptor>(180);
                     for (ElementDescriptor elementDesc : rootElementDescriptors) {
                         for (AttributeDescriptor desc : elementDesc.getAttributes()) {
                             if (desc instanceof SeparatorAttributeDescriptor) {
@@ -127,8 +119,7 @@ public final class AnimationContentAssist extends AndroidContentAssist {
                             String name = desc.getXmlLocalName();
                             if (startsWith(name, attributePrefix)) {
                                 EnumSet<Format> formats = desc.getAttributeInfo().getFormats();
-                                if (formats.contains(Format.INTEGER)
-                                        || formats.contains(Format.FLOAT)) {
+                                if (formats.contains(Format.INTEGER) || formats.contains(Format.FLOAT)) {
                                     // TODO: Filter out some common properties
                                     // that the user probably isn't trying to
                                     // animate:
@@ -140,29 +131,26 @@ public final class AnimationContentAssist extends AndroidContentAssist {
                         }
                     }
 
-                    List<AttributeDescriptor> sorted =
-                        new ArrayList<AttributeDescriptor>(matches.size());
+                    List<AttributeDescriptor> sorted = new ArrayList<AttributeDescriptor>(matches.size());
                     sorted.addAll(matches.values());
                     Collections.sort(sorted);
                     // Extract just the name+description pairs, since we don't want to
                     // use the full attribute descriptor (which forces the namespace
                     // prefix to be included)
-                    List<Pair<String, String>> pairs =
-                        new ArrayList<Pair<String, String>>(sorted.size());
+                    List<Pair<String, String>> pairs = new ArrayList<Pair<String, String>>(sorted.size());
                     for (AttributeDescriptor d : sorted) {
                         pairs.add(Pair.of(d.getXmlLocalName(), d.getAttributeInfo().getJavaDoc()));
                     }
 
-                    addMatchingProposals(proposals, pairs.toArray(), offset, node, wordPrefix,
-                            (char) 0 /* needTag */, true /* isAttribute */, false /* isNew */,
-                            skipEndTag /* skipEndTag */, replaceLength);
+                    addMatchingProposals(proposals, pairs.toArray(), offset, node, wordPrefix, (char) 0 /* needTag */,
+                            true /* isAttribute */, false /* isNew */, skipEndTag /* skipEndTag */, replaceLength);
                 }
             }
 
             return false;
         } else {
-            return super.computeAttributeValues(proposals, offset, parentTagName, attributeName,
-                    node, wordPrefix, skipEndTag, replaceLength);
+            return super.computeAttributeValues(proposals, offset, parentTagName, attributeName, node, wordPrefix,
+                    skipEndTag, replaceLength);
         }
     }
 }

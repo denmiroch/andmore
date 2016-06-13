@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.eclipse.org/org/documents/epl-v10.php
+ * http://www.eclipse.org/org/documents/epl-v10.php
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,7 +32,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
-
 /**
  * An "Import Android Project" wizard.
  */
@@ -44,8 +43,7 @@ public class ImportProjectWizard extends Wizard implements INewWizard {
     private IStructuredSelection mSelection;
 
     /** Constructs a new wizard default project wizard */
-    public ImportProjectWizard() {
-    }
+    public ImportProjectWizard() {}
 
     @Override
     public void addPages() {
@@ -72,13 +70,13 @@ public class ImportProjectWizard extends Wizard implements INewWizard {
 
     @Override
     public boolean performFinish() {
-        File file = new File(AndmoreAndroidPlugin.getOsSdkFolder(), OS_SDK_TOOLS_LIB_FOLDER + File.separator
-                + FN_PROJECT_PROGUARD_FILE);
+        File file = new File(AndmoreAndroidPlugin.getOsSdkFolder(),
+                OS_SDK_TOOLS_LIB_FOLDER + File.separator + FN_PROJECT_PROGUARD_FILE);
         if (!file.exists()) {
             AndmoreAndroidPlugin.displayError("Tools Out of Date?",
-            String.format("It looks like you do not have the latest version of the "
-                    + "SDK Tools installed. Make sure you update via the SDK Manager "
-                    + "first. (Could not find %1$s)", file.getPath()));
+                    String.format("It looks like you do not have the latest version of the "
+                            + "SDK Tools installed. Make sure you update via the SDK Manager "
+                            + "first. (Could not find %1$s)", file.getPath()));
             return false;
         }
 

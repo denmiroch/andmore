@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +29,6 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
-
 
 /**
  * Page for "Application" settings, part of the AndroidManifest form editor.
@@ -61,9 +57,7 @@ public final class ApplicationPage extends FormPage implements IPageImageProvide
 
     @Override
     public Image getPageImage() {
-        return IconFactory.getInstance().getIcon(getTitle(),
-                                                 IconFactory.COLOR_BLUE,
-                                                 IconFactory.SHAPE_RECT);
+        return IconFactory.getInstance().getIcon(getTitle(), IconFactory.COLOR_BLUE, IconFactory.SHAPE_RECT);
     }
 
     /**
@@ -92,11 +86,8 @@ public final class ApplicationPage extends FormPage implements IPageImageProvide
         mAttrPart.getSection().setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         managedForm.addPart(mAttrPart);
 
-        mTreeBlock = new UiTreeBlock(mEditor, appUiNode,
-                false /* autoCreateRoot */,
-                null /* element filters */,
-                "Application Nodes",
-                "List of all elements in the application");
+        mTreeBlock = new UiTreeBlock(mEditor, appUiNode, false /* autoCreateRoot */, null /* element filters */,
+                "Application Nodes", "List of all elements in the application");
         mTreeBlock.createContent(managedForm);
     }
 
@@ -127,9 +118,7 @@ public final class ApplicationPage extends FormPage implements IPageImageProvide
             mAttrPart.setUiElementNode(appUiNode);
         }
         if (mTreeBlock != null) {
-            mTreeBlock.changeRootAndDescriptors(appUiNode,
-                    null /* element filters */,
-                    true /* refresh */);
+            mTreeBlock.changeRootAndDescriptors(appUiNode, null /* element filters */, true /* refresh */);
         }
     }
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -128,8 +125,8 @@ public class AndroidNature implements IProjectNature {
      * add only the Java nature.
      * @throws CoreException if fails to change the nature.
      */
-    public static synchronized void setupProjectNatures(IProject project,
-            IProgressMonitor monitor, boolean addAndroidNature) throws CoreException {
+    public static synchronized void setupProjectNatures(IProject project, IProgressMonitor monitor,
+            boolean addAndroidNature) throws CoreException {
         System.out.println("Adding Android natures, setupProjectNatures");
         if (project == null || !project.isOpen()) {
             return;
@@ -147,7 +144,7 @@ public class AndroidNature implements IProjectNature {
                 Sdk.getCurrent().initProject(project, androidTarget);
             } catch (Exception e) {
                 AndmoreLogger.error(AndroidNature.class, "Error associating project " + project.getName() //$NON-NLS-1$
-                + " with target " + androidTarget.getName()); //$NON-NLS-1$
+                        + " with target " + androidTarget.getName()); //$NON-NLS-1$
             }
         }
 
@@ -174,8 +171,8 @@ public class AndroidNature implements IProjectNature {
      * @param monitor An existing progress monitor.
      * @throws CoreException if fails to change the nature.
      */
-    private static void addNatureToProjectDescription(IProject project,
-            String natureId, IProgressMonitor monitor) throws CoreException {
+    private static void addNatureToProjectDescription(IProject project, String natureId, IProgressMonitor monitor)
+            throws CoreException {
         if (!project.hasNature(natureId)) {
 
             IProjectDescription description = project.getDescription();
@@ -202,8 +199,7 @@ public class AndroidNature implements IProjectNature {
      * @throws CoreException
      *
      */
-    public static void configureResourceManagerBuilder(IProject project)
-            throws CoreException {
+    public static void configureResourceManagerBuilder(IProject project) throws CoreException {
         // get the builder list
         IProjectDescription desc = project.getDescription();
         ICommand[] commands = desc.getBuildSpec();
@@ -231,8 +227,7 @@ public class AndroidNature implements IProjectNature {
      * @param project
      * @throws CoreException
      */
-    public static void configurePreBuilder(IProject project)
-            throws CoreException {
+    public static void configurePreBuilder(IProject project) throws CoreException {
         // get the builder list
         IProjectDescription desc = project.getDescription();
         ICommand[] commands = desc.getBuildSpec();
@@ -269,15 +264,14 @@ public class AndroidNature implements IProjectNature {
         newCommands[index] = command;
 
         // copy the builder after
-        System.arraycopy(commands, index, newCommands, index + 1, commands.length-index);
+        System.arraycopy(commands, index, newCommands, index + 1, commands.length - index);
 
         // set the new builders in the project
         desc.setBuildSpec(newCommands);
         project.setDescription(desc, null);
     }
 
-    public static void configureApkBuilder(IProject project)
-            throws CoreException {
+    public static void configureApkBuilder(IProject project) throws CoreException {
         // Add the .apk builder at the end if it's not already there
         IProjectDescription desc = project.getDescription();
         ICommand[] commands = desc.getBuildSpec();

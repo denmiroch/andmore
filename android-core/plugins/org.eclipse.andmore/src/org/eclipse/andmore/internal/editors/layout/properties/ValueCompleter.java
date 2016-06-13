@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,11 +28,9 @@ import static com.android.ide.common.api.IAttributeInfo.Format.INTEGER;
 import static com.android.ide.common.api.IAttributeInfo.Format.REFERENCE;
 import static com.android.ide.common.api.IAttributeInfo.Format.STRING;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.IAttributeInfo;
-import com.android.ide.common.api.IAttributeInfo.Format;
-import com.android.utils.SdkUtils;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 import org.eclipse.andmore.internal.editors.common.CommonXmlEditor;
 import org.eclipse.andmore.internal.editors.descriptors.AttributeDescriptor;
@@ -43,9 +38,11 @@ import org.eclipse.jface.fieldassist.ContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.IAttributeInfo;
+import com.android.ide.common.api.IAttributeInfo.Format;
+import com.android.utils.SdkUtils;
 
 /**
  * An {@link IContentProposalProvider} which completes possible property values
@@ -72,19 +69,14 @@ abstract class ValueCompleter implements IContentProposalProvider {
         // TODO: If the user is typing in a number, or a number plus a prefix of a dimension unit,
         // then propose that number plus the completed dimension unit (using sp for text, dp
         // for other properties and maybe both if I'm not sure)
-        if (formats.contains(STRING)
-                && !contents.isEmpty()
-                && (formats.size() > 1 && formats.contains(REFERENCE) ||
-                        formats.size() > 2)
-                && !contents.startsWith(PREFIX_RESOURCE_REF)
-                && !contents.startsWith(PREFIX_THEME_REF)) {
+        if (formats.contains(STRING) && !contents.isEmpty()
+                && (formats.size() > 1 && formats.contains(REFERENCE) || formats.size() > 2)
+                && !contents.startsWith(PREFIX_RESOURCE_REF) && !contents.startsWith(PREFIX_THEME_REF)) {
             proposals.add(new ContentProposal(contents));
         }
 
         if (!contents.isEmpty() && Character.isDigit(contents.charAt(0))
-                && (formats.contains(DIMENSION)
-                        || formats.contains(INTEGER)
-                        || formats.contains(FLOAT))) {
+                && (formats.contains(DIMENSION) || formats.contains(INTEGER) || formats.contains(FLOAT))) {
             StringBuilder sb = new StringBuilder();
             for (int i = 0, n = contents.length(); i < n; i++) {
                 char c = contents.charAt(i);
@@ -111,9 +103,8 @@ abstract class ValueCompleter implements IContentProposalProvider {
                 || contents.startsWith(PREFIX_THEME_REF)) {
             CommonXmlEditor editor = getEditor();
             if (editor != null) {
-                String[] matches = ResourceValueCompleter.computeResourceStringMatches(
-                        editor,
-                        descriptor, contents.substring(0, position));
+                String[] matches = ResourceValueCompleter.computeResourceStringMatches(editor, descriptor,
+                        contents.substring(0, position));
                 for (String match : matches) {
                     proposals.add(new ContentProposal(match));
                 }

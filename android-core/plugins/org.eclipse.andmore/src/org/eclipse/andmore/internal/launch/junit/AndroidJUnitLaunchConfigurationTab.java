@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +12,9 @@
  */
 package org.eclipse.andmore.internal.launch.junit;
 
-import com.android.SdkConstants;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -90,9 +89,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.dialogs.SelectionDialog;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
+import com.android.SdkConstants;
 
 /**
  * The launch config UI tab for Android JUnit
@@ -131,15 +128,11 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
     private InstrumentationRunnerValidator mInstrValidator = null;
     private ProjectChooserHelper mProjectChooserHelper;
 
-    public static final String SMALL_TEST_ANNOTATION = "@SmallTest";        //$NON-NLS-1$
-    public static final String MEDIUM_TEST_ANNOTATION = "@MediumTest";      //$NON-NLS-1$
-    public static final String LARGE_TEST_ANNOTATION = "@LargeTest";        //$NON-NLS-1$
-    private static final List<String> TEST_SIZE_OPTIONS = Arrays.asList(
-            "All Tests",
-            SMALL_TEST_ANNOTATION,
-            MEDIUM_TEST_ANNOTATION,
-            LARGE_TEST_ANNOTATION
-    );
+    public static final String SMALL_TEST_ANNOTATION = "@SmallTest"; //$NON-NLS-1$
+    public static final String MEDIUM_TEST_ANNOTATION = "@MediumTest"; //$NON-NLS-1$
+    public static final String LARGE_TEST_ANNOTATION = "@LargeTest"; //$NON-NLS-1$
+    private static final List<String> TEST_SIZE_OPTIONS = Arrays.asList("All Tests", SMALL_TEST_ANNOTATION,
+            MEDIUM_TEST_ANNOTATION, LARGE_TEST_ANNOTATION);
 
     @Override
     public void createControl(Composite parent) {
@@ -166,7 +159,6 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
         //      IJUnitHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_JUNIT_MAIN_TAB);
         validatePage();
     }
-
 
     private void createSpacer(Composite comp) {
         Label label = new Label(comp, SWT.NONE);
@@ -203,8 +195,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
             public void modifyText(ModifyEvent evt) {
                 validatePage();
                 updateLaunchConfigurationDialog();
-                mSearchButton.setEnabled(mTestRadioButton.getSelection() &&
-                        mProjText.getText().length() > 0);
+                mSearchButton.setEnabled(mTestRadioButton.getSelection() && mProjText.getText().length() > 0);
             }
         });
 
@@ -223,7 +214,6 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
         gd.horizontalIndent = 25;
         mTestLabel.setLayoutData(gd);
         mTestLabel.setText(JUnitMessages.JUnitLaunchConfigurationTab_label_test);
-
 
         mTestText = new Text(comp, SWT.SINGLE | SWT.BORDER);
         mTestText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -249,7 +239,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
         new Label(comp, SWT.NONE);
 
         mTestMethodLabel = new Label(comp, SWT.NONE);
-        mTestMethodLabel.setText("");  //$NON-NLS-1$
+        mTestMethodLabel.setText(""); //$NON-NLS-1$
         gd = new GridData();
         gd.horizontalSpan = 2;
         mTestMethodLabel.setLayoutData(gd);
@@ -257,8 +247,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
 
     private void createTestContainerSelectionGroup(Composite comp) {
         mTestContainerRadioButton = new Button(comp, SWT.RADIO);
-        mTestContainerRadioButton.setText(
-                LaunchMessages.AndroidJUnitTab_TestContainerText);
+        mTestContainerRadioButton.setText(LaunchMessages.AndroidJUnitTab_TestContainerText);
         GridData gd = new GridData();
         gd.horizontalSpan = 3;
         mTestContainerRadioButton.setLayoutData(gd);
@@ -302,9 +291,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
         loaderLabel.setLayoutData(gd);
 
         mInstrumentationCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
-        GridDataFactory.defaultsFor(mInstrumentationCombo)
-            .span(2, 1)
-            .applyTo(mInstrumentationCombo);
+        GridDataFactory.defaultsFor(mInstrumentationCombo).span(2, 1).applyTo(mInstrumentationCombo);
         mInstrumentationCombo.clearSelection();
         mInstrumentationCombo.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -355,8 +342,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
         String projectName = updateProjectFromConfig(config);
         String containerHandle = EMPTY_STRING;
         try {
-            containerHandle = config.getAttribute(
-                    JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER, EMPTY_STRING);
+            containerHandle = config.getAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER, EMPTY_STRING);
         } catch (CoreException ce) {
             // ignore
         }
@@ -378,15 +364,15 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
     private void updateInstrumentationFromConfig(ILaunchConfiguration config) {
         boolean found = false;
         try {
-            String currentInstrumentation = config.getAttribute(
-                    AndroidJUnitLaunchConfigDelegate.ATTR_INSTR_NAME, EMPTY_STRING);
+            String currentInstrumentation = config.getAttribute(AndroidJUnitLaunchConfigDelegate.ATTR_INSTR_NAME,
+                    EMPTY_STRING);
             if (mInstrumentations != null) {
                 // look for the name of the instrumentation in the combo.
                 for (int i = 0; i < mInstrumentations.length; i++) {
-                   if (currentInstrumentation.equals(mInstrumentations[i])) {
-                       found = true;
-                       mInstrumentationCombo.select(i);
-                       break;
+                    if (currentInstrumentation.equals(mInstrumentations[i])) {
+                        found = true;
+                        mInstrumentationCombo.select(i);
+                        break;
                     }
                 }
             }
@@ -400,8 +386,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
 
     private void updateTestSizeFromConfig(ILaunchConfiguration config) {
         try {
-            String testSize = config.getAttribute(
-                    AndroidJUnitLaunchConfigDelegate.ATTR_TEST_SIZE, EMPTY_STRING);
+            String testSize = config.getAttribute(AndroidJUnitLaunchConfigDelegate.ATTR_TEST_SIZE, EMPTY_STRING);
             int index = TEST_SIZE_OPTIONS.indexOf(testSize);
             if (index >= 0 && mTestSizeCombo != null) {
                 mTestSizeCombo.select(index);
@@ -414,8 +399,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
     private String updateProjectFromConfig(ILaunchConfiguration config) {
         String projectName = EMPTY_STRING;
         try {
-            projectName = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
-                    EMPTY_STRING);
+            projectName = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING);
         } catch (CoreException ce) {
             // ignore
         }
@@ -427,10 +411,8 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
         String testTypeName = EMPTY_STRING;
         mOriginalTestMethodName = EMPTY_STRING;
         try {
-            testTypeName = config.getAttribute(
-                    IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, ""); //$NON-NLS-1$
-            mOriginalTestMethodName = config.getAttribute(
-                    JUnitLaunchConfigurationConstants.ATTR_TEST_METHOD_NAME, ""); //$NON-NLS-1$
+            testTypeName = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, ""); //$NON-NLS-1$
+            mOriginalTestMethodName = config.getAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_METHOD_NAME, ""); //$NON-NLS-1$
         } catch (CoreException ce) {
             // ignore
         }
@@ -445,9 +427,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
 
     private void setTestMethodLabel(String testMethodName) {
         if (!EMPTY_STRING.equals(testMethodName)) {
-            mTestMethodLabel.setText(
-                    JUnitMessages.JUnitLaunchConfigurationTab_label_method +
-                    mOriginalTestMethodName);
+            mTestMethodLabel.setText(JUnitMessages.JUnitLaunchConfigurationTab_label_method + mOriginalTestMethodName);
         } else {
             mTestMethodLabel.setText(EMPTY_STRING);
         }
@@ -457,8 +437,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
         String containerHandle = EMPTY_STRING;
         IJavaElement containerElement = null;
         try {
-            containerHandle = config.getAttribute(
-                    JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER, EMPTY_STRING);
+            containerHandle = config.getAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER, EMPTY_STRING);
             if (containerHandle.length() > 0) {
                 containerElement = JavaCore.create(containerHandle);
             }
@@ -489,20 +468,14 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
                     mContainerElement.getJavaProject().getElementName());
             config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER,
                     mContainerElement.getHandleIdentifier());
-            config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME,
-                    EMPTY_STRING);
-             //workaround for Eclipse bug 65399
-            config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_METHOD_NAME,
-                    EMPTY_STRING);
+            config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, EMPTY_STRING);
+            //workaround for Eclipse bug 65399
+            config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_METHOD_NAME, EMPTY_STRING);
         } else {
-            config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
-                    mProjText.getText());
-            config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME,
-                    mTestText.getText());
-            config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER,
-                    EMPTY_STRING);
-            config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_METHOD_NAME,
-                    mOriginalTestMethodName);
+            config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, mProjText.getText());
+            config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, mTestText.getText());
+            config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER, EMPTY_STRING);
+            config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_METHOD_NAME, mOriginalTestMethodName);
         }
         try {
             mapResources(config);
@@ -512,13 +485,11 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
         }
         AndroidJUnitLaunchConfigDelegate.setJUnitDefaults(config);
 
-        config.setAttribute(AndroidJUnitLaunchConfigDelegate.ATTR_INSTR_NAME,
-                getSelectedInstrumentation());
-        config.setAttribute(AndroidJUnitLaunchConfigDelegate.ATTR_TEST_SIZE,
-                getSelectedTestSize());
+        config.setAttribute(AndroidJUnitLaunchConfigDelegate.ATTR_INSTR_NAME, getSelectedInstrumentation());
+        config.setAttribute(AndroidJUnitLaunchConfigDelegate.ATTR_TEST_SIZE, getSelectedTestSize());
     }
 
-    private void mapResources(ILaunchConfigurationWorkingCopy config)  throws CoreException {
+    private void mapResources(ILaunchConfigurationWorkingCopy config) throws CoreException {
         JUnitMigrationDelegate.mapResources(config);
     }
 
@@ -560,8 +531,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
             radioSetting[0] = mTestRadioButton.getSelection();
             radioSetting[1] = mTestContainerRadioButton.getSelection();
 
-            types = TestSearchEngine.findTests(getLaunchConfigurationDialog(), javaProject,
-                    getTestKind());
+            types = TestSearchEngine.findTests(getLaunchConfigurationDialog(), javaProject, getTestKind());
         } catch (InterruptedException e) {
             setErrorMessage(e.getMessage());
             return;
@@ -694,12 +664,10 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
             return;
         }
 
-        IStatus status = ResourcesPlugin.getWorkspace().validatePath(IPath.SEPARATOR + projectName,
-                IResource.PROJECT);
+        IStatus status = ResourcesPlugin.getWorkspace().validatePath(IPath.SEPARATOR + projectName, IResource.PROJECT);
         if (!status.isOK() || !Path.ROOT.isValidSegment(projectName)) {
-            setErrorMessage(Messages.format(
-                    JUnitMessages.JUnitLaunchConfigurationTab_error_invalidProjectName,
-                    projectName));
+            setErrorMessage(
+                    Messages.format(JUnitMessages.JUnitLaunchConfigurationTab_error_invalidProjectName, projectName));
             return;
         }
 
@@ -713,8 +681,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
 
         try {
             if (!project.hasNature(AndmoreAndroidConstants.NATURE_DEFAULT)) {
-                setErrorMessage(
-                        LaunchMessages.NonAndroidProjectError);
+                setErrorMessage(LaunchMessages.NonAndroidProjectError);
                 return;
             }
             String className = mTestText.getText().trim();
@@ -723,8 +690,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
                 return;
             }
             if (javaProject.findType(className) == null) {
-                setErrorMessage(Messages.format(
-                        JUnitMessages.JUnitLaunchConfigurationTab_error_test_class_not_found,
+                setErrorMessage(Messages.format(JUnitMessages.JUnitLaunchConfigurationTab_error_test_class_not_found,
                         new String[] { className, projectName }));
                 return;
             }
@@ -757,8 +723,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
 
     private String getSelectedInstrumentation() {
         int selectionIndex = mInstrumentationCombo.getSelectionIndex();
-        if (mInstrumentations != null && selectionIndex >= 0 &&
-                selectionIndex < mInstrumentations.length) {
+        if (mInstrumentations != null && selectionIndex >= 0 && selectionIndex < mInstrumentations.length) {
             return mInstrumentations[selectionIndex];
         }
         return null;
@@ -803,14 +768,12 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
             // for these attributes being set on a config if there is nothing in the
             // corresponding text boxes)
             config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING);
-            config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER,
-                    EMPTY_STRING);
+            config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER, EMPTY_STRING);
         }
         initializeTestAttributes(javaElement, config);
     }
 
-    private void initializeTestAttributes(IJavaElement javaElement,
-            ILaunchConfigurationWorkingCopy config) {
+    private void initializeTestAttributes(IJavaElement javaElement, ILaunchConfigurationWorkingCopy config) {
         if (javaElement != null && javaElement.getElementType() < IJavaElement.COMPILATION_UNIT) {
             initializeTestContainer(javaElement, config);
         } else {
@@ -818,10 +781,8 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
         }
     }
 
-    private void initializeTestContainer(IJavaElement javaElement,
-            ILaunchConfigurationWorkingCopy config) {
-        config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER,
-                javaElement.getHandleIdentifier());
+    private void initializeTestContainer(IJavaElement javaElement, ILaunchConfigurationWorkingCopy config) {
+        config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_CONTAINER, javaElement.getHandleIdentifier());
         initializeName(config, javaElement.getElementName());
     }
 
@@ -842,8 +803,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
     /**
      * Sets the main type & name attributes on the working copy based on the IJavaElement
      */
-    private void initializeTestType(IJavaElement javaElement,
-            ILaunchConfigurationWorkingCopy config) {
+    private void initializeTestType(IJavaElement javaElement, ILaunchConfigurationWorkingCopy config) {
         String name = EMPTY_STRING;
         String testKindId = null;
         try {
@@ -852,8 +812,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
                 ITestKind testKind = TestKindRegistry.getContainerTestKind(javaElement);
                 testKindId = testKind.getId();
 
-                IType[] types = TestSearchEngine.findTests(getLaunchConfigurationDialog(),
-                        javaElement, testKind);
+                IType[] types = TestSearchEngine.findTests(getLaunchConfigurationDialog(), javaElement, testKind);
                 if ((types == null) || (types.length < 1)) {
                     return;
                 }
@@ -868,8 +827,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
         }
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, name);
         if (testKindId != null) {
-            config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_RUNNER_KIND,
-                    testKindId);
+            config.setAttribute(JUnitLaunchConfigurationConstants.ATTR_TEST_RUNNER_KIND, testKindId);
         }
         initializeName(config, name);
     }
@@ -884,28 +842,24 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
 
     private IJavaElement chooseContainer(IJavaElement initElement) {
         @SuppressWarnings("rawtypes")
-        Class[] acceptedClasses = new Class[] { IJavaProject.class,
-                IPackageFragment.class };
-        TypedElementSelectionValidator validator = new TypedElementSelectionValidator(
-                acceptedClasses, false) {
+        Class[] acceptedClasses = new Class[] { IJavaProject.class, IPackageFragment.class };
+        TypedElementSelectionValidator validator = new TypedElementSelectionValidator(acceptedClasses, false) {
             @Override
             public boolean isSelectedValid(Object element) {
                 return true;
             }
         };
 
-        acceptedClasses = new Class[] { IJavaModel.class, IPackageFragmentRoot.class,
-                IJavaProject.class, IPackageFragment.class };
+        acceptedClasses = new Class[] { IJavaModel.class, IPackageFragmentRoot.class, IJavaProject.class,
+                IPackageFragment.class };
         ViewerFilter filter = new TypedViewerFilter(acceptedClasses) {
             @Override
             public boolean select(Viewer viewer, Object parent, Object element) {
-                if (element instanceof IPackageFragmentRoot &&
-                        ((IPackageFragmentRoot) element).isArchive()) {
+                if (element instanceof IPackageFragmentRoot && ((IPackageFragmentRoot) element).isArchive()) {
                     return false;
                 }
                 try {
-                    if (element instanceof IPackageFragment &&
-                            !((IPackageFragment) element).hasChildren()) {
+                    if (element instanceof IPackageFragment && !((IPackageFragment) element).hasChildren()) {
                         return false;
                     }
                 } catch (JavaModelException e) {
@@ -916,10 +870,8 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
         };
 
         AndroidJavaElementContentProvider provider = new AndroidJavaElementContentProvider();
-        ILabelProvider labelProvider = new JavaElementLabelProvider(
-                JavaElementLabelProvider.SHOW_DEFAULT);
-        ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(),
-                labelProvider, provider);
+        ILabelProvider labelProvider = new JavaElementLabelProvider(JavaElementLabelProvider.SHOW_DEFAULT);
+        ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(), labelProvider, provider);
         dialog.setValidator(validator);
         dialog.setComparator(new JavaElementComparator());
         dialog.setTitle(JUnitMessages.JUnitLaunchConfigurationTab_folderdialog_title);
@@ -947,8 +899,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
      * @return Java element context.
      */
     private IJavaElement getContext() {
-        IWorkbenchWindow activeWorkbenchWindow =
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         if (activeWorkbenchWindow == null) {
             return null;
         }
@@ -977,14 +928,13 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
             IEditorPart part = page.getActiveEditor();
             if (part != null) {
                 IEditorInput input = part.getEditorInput();
-                return (IJavaElement) input.getAdapter(IJavaElement.class);
+                return input.getAdapter(IJavaElement.class);
             }
         }
         return null;
     }
 
-    private void initializeJavaProject(IJavaElement javaElement,
-            ILaunchConfigurationWorkingCopy config) {
+    private void initializeJavaProject(IJavaElement javaElement, ILaunchConfigurationWorkingCopy config) {
         IJavaProject javaProject = javaElement.getJavaProject();
         String name = null;
         if (javaProject != null && javaProject.exists()) {
@@ -1027,8 +977,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
                 return;
             }
         } catch (CoreException e) {
-            AndmoreAndroidPlugin.logAndPrintError(e, project.getName(),
-                    LaunchMessages.AndroidJUnitTab_LoadInstrError_s,
+            AndmoreAndroidPlugin.logAndPrintError(e, project.getName(), LaunchMessages.AndroidJUnitTab_LoadInstrError_s,
                     SdkConstants.FN_ANDROID_MANIFEST_XML);
         }
         // if we reach this point, either project is null, or we got an exception during
@@ -1041,8 +990,7 @@ public class AndroidJUnitLaunchConfigurationTab extends AbstractLaunchConfigurat
     /**
      * Overrides the {@link StandardJavaElementContentProvider} to only display Android projects
      */
-    private static class AndroidJavaElementContentProvider
-            extends StandardJavaElementContentProvider {
+    private static class AndroidJavaElementContentProvider extends StandardJavaElementContentProvider {
 
         /**
          * Override parent to return only Android projects if at the root. Otherwise, use parent

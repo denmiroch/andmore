@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,8 +38,7 @@ public class TabHostRule extends IgnoredLayoutRule {
     // the child elements yourself, e.g. via addTab() etc.
 
     @Override
-    public void onCreate(@NonNull INode node, @NonNull INode parent,
-            @NonNull InsertType insertType) {
+    public void onCreate(@NonNull INode node, @NonNull INode parent, @NonNull InsertType insertType) {
         super.onCreate(node, parent, insertType);
 
         if (insertType.isCreate()) {
@@ -56,8 +52,7 @@ public class TabHostRule extends IgnoredLayoutRule {
             INode linear = node.appendChild(FQCN_LINEAR_LAYOUT);
             linear.setAttribute(ANDROID_URI, ATTR_LAYOUT_WIDTH, fillParent);
             linear.setAttribute(ANDROID_URI, ATTR_LAYOUT_HEIGHT, fillParent);
-            linear.setAttribute(ANDROID_URI, ATTR_ORIENTATION,
-                    VALUE_VERTICAL);
+            linear.setAttribute(ANDROID_URI, ATTR_ORIENTATION, VALUE_VERTICAL);
 
             INode tab = linear.appendChild(FQCN_TAB_WIDGET);
             tab.setAttribute(ANDROID_URI, ATTR_LAYOUT_WIDTH, fillParent);
@@ -73,8 +68,7 @@ public class TabHostRule extends IgnoredLayoutRule {
                 INode child = frame.appendChild(FQCN_LINEAR_LAYOUT);
                 child.setAttribute(ANDROID_URI, ATTR_LAYOUT_WIDTH, fillParent);
                 child.setAttribute(ANDROID_URI, ATTR_LAYOUT_HEIGHT, fillParent);
-                child.setAttribute(ANDROID_URI, ATTR_ID,
-                        String.format("@+id/tab%d", i + 1)); //$NON-NLS-1$
+                child.setAttribute(ANDROID_URI, ATTR_ID, String.format("@+id/tab%d", i + 1)); //$NON-NLS-1$
             }
         }
     }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,8 +36,7 @@ public class AndroidXmlCharacterMatcher extends XMLDocumentRegionEdgeMatcher {
     /**
      * Constructs a new character matcher for Android XML files
      */
-    public AndroidXmlCharacterMatcher() {
-    }
+    public AndroidXmlCharacterMatcher() {}
 
     @Override
     public IRegion match(IDocument doc, int offset) {
@@ -82,8 +78,8 @@ public class AndroidXmlCharacterMatcher extends XMLDocumentRegionEdgeMatcher {
             isOpenTag = true;
         } else if (type.equals(XML_END_TAG_OPEN)) {
             isCloseTag = true;
-        } else if (!(type.equals(XML_TAG_CLOSE) || type.equals(XML_TAG_NAME)) &&
-                (subRegion.getStart() + region.getStartOffset() == offset)) {
+        } else if (!(type.equals(XML_TAG_CLOSE) || type.equals(XML_TAG_NAME))
+                && (subRegion.getStart() + region.getStartOffset() == offset)) {
             // Look to the left one character; we may have the case where you're
             // pointing to the right of a tag, e.g.
             //     <foo>^text

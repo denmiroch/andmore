@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,8 @@
  */
 
 package org.eclipse.andmore.internal.editors.manifest.model;
+
+import java.util.ArrayList;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -62,8 +61,6 @@ import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 
-import java.util.ArrayList;
-
 /**
  * Represents an XML attribute for a package, that can be modified using a simple text field or
  * a dialog to choose an existing package. Also, there's a link to create a new package.
@@ -94,11 +91,11 @@ public class UiPackageAttributeNode extends UiTextAttributeNode {
         TextAttributeDescriptor desc = (TextAttributeDescriptor) getDescriptor();
 
         StringBuilder label = new StringBuilder();
-        label.append("<form><p><a href='unused'>");  //$NON-NLS-1$
+        label.append("<form><p><a href='unused'>"); //$NON-NLS-1$
         label.append(desc.getUiName());
-        label.append("</a></p></form>");  //$NON-NLS-1$
-        FormText formText = SectionHelper.createFormText(parent, toolkit, true /* isHtml */,
-                label.toString(), true /* setupLayoutData */);
+        label.append("</a></p></form>"); //$NON-NLS-1$
+        FormText formText = SectionHelper.createFormText(parent, toolkit, true /* isHtml */, label.toString(),
+                true /* setupLayoutData */);
         formText.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
             public void linkActivated(HyperlinkEvent e) {
@@ -120,7 +117,7 @@ public class UiPackageAttributeNode extends UiTextAttributeNode {
 
         final Text text = toolkit.createText(composite, getCurrentValue());
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalIndent = 1;  // Needed by the fixed composite borders under GTK
+        gd.horizontalIndent = 1; // Needed by the fixed composite borders under GTK
         text.setLayoutData(gd);
 
         setTextWidget(text);
@@ -148,8 +145,8 @@ public class UiPackageAttributeNode extends UiTextAttributeNode {
                 String package_name = text.getText();
                 if (package_name.indexOf('.') < 1) {
                     getManagedForm().getMessageManager().addMessage(text,
-                            "Package name should contain at least two identifiers.",
-                            null /* data */, IMessageProvider.ERROR, text);
+                            "Package name should contain at least two identifiers.", null /* data */,
+                            IMessageProvider.ERROR, text);
                 } else {
                     getManagedForm().getMessageManager().removeMessage(text, text);
                 }
@@ -181,8 +178,7 @@ public class UiPackageAttributeNode extends UiTextAttributeNode {
         if (project != null) {
 
             try {
-                SelectionDialog dlg = JavaUI.createPackageDialog(text.getShell(),
-                        JavaCore.create(project), 0);
+                SelectionDialog dlg = JavaUI.createPackageDialog(text.getShell(), JavaCore.create(project), 0);
                 dlg.setTitle("Select Android Package");
                 dlg.setMessage("Select the package for the Android project.");
                 Window.setDefaultImage(AndmoreAndroidPlugin.getAndroidLogo());
@@ -190,11 +186,10 @@ public class UiPackageAttributeNode extends UiTextAttributeNode {
                 if (dlg.open() == Window.OK) {
                     Object[] results = dlg.getResult();
                     if (results.length == 1) {
-                        setPackageTextField((IPackageFragment)results[0]);
+                        setPackageTextField((IPackageFragment) results[0]);
                     }
                 }
-            } catch (JavaModelException e1) {
-            }
+            } catch (JavaModelException e1) {}
         }
     }
 
@@ -247,7 +242,7 @@ public class UiPackageAttributeNode extends UiTextAttributeNode {
         IEditorInput input = editor.getEditorInput();
         if (input instanceof IFileEditorInput) {
             // from the file editor we can get the IFile object, and from it, the IProject.
-            IFile file = ((IFileEditorInput)input).getFile();
+            IFile file = ((IFileEditorInput) input).getFile();
             return file.getProject();
         }
 
@@ -272,8 +267,7 @@ public class UiPackageAttributeNode extends UiTextAttributeNode {
                     result.add(roots[i]);
                 }
             }
-        } catch (JavaModelException e) {
-        }
+        } catch (JavaModelException e) {}
 
         return result.toArray(new IPackageFragmentRoot[result.size()]);
     }
@@ -289,7 +283,6 @@ public class UiPackageAttributeNode extends UiTextAttributeNode {
         text.setText(name);
     }
 
-
     /**
      * Displays and handles a "Create Package Wizard".
      *
@@ -304,9 +297,7 @@ public class UiPackageAttributeNode extends UiTextAttributeNode {
         action.run();
 
         IJavaElement element = action.getCreatedElement();
-        if (element != null &&
-                element.exists() &&
-                element.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
+        if (element != null && element.exists() && element.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
             setPackageTextField((IPackageFragment) element);
         }
     }
@@ -317,4 +308,3 @@ public class UiPackageAttributeNode extends UiTextAttributeNode {
         return null;
     }
 }
-

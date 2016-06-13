@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,10 @@
  */
 
 package org.eclipse.andmore.internal.editors.ui.tree;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -66,10 +67,6 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.MasterDetailsBlock;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
  * {@link UiTreeBlock} is a {@link MasterDetailsBlock} which displays a tree view for
@@ -134,7 +131,6 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
      */
     private final boolean mAutoCreateRoot;
 
-
     /**
      * Creates a new {@link MasterDetailsBlock} that will display all UI nodes matching the
      * given filter in the given root node.
@@ -153,12 +149,8 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
      * @param title Title for the section
      * @param description Description for the section
      */
-    public UiTreeBlock(AndroidXmlEditor editor,
-            UiElementNode uiRootNode,
-            boolean autoCreateRoot,
-            ElementDescriptor[] descriptorFilters,
-            String title,
-            String description) {
+    public UiTreeBlock(AndroidXmlEditor editor, UiElementNode uiRootNode, boolean autoCreateRoot,
+            ElementDescriptor[] descriptorFilters, String title, String description) {
         mEditor = editor;
         mUiRootNode = uiRootNode;
         mAutoCreateRoot = autoCreateRoot;
@@ -240,8 +232,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
      * Creates the tree and its viewer
      * @return The tree control
      */
-    private Tree createTreeViewer(FormToolkit toolkit, Composite grid,
-            final IManagedForm managedForm) {
+    private Tree createTreeViewer(FormToolkit toolkit, Composite grid, final IManagedForm managedForm) {
         // Note: we *could* use a FilteredTree instead of the Tree+TreeViewer here.
         // However the class must be adapted to create an adapted toolkit tree.
         final Tree tree = toolkit.createTree(grid, SWT.MULTI);
@@ -341,9 +332,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
             @Override
             public void widgetDisposed(DisposeEvent e) {
                 if (mUiRootNode != null) {
-                    UiElementNode node = mUiRootNode.getUiParent() != null ?
-                                            mUiRootNode.getUiParent() :
-                                            mUiRootNode;
+                    UiElementNode node = mUiRootNode.getUiParent() != null ? mUiRootNode.getUiParent() : mUiRootNode;
 
                     if (node != null) {
                         node.removeUpdateListener(mUiRefreshListener);
@@ -378,8 +367,8 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
      *        this tree view. Use null or an empty list to accept any kind of node.
      * @param forceRefresh If tree, forces the tree to refresh
      */
-    public void changeRootAndDescriptors(UiElementNode uiRootNode,
-            ElementDescriptor[] descriptorFilters, boolean forceRefresh) {
+    public void changeRootAndDescriptors(UiElementNode uiRootNode, ElementDescriptor[] descriptorFilters,
+            boolean forceRefresh) {
         UiElementNode node;
 
         // Remove previous listeners if any
@@ -392,8 +381,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
         mUiRootNode = uiRootNode;
         mDescriptorFilters = descriptorFilters;
 
-        mTreeViewer.setContentProvider(
-                new UiModelTreeContentProvider(mUiRootNode, mDescriptorFilters));
+        mTreeViewer.setContentProvider(new UiModelTreeContentProvider(mUiRootNode, mDescriptorFilters));
 
         // Listen on structural changes on the root node of the tree
         // If the node has a parent, listen on the parent instead.
@@ -429,8 +417,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
         button_grid.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         mAddButton = toolkit.createButton(button_grid, "Add...", SWT.PUSH);
         SectionHelper.addControlTooltip(mAddButton, "Adds a new element.");
-        mAddButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL |
-                GridData.VERTICAL_ALIGN_BEGINNING));
+        mAddButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_BEGINNING));
 
         mAddButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -489,15 +476,15 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
              * tree selection and if it is of the appropriate type it re-creates
              * the necessary actions.
              */
-           @Override
-        public void menuAboutToShow(IMenuManager manager) {
-               ISelection selection = mTreeViewer.getSelection();
-               if (!selection.isEmpty() && selection instanceof ITreeSelection) {
-                   ArrayList<UiElementNode> selected = filterSelection((ITreeSelection) selection);
-                   doCreateMenuAction(manager, selected);
-                   return;
-               }
-               doCreateMenuAction(manager, null /* ui_node */);
+            @Override
+            public void menuAboutToShow(IMenuManager manager) {
+                ISelection selection = mTreeViewer.getSelection();
+                if (!selection.isEmpty() && selection instanceof ITreeSelection) {
+                    ArrayList<UiElementNode> selected = filterSelection((ITreeSelection) selection);
+                    doCreateMenuAction(manager, selected);
+                    return;
+                }
+                doCreateMenuAction(manager, null /* ui_node */);
             }
         });
         Menu contextMenu = menuManager.createContextMenu(tree);
@@ -523,10 +510,8 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
             }
 
             if (hasXml) {
-                manager.add(new CopyCutAction(getEditor(), getClipboard(),
-                        null, selected, true /* cut */));
-                manager.add(new CopyCutAction(getEditor(), getClipboard(),
-                        null, selected, false /* cut */));
+                manager.add(new CopyCutAction(getEditor(), getClipboard(), null, selected, true /* cut */));
+                manager.add(new CopyCutAction(getEditor(), getClipboard(), null, selected, false /* cut */));
 
                 // Can't paste with more than one element selected (the selection is the target)
                 if (selected.size() <= 1) {
@@ -535,8 +520,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
                     // means paste is valid if the current UI node can have children or if the
                     // parent is not a document.
                     UiElementNode ui_root = selected.get(0).getUiRoot();
-                    if (ui_root.getDescriptor().hasChildren() ||
-                            !(ui_root.getUiParent() instanceof UiDocumentNode)) {
+                    if (ui_root.getDescriptor().hasChildren() || !(ui_root.getUiParent() instanceof UiDocumentNode)) {
                         manager.add(new PasteAction(getEditor(), getClipboard(), selected.get(0)));
                     }
                 }
@@ -589,7 +573,6 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
         }
     }
 
-
     /**
      * This is called by the tree when a selection is made.
      * It enables/disables the buttons associated with the tree depending on the current
@@ -617,8 +600,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
             // Select the new item
             if (uiNodeToSelect != null) {
                 LinkedList<UiElementNode> segments = new LinkedList<UiElementNode>();
-                for (UiElementNode ui_node = uiNodeToSelect; ui_node != mUiRootNode;
-                        ui_node = ui_node.getUiParent()) {
+                for (UiElementNode ui_node = uiNodeToSelect; ui_node != mUiRootNode; ui_node = ui_node.getUiParent()) {
                     segments.add(0, ui_node);
                 }
                 if (segments.size() > 0) {
@@ -644,7 +626,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
     private ArrayList<UiElementNode> filterSelection(ITreeSelection selection) {
         ArrayList<UiElementNode> selected = new ArrayList<UiElementNode>();
 
-        for (Iterator<Object> it = selection.iterator(); it.hasNext(); ) {
+        for (Iterator<Object> it = selection.iterator(); it.hasNext();) {
             Object selectedObj = it.next();
 
             if (selectedObj instanceof UiElementNode) {
@@ -672,10 +654,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
             }
         }
 
-        mUiTreeActions.doAdd(
-                ui_node,
-                mDescriptorFilters,
-                mTreeViewer.getControl().getShell(),
+        mUiTreeActions.doAdd(ui_node, mDescriptorFilters, mTreeViewer.getControl().getShell(),
                 (ILabelProvider) mTreeViewer.getLabelProvider());
     }
 
@@ -799,7 +778,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
 
             @Override
             public Object getPageKey(Object object) {
-                return object;  // use node object as key
+                return object; // use node object as key
             }
         });
     }
@@ -866,8 +845,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
         private ViewerFilter mFilter;
 
         public DescriptorFilterAction(ElementDescriptor descriptor) {
-            super(String.format("Displays only %1$s elements.", descriptor.getUiName()),
-                    AS_CHECK_BOX);
+            super(String.format("Displays only %1$s elements.", descriptor.getUiName()), AS_CHECK_BOX);
 
             mDescriptor = descriptor;
             setImageDescriptor(descriptor.getImageDescriptor());
@@ -901,7 +879,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
                         mTreeViewer.removeFilter(filter);
                     }
                 }
-            } else if (mFilter != null){
+            } else if (mFilter != null) {
                 mTreeViewer.removeFilter(mFilter);
             }
         }
@@ -931,7 +909,7 @@ public final class UiTreeBlock extends MasterDetailsBlock implements ICommitXml 
             @Override
             public boolean select(Viewer viewer, Object parentElement, Object element) {
                 while (element instanceof UiElementNode) {
-                    UiElementNode uiNode = (UiElementNode)element;
+                    UiElementNode uiNode = (UiElementNode) element;
                     if (uiNode.getDescriptor() == mDescriptor) {
                         return true;
                     }

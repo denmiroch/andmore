@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,14 +13,14 @@
 
 package org.eclipse.andmore.internal.editors.export;
 
+import java.util.HashMap;
+
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-
-import java.util.HashMap;
 
 /**
  * Section part for editing the properties in an Export editor.
@@ -39,43 +36,37 @@ final class ExportFieldsPart extends AbstractPropertiesFieldsPart {
 
         Composite table = createTableLayout(toolkit, 2 /* numColumns */);
 
-        createLabel(table, toolkit,
-                "Available Properties", //label
-                "List of properties you can edit in export.properties");  //tooltip
+        createLabel(table, toolkit, "Available Properties", //label
+                "List of properties you can edit in export.properties"); //tooltip
 
-        Text packageField = createLabelAndText(table, toolkit,
-                "Package", //label,
+        Text packageField = createLabelAndText(table, toolkit, "Package", //label,
                 "", //$NON-NLS-1$ value,
-                "TODO tooltip for Package");  //tooltip
+                "TODO tooltip for Package"); //tooltip
 
-        Text projectsField = createLabelAndText(table, toolkit,
-                "Projects", //label,
+        Text projectsField = createLabelAndText(table, toolkit, "Projects", //label,
                 "", //$NON-NLS-1$ value,
-                "TODO tooltip for Projects");  //tooltip
+                "TODO tooltip for Projects"); //tooltip
 
-        Text versionCodeField = createLabelAndText(table, toolkit,
-                "Version Code", //label,
+        Text versionCodeField = createLabelAndText(table, toolkit, "Version Code", //label,
                 "", //$NON-NLS-1$ value,
-                "TODO tooltip for Version Code");  //tooltip
+                "TODO tooltip for Version Code"); //tooltip
 
-        Text keyStoreField = createLabelAndText(table, toolkit,
-                "Key Store", //label,
+        Text keyStoreField = createLabelAndText(table, toolkit, "Key Store", //label,
                 "", //$NON-NLS-1$ value,
-                "TODO tooltip for Key Store");  //tooltip
+                "TODO tooltip for Key Store"); //tooltip
 
-        Text keyAliasField = createLabelAndText(table, toolkit,
-                "Key Alias", //label,
+        Text keyAliasField = createLabelAndText(table, toolkit, "Key Alias", //label,
                 "", //$NON-NLS-1$ value,
-                "TODO tooltip for Key Alias");  //tooltip
+                "TODO tooltip for Key Alias"); //tooltip
 
         // Associate each field with the keyword in the properties files.
         // TODO there's probably some constant to reuse here.
         HashMap<String, Control> map = getNameToField();
-        map.put("package", packageField);              //$NON-NLS-1$
-        map.put("projects", projectsField);            //$NON-NLS-1$
-        map.put("versionCode", versionCodeField);      //$NON-NLS-1$
-        map.put("_key.store", keyStoreField);          //$NON-NLS-1$
-        map.put("_key.alias", keyAliasField);          //$NON-NLS-1$
+        map.put("package", packageField); //$NON-NLS-1$
+        map.put("projects", projectsField); //$NON-NLS-1$
+        map.put("versionCode", versionCodeField); //$NON-NLS-1$
+        map.put("_key.store", keyStoreField); //$NON-NLS-1$
+        map.put("_key.alias", keyAliasField); //$NON-NLS-1$
 
         addModifyListenerToFields();
     }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,16 +21,16 @@ import static com.android.SdkConstants.VALUE_WRAP_CONTENT;
 import static com.android.SdkConstants.XMLNS_ANDROID;
 import static com.android.SdkConstants.XMLNS_URI;
 
-import com.android.ide.common.api.InsertType;
-import com.android.ide.common.api.Rect;
-import com.android.ide.common.api.RuleAction.Toggle;
-import com.android.ide.common.rendering.LayoutLibrary;
-import com.android.ide.common.rendering.api.Capability;
-import com.android.ide.common.rendering.api.LayoutLog;
-import com.android.ide.common.rendering.api.RenderSession;
-import com.android.ide.common.rendering.api.ViewInfo;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.IconFactory;
@@ -99,16 +96,16 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.ide.common.api.InsertType;
+import com.android.ide.common.api.Rect;
+import com.android.ide.common.api.RuleAction.Toggle;
+import com.android.ide.common.rendering.LayoutLibrary;
+import com.android.ide.common.rendering.api.Capability;
+import com.android.ide.common.rendering.api.LayoutLog;
+import com.android.ide.common.rendering.api.RenderSession;
+import com.android.ide.common.rendering.api.ViewInfo;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
 
 /**
  * A palette control for the {@link GraphicalEditorPart}.
@@ -154,8 +151,7 @@ public class PaletteControl extends Composite {
         }
 
         @Override
-        public void setToolBar(IToolBarManager toolBarManager) {
-        }
+        public void setToolBar(IToolBarManager toolBarManager) {}
 
         /**
          * Add tool bar items to the given toolbar
@@ -231,11 +227,11 @@ public class PaletteControl extends Composite {
     };
 
     /** Token used in preference string to record alphabetical sorting */
-    private static final String VALUE_ALPHABETICAL = "alpha";   //$NON-NLS-1$
+    private static final String VALUE_ALPHABETICAL = "alpha"; //$NON-NLS-1$
     /** Token used in preference string to record categories being turned off */
     private static final String VALUE_NO_CATEGORIES = "nocat"; //$NON-NLS-1$
     /** Token used in preference string to record auto close being turned off */
-    private static final String VALUE_NO_AUTOCLOSE = "noauto";      //$NON-NLS-1$
+    private static final String VALUE_NO_AUTOCLOSE = "noauto"; //$NON-NLS-1$
 
     private final PreviewIconFactory mPreviewIconFactory = new PreviewIconFactory(this);
     private PaletteMode mPaletteMode = null;
@@ -381,11 +377,9 @@ public class PaletteControl extends Composite {
         if (device == null) {
             return;
         }
-        AndroidTargetData targetData =
-            target != null ? Sdk.getCurrent().getTargetData(target) : null;
-        if (target == mCurrentTarget && targetData == mCurrentTargetData
-                && mCurrentTheme != null && mCurrentTheme.equals(theme)
-                && mCurrentDevice != null && mCurrentDevice.equals(device)) {
+        AndroidTargetData targetData = target != null ? Sdk.getCurrent().getTargetData(target) : null;
+        if (target == mCurrentTarget && targetData == mCurrentTargetData && mCurrentTheme != null
+                && mCurrentTheme.equals(theme) && mCurrentDevice != null && mCurrentDevice.equals(device)) {
             return;
         }
         mCurrentTheme = theme;
@@ -448,10 +442,9 @@ public class PaletteControl extends Composite {
         final Map<String, List<ViewElementDescriptor>> categoryToItems;
         categoryToItems = new HashMap<String, List<ViewElementDescriptor>>();
         headers = new ArrayList<String>();
-        List<Pair<String,List<ViewElementDescriptor>>> paletteEntries =
-            ViewMetadataRepository.get().getPaletteEntries(targetData,
-                    mAlphabetical, mCategories);
-        for (Pair<String,List<ViewElementDescriptor>> pair : paletteEntries) {
+        List<Pair<String, List<ViewElementDescriptor>>> paletteEntries = ViewMetadataRepository.get()
+                .getPaletteEntries(targetData, mAlphabetical, mCategories);
+        for (Pair<String, List<ViewElementDescriptor>> pair : paletteEntries) {
             String category = pair.getFirst();
             List<ViewElementDescriptor> categoryItems = pair.getSecond();
             headers.add(category);
@@ -465,10 +458,9 @@ public class PaletteControl extends Composite {
         //   (2) there's just one category anyway, or
         //   (3) the set of categories have changed so our previously selected category
         //       doesn't exist anymore (can happen when you toggle "Show Categories")
-        if ((expandedCategories == null && headers.size() > 0) || headers.size() == 1 ||
-                (expandedCategories != null && expandedCategories.size() >= 1
-                        && !headers.contains(
-                                expandedCategories.iterator().next().replace("&&", "&")))) { //$NON-NLS-1$ //$NON-NLS-2$
+        if ((expandedCategories == null && headers.size() > 0) || headers.size() == 1
+                || (expandedCategories != null && expandedCategories.size() >= 1
+                        && !headers.contains(expandedCategories.iterator().next().replace("&&", "&")))) { //$NON-NLS-1$ //$NON-NLS-2$
             // Expand the first category if we don't have a previous selection (e.g. refresh)
             expandedCategories = Collections.singleton(headers.get(0));
         }
@@ -478,8 +470,7 @@ public class PaletteControl extends Composite {
         // Pack icon-only view vertically; others stretch to fill palette region
         boolean fillVertical = mPaletteMode != PaletteMode.ICON_ONLY;
 
-        mAccordion = new AccordionControl(this, SWT.NONE, headers, fillVertical, wrap,
-                expandedCategories) {
+        mAccordion = new AccordionControl(this, SWT.NONE, headers, fillVertical, wrap, expandedCategories) {
             @Override
             protected Composite createChildContainer(Composite parent, Object header, int style) {
                 assert categoryToItems != null;
@@ -504,8 +495,7 @@ public class PaletteControl extends Composite {
                     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
                     Button refreshButton = new Button(wrapper, SWT.PUSH | SWT.FLAT);
-                    refreshButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER,
-                            false, false, 1, 1));
+                    refreshButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
                     refreshButton.setText("Refresh");
                     refreshButton.setImage(IconFactory.getInstance().getIcon("refresh")); //$NON-NLS-1$
                     refreshButton.addSelectionListener(new SelectionAdapter() {
@@ -526,6 +516,7 @@ public class PaletteControl extends Composite {
                 addMenu(composite);
                 return composite;
             }
+
             @Override
             protected void createChildren(Composite parent, Object header) {
                 assert categoryToItems != null;
@@ -773,11 +764,8 @@ public class PaletteControl extends Composite {
                 dragBounds = new Rect(x, y, scaledWidth, scaledHeight);
             }
 
-            SimpleElement se = new SimpleElement(
-                    SimpleXmlTransfer.getFqcn(mDesc),
-                    null   /* parentFqcn */,
-                    bounds /* bounds */,
-                    null   /* parentBounds */);
+            SimpleElement se = new SimpleElement(SimpleXmlTransfer.getFqcn(mDesc), null /* parentFqcn */,
+                    bounds /* bounds */, null /* parentBounds */);
             if (mDesc instanceof PaletteMetadataDescriptor) {
                 PaletteMetadataDescriptor pm = (PaletteMetadataDescriptor) mDesc;
                 pm.initializeNew(se);
@@ -786,14 +774,9 @@ public class PaletteControl extends Composite {
 
             // Register this as the current dragged data
             GlobalCanvasDragInfo dragInfo = GlobalCanvasDragInfo.getInstance();
-            dragInfo.startDrag(
-                    mElements,
-                    null /* selection */,
-                    null /* canvas */,
-                    null /* removeSource */);
+            dragInfo.startDrag(mElements, null /* selection */, null /* canvas */, null /* removeSource */);
             dragInfo.setDragBounds(dragBounds);
             dragInfo.setDragBaseline(mBaseline);
-
 
             e.doit = true;
         }
@@ -877,8 +860,8 @@ public class PaletteControl extends Composite {
 
                 BufferedImage awtImage = SwtUtils.convertToAwt(image);
                 if (awtImage != null) {
-                    awtImage = ImageUtils.createDropShadow(awtImage, 3 /* shadowSize */,
-                            0.7f /* shadowAlpha */, 0x000000 /* shadowRgb */);
+                    awtImage = ImageUtils.createDropShadow(awtImage, 3 /* shadowSize */, 0.7f /* shadowAlpha */,
+                            0x000000 /* shadowRgb */);
                     mImage = SwtUtils.convertToSwt(display, awtImage, true, IMG_ALPHA);
                 } else {
                     ImageData data = image.getImageData();
@@ -934,8 +917,7 @@ public class PaletteControl extends Composite {
 
             // This doesn't apply to all, but doesn't seem to cause harm and makes for a
             // better experience with text-oriented views like buttons and texts
-            element.setAttributeNS(ANDROID_URI, ATTR_TEXT,
-                    DescriptorsUtils.getBasename(mDesc.getUiName()));
+            element.setAttributeNS(ANDROID_URI, ATTR_TEXT, DescriptorsUtils.getBasename(mDesc.getUiName()));
 
             // Is this a palette variation?
             if (mDesc instanceof PaletteMetadataDescriptor) {
@@ -973,8 +955,8 @@ public class PaletteControl extends Composite {
                 // not trigger model updates
                 layoutEditorDelegate.getEditor().setIgnoreXmlUpdate(true);
                 try {
-                    canvas.getRulesEngine().callCreateHooks(layoutEditorDelegate.getEditor(),
-                            null, childNode, InsertType.CREATE_PREVIEW);
+                    canvas.getRulesEngine().callCreateHooks(layoutEditorDelegate.getEditor(), null, childNode,
+                            InsertType.CREATE_PREVIEW);
                     childNode.applyPendingChanges();
                 } catch (Throwable t) {
                     AndmoreAndroidPlugin.log(t, "Failed calling creation hooks for widget %1$s", viewName);
@@ -986,8 +968,7 @@ public class PaletteControl extends Composite {
             Integer overrideBgColor = null;
             boolean hasTransparency = false;
             LayoutLibrary layoutLibrary = editor.getLayoutLibrary();
-            if (layoutLibrary != null &&
-                    layoutLibrary.supports(Capability.CUSTOM_BACKGROUND_COLOR)) {
+            if (layoutLibrary != null && layoutLibrary.supports(Capability.CUSTOM_BACKGROUND_COLOR)) {
                 // It doesn't matter what the background color is as long as the alpha
                 // is 0 (fully transparent). We're using red to make it more obvious if
                 // for some reason the background is painted when it shouldn't be.
@@ -1002,13 +983,9 @@ public class PaletteControl extends Composite {
                 // screens the RENDER_WIDTH was wider.
                 LayoutLog silentLogger = new LayoutLog();
 
-                session = RenderService.create(editor)
-                    .setModel(model)
-                    .setMaxRenderSize(MAX_RENDER_WIDTH, MAX_RENDER_HEIGHT)
-                    .setLog(silentLogger)
-                    .setOverrideBgColor(overrideBgColor)
-                    .setDecorations(false)
-                    .createRenderSession();
+                session = RenderService.create(editor).setModel(model)
+                        .setMaxRenderSize(MAX_RENDER_WIDTH, MAX_RENDER_HEIGHT).setLog(silentLogger)
+                        .setOverrideBgColor(overrideBgColor).setDecorations(false).createRenderSession();
             } catch (Throwable t) {
                 // Previews can fail for a variety of reasons -- let's not bug
                 // the user with it
@@ -1047,14 +1024,14 @@ public class PaletteControl extends Composite {
                             // bottom corner, we pick one as close to the bounds of the view as
                             // possible (but still outside of the bounds), such that we can
                             // deal with themes like the dialog theme.
-                            int edgeX = image.getWidth() -1;
-                            int edgeY = image.getHeight() -1;
+                            int edgeX = image.getWidth() - 1;
+                            int edgeY = image.getHeight() - 1;
                             if (viewInfo != null) {
-                                if (viewInfo.getRight() < image.getWidth()-1) {
-                                    edgeX = viewInfo.getRight()+1;
+                                if (viewInfo.getRight() < image.getWidth() - 1) {
+                                    edgeX = viewInfo.getRight() + 1;
                                 }
-                                if (viewInfo.getBottom() < image.getHeight()-1) {
-                                    edgeY = viewInfo.getBottom()+1;
+                                if (viewInfo.getBottom() < image.getHeight() - 1) {
+                                    edgeY = viewInfo.getBottom() + 1;
                                 }
                             }
                             int edgeColor = image.getRGB(edgeX, edgeY);
@@ -1064,10 +1041,8 @@ public class PaletteControl extends Composite {
                         if (cropped != null) {
                             int width = initialCrop != null ? initialCrop.w : cropped.getWidth();
                             int height = initialCrop != null ? initialCrop.h : cropped.getHeight();
-                            boolean needsContrast = hasTransparency
-                                    && !ImageUtils.containsDarkPixels(cropped);
-                            cropped = ImageUtils.createDropShadow(cropped,
-                                    hasTransparency ? 3 : 5 /* shadowSize */,
+                            boolean needsContrast = hasTransparency && !ImageUtils.containsDarkPixels(cropped);
+                            cropped = ImageUtils.createDropShadow(cropped, hasTransparency ? 3 : 5 /* shadowSize */,
                                     !hasTransparency ? 0.6f : needsContrast ? 0.8f : 0.7f/*alpha*/,
                                     0x000000 /* shadowRgb */);
 
@@ -1102,9 +1077,8 @@ public class PaletteControl extends Composite {
         private void dumpDocument(Document document) {
             // Diagnostics: print out the XML that we're about to render
             if (false) { // Will be omitted by the compiler
-                org.apache.xml.serialize.OutputFormat outputFormat =
-                    new org.apache.xml.serialize.OutputFormat(
-                            "XML", "ISO-8859-1", true); //$NON-NLS-1$ //$NON-NLS-2$
+                org.apache.xml.serialize.OutputFormat outputFormat = new org.apache.xml.serialize.OutputFormat("XML", //$NON-NLS-1$
+                        "ISO-8859-1", true); //$NON-NLS-1$
                 outputFormat.setIndent(2);
                 outputFormat.setLineWidth(100);
                 outputFormat.setIndenting(true);
@@ -1114,8 +1088,8 @@ public class PaletteControl extends Composite {
                 // Using FQN here to avoid having an import above, which will result
                 // in a deprecation warning, and there isn't a way to annotate a single
                 // import element with a SuppressWarnings.
-                org.apache.xml.serialize.XMLSerializer serializer =
-                    new org.apache.xml.serialize.XMLSerializer(stringWriter, outputFormat);
+                org.apache.xml.serialize.XMLSerializer serializer = new org.apache.xml.serialize.XMLSerializer(
+                        stringWriter, outputFormat);
                 serializer.setNamespaces(true);
                 try {
                     serializer.serialize(document.getDocumentElement());
@@ -1159,8 +1133,7 @@ public class PaletteControl extends Composite {
         final static int RESET = 5;
 
         ToggleViewOptionAction(String title, int action, boolean checked) {
-            super(title, (action == REFRESH || action == RESET) ? IAction.AS_PUSH_BUTTON
-                    : IAction.AS_CHECK_BOX);
+            super(title, (action == REFRESH || action == RESET) ? IAction.AS_PUSH_BUTTON : IAction.AS_CHECK_BOX);
             mAction = action;
             if (checked) {
                 setChecked(checked);
@@ -1223,25 +1196,17 @@ public class PaletteControl extends Composite {
         }
         if (mPaletteMode.isPreview()) {
             manager.add(new Separator());
-            manager.add(new ToggleViewOptionAction("Refresh Previews",
-                    ToggleViewOptionAction.REFRESH,
-                    false));
+            manager.add(new ToggleViewOptionAction("Refresh Previews", ToggleViewOptionAction.REFRESH, false));
         }
         manager.add(new Separator());
-        manager.add(new ToggleViewOptionAction("Show Categories",
-                ToggleViewOptionAction.TOGGLE_CATEGORY,
-                mCategories));
-        manager.add(new ToggleViewOptionAction("Sort Alphabetically",
-                ToggleViewOptionAction.TOGGLE_ALPHABETICAL,
+        manager.add(new ToggleViewOptionAction("Show Categories", ToggleViewOptionAction.TOGGLE_CATEGORY, mCategories));
+        manager.add(new ToggleViewOptionAction("Sort Alphabetically", ToggleViewOptionAction.TOGGLE_ALPHABETICAL,
                 mAlphabetical));
         manager.add(new Separator());
-        manager.add(new ToggleViewOptionAction("Auto Close Previous",
-                ToggleViewOptionAction.TOGGLE_AUTO_CLOSE,
+        manager.add(new ToggleViewOptionAction("Auto Close Previous", ToggleViewOptionAction.TOGGLE_AUTO_CLOSE,
                 mAutoClose));
         manager.add(new Separator());
-        manager.add(new ToggleViewOptionAction("Reset",
-                ToggleViewOptionAction.RESET,
-                false));
+        manager.add(new ToggleViewOptionAction("Reset", ToggleViewOptionAction.RESET, false));
 
         Menu menu = manager.createContextMenu(PaletteControl.this);
         menu.setLocation(x, y);
@@ -1256,8 +1221,7 @@ public class PaletteControl extends Composite {
         }
 
         @Override
-        public void viewsUpdated(Collection<String> customViews,
-                Collection<String> thirdPartyViews) {
+        public void viewsUpdated(Collection<String> customViews, Collection<String> thirdPartyViews) {
             addCustomItems(mParent);
             mParent.layout(true);
         }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,10 @@
  */
 
 package org.eclipse.andmore.internal.editors.draw9patch.ui;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.draw9patch.graphics.NinePatchedImage;
@@ -40,15 +41,10 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ScrollBar;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-
 /**
  * View and edit Draw 9-patch image.
  */
-public class ImageViewer extends Canvas implements PaintListener, KeyListener, MouseListener,
-        MouseMoveListener {
+public class ImageViewer extends Canvas implements PaintListener, KeyListener, MouseListener, MouseMoveListener {
     private static final boolean DEBUG = false;
 
     public static final String HELP_MESSAGE_KEY_TIPS = "Press Shift to erase pixels."
@@ -59,16 +55,13 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
     private static final Color BLACK_COLOR = AndmoreAndroidPlugin.getDisplay().getSystemColor(SWT.COLOR_BLACK);
     private static final Color RED_COLOR = AndmoreAndroidPlugin.getDisplay().getSystemColor(SWT.COLOR_RED);
 
-    private static final Color BACK_COLOR
-            = new Color(AndmoreAndroidPlugin.getDisplay(), new RGB(0x00, 0xFF, 0x00));
-    private static final Color LOCK_COLOR
-            = new Color(AndmoreAndroidPlugin.getDisplay(), new RGB(0xFF, 0x00, 0x00));
-    private static final Color PATCH_COLOR
-            = new Color(AndmoreAndroidPlugin.getDisplay(), new RGB(0xFF, 0xFF, 0x00));
-    private static final Color PATCH_ONEWAY_COLOR
-            = new Color(AndmoreAndroidPlugin.getDisplay(), new RGB(0x00, 0x00, 0xFF));
-    private static final Color CORRUPTED_COLOR
-            = new Color(AndmoreAndroidPlugin.getDisplay(), new RGB(0xFF, 0x00, 0x00));
+    private static final Color BACK_COLOR = new Color(AndmoreAndroidPlugin.getDisplay(), new RGB(0x00, 0xFF, 0x00));
+    private static final Color LOCK_COLOR = new Color(AndmoreAndroidPlugin.getDisplay(), new RGB(0xFF, 0x00, 0x00));
+    private static final Color PATCH_COLOR = new Color(AndmoreAndroidPlugin.getDisplay(), new RGB(0xFF, 0xFF, 0x00));
+    private static final Color PATCH_ONEWAY_COLOR = new Color(AndmoreAndroidPlugin.getDisplay(),
+            new RGB(0x00, 0x00, 0xFF));
+    private static final Color CORRUPTED_COLOR = new Color(AndmoreAndroidPlugin.getDisplay(),
+            new RGB(0xFF, 0x00, 0x00));
 
     private static final int NONE_ALPHA = 0xFF;
     private static final int LOCK_ALPHA = 50;
@@ -114,15 +107,14 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
     private boolean isCtrlPressed = false;
     private boolean isShiftPressed = false;
 
-    private final List<UpdateListener> mUpdateListenerList
-            = new ArrayList<UpdateListener>();
+    private final List<UpdateListener> mUpdateListenerList = new ArrayList<UpdateListener>();
 
     private final Point mCursorPoint = new Point(0, 0);
 
     private static final int DEFAULT_UPDATE_QUEUE_SIZE = 10;
 
-    private final ArrayBlockingQueue<NinePatchedImage> mUpdateQueue
-            = new ArrayBlockingQueue<NinePatchedImage>(DEFAULT_UPDATE_QUEUE_SIZE);
+    private final ArrayBlockingQueue<NinePatchedImage> mUpdateQueue = new ArrayBlockingQueue<NinePatchedImage>(
+            DEFAULT_UPDATE_QUEUE_SIZE);
 
     private final Runnable mUpdateRunnable = new Runnable() {
         @Override
@@ -151,8 +143,7 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
 
                     AndmoreAndroidPlugin.getDisplay().asyncExec(mUpdateRunnable);
 
-                } catch (InterruptedException e) {
-                }
+                } catch (InterruptedException e) {}
             }
         }
     };
@@ -169,7 +160,7 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
 
     private void fireUpdateEvent() {
         int len = mUpdateListenerList.size();
-        for(int i=0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
             mUpdateListenerList.get(i).update(mNinePatchedImage);
         }
     }
@@ -220,8 +211,7 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
             public void widgetSelected(SelectionEvent event) {
                 super.widgetSelected(event);
                 ScrollBar bar = (ScrollBar) event.widget;
-                if (mHorizontalBar.isVisible()
-                        && mHorizontalScroll != bar.getSelection()) {
+                if (mHorizontalBar.isVisible() && mHorizontalScroll != bar.getSelection()) {
                     mHorizontalScroll = bar.getSelection();
                     redraw();
                 }
@@ -235,8 +225,7 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
             public void widgetSelected(SelectionEvent event) {
                 super.widgetSelected(event);
                 ScrollBar bar = (ScrollBar) event.widget;
-                if (mVerticalBar.isVisible()
-                        && mVerticalScroll != bar.getSelection()) {
+                if (mVerticalBar.isVisible() && mVerticalScroll != bar.getSelection()) {
                     mVerticalScroll = bar.getSelection();
                     redraw();
                 }
@@ -268,8 +257,7 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
         if (drawMode == MODE_ERASE) {
             erase(x, y);
         } else {
-            int color = (drawMode == MODE_RED_TICK) ? NinePatchedImage.RED_TICK
-                    : NinePatchedImage.BLACK_TICK;
+            int color = (drawMode == MODE_RED_TICK) ? NinePatchedImage.RED_TICK : NinePatchedImage.BLACK_TICK;
             mNinePatchedImage.setPatch(x, y, color);
             redraw();
 
@@ -287,8 +275,7 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
     private void scheduleUpdate() {
         try {
             mUpdateQueue.put(mNinePatchedImage);
-        } catch (InterruptedException e) {
-        }
+        } catch (InterruptedException e) {}
     }
 
     @Override
@@ -308,8 +295,7 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
     }
 
     @Override
-    public void mouseDoubleClick(MouseEvent event) {
-    }
+    public void mouseDoubleClick(MouseEvent event) {}
 
     private int getLogicalPositionX(int x) {
         return Math.round((x - mPadding.x + mHorizontalScroll) / ((float) mZoom / 100));
@@ -371,8 +357,7 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
 
         if (mStatusChangedListener != null) {
             // Update position on status panel if position is in logical size.
-            if (posX >= 0 && posY >= 0
-                    && posX <= mNinePatchedImage.getWidth()
+            if (posX >= 0 && posY >= 0 && posX <= mNinePatchedImage.getWidth()
                     && posY <= mNinePatchedImage.getHeight()) {
                 mStatusChangedListener.cursorPositionChanged(posX + 1, posY + 1);
             }
@@ -503,20 +488,18 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
         int baseY = mPadding.y - mVerticalScroll;
 
         // draw checker image
-        bufferGc.drawImage(mBackgroundLayer,
-                0, 0, mBackgroundLayer.getImageData().width,
-                mBackgroundLayer.getImageData().height,
-                baseX, baseY, mPadding.width, mPadding.height);
+        bufferGc.drawImage(mBackgroundLayer, 0, 0, mBackgroundLayer.getImageData().width,
+                mBackgroundLayer.getImageData().height, baseX, baseY, mPadding.width, mPadding.height);
 
         if (DEBUG) {
-            System.out.println(String.format("%d,%d %d,%d %d,%d",
-                    width, height, baseX, baseY, mPadding.width, mPadding.height));
+            System.out.println(
+                    String.format("%d,%d %d,%d %d,%d", width, height, baseX, baseY, mPadding.width, mPadding.height));
         }
 
         // draw image
         /* TODO: Do not draw invisible area, for better performance. */
-        bufferGc.drawImage(mNinePatchedImage.getImage(), 0, 0, width, height, baseX, baseY,
-                mPadding.width, mPadding.height);
+        bufferGc.drawImage(mNinePatchedImage.getImage(), 0, 0, width, height, baseX, baseY, mPadding.width,
+                mPadding.height);
 
         bufferGc.setBackground(BLACK_COLOR);
 
@@ -571,10 +554,7 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
         for (Tick t : verticalPatches) {
             if (t.color != NinePatchedImage.TRANSPARENT_TICK) {
                 gc.setBackground(getColor(t.color));
-                gc.fillRectangle(
-                        baseX,
-                        baseY + getZoomedPixelSize(t.start),
-                        mZoomedPixelSize,
+                gc.fillRectangle(baseX, baseY + getZoomedPixelSize(t.start), mZoomedPixelSize,
                         getZoomedPixelSize(t.getLength()));
             }
         }
@@ -585,10 +565,7 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
         for (Tick t : horizontalPatches) {
             if (t.color != NinePatchedImage.TRANSPARENT_TICK) {
                 gc.setBackground(getColor(t.color));
-                gc.fillRectangle(
-                        baseX + getZoomedPixelSize(t.start),
-                        baseY,
-                        getZoomedPixelSize(t.getLength()),
+                gc.fillRectangle(baseX + getZoomedPixelSize(t.start), baseY, getZoomedPixelSize(t.getLength()),
                         mZoomedPixelSize);
             }
         }
@@ -599,11 +576,9 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
         for (Tick t : horizontalContentArea) {
             if (t.color != NinePatchedImage.TRANSPARENT_TICK) {
                 gc.setBackground(getColor(t.color));
-                gc.fillRectangle(
-                        baseX + getZoomedPixelSize(t.start),
+                gc.fillRectangle(baseX + getZoomedPixelSize(t.start),
                         baseY + getZoomedPixelSize(mNinePatchedImage.getHeight() - 1),
-                        getZoomedPixelSize(t.getLength()),
-                        mZoomedPixelSize);
+                        getZoomedPixelSize(t.getLength()), mZoomedPixelSize);
             }
         }
 
@@ -614,11 +589,8 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
         for (Tick t : verticalContentArea) {
             if (t.color != NinePatchedImage.TRANSPARENT_TICK) {
                 gc.setBackground(getColor(t.color));
-                gc.fillRectangle(
-                        baseX + getZoomedPixelSize(mNinePatchedImage.getWidth() - 1),
-                        baseY + getZoomedPixelSize(t.start),
-                        mZoomedPixelSize,
-                        getZoomedPixelSize(t.getLength()));
+                gc.fillRectangle(baseX + getZoomedPixelSize(mNinePatchedImage.getWidth() - 1),
+                        baseY + getZoomedPixelSize(t.start), mZoomedPixelSize, getZoomedPixelSize(t.getLength()));
             }
         }
     }
@@ -628,9 +600,7 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
         gc.setForeground(LOCK_COLOR);
         gc.setBackground(LOCK_COLOR);
 
-        gc.fillRectangle(
-                baseX + mZoomedPixelSize,
-                baseY + mZoomedPixelSize,
+        gc.fillRectangle(baseX + mZoomedPixelSize, baseY + mZoomedPixelSize,
                 getZoomedPixelSize(mNinePatchedImage.getWidth() - 2),
                 getZoomedPixelSize(mNinePatchedImage.getHeight() - 2));
         gc.setAlpha(NONE_ALPHA);
@@ -658,11 +628,8 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
                         gc.setBackground(PATCH_COLOR);
                     }
                     Rectangle r = c.rect;
-                    gc.fillRectangle(
-                            baseX + getZoomedPixelSize(r.x),
-                            baseY + getZoomedPixelSize(r.y),
-                            getZoomedPixelSize(r.width),
-                            getZoomedPixelSize(r.height));
+                    gc.fillRectangle(baseX + getZoomedPixelSize(r.x), baseY + getZoomedPixelSize(r.y),
+                            getZoomedPixelSize(r.width), getZoomedPixelSize(r.height));
                 }
             }
         }
@@ -683,11 +650,8 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
                     Chunk c = mBadChunks[yPos][xPos];
                     if ((c.type & Chunk.TYPE_CORRUPT) != 0) {
                         Rectangle r = c.rect;
-                        gc.drawRectangle(
-                                baseX + getZoomedPixelSize(r.x),
-                                baseY + getZoomedPixelSize(r.y),
-                                getZoomedPixelSize(r.width),
-                                getZoomedPixelSize(r.height));
+                        gc.drawRectangle(baseX + getZoomedPixelSize(r.x), baseY + getZoomedPixelSize(r.y),
+                                getZoomedPixelSize(r.width), getZoomedPixelSize(r.height));
                     }
                 }
             }
@@ -698,10 +662,8 @@ public class ImageViewer extends Canvas implements PaintListener, KeyListener, M
         gc.setAntialias(SWT.ON);
         gc.setInterpolation(SWT.HIGH);
 
-        int x = Math.round((mCursorPoint.x * ((float) mZoom / 100) + baseX)
-                + ((float) mZoom / 100 / 2));
-        int y = Math.round((mCursorPoint.y * ((float) mZoom / 100) + baseY)
-                + ((float) mZoom / 100 / 2));
+        int x = Math.round((mCursorPoint.x * ((float) mZoom / 100) + baseX) + ((float) mZoom / 100 / 2));
+        int y = Math.round((mCursorPoint.y * ((float) mZoom / 100) + baseY) + ((float) mZoom / 100 / 2));
         gc.setAlpha(GUIDE_ALPHA);
 
         Point size = getSize();

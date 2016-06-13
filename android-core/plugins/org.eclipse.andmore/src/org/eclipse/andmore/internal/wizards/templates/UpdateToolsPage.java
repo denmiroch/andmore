@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,6 +24,7 @@ import org.eclipse.swt.widgets.Label;
 
 class UpdateToolsPage extends WizardPage implements SelectionListener {
     private Button mInstallButton;
+
     UpdateToolsPage() {
         super("update");
         setTitle("Update Tools");
@@ -43,16 +41,13 @@ class UpdateToolsPage extends WizardPage implements SelectionListener {
         GridData layoutData = new GridData(SWT.LEFT, SWT.TOP, true, true, 1, 1);
         layoutData.widthHint = NewTemplatePage.WIZARD_PAGE_WIDTH - 50;
         label.setLayoutData(layoutData);
-        label.setText(
-                "Your tools installation appears to be out of date (or not yet installed).\n" +
-                "\n" +
-                "This wizard depends on templates distributed with the Android SDK Tools.\n" +
-                "\n" +
-                "Please update the tools first (via Window > Android SDK Manager, or by " +
-                "using the \"android\" command in a terminal window). Note that on Windows " +
-                "you may need to restart the IDE, since there are some known problems where " +
-                "Windows locks the files held open by the running IDE, so the updater is " +
-                "unable to delete them in order to upgrade them.");
+        label.setText("Your tools installation appears to be out of date (or not yet installed).\n" + "\n"
+                + "This wizard depends on templates distributed with the Android SDK Tools.\n" + "\n"
+                + "Please update the tools first (via Window > Android SDK Manager, or by "
+                + "using the \"android\" command in a terminal window). Note that on Windows "
+                + "you may need to restart the IDE, since there are some known problems where "
+                + "Windows locks the files held open by the running IDE, so the updater is "
+                + "unable to delete them in order to upgrade them.");
 
         mInstallButton = new Button(container, SWT.NONE);
         mInstallButton.setText("Check Again");
@@ -89,6 +84,5 @@ class UpdateToolsPage extends WizardPage implements SelectionListener {
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 }

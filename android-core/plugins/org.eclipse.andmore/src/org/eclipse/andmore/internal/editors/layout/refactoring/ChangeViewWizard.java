@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,8 +17,8 @@ import static com.android.SdkConstants.REQUEST_FOCUS;
 import static com.android.SdkConstants.VIEW_FRAGMENT;
 import static com.android.SdkConstants.VIEW_INCLUDE;
 
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.descriptors.ViewElementDescriptor;
@@ -37,12 +34,11 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
 
 class ChangeViewWizard extends VisualRefactoringWizard {
-    private static final String SEPARATOR_LABEL =
-        "----------------------------------------"; //$NON-NLS-1$
+    private static final String SEPARATOR_LABEL = "----------------------------------------"; //$NON-NLS-1$
 
     public ChangeViewWizard(ChangeViewRefactoring ref, LayoutEditorDelegate editor) {
         super(ref, editor);
@@ -74,7 +70,7 @@ class ChangeViewWizard extends VisualRefactoringWizard {
         private List<String> mClassNames;
 
         public InputPage(IProject project, String oldType) {
-            super("ChangeViewInputPage");  //$NON-NLS-1$
+            super("ChangeViewInputPage"); //$NON-NLS-1$
             mProject = project;
             mOldType = oldType;
         }
@@ -126,8 +122,7 @@ class ChangeViewWizard extends VisualRefactoringWizard {
                         }
                     }
 
-                    Pair<List<String>,List<String>> result =
-                        CustomViewFinder.findViews(mProject, false);
+                    Pair<List<String>, List<String>> result = CustomViewFinder.findViews(mProject, false);
                     List<String> customViews = result.getFirst();
                     List<String> thirdPartyViews = result.getSecond();
                     if (customViews.size() > 0) {
@@ -152,12 +147,11 @@ class ChangeViewWizard extends VisualRefactoringWizard {
                     if (targetData != null) {
                         // Now add ALL known layout descriptors in case the user has
                         // a special case
-                        List<ViewElementDescriptor> descriptors =
-                            targetData.getLayoutDescriptors().getViewDescriptors();
+                        List<ViewElementDescriptor> descriptors = targetData.getLayoutDescriptors()
+                                .getViewDescriptors();
                         for (ViewElementDescriptor d : descriptors) {
                             String className = d.getFullClassName();
-                            if (className.equals(VIEW_INCLUDE)
-                                    || className.equals(VIEW_FRAGMENT)
+                            if (className.equals(VIEW_INCLUDE) || className.equals(VIEW_FRAGMENT)
                                     || className.equals(REQUEST_FOCUS)) {
                                 continue;
                             }
@@ -188,8 +182,7 @@ class ChangeViewWizard extends VisualRefactoringWizard {
             }
 
             // Record state
-            ChangeViewRefactoring refactoring =
-                (ChangeViewRefactoring) getRefactoring();
+            ChangeViewRefactoring refactoring = (ChangeViewRefactoring) getRefactoring();
             refactoring.setType(type);
 
             setPageComplete(ok);

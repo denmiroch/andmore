@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,15 +39,13 @@ public final class InstrumentationPage extends FormPage implements IPageImagePro
     private UiTreeBlock mTreeBlock;
 
     public InstrumentationPage(ManifestEditor editor) {
-        super(editor, PAGE_ID, "Instrumentation");  // tab's label, keep it short
+        super(editor, PAGE_ID, "Instrumentation"); // tab's label, keep it short
         mEditor = editor;
     }
 
     @Override
     public Image getPageImage() {
-        return IconFactory.getInstance().getIcon(getTitle(),
-                                                 IconFactory.COLOR_GREEN,
-                                                 IconFactory.SHAPE_RECT);
+        return IconFactory.getInstance().getIcon(getTitle(), IconFactory.COLOR_GREEN, IconFactory.SHAPE_RECT);
     }
 
     /**
@@ -70,15 +65,10 @@ public final class InstrumentationPage extends FormPage implements IPageImagePro
 
         ElementDescriptor[] descriptorFilters = null;
         if (manifestDescriptor != null) {
-            descriptorFilters = new ElementDescriptor[] {
-                    manifestDescriptor.getInstrumentationElement(),
-            };
+            descriptorFilters = new ElementDescriptor[] { manifestDescriptor.getInstrumentationElement(), };
         }
 
-        mTreeBlock = new UiTreeBlock(mEditor, manifest,
-                true /* autoCreateRoot */,
-                descriptorFilters,
-                "Instrumentation",
+        mTreeBlock = new UiTreeBlock(mEditor, manifest, true /* autoCreateRoot */, descriptorFilters, "Instrumentation",
                 "List of instrumentations defined in the manifest");
         mTreeBlock.createContent(managedForm);
     }
@@ -92,10 +82,7 @@ public final class InstrumentationPage extends FormPage implements IPageImagePro
             AndroidManifestDescriptors manifestDescriptor = mEditor.getManifestDescriptors();
 
             mTreeBlock.changeRootAndDescriptors(manifest,
-                    new ElementDescriptor[] {
-                        manifestDescriptor.getInstrumentationElement()
-                    },
-                    true /* refresh */);
+                    new ElementDescriptor[] { manifestDescriptor.getInstrumentationElement() }, true /* refresh */);
         }
     }
 }

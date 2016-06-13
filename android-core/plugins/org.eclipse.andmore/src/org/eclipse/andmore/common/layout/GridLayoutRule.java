@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,6 +29,17 @@ import static com.android.SdkConstants.GRID_LAYOUT;
 import static com.android.SdkConstants.VALUE_HORIZONTAL;
 import static com.android.SdkConstants.VALUE_TRUE;
 
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.andmore.common.layout.grid.GridDropHandler;
+import org.eclipse.andmore.common.layout.grid.GridLayoutPainter;
+import org.eclipse.andmore.common.layout.grid.GridModel;
+import org.eclipse.andmore.common.layout.grid.GridModel.ViewData;
+
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.ide.common.api.DrawingStyle;
@@ -52,17 +60,6 @@ import com.android.ide.common.api.RuleAction;
 import com.android.ide.common.api.RuleAction.Choices;
 import com.android.ide.common.api.SegmentType;
 import com.android.utils.Pair;
-
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import org.eclipse.andmore.common.layout.grid.GridDropHandler;
-import org.eclipse.andmore.common.layout.grid.GridLayoutPainter;
-import org.eclipse.andmore.common.layout.grid.GridModel;
-import org.eclipse.andmore.common.layout.grid.GridModel.ViewData;
 
 /**
  * An {@link IViewRule} for android.widget.GridLayout which provides designtime
@@ -107,8 +104,7 @@ public class GridLayoutRule extends BaseLayoutRule {
     public static final double MAX_CELL_DIFFERENCE = 1.2;
 
     /** Whether debugging diagnostics is available in the toolbar */
-    private static final boolean CAN_DEBUG =
-            VALUE_TRUE.equals(System.getenv("ADT_DEBUG_GRIDLAYOUT")); //$NON-NLS-1$
+    private static final boolean CAN_DEBUG = VALUE_TRUE.equals(System.getenv("ADT_DEBUG_GRIDLAYOUT")); //$NON-NLS-1$
 
     private static final String ACTION_ADD_ROW = "_addrow"; //$NON-NLS-1$
     private static final String ACTION_REMOVE_ROW = "_removerow"; //$NON-NLS-1$
@@ -149,26 +145,20 @@ public class GridLayoutRule extends BaseLayoutRule {
     public static boolean sGridMode = true;
 
     /** Constructs a new {@link GridLayoutRule} */
-    public GridLayoutRule() {
-    }
+    public GridLayoutRule() {}
 
     @Override
-    public void addLayoutActions(
-            @NonNull List<RuleAction> actions,
-            final @NonNull INode parentNode,
+    public void addLayoutActions(@NonNull List<RuleAction> actions, final @NonNull INode parentNode,
             final @NonNull List<? extends INode> children) {
         super.addLayoutActions(actions, parentNode, children);
 
         String namespace = getNamespace(parentNode);
-        Choices orientationAction = RuleAction.createChoices(
-                ACTION_ORIENTATION,
-                "Orientation", //$NON-NLS-1$
-                new PropertyCallback(Collections.singletonList(parentNode),
-                        "Change LinearLayout Orientation", namespace, ATTR_ORIENTATION), Arrays
-                        .<String> asList("Set Horizontal Orientation", "Set Vertical Orientation"),
-                Arrays.<URL> asList(ICON_HORIZONTAL, ICON_VERTICAL), Arrays.<String> asList(
-                        "horizontal", "vertical"), getCurrentOrientation(parentNode),
-                null /* icon */, -10, false);
+        Choices orientationAction = RuleAction.createChoices(ACTION_ORIENTATION, "Orientation", //$NON-NLS-1$
+                new PropertyCallback(Collections.singletonList(parentNode), "Change LinearLayout Orientation",
+                        namespace, ATTR_ORIENTATION),
+                Arrays.<String> asList("Set Horizontal Orientation", "Set Vertical Orientation"),
+                Arrays.<URL> asList(ICON_HORIZONTAL, ICON_VERTICAL), Arrays.<String> asList("horizontal", "vertical"),
+                getCurrentOrientation(parentNode), null /* icon */, -10, false);
         orientationAction.setRadio(true);
         actions.add(orientationAction);
 
@@ -181,11 +171,8 @@ public class GridLayoutRule extends BaseLayoutRule {
 
         IMenuCallback actionCallback = new IMenuCallback() {
             @Override
-            public void action(
-                    final @NonNull RuleAction action,
-                    @NonNull List<? extends INode> selectedNodes,
-                    final @Nullable String valueId,
-                    final @Nullable Boolean newValue) {
+            public void action(final @NonNull RuleAction action, @NonNull List<? extends INode> selectedNodes,
+                    final @Nullable String valueId, final @Nullable Boolean newValue) {
                 parentNode.editXml("Add/Remove Row/Column", new INodeHandler() {
                     @Override
                     public void handle(@NonNull INode n) {
@@ -226,45 +213,44 @@ public class GridLayoutRule extends BaseLayoutRule {
 
         actions.add(RuleAction.createSeparator(142));
 
-        actions.add(RuleAction.createToggle(ACTION_GRID_MODE, "Grid Model Mode",
-                sGridMode, actionCallback, ICON_GRID_MODE, 145, false));
+        actions.add(RuleAction.createToggle(ACTION_GRID_MODE, "Grid Model Mode", sGridMode, actionCallback,
+                ICON_GRID_MODE, 145, false));
 
         // Add and Remove Column actions only apply in Grid Mode
         if (sGridMode) {
-            actions.add(RuleAction.createToggle(ACTION_SHOW_STRUCTURE, "Show Structure",
-                    sShowStructure, actionCallback, ICON_SHOW_STRUCT, 147, false));
+            actions.add(RuleAction.createToggle(ACTION_SHOW_STRUCTURE, "Show Structure", sShowStructure, actionCallback,
+                    ICON_SHOW_STRUCT, 147, false));
 
             // Add Row and Add Column
             actions.add(RuleAction.createSeparator(150));
-            actions.add(RuleAction.createAction(ACTION_ADD_COL, "Add Column", actionCallback,
-                    ICON_ADD_COL, 160, false /* supportsMultipleNodes */));
-            actions.add(RuleAction.createAction(ACTION_ADD_ROW, "Add Row", actionCallback,
-                    ICON_ADD_ROW, 165, false));
+            actions.add(RuleAction.createAction(ACTION_ADD_COL, "Add Column", actionCallback, ICON_ADD_COL, 160,
+                    false /* supportsMultipleNodes */));
+            actions.add(RuleAction.createAction(ACTION_ADD_ROW, "Add Row", actionCallback, ICON_ADD_ROW, 165, false));
 
             // Remove Row and Remove Column (if something is selected)
             if (children != null && children.size() > 0) {
                 // TODO: Add "Merge Columns" and "Merge Rows" ?
 
-                actions.add(RuleAction.createAction(ACTION_REMOVE_COL, "Remove Column",
-                        actionCallback, ICON_REMOVE_COL, 170, false));
-                actions.add(RuleAction.createAction(ACTION_REMOVE_ROW, "Remove Row",
-                        actionCallback, ICON_REMOVE_ROW, 175, false));
+                actions.add(RuleAction.createAction(ACTION_REMOVE_COL, "Remove Column", actionCallback, ICON_REMOVE_COL,
+                        170, false));
+                actions.add(RuleAction.createAction(ACTION_REMOVE_ROW, "Remove Row", actionCallback, ICON_REMOVE_ROW,
+                        175, false));
             }
 
             actions.add(RuleAction.createSeparator(185));
         } else {
-            actions.add(RuleAction.createToggle(ACTION_SHOW_STRUCTURE, "Show Structure",
-                    sShowStructure, actionCallback, ICON_SHOW_STRUCT, 190, false));
+            actions.add(RuleAction.createToggle(ACTION_SHOW_STRUCTURE, "Show Structure", sShowStructure, actionCallback,
+                    ICON_SHOW_STRUCT, 190, false));
 
             // Snap to Grid and Show Structure are only relevant in free form mode
-            actions.add(RuleAction.createToggle(ACTION_SNAP, "Snap to Grid",
-                    sSnapToGrid, actionCallback, ICON_SNAP, 200, false));
+            actions.add(RuleAction.createToggle(ACTION_SNAP, "Snap to Grid", sSnapToGrid, actionCallback, ICON_SNAP,
+                    200, false));
         }
 
         // Temporary: Diagnostics for GridLayout
         if (CAN_DEBUG) {
-            actions.add(RuleAction.createToggle(ACTION_DEBUG, "Debug",
-                    sDebugGridLayout, actionCallback, null, 210, false));
+            actions.add(
+                    RuleAction.createToggle(ACTION_DEBUG, "Debug", sDebugGridLayout, actionCallback, null, 210, false));
         }
     }
 
@@ -340,8 +326,7 @@ public class GridLayoutRule extends BaseLayoutRule {
     }
 
     @Override
-    public void onChildInserted(@NonNull INode node, @NonNull INode parent,
-            @NonNull InsertType insertType) {
+    public void onChildInserted(@NonNull INode node, @NonNull INode parent, @NonNull InsertType insertType) {
         if (insertType == InsertType.MOVE_WITHIN) {
             // Don't adjust widths/heights/weights when just moving within a single layout
             return;
@@ -397,8 +382,7 @@ public class GridLayoutRule extends BaseLayoutRule {
             vertical = GRAVITY_VALUE_FILL_VERTICAL;
         }
         String gravity;
-        if (horizontal == GRAVITY_VALUE_FILL_HORIZONTAL
-                && vertical == GRAVITY_VALUE_FILL_VERTICAL) {
+        if (horizontal == GRAVITY_VALUE_FILL_HORIZONTAL && vertical == GRAVITY_VALUE_FILL_VERTICAL) {
             gravity = GRAVITY_VALUE_FILL;
         } else if (vertical != null) {
             gravity = horizontal + '|' + vertical;
@@ -410,8 +394,7 @@ public class GridLayoutRule extends BaseLayoutRule {
     }
 
     @Override
-    public void onRemovingChildren(@NonNull List<INode> deleted, @NonNull INode parent,
-            boolean moved) {
+    public void onRemovingChildren(@NonNull List<INode> deleted, @NonNull INode parent, boolean moved) {
         super.onRemovingChildren(deleted, parent, moved);
 
         if (!sGridMode) {
@@ -459,8 +442,8 @@ public class GridLayoutRule extends BaseLayoutRule {
     }
 
     @Override
-    protected void setNewSizeBounds(ResizeState state, INode node, INode layout,
-            Rect oldBounds, Rect newBounds, SegmentType horizontalEdge, SegmentType verticalEdge) {
+    protected void setNewSizeBounds(ResizeState state, INode node, INode layout, Rect oldBounds, Rect newBounds,
+            SegmentType horizontalEdge, SegmentType verticalEdge) {
 
         if (resizingWidget(state)) {
             if (state.fillWidth || state.fillHeight || state.wrapWidth || state.wrapHeight) {
@@ -492,8 +475,7 @@ public class GridLayoutRule extends BaseLayoutRule {
                     // Fall through and set layout_width and/or layout_height to wrap_content
                 }
             }
-            super.setNewSizeBounds(state, node, layout, oldBounds, newBounds, horizontalEdge,
-                    verticalEdge);
+            super.setNewSizeBounds(state, node, layout, oldBounds, newBounds, horizontalEdge, verticalEdge);
         } else {
             Pair<Integer, Integer> spans = computeResizeSpans(state);
             int rowSpan = spans.getFirst();
@@ -521,8 +503,8 @@ public class GridLayoutRule extends BaseLayoutRule {
     }
 
     @Override
-    protected String getResizeUpdateMessage(ResizeState state, INode child, INode parent,
-            Rect newBounds, SegmentType horizontalEdge, SegmentType verticalEdge) {
+    protected String getResizeUpdateMessage(ResizeState state, INode child, INode parent, Rect newBounds,
+            SegmentType horizontalEdge, SegmentType verticalEdge) {
         Pair<Integer, Integer> spans = computeResizeSpans(state);
         if (resizingWidget(state)) {
             String width = state.getWidthAttribute();
@@ -543,8 +525,8 @@ public class GridLayoutRule extends BaseLayoutRule {
         } else {
             int rowSpan = spans.getFirst();
             int columnSpan = spans.getSecond();
-            return String.format("ColumnSpan=%d, RowSpan=%d\n(Release Shift to resize widget itself)",
-                    columnSpan, rowSpan);
+            return String.format("ColumnSpan=%d, RowSpan=%d\n(Release Shift to resize widget itself)", columnSpan,
+                    rowSpan);
         }
     }
 
@@ -591,16 +573,15 @@ public class GridLayoutRule extends BaseLayoutRule {
         if (sShowStructure) {
             // TODO: Cache the grid
             if (view != null) {
-                if (GridLayoutPainter.paintStructure(view, DrawingStyle.GUIDELINE_DASHED,
-                        parentNode, graphics)) {
+                if (GridLayoutPainter.paintStructure(view, DrawingStyle.GUIDELINE_DASHED, parentNode, graphics)) {
                     return;
                 }
             }
-            GridLayoutPainter.paintStructure(DrawingStyle.GUIDELINE_DASHED,
-                        parentNode, graphics, GridModel.get(mRulesEngine, parentNode, view));
+            GridLayoutPainter.paintStructure(DrawingStyle.GUIDELINE_DASHED, parentNode, graphics,
+                    GridModel.get(mRulesEngine, parentNode, view));
         } else if (sDebugGridLayout) {
-            GridLayoutPainter.paintStructure(DrawingStyle.GRID,
-                    parentNode, graphics, GridModel.get(mRulesEngine, parentNode, view));
+            GridLayoutPainter.paintStructure(DrawingStyle.GRID, parentNode, graphics,
+                    GridModel.get(mRulesEngine, parentNode, view));
         }
 
         // TBD: Highlight the cells around the selection, and display easy controls
@@ -632,10 +613,7 @@ public class GridLayoutRule extends BaseLayoutRule {
      * approach #3 above.
      */
     @Override
-    public void onPaste(
-            @NonNull INode targetNode,
-            @Nullable Object targetView,
-            @NonNull IDragElement[] elements) {
+    public void onPaste(@NonNull INode targetNode, @Nullable Object targetView, @NonNull IDragElement[] elements) {
         DropFeedback feedback = onDropEnter(targetNode, targetView, elements);
         if (feedback != null) {
             Rect b = targetNode.getBounds();
@@ -643,14 +621,13 @@ public class GridLayoutRule extends BaseLayoutRule {
                 return;
             }
 
-            Map<String, Pair<String, String>> idMap = getDropIdMap(targetNode, elements,
-                    true /* remap id's */);
+            Map<String, Pair<String, String>> idMap = getDropIdMap(targetNode, elements, true /* remap id's */);
 
             for (IDragElement element : elements) {
                 // Skip <Space> elements and only insert the real elements being
                 // copied
-                if (elements.length > 1 && (FQCN_SPACE.equals(element.getFqcn())
-                        || FQCN_SPACE_V7.equals(element.getFqcn()))) {
+                if (elements.length > 1
+                        && (FQCN_SPACE.equals(element.getFqcn()) || FQCN_SPACE_V7.equals(element.getFqcn()))) {
                     continue;
                 }
 

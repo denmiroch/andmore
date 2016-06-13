@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,35 +26,35 @@ import org.eclipse.jface.viewers.Viewer;
  */
 @SuppressWarnings("restriction")
 class ElementTreeViewFilter extends TypedViewerFilter {
-	private static Class<?>[] acceptedClasses = new Class[] { IJavaModel.class, IPackageFragmentRoot.class,
-			IJavaProject.class };
+    private static Class<?>[] acceptedClasses = new Class[] { IJavaModel.class, IPackageFragmentRoot.class,
+            IJavaProject.class };
 
-	/**
-	 * Default constructor
-	 */
-	public ElementTreeViewFilter() {
-		super(acceptedClasses);
-	}
+    /**
+     * Default constructor
+     */
+    public ElementTreeViewFilter() {
+        super(acceptedClasses);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jdt.internal.ui.wizards.TypedViewerFilter#select(org.eclipse
-	 * .jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-	 */
-	@Override
-	public boolean select(Viewer viewer, Object parent, Object element) {
-		boolean select = false;
-		if (element instanceof IPackageFragmentRoot) {
-			try {
-				select = (((IPackageFragmentRoot) element).getKind() == IPackageFragmentRoot.K_SOURCE);
-			} catch (JavaModelException e) {
-				AndmoreLogger.error(ElementTreeViewFilter.class, e.getLocalizedMessage(), e);
-			}
-		} else {
-			select = super.select(viewer, parent, element);
-		}
-		return select;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.jdt.internal.ui.wizards.TypedViewerFilter#select(org.eclipse
+     * .jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+     */
+    @Override
+    public boolean select(Viewer viewer, Object parent, Object element) {
+        boolean select = false;
+        if (element instanceof IPackageFragmentRoot) {
+            try {
+                select = (((IPackageFragmentRoot) element).getKind() == IPackageFragmentRoot.K_SOURCE);
+            } catch (JavaModelException e) {
+                AndmoreLogger.error(ElementTreeViewFilter.class, e.getLocalizedMessage(), e);
+            }
+        } else {
+            select = super.select(viewer, parent, element);
+        }
+        return select;
+    }
 }

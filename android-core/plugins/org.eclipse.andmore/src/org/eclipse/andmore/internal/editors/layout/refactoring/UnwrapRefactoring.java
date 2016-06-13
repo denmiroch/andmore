@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,9 +17,10 @@ import static com.android.SdkConstants.ATTR_LAYOUT_HEIGHT;
 import static com.android.SdkConstants.ATTR_LAYOUT_WIDTH;
 import static com.android.SdkConstants.EXT_XML;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.xml.XmlFormatStyle;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.gle2.DomUtilities;
@@ -43,10 +41,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.xml.XmlFormatStyle;
 
 /**
  * Removes the layout surrounding the current selection (or if the current selection has
@@ -65,10 +62,7 @@ public class UnwrapRefactoring extends VisualRefactoring {
         super(arguments);
     }
 
-    public UnwrapRefactoring(
-            IFile file,
-            LayoutEditorDelegate delegate,
-            ITextSelection selection,
+    public UnwrapRefactoring(IFile file, LayoutEditorDelegate delegate, ITextSelection selection,
             ITreeSelection treeSelection) {
         super(file, delegate, selection, treeSelection);
     }
@@ -79,8 +73,8 @@ public class UnwrapRefactoring extends VisualRefactoring {
     }
 
     @Override
-    public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+    public RefactoringStatus checkInitialConditions(IProgressMonitor pm)
+            throws CoreException, OperationCanceledException {
         RefactoringStatus status = new RefactoringStatus();
 
         try {
@@ -114,9 +108,8 @@ public class UnwrapRefactoring extends VisualRefactoring {
                 mContainer = first;
                 List<Element> elements = DomUtilities.getChildren(mContainer);
                 if (elements.size() == 0) {
-                    status.addFatalError(
-                            "Cannot remove container when it has no children");
-                        return status;
+                    status.addFatalError("Cannot remove container when it has no children");
+                    return status;
                 }
             } else if (useParent && (parent instanceof Element)) {
                 mContainer = (Element) parent;
@@ -126,8 +119,7 @@ public class UnwrapRefactoring extends VisualRefactoring {
 
             for (Element element : mElements) {
                 if (element.getParentNode() != parent) {
-                    status.addFatalError(
-                            "All unwrapped elements must share the same parent element");
+                    status.addFatalError("All unwrapped elements must share the same parent element");
                     return status;
                 }
             }
@@ -136,8 +128,7 @@ public class UnwrapRefactoring extends VisualRefactoring {
             // such that there is a new single root
             if (mContainer.getParentNode() instanceof Document) {
                 if (DomUtilities.getChildren(mContainer).size() > 1) {
-                    status.addFatalError(
-                        "Cannot remove root: it has more than one child "
+                    status.addFatalError("Cannot remove root: it has more than one child "
                             + "which would result in multiple new roots");
                     return status;
                 }
@@ -154,8 +145,7 @@ public class UnwrapRefactoring extends VisualRefactoring {
     @Override
     protected VisualRefactoringDescriptor createDescriptor() {
         String comment = getName();
-        return new Descriptor(
-                mProject.getName(), //project
+        return new Descriptor(mProject.getName(), //project
                 comment, //description
                 comment, //comment
                 createArgumentMap());
@@ -190,15 +180,15 @@ public class UnwrapRefactoring extends VisualRefactoring {
             List<Attr> declarations = findNamespaceAttributes(mContainer);
             for (Attr attribute : declarations) {
                 if (attribute instanceof IndexedRegion) {
-                    setAttribute(rootEdit, newRoot, attribute.getNamespaceURI(),
-                            attribute.getPrefix(), attribute.getLocalName(), attribute.getValue());
+                    setAttribute(rootEdit, newRoot, attribute.getNamespaceURI(), attribute.getPrefix(),
+                            attribute.getLocalName(), attribute.getValue());
                 }
             }
         }
 
         // Transfer layout_ attributes (other than width and height)
-         List<Element> children = DomUtilities.getChildren(mContainer);
-         if (children.size() == 1) {
+        List<Element> children = DomUtilities.getChildren(mContainer);
+        if (children.size() == 1) {
             List<Attr> layoutAttributes = findLayoutAttributes(mContainer);
             for (Attr attribute : layoutAttributes) {
                 String name = attribute.getLocalName();
@@ -210,20 +200,20 @@ public class UnwrapRefactoring extends VisualRefactoring {
             }
         }
 
-         // Remove the root
-         removeElementTags(rootEdit, mContainer, Collections.<Element>emptyList() /* skip */,
-                 false /*changeIndentation*/);
+        // Remove the root
+        removeElementTags(rootEdit, mContainer, Collections.<Element> emptyList() /* skip */,
+                false /*changeIndentation*/);
 
-         MultiTextEdit formatted = reformat(rootEdit, XmlFormatStyle.LAYOUT);
-         if (formatted != null) {
-             rootEdit = formatted;
-         }
+        MultiTextEdit formatted = reformat(rootEdit, XmlFormatStyle.LAYOUT);
+        if (formatted != null) {
+            rootEdit = formatted;
+        }
 
-         TextFileChange change = new TextFileChange(file.getName(), file);
-         change.setEdit(rootEdit);
-         change.setTextType(EXT_XML);
-         changes.add(change);
-         return changes;
+        TextFileChange change = new TextFileChange(file.getName(), file);
+        change.setEdit(rootEdit);
+        change.setTextType(EXT_XML);
+        changes.add(change);
+        return changes;
     }
 
     @Override
@@ -232,8 +222,7 @@ public class UnwrapRefactoring extends VisualRefactoring {
     }
 
     public static class Descriptor extends VisualRefactoringDescriptor {
-        public Descriptor(String project, String description, String comment,
-                Map<String, String> arguments) {
+        public Descriptor(String project, String description, String comment, Map<String, String> arguments) {
             super("org.eclipse.andmore.refactoring.unwrap", //$NON-NLS-1$
                     project, description, comment, arguments);
         }

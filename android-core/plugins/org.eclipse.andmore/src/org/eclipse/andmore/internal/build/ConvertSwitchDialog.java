@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +11,8 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.build;
+
+import java.net.URL;
 
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -34,8 +33,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
-
-import java.net.URL;
 
 /**
  * Dialog shown by the {@link ConvertSwitchQuickFixProcessor}. This is a custom
@@ -64,21 +61,16 @@ class ConvertSwitchDialog extends TitleAreaDialog implements SelectionListener {
 
     @Override
     protected Control createDialogArea(Composite parent) {
-        String text = String.format(
-            "As of ADT 14, the resource fields (such as %1$s) are no longer constants " +
-            "when defined in library projects. This is necessary to make library " +
-            "projects reusable without recompiling them.\n" +
-            "\n" +
-            "One consequence of this is that you can no longer use the fields directly " +
-            "in switch statements. You must use an if-else chain instead.\n" +
-            "\n" +
-            "Eclipse can automatically convert from a switch statement to an if-else " +
-            "statement. Just place the caret on the switch keyword and invoke " +
-            "Quick Fix (Ctrl-1 on Windows and Linux, Cmd-1 on Mac), then select " +
-            "\"Convert 'switch' to 'if-else'\".\n" +
-            "\n" +
-            "For more information, see <a href=\"" + URL + "\">" + URL + "</a>",
-            mField);
+        String text = String.format("As of ADT 14, the resource fields (such as %1$s) are no longer constants "
+                + "when defined in library projects. This is necessary to make library "
+                + "projects reusable without recompiling them.\n" + "\n"
+                + "One consequence of this is that you can no longer use the fields directly "
+                + "in switch statements. You must use an if-else chain instead.\n" + "\n"
+                + "Eclipse can automatically convert from a switch statement to an if-else "
+                + "statement. Just place the caret on the switch keyword and invoke "
+                + "Quick Fix (Ctrl-1 on Windows and Linux, Cmd-1 on Mac), then select "
+                + "\"Convert 'switch' to 'if-else'\".\n" + "\n" + "For more information, see <a href=\"" + URL + "\">"
+                + URL + "</a>", mField);
 
         Composite area = (Composite) super.createDialogArea(parent);
         Composite container = new Composite(area, SWT.NONE);
@@ -112,8 +104,7 @@ class ConvertSwitchDialog extends TitleAreaDialog implements SelectionListener {
             IWebBrowser browser = workbench.getBrowserSupport().getExternalBrowser();
             browser.openURL(new URL(URL));
         } catch (Exception e) {
-            String message = String.format("Could not open browser. Vist\n%1$s\ninstead.",
-                    URL);
+            String message = String.format("Could not open browser. Vist\n%1$s\ninstead.", URL);
             MessageDialog.openError(getShell(), "Browser Error", message);
         }
 
@@ -138,6 +129,5 @@ class ConvertSwitchDialog extends TitleAreaDialog implements SelectionListener {
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 }

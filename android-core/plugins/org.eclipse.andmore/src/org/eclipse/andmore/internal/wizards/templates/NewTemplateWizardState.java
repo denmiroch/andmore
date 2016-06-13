@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,9 +23,13 @@ import static org.eclipse.andmore.internal.wizards.templates.NewProjectWizard.IS
 import static org.eclipse.andmore.internal.wizards.templates.NewProjectWizard.IS_NEW_PROJECT;
 import static org.eclipse.andmore.internal.wizards.templates.NewTemplateWizard.BLANK_ACTIVITY;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.sdklib.IAndroidTarget;
+import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.internal.assetstudio.ConfigureAssetSetPage;
 import org.eclipse.andmore.internal.assetstudio.CreateAssetSetWizardState;
@@ -41,13 +42,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.NullChange;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * Value object which holds the current state of the wizard pages for the
@@ -158,21 +155,18 @@ public class NewTemplateWizardState {
         parameters.put(ATTR_BUILD_API, getBuildApi());
         parameters.put(ATTR_COPY_ICONS, mIconState == null);
         ProjectState projectState = Sdk.getProjectState(project);
-        parameters.put(IS_LIBRARY_PROJECT,
-                projectState != null ? projectState.isLibrary() : false);
+        parameters.put(IS_LIBRARY_PROJECT, projectState != null ? projectState.isLibrary() : false);
 
         TemplateHandler.addDirectoryParameters(parameters, project);
 
         List<Change> changes = getTemplateHandler().render(project, parameters);
 
         if (mIconState != null) {
-            String title = String.format("Generate icons (res/drawable-<density>/%1$s.png)",
-                    mIconState.outputName);
+            String title = String.format("Generate icons (res/drawable-<density>/%1$s.png)", mIconState.outputName);
             changes.add(new NullChange(title) {
                 @Override
                 public Change perform(IProgressMonitor pm) throws CoreException {
-                    ConfigureAssetSetPage.generateIcons(mIconState.project,
-                            mIconState, false, null);
+                    ConfigureAssetSetPage.generateIcons(mIconState.project, mIconState, false, null);
 
                     // Not undoable: just return null instead of an undo-change.
                     return null;

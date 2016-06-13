@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +16,12 @@ package org.eclipse.andmore;
 import static com.android.SdkConstants.CLASS_CONSTRUCTOR;
 import static com.android.SdkConstants.CONSTRUCTOR_NAME;
 
-import com.google.common.base.Predicate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.ddms.ISourceRevealer;
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
@@ -57,12 +59,7 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.ide.IDE;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Predicate;
 
 /**
  * Implementation of the com.android.ide.ddms.sourceRevealer extension point.
@@ -121,7 +118,7 @@ public class SourceRevealer implements ISourceRevealer {
         if (methodMatches.size() == 1) {
             if (fileMatches.size() > 0) {
                 List<SearchMatch> filteredMatches = filterMatchByResource(fileMatches,
-                                                        methodMatches.get(0).getResource());
+                        methodMatches.get(0).getResource());
                 if (filteredMatches.size() == 1) {
                     return revealLineMatch(filteredMatches, fileName, lineNumber, perspective);
                 }
@@ -146,11 +143,8 @@ public class SourceRevealer implements ISourceRevealer {
                                 // constructor. In this case we'll trust the line number rather
                                 // than the method range.
                                 boolean isConstructor = fqmn.endsWith(CONSTRUCTOR_NAME);
-                                if (isConstructor
-                                        || region != null
-                                            && region.getOffset() >= sourceRange.getOffset()
-                                            && region.getOffset() < sourceRange.getOffset()
-                                            + sourceRange.getLength()) {
+                                if (isConstructor || region != null && region.getOffset() >= sourceRange.getOffset()
+                                        && region.getOffset() < sourceRange.getOffset() + sourceRange.getLength()) {
                                     // Yes: use the line number instead
                                     if (perspective != null) {
                                         SourceRevealer.switchToPerspective(perspective);
@@ -205,9 +199,7 @@ public class SourceRevealer implements ISourceRevealer {
 
         // multiple matches for search by method, narrow down by filename
         if (fileName != null) {
-            return revealLineMatch(
-                    filterMatchByFileName(methodMatches, fileName),
-                    fileName, lineNumber, perspective);
+            return revealLineMatch(filterMatchByFileName(methodMatches, fileName), fileName, lineNumber, perspective);
         }
 
         // prompt the user
@@ -219,10 +211,8 @@ public class SourceRevealer implements ISourceRevealer {
         }
     }
 
-    private boolean revealLineMatch(List<SearchMatch> matches, String fileName, int lineNumber,
-            String perspective) {
-        SearchMatch match = getMatchToDisplay(matches,
-                String.format("%s:%d", fileName, lineNumber));
+    private boolean revealLineMatch(List<SearchMatch> matches, String fileName, int lineNumber, String perspective) {
+        SearchMatch match = getMatchToDisplay(matches, String.format("%s:%d", fileName, lineNumber));
         if (match == null) {
             return false;
         }
@@ -238,9 +228,7 @@ public class SourceRevealer implements ISourceRevealer {
         try {
             IMarker marker = file.createMarker(IMarker.TEXT);
             marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-            IDE.openEditor(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(),
-                    marker);
+            IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), marker);
             marker.delete();
             return true;
         } catch (CoreException e) {
@@ -270,12 +258,10 @@ public class SourceRevealer implements ISourceRevealer {
 
         // Use a map to collapse multiple matches in a single file into just one match since
         // we know the line number in the file.
-        Map<IResource, SearchMatch> matchesPerFile =
-                new HashMap<IResource, SearchMatch>(matches.size());
+        Map<IResource, SearchMatch> matchesPerFile = new HashMap<IResource, SearchMatch>(matches.size());
 
-        for (SearchMatch m: matches) {
-            if (m.getResource() instanceof IFile
-                    && m.getResource().getName().startsWith(fileName)) {
+        for (SearchMatch m : matches) {
+            if (m.getResource() instanceof IFile && m.getResource().getName().startsWith(fileName)) {
                 matchesPerFile.put(m.getResource(), m);
             }
         }
@@ -301,11 +287,10 @@ public class SourceRevealer implements ISourceRevealer {
         return filteredMatches;
     }
 
-    private List<SearchMatch> filterMatchByResource(List<SearchMatch> matches,
-            IResource resource) {
+    private List<SearchMatch> filterMatchByResource(List<SearchMatch> matches, IResource resource) {
         List<SearchMatch> filteredMatches = new ArrayList<SearchMatch>(matches.size());
 
-        for (SearchMatch m: matches) {
+        for (SearchMatch m : matches) {
             if (m.getResource().equals(resource)) {
                 filteredMatches.add(m);
             }
@@ -337,12 +322,10 @@ public class SourceRevealer implements ISourceRevealer {
         dlg.setInput(matches);
         dlg.setContentProvider(new IStructuredContentProvider() {
             @Override
-            public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-            }
+            public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
             @Override
-            public void dispose() {
-            }
+            public void dispose() {}
 
             @Override
             public Object[] getElements(Object inputElement) {
@@ -350,13 +333,12 @@ public class SourceRevealer implements ISourceRevealer {
             }
         });
         dlg.setLabelProvider(new LabelProvider() {
-           @Override
-           public String getText(Object element) {
-               SearchMatch m = (SearchMatch) element;
-               return String.format("/%s/%s",    //$NON-NLS-1$
-                       m.getResource().getProject().getName(),
-                       m.getResource().getProjectRelativePath().toString());
-           }
+            @Override
+            public String getText(Object element) {
+                SearchMatch m = (SearchMatch) element;
+                return String.format("/%s/%s", //$NON-NLS-1$
+                        m.getResource().getProject().getName(), m.getResource().getProjectRelativePath().toString());
+            }
         });
         dlg.setInitialSelections(new Object[] { matches.get(0) });
         dlg.setHelpAvailable(false);
@@ -378,8 +360,7 @@ public class SourceRevealer implements ISourceRevealer {
     private List<SearchMatch> searchForMethod(String fqmn) {
         if (fqmn.endsWith(CONSTRUCTOR_NAME)) {
             fqmn = fqmn.substring(0, fqmn.length() - CONSTRUCTOR_NAME.length() - 1); // -1: dot
-            return searchForPattern(fqmn, IJavaSearchConstants.CONSTRUCTOR,
-                    MATCH_IS_METHOD_PREDICATE);
+            return searchForPattern(fqmn, IJavaSearchConstants.CONSTRUCTOR, MATCH_IS_METHOD_PREDICATE);
         }
         if (fqmn.endsWith(CLASS_CONSTRUCTOR)) {
             // Don't try to search for class init methods: Eclipse will throw NPEs if you do
@@ -389,21 +370,14 @@ public class SourceRevealer implements ISourceRevealer {
         return searchForPattern(fqmn, IJavaSearchConstants.METHOD, MATCH_IS_METHOD_PREDICATE);
     }
 
-    private List<SearchMatch> searchForPattern(String pattern, int searchFor,
-            Predicate<SearchMatch> filterPredicate) {
+    private List<SearchMatch> searchForPattern(String pattern, int searchFor, Predicate<SearchMatch> filterPredicate) {
         SearchEngine se = new SearchEngine();
-        SearchPattern searchPattern = SearchPattern.createPattern(
-                pattern,
-                searchFor,
-                IJavaSearchConstants.DECLARATIONS,
+        SearchPattern searchPattern = SearchPattern.createPattern(pattern, searchFor, IJavaSearchConstants.DECLARATIONS,
                 SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE);
         SearchResultAccumulator requestor = new SearchResultAccumulator(filterPredicate);
         try {
-            se.search(searchPattern,
-                    new SearchParticipant[] {SearchEngine.getDefaultSearchParticipant()},
-                    SearchEngine.createWorkspaceScope(),
-                    requestor,
-                    new NullProgressMonitor());
+            se.search(searchPattern, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
+                    SearchEngine.createWorkspaceScope(), requestor, new NullProgressMonitor());
         } catch (CoreException e) {
             AndmoreAndroidPlugin.printErrorToConsole(e.getMessage());
             return Collections.emptyList();
@@ -412,21 +386,19 @@ public class SourceRevealer implements ISourceRevealer {
         return requestor.getMatches();
     }
 
-    private static final Predicate<SearchMatch> MATCH_IS_FILE_PREDICATE =
-            new Predicate<SearchMatch>() {
-                @Override
-                public boolean apply(SearchMatch match) {
-                    return match.getResource() instanceof IFile;
-                }
-            };
+    private static final Predicate<SearchMatch> MATCH_IS_FILE_PREDICATE = new Predicate<SearchMatch>() {
+        @Override
+        public boolean apply(SearchMatch match) {
+            return match.getResource() instanceof IFile;
+        }
+    };
 
-    private static final Predicate<SearchMatch> MATCH_IS_METHOD_PREDICATE =
-            new Predicate<SearchMatch>() {
-                @Override
-                public boolean apply(SearchMatch match) {
-                    return match.getResource() instanceof IFile;
-                }
-            };
+    private static final Predicate<SearchMatch> MATCH_IS_METHOD_PREDICATE = new Predicate<SearchMatch>() {
+        @Override
+        public boolean apply(SearchMatch match) {
+            return match.getResource() instanceof IFile;
+        }
+    };
 
     private static class SearchResultAccumulator extends SearchRequestor {
         private final List<SearchMatch> mSearchMatches = new ArrayList<SearchMatch>();
@@ -452,8 +424,7 @@ public class SourceRevealer implements ISourceRevealer {
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
         IPerspectiveRegistry perspectiveRegistry = workbench.getPerspectiveRegistry();
-        if (perspectiveId != null
-                && perspectiveId.length() > 0
+        if (perspectiveId != null && perspectiveId.length() > 0
                 && perspectiveRegistry.findPerspectiveWithId(perspectiveId) != null) {
             try {
                 workbench.showPerspective(perspectiveId, window);

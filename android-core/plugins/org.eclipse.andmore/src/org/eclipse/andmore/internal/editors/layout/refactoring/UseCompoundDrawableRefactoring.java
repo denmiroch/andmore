@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,10 +36,11 @@ import static com.android.SdkConstants.PREFIX_RESOURCE_REF;
 import static com.android.SdkConstants.TEXT_VIEW;
 import static com.android.SdkConstants.VALUE_VERTICAL;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.xml.XmlFormatStyle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.formatting.EclipseXmlFormatPreferences;
@@ -72,11 +70,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.xml.XmlFormatStyle;
 
 /**
  * Converts a LinearLayout with exactly a TextView child and an ImageView child into
@@ -92,8 +89,8 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
      * @param selection the editor selection, or null
      * @param treeSelection the canvas selection, or null
      */
-    public UseCompoundDrawableRefactoring(IFile file, LayoutEditorDelegate editor,
-            ITextSelection selection, ITreeSelection treeSelection) {
+    public UseCompoundDrawableRefactoring(IFile file, LayoutEditorDelegate editor, ITextSelection selection,
+            ITreeSelection treeSelection) {
         super(file, editor, selection, treeSelection);
     }
 
@@ -113,8 +110,8 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
     }
 
     @Override
-    public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+    public RefactoringStatus checkInitialConditions(IProgressMonitor pm)
+            throws CoreException, OperationCanceledException {
         RefactoringStatus status = new RefactoringStatus();
 
         try {
@@ -145,8 +142,7 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
             }
 
             // Ensure that we have selected precisely one LinearLayout
-            if (mElements.size() != 1 ||
-                    !(mElements.get(0).getTagName().equals(LINEAR_LAYOUT))) {
+            if (mElements.size() != 1 || !(mElements.get(0).getTagName().equals(LINEAR_LAYOUT))) {
                 status.addFatalError("Must select exactly one LinearLayout");
                 return status;
             }
@@ -159,15 +155,11 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
             }
             Element first = children.get(0);
             Element second = children.get(1);
-            boolean haveTextView =
-                    first.getTagName().equals(TEXT_VIEW)
-                    || second.getTagName().equals(TEXT_VIEW);
-            boolean haveImageView =
-                    first.getTagName().equals(IMAGE_VIEW)
-                    || second.getTagName().equals(IMAGE_VIEW);
+            boolean haveTextView = first.getTagName().equals(TEXT_VIEW) || second.getTagName().equals(TEXT_VIEW);
+            boolean haveImageView = first.getTagName().equals(IMAGE_VIEW) || second.getTagName().equals(IMAGE_VIEW);
             if (!(haveTextView && haveImageView)) {
-                status.addFatalError("The LinearLayout must have exactly one TextView child " +
-                        "and one ImageView child");
+                status.addFatalError(
+                        "The LinearLayout must have exactly one TextView child " + "and one ImageView child");
                 return status;
             }
 
@@ -182,8 +174,7 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
     @Override
     protected VisualRefactoringDescriptor createDescriptor() {
         String comment = getName();
-        return new Descriptor(
-                mProject.getName(), //project
+        return new Descriptor(mProject.getName(), //project
                 comment, //description
                 comment, //comment
                 createArgumentMap());
@@ -235,8 +226,7 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
         }
 
         // Horizontal is the default, so if no value is specified it is horizontal.
-        boolean isVertical = VALUE_VERTICAL.equals(layout.getAttributeNS(ANDROID_URI,
-                ATTR_ORIENTATION));
+        boolean isVertical = VALUE_VERTICAL.equals(layout.getAttributeNS(ANDROID_URI, ATTR_ORIENTATION));
 
         // The WST DOM implementation doesn't correctly implement cloneNode: this returns
         // an empty document instead:
@@ -250,12 +240,11 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
         Element newTextElement = tempDocument.createElement(text.getTagName());
         tempDocument.appendChild(newTextElement);
 
-        NamedNodeMap attributes =  text.getAttributes();
+        NamedNodeMap attributes = text.getAttributes();
         for (int i = 0, n = attributes.getLength(); i < n; i++) {
             Attr attribute = (Attr) attributes.item(i);
             String name = attribute.getLocalName();
-            if (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)
-                    && ANDROID_URI.equals(attribute.getNamespaceURI())
+            if (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX) && ANDROID_URI.equals(attribute.getNamespaceURI())
                     && !(name.equals(ATTR_LAYOUT_WIDTH) || name.equals(ATTR_LAYOUT_HEIGHT))) {
                 // Ignore layout params: the parent layout is going away
             } else {
@@ -342,8 +331,8 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
             try {
                 IStructuredDocument doc = model.getStructuredDocument();
                 if (doc != null) {
-                    List<TextEdit> replaceIds = replaceIds(androidNsPrefix,
-                            doc, mSelectionStart, mSelectionEnd, layoutId, id);
+                    List<TextEdit> replaceIds = replaceIds(androidNsPrefix, doc, mSelectionStart, mSelectionEnd,
+                            layoutId, id);
                     for (TextEdit edit : replaceIds) {
                         rootEdit.addChild(edit);
                     }
@@ -353,10 +342,8 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
             }
         }
 
-        String xml = EclipseXmlPrettyPrinter.prettyPrint(
-                tempDocument.getDocumentElement(),
-                EclipseXmlFormatPreferences.create(),
-                XmlFormatStyle.LAYOUT, null, false);
+        String xml = EclipseXmlPrettyPrinter.prettyPrint(tempDocument.getDocumentElement(),
+                EclipseXmlFormatPreferences.create(), XmlFormatStyle.LAYOUT, null, false);
 
         TextEdit replace = new ReplaceEdit(mSelectionStart, mSelectionEnd - mSelectionStart, xml);
         rootEdit.addChild(replace);
@@ -399,8 +386,7 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
             // Two dimensions are specified (e.g. marginRight for the left one and marginLeft
             // for the right one); we have to add these together. We can only do that if
             // they use the same units, and do not use resources.
-            if (dimension1.startsWith(PREFIX_RESOURCE_REF)
-                    || dimension2.startsWith(PREFIX_RESOURCE_REF)) {
+            if (dimension1.startsWith(PREFIX_RESOURCE_REF) || dimension2.startsWith(PREFIX_RESOURCE_REF)) {
                 return null;
             }
 
@@ -426,8 +412,7 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
      * in a temporary document such that the namespace prefix matches when the element is
      * formatted and replaced in the target document.
      */
-    private static void setAndroidAttribute(Element element, String prefix, String name,
-            String value) {
+    private static void setAndroidAttribute(Element element, String prefix, String name, String value) {
         element.setAttribute(prefix + ':' + name, value);
     }
 
@@ -438,8 +423,7 @@ public class UseCompoundDrawableRefactoring extends VisualRefactoring {
 
     @SuppressWarnings("javadoc")
     public static class Descriptor extends VisualRefactoringDescriptor {
-        public Descriptor(String project, String description, String comment,
-                Map<String, String> arguments) {
+        public Descriptor(String project, String description, String comment, Map<String, String> arguments) {
             super("org.eclipse.andmore.refactoring.usecompound", //$NON-NLS-1$
                     project, description, comment, arguments);
         }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,8 @@
 
 package org.eclipse.andmore.internal.wizards.exportgradle;
 
-import com.google.common.collect.Multimap;
+import java.io.File;
+import java.util.Collection;
 
 import org.eclipse.andmore.internal.wizards.exportgradle.ExportStatus.FileStatus;
 import org.eclipse.jface.dialogs.Dialog;
@@ -26,8 +24,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
-import java.io.File;
-import java.util.Collection;
+import com.google.common.collect.Multimap;
 
 /**
  * Final page to review the result of the export.
@@ -52,8 +49,7 @@ public class FinalPage extends WizardPage {
         initializeDialogUnits(parent);
 
         mText = new Text(parent, SWT.MULTI | SWT.READ_ONLY);
-        mText.setLayoutData(new GridData(GridData.FILL_BOTH
-                | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
+        mText.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
         setControl(mText);
         Dialog.applyDialogFont(parent);
@@ -90,8 +86,7 @@ public class FinalPage extends WizardPage {
                 int count = mBuilder.getModuleCount();
                 if (count > 1) {
                     sb.append(String.format("Exported %s modules", count)).append('\n');
-                    sb.append(String.format(
-                            "Root folder: %s", mBuilder.getCommonRoot().toOSString()));
+                    sb.append(String.format("Root folder: %s", mBuilder.getCommonRoot().toOSString()));
                 } else {
                     sb.append("Exported project: ").append(mBuilder.getCommonRoot().toOSString());
                 }
@@ -99,8 +94,7 @@ public class FinalPage extends WizardPage {
                 sb.append("\n\n").append("Choose 'import project' in Android Studio").append('\n');
                 sb.append("and select the following file:").append("\n\t");
 
-                File bGradle = new File(
-                        mBuilder.getCommonRoot().toFile(), BuildFileCreator.BUILD_FILE);
+                File bGradle = new File(mBuilder.getCommonRoot().toFile(), BuildFileCreator.BUILD_FILE);
                 sb.append(bGradle.getAbsolutePath());
 
                 sb.append("\n\n").append("Do NOT import the Eclipse project itself!");

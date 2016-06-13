@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,11 +31,12 @@ import static com.android.SdkConstants.VALUE_MATCH_PARENT;
 import static com.android.SdkConstants.VIEW_FRAGMENT;
 import static com.android.SdkConstants.VIEW_INCLUDE;
 
-import com.android.ide.common.rendering.api.ILayoutPullParser;
-import com.android.ide.common.rendering.api.ViewInfo;
-import com.android.ide.common.res2.ValueXmlHelper;
-import com.android.resources.Density;
-import com.android.sdklib.IAndroidTarget;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.internal.editors.layout.descriptors.LayoutDescriptors;
 import org.eclipse.andmore.internal.editors.layout.descriptors.ViewElementDescriptor;
@@ -53,12 +51,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.ide.common.rendering.api.ILayoutPullParser;
+import com.android.ide.common.rendering.api.ViewInfo;
+import com.android.ide.common.res2.ValueXmlHelper;
+import com.android.resources.Density;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * {@link ILayoutPullParser} implementation on top of {@link UiElementNode}.
@@ -83,8 +80,7 @@ public class UiElementPullParser extends BasePullParser {
     /**
      * Number of pixels to pad views with in exploded-rendering mode.
      */
-    private static final String DEFAULT_PADDING_VALUE =
-        ExplodedRenderingHelper.PADDING_VALUE + UNIT_PX;
+    private static final String DEFAULT_PADDING_VALUE = ExplodedRenderingHelper.PADDING_VALUE + UNIT_PX;
 
     /**
      * Number of pixels to pad exploded individual views with. (This is HALF the width of the
@@ -115,8 +111,7 @@ public class UiElementPullParser extends BasePullParser {
      * @param density the density factor for the screen.
      * @param project Project containing this layout.
      */
-    public UiElementPullParser(UiElementNode top, boolean explodeRendering,
-            Set<UiElementNode> explodeNodes,
+    public UiElementPullParser(UiElementNode top, boolean explodeRendering, Set<UiElementNode> explodeNodes,
             Density density, IProject project) {
         super();
         mRoot = top;
@@ -134,7 +129,7 @@ public class UiElementPullParser extends BasePullParser {
 
     protected UiElementNode getCurrentNode() {
         if (mNodeStack.size() > 0) {
-            return mNodeStack.get(mNodeStack.size()-1);
+            return mNodeStack.get(mNodeStack.size() - 1);
         }
 
         return null;
@@ -182,7 +177,7 @@ public class UiElementPullParser extends BasePullParser {
     }
 
     private UiElementNode pop() {
-        return mNodeStack.remove(mNodeStack.size()-1);
+        return mNodeStack.remove(mNodeStack.size() - 1);
     }
 
     // ------------- IXmlPullParser --------
@@ -328,8 +323,8 @@ public class UiElementPullParser extends BasePullParser {
         Node attribute = getAttribute(i);
         if (attribute != null) {
             String value = attribute.getNodeValue();
-            if (mIncreaseExistingPadding && ATTR_PADDING.equals(attribute.getLocalName()) &&
-                    ANDROID_URI.equals(attribute.getNamespaceURI())) {
+            if (mIncreaseExistingPadding && ATTR_PADDING.equals(attribute.getLocalName())
+                    && ANDROID_URI.equals(attribute.getNamespaceURI())) {
                 // add the padding and return the value
                 return addPaddingToValue(value);
             }
@@ -344,16 +339,14 @@ public class UiElementPullParser extends BasePullParser {
      */
     @Override
     public String getAttributeValue(String namespace, String localName) {
-        if (mExplodeNodes != null && ATTR_PADDING.equals(localName) &&
-                ANDROID_URI.equals(namespace)) {
+        if (mExplodeNodes != null && ATTR_PADDING.equals(localName) && ANDROID_URI.equals(namespace)) {
             UiElementNode node = getCurrentNode();
             if (node != null && mExplodeNodes.contains(node)) {
                 return FIXED_PADDING_VALUE;
             }
         }
 
-        if (mZeroAttributeIsPadding && ATTR_PADDING.equals(localName) &&
-                ANDROID_URI.equals(namespace)) {
+        if (mZeroAttributeIsPadding && ATTR_PADDING.equals(localName) && ANDROID_URI.equals(namespace)) {
             return DEFAULT_PADDING_VALUE;
         }
 
@@ -383,18 +376,16 @@ public class UiElementPullParser extends BasePullParser {
 
             if (attribute != null) {
                 String value = attribute.getNodeValue();
-                if (mIncreaseExistingPadding && ATTR_PADDING.equals(localName) &&
-                        ANDROID_URI.equals(namespace)) {
+                if (mIncreaseExistingPadding && ATTR_PADDING.equals(localName) && ANDROID_URI.equals(namespace)) {
                     // add the padding and return the value
                     return addPaddingToValue(value);
                 }
 
                 // on the fly convert match_parent to fill_parent for compatibility with older
                 // platforms.
-                if (VALUE_MATCH_PARENT.equals(value) &&
-                        (ATTR_LAYOUT_WIDTH.equals(localName) ||
-                                ATTR_LAYOUT_HEIGHT.equals(localName)) &&
-                        ANDROID_URI.equals(namespace)) {
+                if (VALUE_MATCH_PARENT.equals(value)
+                        && (ATTR_LAYOUT_WIDTH.equals(localName) || ATTR_LAYOUT_HEIGHT.equals(localName))
+                        && ANDROID_URI.equals(namespace)) {
                     return VALUE_FILL_PARENT;
                 }
 
@@ -459,8 +450,7 @@ public class UiElementPullParser extends BasePullParser {
             return getCurrentNode().getUiChildren().size() == 0;
         }
 
-        throw new XmlPullParserException("Call to isEmptyElementTag while not in START_TAG",
-                this, null);
+        throw new XmlPullParserException("Call to isEmptyElementTag while not in START_TAG", this, null);
     }
 
     @Override
@@ -525,7 +515,7 @@ public class UiElementPullParser extends BasePullParser {
 
         DimensionEntry(String name, int unit) {
             this.name = name;
-            this.type = unit;
+            type = unit;
         }
     }
 
@@ -544,14 +534,10 @@ public class UiElementPullParser extends BasePullParser {
     private static final int COMPLEX_UNIT_MM = 5;
 
     private final static DimensionEntry[] sDimensions = new DimensionEntry[] {
-        new DimensionEntry(UNIT_PX, COMPLEX_UNIT_PX),
-        new DimensionEntry(UNIT_DIP, COMPLEX_UNIT_DIP),
-        new DimensionEntry(UNIT_DP, COMPLEX_UNIT_DIP),
-        new DimensionEntry(UNIT_SP, COMPLEX_UNIT_SP),
-        new DimensionEntry(UNIT_PT, COMPLEX_UNIT_PT),
-        new DimensionEntry(UNIT_IN, COMPLEX_UNIT_IN),
-        new DimensionEntry(UNIT_MM, COMPLEX_UNIT_MM),
-    };
+            new DimensionEntry(UNIT_PX, COMPLEX_UNIT_PX), new DimensionEntry(UNIT_DIP, COMPLEX_UNIT_DIP),
+            new DimensionEntry(UNIT_DP, COMPLEX_UNIT_DIP), new DimensionEntry(UNIT_SP, COMPLEX_UNIT_SP),
+            new DimensionEntry(UNIT_PT, COMPLEX_UNIT_PT), new DimensionEntry(UNIT_IN, COMPLEX_UNIT_IN),
+            new DimensionEntry(UNIT_MM, COMPLEX_UNIT_MM), };
 
     /**
      * Adds padding to an existing dimension.
@@ -585,7 +571,7 @@ public class UiElementPullParser extends BasePullParser {
 
         // check that there's no non ASCII characters.
         char[] buf = s.toCharArray();
-        for (int i = 0 ; i < len ; i++) {
+        for (int i = 0; i < len; i++) {
             if (buf[i] > 255) {
                 return false;
             }
@@ -622,8 +608,8 @@ public class UiElementPullParser extends BasePullParser {
                             break;
                         case COMPLEX_UNIT_DIP:
                         case COMPLEX_UNIT_SP: // intended fall-through since we don't
-                                              // adjust for font size
-                            f *= (float)mDensity.getDpiValue() / Density.DEFAULT_DENSITY;
+                                                  // adjust for font size
+                            f *= (float) mDensity.getDpiValue() / Density.DEFAULT_DENSITY;
                             break;
                         case COMPLEX_UNIT_PT:
                             f *= mDensity.getDpiValue() * (1.0f / 72);

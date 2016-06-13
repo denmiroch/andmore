@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -124,28 +121,28 @@ public class ResourceHelper {
     static {
         try {
             IconFactory factory = IconFactory.getInstance();
-            sIconMap.put(CountryCodeQualifier.class,        factory.getIcon("mcc")); //$NON-NLS-1$
-            sIconMap.put(NetworkCodeQualifier.class,        factory.getIcon("mnc")); //$NON-NLS-1$
-            sIconMap.put(LocaleQualifier.class,             factory.getIcon("language")); //$NON-NLS-1$
-            sIconMap.put(LayoutDirectionQualifier.class,    factory.getIcon("bidi")); //$NON-NLS-1$
-            sIconMap.put(ScreenSizeQualifier.class,         factory.getIcon("size")); //$NON-NLS-1$
-            sIconMap.put(ScreenRatioQualifier.class,        factory.getIcon("ratio")); //$NON-NLS-1$
-            sIconMap.put(ScreenOrientationQualifier.class,  factory.getIcon("orientation")); //$NON-NLS-1$
-            sIconMap.put(UiModeQualifier.class,             factory.getIcon("dockmode")); //$NON-NLS-1$
-            sIconMap.put(NightModeQualifier.class,          factory.getIcon("nightmode")); //$NON-NLS-1$
-            sIconMap.put(DensityQualifier.class,            factory.getIcon("dpi")); //$NON-NLS-1$
-            sIconMap.put(TouchScreenQualifier.class,        factory.getIcon("touch")); //$NON-NLS-1$
-            sIconMap.put(KeyboardStateQualifier.class,      factory.getIcon("keyboard")); //$NON-NLS-1$
-            sIconMap.put(TextInputMethodQualifier.class,    factory.getIcon("text_input")); //$NON-NLS-1$
-            sIconMap.put(NavigationStateQualifier.class,    factory.getIcon("navpad")); //$NON-NLS-1$
-            sIconMap.put(NavigationMethodQualifier.class,   factory.getIcon("navpad")); //$NON-NLS-1$
-            sIconMap.put(ScreenDimensionQualifier.class,    factory.getIcon("dimension")); //$NON-NLS-1$
-            sIconMap.put(VersionQualifier.class,            factory.getIcon("version")); //$NON-NLS-1$
-            sIconMap.put(ScreenWidthQualifier.class,        factory.getIcon("width")); //$NON-NLS-1$
-            sIconMap.put(ScreenHeightQualifier.class,       factory.getIcon("height")); //$NON-NLS-1$
-            sIconMap.put(SmallestScreenWidthQualifier.class,factory.getIcon("swidth")); //$NON-NLS-1$
+            sIconMap.put(CountryCodeQualifier.class, factory.getIcon("mcc")); //$NON-NLS-1$
+            sIconMap.put(NetworkCodeQualifier.class, factory.getIcon("mnc")); //$NON-NLS-1$
+            sIconMap.put(LocaleQualifier.class, factory.getIcon("language")); //$NON-NLS-1$
+            sIconMap.put(LayoutDirectionQualifier.class, factory.getIcon("bidi")); //$NON-NLS-1$
+            sIconMap.put(ScreenSizeQualifier.class, factory.getIcon("size")); //$NON-NLS-1$
+            sIconMap.put(ScreenRatioQualifier.class, factory.getIcon("ratio")); //$NON-NLS-1$
+            sIconMap.put(ScreenOrientationQualifier.class, factory.getIcon("orientation")); //$NON-NLS-1$
+            sIconMap.put(UiModeQualifier.class, factory.getIcon("dockmode")); //$NON-NLS-1$
+            sIconMap.put(NightModeQualifier.class, factory.getIcon("nightmode")); //$NON-NLS-1$
+            sIconMap.put(DensityQualifier.class, factory.getIcon("dpi")); //$NON-NLS-1$
+            sIconMap.put(TouchScreenQualifier.class, factory.getIcon("touch")); //$NON-NLS-1$
+            sIconMap.put(KeyboardStateQualifier.class, factory.getIcon("keyboard")); //$NON-NLS-1$
+            sIconMap.put(TextInputMethodQualifier.class, factory.getIcon("text_input")); //$NON-NLS-1$
+            sIconMap.put(NavigationStateQualifier.class, factory.getIcon("navpad")); //$NON-NLS-1$
+            sIconMap.put(NavigationMethodQualifier.class, factory.getIcon("navpad")); //$NON-NLS-1$
+            sIconMap.put(ScreenDimensionQualifier.class, factory.getIcon("dimension")); //$NON-NLS-1$
+            sIconMap.put(VersionQualifier.class, factory.getIcon("version")); //$NON-NLS-1$
+            sIconMap.put(ScreenWidthQualifier.class, factory.getIcon("width")); //$NON-NLS-1$
+            sIconMap.put(ScreenHeightQualifier.class, factory.getIcon("height")); //$NON-NLS-1$
+            sIconMap.put(SmallestScreenWidthQualifier.class, factory.getIcon("swidth")); //$NON-NLS-1$
         } catch (Throwable t) {
-            AndmoreAndroidPlugin.log(t , null);
+            AndmoreAndroidPlugin.log(t, null);
         }
     }
 
@@ -256,8 +253,8 @@ public class ResourceHelper {
             String name = parsed.name;
 
             // Make sure the name is valid
-            ResourceNameValidator validator =
-                ResourceNameValidator.create(false, (Set<String>) null /* existing */, type);
+            ResourceNameValidator validator = ResourceNameValidator.create(false, (Set<String>) null /* existing */,
+                    type);
             if (validator.isValid(name) != null) {
                 return false;
             }
@@ -293,8 +290,7 @@ public class ResourceHelper {
     }
 
     /** Creates a file-based resource, like a layout. Used by {@link #createResource} */
-    private static Pair<IFile,IRegion> createFileResource(IProject project, ResourceType type,
-            String name) {
+    private static Pair<IFile, IRegion> createFileResource(IProject project, ResourceType type, String name) {
 
         ResourceFolderType folderType = null;
         for (ResourceFolderType f : FolderTypeRelationship.getRelatedFolders(type)) {
@@ -309,8 +305,7 @@ public class ResourceHelper {
 
         // Find "dimens.xml" file in res/values/ (or corresponding name for other
         // value types)
-        IPath projectPath = new Path(FD_RESOURCES + WS_SEP + folderType.getName() + WS_SEP
-            + name + '.' + EXT_XML);
+        IPath projectPath = new Path(FD_RESOURCES + WS_SEP + folderType.getName() + WS_SEP + name + '.' + EXT_XML);
         IFile file = project.getFile(projectPath);
         return NewXmlFileWizard.createXmlFile(project, file, folderType);
     }
@@ -325,8 +320,7 @@ public class ResourceHelper {
      * @return a pair of the file containing the resource and a region where the value
      *         appears
      */
-    public static Pair<IFile,IRegion> createResource(IProject project, ResourceType type,
-            String name, String value) {
+    public static Pair<IFile, IRegion> createResource(IProject project, ResourceType type, String name, String value) {
         if (!isValueBasedResourceType(type)) {
             return createFileResource(project, type, name);
         }
@@ -335,8 +329,7 @@ public class ResourceHelper {
         // value types)
         String typeName = type.getName();
         String fileName = typeName + 's';
-        String projectPath = FD_RESOURCES + WS_SEP + FD_RES_VALUES + WS_SEP
-            + fileName + '.' + EXT_XML;
+        String projectPath = FD_RESOURCES + WS_SEP + FD_RES_VALUES + WS_SEP + fileName + '.' + EXT_XML;
         Object editRequester = project;
         IResource member = project.findMember(projectPath);
         String tagName = Hyperlinks.getTagName(type);
@@ -353,8 +346,7 @@ public class ResourceHelper {
                         model = manager.getModelForEdit(file);
                     }
                     if (model instanceof IDOMModel) {
-                        model.beginRecording(editRequester, String.format("Add %1$s",
-                                type.getDisplayName()));
+                        model.beginRecording(editRequester, String.format("Add %1$s", type.getDisplayName()));
                         IDOMModel domModel = (IDOMModel) model;
                         Document document = domModel.getDocument();
                         Element root = document.getDocumentElement();
@@ -437,7 +429,7 @@ public class ResourceHelper {
             }
             int start, end;
             if (createEmptyTag) {
-                sb.append("/>");                             //$NON-NLS-1$
+                sb.append("/>"); //$NON-NLS-1$
                 start = sb.length();
                 end = sb.length();
             } else {
@@ -454,7 +446,7 @@ public class ResourceHelper {
             // TODO: Pretty print string (wait until that CL is integrated)
             String error = null;
             try {
-                byte[] buf = result.getBytes("UTF8");    //$NON-NLS-1$
+                byte[] buf = result.getBytes("UTF8"); //$NON-NLS-1$
                 InputStream stream = new ByteArrayInputStream(buf);
                 IFile file = project.getFile(new Path(projectPath));
                 file.create(stream, true /*force*/, null /*progress*/);
@@ -502,8 +494,7 @@ public class ResourceHelper {
      *         to a framework theme
      */
     public static boolean isProjectStyle(String style) {
-        assert style.startsWith(STYLE_RESOURCE_PREFIX)
-            || style.startsWith(ANDROID_STYLE_RESOURCE_PREFIX) : style;
+        assert style.startsWith(STYLE_RESOURCE_PREFIX) || style.startsWith(ANDROID_STYLE_RESOURCE_PREFIX) : style;
 
         return style.startsWith(STYLE_RESOURCE_PREFIX);
     }

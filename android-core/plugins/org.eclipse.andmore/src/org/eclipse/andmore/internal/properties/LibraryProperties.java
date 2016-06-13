@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,15 +13,16 @@
 
 package org.eclipse.andmore.internal.properties;
 
-import com.android.sdklib.internal.project.ProjectProperties;
-import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.project.ProjectChooserHelper;
 import org.eclipse.andmore.internal.project.ProjectChooserHelper.IProjectChooserFilter;
 import org.eclipse.andmore.internal.sdk.ProjectState;
-import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.andmore.internal.sdk.ProjectState.LibraryState;
+import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IJavaProject;
@@ -46,10 +44,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
+import com.android.sdklib.internal.project.ProjectProperties;
+import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
 
 /**
  * Self-contained UI to edit the library dependencies of a Project.
@@ -170,8 +166,7 @@ final class LibraryProperties {
                         "Please select a library project");
                 if (javaProject != null) {
                     IProject iProject = javaProject.getProject();
-                    IPath relativePath = iProject.getLocation().makeRelativeTo(
-                            mState.getProject().getLocation());
+                    IPath relativePath = iProject.getLocation().makeRelativeTo(mState.getProject().getLocation());
 
                     addItem(relativePath.toString(), iProject, -1);
                     resetEnabled();
@@ -292,8 +287,7 @@ final class LibraryProperties {
             // now add the new libraries.
             int index = 1;
             for (ItemData data : mItemDataList) {
-                mPropertiesWorkingCopy.setProperty(ProjectProperties.PROPERTY_LIB_REF + index++,
-                        data.relativePath);
+                mPropertiesWorkingCopy.setProperty(ProjectProperties.PROPERTY_LIB_REF + index++, data.relativePath);
             }
         }
 
@@ -357,9 +351,7 @@ final class LibraryProperties {
      * If we need something more fancy, we might want to use this:
      * http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.swt.snippets/src/org/eclipse/swt/snippets/Snippet77.java?view=co
      */
-    private void adjustColumnsWidth(final Table table,
-            final TableColumn column0,
-            final TableColumn column1) {
+    private void adjustColumnsWidth(final Table table, final TableColumn column0, final TableColumn column1) {
         // Add a listener to resize the column to the full width of the table
         table.addControlListener(new ControlAdapter() {
             @Override
@@ -371,4 +363,3 @@ final class LibraryProperties {
         });
     }
 }
-

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,27 +26,26 @@ import static com.android.SdkConstants.XMLNS_PREFIX;
 import static org.eclipse.andmore.internal.wizards.templates.InstallDependencyPage.SUPPORT_LIBRARY_NAME;
 import static org.eclipse.andmore.internal.wizards.templates.TemplateManager.getTemplateRootFolder;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.xml.XmlFormatStyle;
-import com.android.manifmerger.ManifestMerger;
-import com.android.manifmerger.MergerLog;
-import com.android.resources.ResourceFolderType;
-import com.android.utils.SdkUtils;
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import freemarker.cache.TemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.actions.AddSupportJarAction;
 import org.eclipse.andmore.internal.editors.formatting.EclipseXmlFormatPreferences;
 import org.eclipse.andmore.internal.editors.formatting.EclipseXmlPrettyPrinter;
@@ -92,23 +88,24 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.xml.XmlFormatStyle;
+import com.android.manifmerger.ManifestMerger;
+import com.android.manifmerger.MergerLog;
+import com.android.resources.ResourceFolderType;
+import com.android.utils.SdkUtils;
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import freemarker.cache.TemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 /**
  * Handler which manages instantiating FreeMarker templates, copying resources
@@ -140,75 +137,74 @@ class TemplateHandler {
      * Directory within the template which contains the resources referenced
      * from the template.xml file
      */
-    private static final String DATA_ROOT = "root";      //$NON-NLS-1$
+    private static final String DATA_ROOT = "root"; //$NON-NLS-1$
 
     /**
      * Shared resource directory containing common resources shared among
      * multiple templates
      */
-    private static final String RESOURCE_ROOT = "resources";   //$NON-NLS-1$
+    private static final String RESOURCE_ROOT = "resources"; //$NON-NLS-1$
 
     /** Reserved filename which describes each template */
-    static final String TEMPLATE_XML = "template.xml";   //$NON-NLS-1$
+    static final String TEMPLATE_XML = "template.xml"; //$NON-NLS-1$
 
     // Various tags and attributes used in the template metadata files - template.xml,
     // globals.xml.ftl, recipe.xml.ftl, etc.
 
-    static final String TAG_MERGE = "merge";             //$NON-NLS-1$
-    static final String TAG_EXECUTE = "execute";         //$NON-NLS-1$
-    static final String TAG_GLOBALS = "globals";         //$NON-NLS-1$
-    static final String TAG_GLOBAL = "global";           //$NON-NLS-1$
-    static final String TAG_PARAMETER = "parameter";     //$NON-NLS-1$
-    static final String TAG_COPY = "copy";               //$NON-NLS-1$
+    static final String TAG_MERGE = "merge"; //$NON-NLS-1$
+    static final String TAG_EXECUTE = "execute"; //$NON-NLS-1$
+    static final String TAG_GLOBALS = "globals"; //$NON-NLS-1$
+    static final String TAG_GLOBAL = "global"; //$NON-NLS-1$
+    static final String TAG_PARAMETER = "parameter"; //$NON-NLS-1$
+    static final String TAG_COPY = "copy"; //$NON-NLS-1$
     static final String TAG_INSTANTIATE = "instantiate"; //$NON-NLS-1$
-    static final String TAG_OPEN = "open";               //$NON-NLS-1$
-    static final String TAG_THUMB = "thumb";             //$NON-NLS-1$
-    static final String TAG_THUMBS = "thumbs";           //$NON-NLS-1$
-    static final String TAG_DEPENDENCY = "dependency";   //$NON-NLS-1$
-    static final String TAG_ICONS = "icons";             //$NON-NLS-1$
-    static final String TAG_FORMFACTOR = "formfactor";   //$NON-NLS-1$
-    static final String TAG_CATEGORY = "category";       //$NON-NLS-1$
-    static final String ATTR_FORMAT = "format";          //$NON-NLS-1$
-    static final String ATTR_REVISION = "revision";      //$NON-NLS-1$
-    static final String ATTR_VALUE = "value";            //$NON-NLS-1$
-    static final String ATTR_DEFAULT = "default";        //$NON-NLS-1$
-    static final String ATTR_SUGGEST = "suggest";        //$NON-NLS-1$
-    static final String ATTR_ID = "id";                  //$NON-NLS-1$
-    static final String ATTR_NAME = "name";              //$NON-NLS-1$
+    static final String TAG_OPEN = "open"; //$NON-NLS-1$
+    static final String TAG_THUMB = "thumb"; //$NON-NLS-1$
+    static final String TAG_THUMBS = "thumbs"; //$NON-NLS-1$
+    static final String TAG_DEPENDENCY = "dependency"; //$NON-NLS-1$
+    static final String TAG_ICONS = "icons"; //$NON-NLS-1$
+    static final String TAG_FORMFACTOR = "formfactor"; //$NON-NLS-1$
+    static final String TAG_CATEGORY = "category"; //$NON-NLS-1$
+    static final String ATTR_FORMAT = "format"; //$NON-NLS-1$
+    static final String ATTR_REVISION = "revision"; //$NON-NLS-1$
+    static final String ATTR_VALUE = "value"; //$NON-NLS-1$
+    static final String ATTR_DEFAULT = "default"; //$NON-NLS-1$
+    static final String ATTR_SUGGEST = "suggest"; //$NON-NLS-1$
+    static final String ATTR_ID = "id"; //$NON-NLS-1$
+    static final String ATTR_NAME = "name"; //$NON-NLS-1$
     static final String ATTR_DESCRIPTION = "description";//$NON-NLS-1$
-    static final String ATTR_TYPE = "type";              //$NON-NLS-1$
-    static final String ATTR_HELP = "help";              //$NON-NLS-1$
-    static final String ATTR_FILE = "file";              //$NON-NLS-1$
-    static final String ATTR_TO = "to";                  //$NON-NLS-1$
-    static final String ATTR_FROM = "from";              //$NON-NLS-1$
+    static final String ATTR_TYPE = "type"; //$NON-NLS-1$
+    static final String ATTR_HELP = "help"; //$NON-NLS-1$
+    static final String ATTR_FILE = "file"; //$NON-NLS-1$
+    static final String ATTR_TO = "to"; //$NON-NLS-1$
+    static final String ATTR_FROM = "from"; //$NON-NLS-1$
     static final String ATTR_CONSTRAINTS = "constraints";//$NON-NLS-1$
-    static final String ATTR_BACKGROUND = "background";  //$NON-NLS-1$
-    static final String ATTR_FOREGROUND = "foreground";  //$NON-NLS-1$
-    static final String ATTR_SHAPE = "shape";            //$NON-NLS-1$
-    static final String ATTR_TRIM = "trim";              //$NON-NLS-1$
-    static final String ATTR_PADDING = "padding";        //$NON-NLS-1$
-    static final String ATTR_SOURCE_TYPE = "source";     //$NON-NLS-1$
+    static final String ATTR_BACKGROUND = "background"; //$NON-NLS-1$
+    static final String ATTR_FOREGROUND = "foreground"; //$NON-NLS-1$
+    static final String ATTR_SHAPE = "shape"; //$NON-NLS-1$
+    static final String ATTR_TRIM = "trim"; //$NON-NLS-1$
+    static final String ATTR_PADDING = "padding"; //$NON-NLS-1$
+    static final String ATTR_SOURCE_TYPE = "source"; //$NON-NLS-1$
     static final String ATTR_CLIPART_NAME = "clipartName";//$NON-NLS-1$
-    static final String ATTR_TEXT = "text";              //$NON-NLS-1$
-    static final String ATTR_SRC_DIR = "srcDir";         //$NON-NLS-1$
-    static final String ATTR_SRC_OUT = "srcOut";         //$NON-NLS-1$
-    static final String ATTR_RES_DIR = "resDir";         //$NON-NLS-1$
-    static final String ATTR_RES_OUT = "resOut";         //$NON-NLS-1$
+    static final String ATTR_TEXT = "text"; //$NON-NLS-1$
+    static final String ATTR_SRC_DIR = "srcDir"; //$NON-NLS-1$
+    static final String ATTR_SRC_OUT = "srcOut"; //$NON-NLS-1$
+    static final String ATTR_RES_DIR = "resDir"; //$NON-NLS-1$
+    static final String ATTR_RES_OUT = "resOut"; //$NON-NLS-1$
     static final String ATTR_MANIFEST_DIR = "manifestDir";//$NON-NLS-1$
     static final String ATTR_MANIFEST_OUT = "manifestOut";//$NON-NLS-1$
     static final String ATTR_PROJECT_DIR = "projectDir"; //$NON-NLS-1$
     static final String ATTR_PROJECT_OUT = "projectOut"; //$NON-NLS-1$
-    static final String ATTR_MAVEN_URL = "mavenUrl";     //$NON-NLS-1$
-    static final String ATTR_DEBUG_KEYSTORE_SHA1 = 
-    		"debugKeystoreSha1";                         //$NON-NLS-1$
+    static final String ATTR_MAVEN_URL = "mavenUrl"; //$NON-NLS-1$
+    static final String ATTR_DEBUG_KEYSTORE_SHA1 = "debugKeystoreSha1"; //$NON-NLS-1$
 
     static final String CATEGORY_ACTIVITIES = "activities";//$NON-NLS-1$
-    static final String CATEGORY_PROJECTS = "projects";    //$NON-NLS-1$
-    static final String CATEGORY_OTHER = "other";          //$NON-NLS-1$
+    static final String CATEGORY_PROJECTS = "projects"; //$NON-NLS-1$
+    static final String CATEGORY_OTHER = "other"; //$NON-NLS-1$
 
-    static final String MAVEN_SUPPORT_V4 = "support-v4";   //$NON-NLS-1$
+    static final String MAVEN_SUPPORT_V4 = "support-v4"; //$NON-NLS-1$
     static final String MAVEN_SUPPORT_V13 = "support-v13"; //$NON-NLS-1$
-    static final String MAVEN_APPCOMPAT = "appcompat-v7";  //$NON-NLS-1$
+    static final String MAVEN_APPCOMPAT = "appcompat-v7"; //$NON-NLS-1$
 
     /** Default padding to apply in wizards around the thumbnail preview images */
     static final int PREVIEW_PADDING = 10;
@@ -280,8 +276,7 @@ class TemplateHandler {
             }
         }
 
-        return new TemplateHandler(new File(getTemplateRootFolder(),
-                category + File.separator + name), manager);
+        return new TemplateHandler(new File(getTemplateRootFolder(), category + File.separator + name), manager);
     }
 
     private TemplateHandler(File rootPath, TemplateManager manager) {
@@ -340,23 +335,23 @@ class TemplateHandler {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         // Builtin conversion methods
-        paramMap.put("slashedPackageName", new FmSlashedPackageNameMethod());       //$NON-NLS-1$
+        paramMap.put("slashedPackageName", new FmSlashedPackageNameMethod()); //$NON-NLS-1$
         paramMap.put("camelCaseToUnderscore", new FmCamelCaseToUnderscoreMethod()); //$NON-NLS-1$
         paramMap.put("underscoreToCamelCase", new FmUnderscoreToCamelCaseMethod()); //$NON-NLS-1$
-        paramMap.put("activityToLayout", new FmActivityToLayoutMethod());           //$NON-NLS-1$
-        paramMap.put("layoutToActivity", new FmLayoutToActivityMethod());           //$NON-NLS-1$
-        paramMap.put("classToResource", new FmClassNameToResourceMethod());         //$NON-NLS-1$
-        paramMap.put("escapeXmlAttribute", new FmEscapeXmlStringMethod());          //$NON-NLS-1$
-        paramMap.put("escapeXmlText", new FmEscapeXmlStringMethod());               //$NON-NLS-1$
-        paramMap.put("escapeXmlString", new FmEscapeXmlStringMethod());             //$NON-NLS-1$
-        paramMap.put("extractLetters", new FmExtractLettersMethod());               //$NON-NLS-1$
+        paramMap.put("activityToLayout", new FmActivityToLayoutMethod()); //$NON-NLS-1$
+        paramMap.put("layoutToActivity", new FmLayoutToActivityMethod()); //$NON-NLS-1$
+        paramMap.put("classToResource", new FmClassNameToResourceMethod()); //$NON-NLS-1$
+        paramMap.put("escapeXmlAttribute", new FmEscapeXmlStringMethod()); //$NON-NLS-1$
+        paramMap.put("escapeXmlText", new FmEscapeXmlStringMethod()); //$NON-NLS-1$
+        paramMap.put("escapeXmlString", new FmEscapeXmlStringMethod()); //$NON-NLS-1$
+        paramMap.put("extractLetters", new FmExtractLettersMethod()); //$NON-NLS-1$
 
         // This should be handled better: perhaps declared "required packages" as part of the
         // inputs? (It would be better if we could conditionally disable template based
         // on availability)
         Map<String, String> builtin = new HashMap<String, String>();
         builtin.put("templatesRes", VALUE_TEMPLATE_DIR); //$NON-NLS-1$
-        paramMap.put("android", builtin);                //$NON-NLS-1$
+        paramMap.put("android", builtin); //$NON-NLS-1$
 
         return paramMap;
     }
@@ -371,10 +366,10 @@ class TemplateHandler {
         IPath manifestDir = project.getProjectRelativePath();
         parameters.put(ATTR_MANIFEST_DIR, manifestDir.toString());
         parameters.put(ATTR_MANIFEST_OUT, manifestDir.toString());
-        
+
         parameters.put(ATTR_PROJECT_DIR, manifestDir.toString());
         parameters.put(ATTR_PROJECT_OUT, manifestDir.toString());
-        
+
         parameters.put(ATTR_DEBUG_KEYSTORE_SHA1, "");
     }
 
@@ -401,8 +396,7 @@ class TemplateHandler {
     @Nullable
     public String readTemplateTextResource(@NonNull String relativePath) {
         try {
-            return Files.toString(new File(mRootPath,
-                    relativePath.replace('/', File.separatorChar)), Charsets.UTF_8);
+            return Files.toString(new File(mRootPath, relativePath.replace('/', File.separatorChar)), Charsets.UTF_8);
         } catch (IOException e) {
             AndmoreAndroidPlugin.log(e, null);
             return null;
@@ -445,8 +439,7 @@ class TemplateHandler {
     public static Exception sMostRecentException;
 
     /** Read the given FreeMarker file and process the variable definitions */
-    private void processVariables(final Configuration freemarker,
-            String file, final Map<String, Object> paramMap) {
+    private void processVariables(final Configuration freemarker, String file, final Map<String, Object> paramMap) {
         try {
             String xml;
             if (file.endsWith(DOT_XML)) {
@@ -468,9 +461,8 @@ class TemplateHandler {
             SAXParser saxParser = factory.newSAXParser();
             saxParser.parse(new ByteArrayInputStream(xml.getBytes()), new DefaultHandler() {
                 @Override
-                public void startElement(String uri, String localName, String name,
-                        Attributes attributes)
-                                throws SAXException {
+                public void startElement(String uri, String localName, String name, Attributes attributes)
+                        throws SAXException {
                     if (TAG_PARAMETER.equals(name)) {
                         String id = attributes.getValue(ATTR_ID);
                         if (!paramMap.containsKey(id)) {
@@ -487,7 +479,7 @@ class TemplateHandler {
                     } else if (TAG_GLOBAL.equals(name)) {
                         String id = attributes.getValue(ATTR_ID);
                         if (!paramMap.containsKey(id)) {
-                        	paramMap.put(id, TypedVariable.parseGlobal(attributes));
+                            paramMap.put(id, TypedVariable.parseGlobal(attributes));
                         }
                     } else if (TAG_GLOBALS.equals(name)) {
                         // Handle evaluation of variables
@@ -507,7 +499,7 @@ class TemplateHandler {
                             // by the wizard
                             File path = AddSupportJarAction.getSupportJarFile();
                             if (path != null) {
-                                IPath to = getTargetPath(FD_NATIVE_LIBS +'/' + path.getName());
+                                IPath to = getTargetPath(FD_NATIVE_LIBS + '/' + path.getName());
                                 try {
                                     copy(path, to);
                                 } catch (IOException ioe) {
@@ -515,10 +507,9 @@ class TemplateHandler {
                                 }
                             }
                         }
-                    } else if (!name.equals("template") && !name.equals(TAG_CATEGORY) &&
-                    		!name.equals(TAG_FORMFACTOR) && !name.equals("option") &&
-                    		!name.equals(TAG_THUMBS) && !name.equals(TAG_THUMB) &&
-                    		!name.equals(TAG_ICONS)) {
+                    } else if (!name.equals("template") && !name.equals(TAG_CATEGORY) && !name.equals(TAG_FORMFACTOR)
+                            && !name.equals("option") && !name.equals(TAG_THUMBS) && !name.equals(TAG_THUMB)
+                            && !name.equals(TAG_ICONS)) {
                         System.err.println("WARNING: Unknown template directive " + name);
                     }
                 }
@@ -535,30 +526,29 @@ class TemplateHandler {
             // Warn that the file already exists and ask the user what to do
             if (!mYesToAll) {
                 MessageDialog dialog = new MessageDialog(null, "File Already Exists", null,
-                        String.format(
-                                "%1$s already exists.\nWould you like to replace it?",
-                                file.getPath()),
-                                MessageDialog.QUESTION, new String[] {
-                    // Yes will be moved to the end because it's the default
-                    "Yes", "No", "Cancel", "Yes to All"
-                }, 0);
+                        String.format("%1$s already exists.\nWould you like to replace it?", file.getPath()),
+                        MessageDialog.QUESTION,
+                        new String[] {
+                                // Yes will be moved to the end because it's the default
+                                "Yes", "No", "Cancel", "Yes to All" },
+                        0);
                 int result = dialog.open();
                 switch (result) {
-                case 0:
-                    // Yes
-                    break;
-                case 3:
-                    // Yes to all
-                    mYesToAll = true;
-                    break;
-                case 1:
-                    // No
-                    return false;
-                case SWT.DEFAULT:
-                case 2:
-                    // Cancel
-                    mNoToAll = true;
-                    return false;
+                    case 0:
+                        // Yes
+                        break;
+                    case 3:
+                        // Yes to all
+                        mYesToAll = true;
+                        break;
+                    case 1:
+                        // No
+                        return false;
+                    case SWT.DEFAULT:
+                    case 2:
+                        // Cancel
+                        mNoToAll = true;
+                        return false;
                 }
             }
 
@@ -573,10 +563,7 @@ class TemplateHandler {
     }
 
     /** Executes the given recipe file: copying, merging, instantiating, opening files etc */
-    private void execute(
-            final Configuration freemarker,
-            String file,
-            final Map<String, Object> paramMap) {
+    private void execute(final Configuration freemarker, String file, final Map<String, Object> paramMap) {
         try {
             mLoader.setTemplateFile(new File(mRootPath, file));
             Template freemarkerTemplate = freemarker.getTemplate(file);
@@ -590,12 +577,10 @@ class TemplateHandler {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser saxParser = factory.newSAXParser();
 
-            saxParser.parse(new ByteArrayInputStream(xml.getBytes()),
-                    new DefaultHandler() {
+            saxParser.parse(new ByteArrayInputStream(xml.getBytes()), new DefaultHandler() {
                 @Override
-                public void startElement(String uri, String localName, String name,
-                        Attributes attributes)
-                                throws SAXException {
+                public void startElement(String uri, String localName, String name, Attributes attributes)
+                        throws SAXException {
                     if (mNoToAll) {
                         return;
                     }
@@ -654,7 +639,7 @@ class TemplateHandler {
                             }
 
                             if (path != null) {
-                                IPath to = getTargetPath(FD_NATIVE_LIBS +'/' + path.getName());
+                                IPath to = getTargetPath(FD_NATIVE_LIBS + '/' + path.getName());
                                 try {
                                     copy(path, to);
                                 } catch (IOException ioe) {
@@ -681,8 +666,7 @@ class TemplateHandler {
     private File getFullPath(@NonNull String fromPath) {
         if (fromPath.startsWith(VALUE_TEMPLATE_DIR)) {
             return new File(getTemplateRootFolder(), RESOURCE_ROOT + File.separator
-                    + fromPath.substring(VALUE_TEMPLATE_DIR.length() + 1).replace('/',
-                            File.separatorChar));
+                    + fromPath.substring(VALUE_TEMPLATE_DIR.length() + 1).replace('/', File.separatorChar));
         }
         return new File(mRootPath, DATA_ROOT + File.separator + fromPath);
     }
@@ -700,11 +684,8 @@ class TemplateHandler {
         return mProject.getFile(path);
     }
 
-    private void merge(
-            @NonNull final Configuration freemarker,
-            @NonNull final Map<String, Object> paramMap,
-            @NonNull String relativeFrom,
-            @NonNull IPath toPath) throws IOException, TemplateException {
+    private void merge(@NonNull final Configuration freemarker, @NonNull final Map<String, Object> paramMap,
+            @NonNull String relativeFrom, @NonNull IPath toPath) throws IOException, TemplateException {
 
         String currentXml = null;
 
@@ -774,20 +755,14 @@ class TemplateHandler {
         String contents = null;
         if (ok) {
             if (modified) {
-                contents = EclipseXmlPrettyPrinter.prettyPrint(currentDocument,
-                        EclipseXmlFormatPreferences.create(), formatStyle, null,
-                        currentXml.endsWith("\n")); //$NON-NLS-1$
+                contents = EclipseXmlPrettyPrinter.prettyPrint(currentDocument, EclipseXmlFormatPreferences.create(),
+                        formatStyle, null, currentXml.endsWith("\n")); //$NON-NLS-1$
             }
         } else {
             // Just insert into file along with comment, using the "standard" conflict
             // syntax that many tools and editors recognize.
             String sep = SdkUtils.getLineSeparator();
-            contents =
-                    "<<<<<<< Original" + sep
-                    + currentXml + sep
-                    + "=======" + sep
-                    + xml
-                    + ">>>>>>> Added" + sep;
+            contents = "<<<<<<< Original" + sep + currentXml + sep + "=======" + sep + xml + ">>>>>>> Added" + sep;
         }
 
         if (contents != null) {
@@ -802,8 +777,8 @@ class TemplateHandler {
 
     /** Merges the given resource file contents into the given resource file
      * @param paramMap */
-    private static boolean mergeResourceFile(Document currentDocument, Document fragment,
-            ResourceFolderType folderType, Map<String, Object> paramMap) {
+    private static boolean mergeResourceFile(Document currentDocument, Document fragment, ResourceFolderType folderType,
+            Map<String, Object> paramMap) {
         boolean modified = false;
 
         // Copy namespace declarations
@@ -812,8 +787,7 @@ class TemplateHandler {
             for (int i = 0, n = attributes.getLength(); i < n; i++) {
                 Attr attribute = (Attr) attributes.item(i);
                 if (attribute.getName().startsWith(XMLNS_PREFIX)) {
-                    currentDocument.getDocumentElement().setAttribute(attribute.getName(),
-                            attribute.getValue());
+                    currentDocument.getDocumentElement().setAttribute(attribute.getName(), attribute.getValue());
                 }
             }
         }
@@ -874,8 +848,7 @@ class TemplateHandler {
                         // really confusing if the new parameter is not set. This is
                         // really an error in the template, since we shouldn't have conflicts
                         // like that, but we need to do something to help track this down.
-                        AndmoreAndroidPlugin.log(null,
-                                "Warning: Ignoring name conflict in resource file for name %1$s",
+                        AndmoreAndroidPlugin.log(null, "Warning: Ignoring name conflict in resource file for name %1$s",
                                 name);
                     } else {
                         root.appendChild(node);
@@ -914,12 +887,9 @@ class TemplateHandler {
             }
         }
 
-        ManifestMerger merger = new ManifestMerger(
-                MergerLog.wrapSdkLog(AndmoreAndroidPlugin.getDefault()),
+        ManifestMerger merger = new ManifestMerger(MergerLog.wrapSdkLog(AndmoreAndroidPlugin.getDefault()),
                 new AdtManifestMergeCallback()).setExtractPackagePrefix(true);
-        return currentManifest != null &&
-                fragment != null &&
-                merger.process(currentManifest, fragment);
+        return currentManifest != null && fragment != null && merger.process(currentManifest, fragment);
     }
 
     /**
@@ -951,11 +921,8 @@ class TemplateHandler {
     }
 
     /** Instantiates the given template file into the given output file */
-    private void instantiate(
-            @NonNull final Configuration freemarker,
-            @NonNull final Map<String, Object> paramMap,
-            @NonNull String relativeFrom,
-            @NonNull IPath to) throws IOException, TemplateException {
+    private void instantiate(@NonNull final Configuration freemarker, @NonNull final Map<String, Object> paramMap,
+            @NonNull String relativeFrom, @NonNull IPath to) throws IOException, TemplateException {
         // For now, treat extension-less files as directories... this isn't quite right
         // so I should refine this! Maybe with a unique attribute in the template file?
         boolean isDirectory = relativeFrom.indexOf('.') == -1;
@@ -1009,8 +976,7 @@ class TemplateHandler {
                 IDocument doc = new org.eclipse.jface.text.Document();
                 // format the file (the meat and potatoes)
                 doc.set(contents);
-                TextEdit edit = formatter.format(
-                        CodeFormatter.K_COMPILATION_UNIT | CodeFormatter.F_INCLUDE_COMMENTS,
+                TextEdit edit = formatter.format(CodeFormatter.K_COMPILATION_UNIT | CodeFormatter.F_INCLUDE_COMMENTS,
                         contents, 0, contents.length(), 0, null);
                 if (edit != null) {
                     edit.apply(doc);
@@ -1082,9 +1048,7 @@ class TemplateHandler {
     }
 
     /** Copy a template resource */
-    private final void copyTemplateResource(
-            @NonNull String relativeFrom,
-            @NonNull IPath output) throws IOException {
+    private final void copyTemplateResource(@NonNull String relativeFrom, @NonNull IPath output) throws IOException {
         File from = getFullPath(relativeFrom);
         copy(from, output);
     }
@@ -1113,14 +1077,13 @@ class TemplateHandler {
             IResource dest = mProject.getFile(path);
             if (dest.exists() && !(dest instanceof IFile)) {// Don't attempt to overwrite a folder
                 assert false : dest.getClass().getName();
-            return;
+                return;
             }
             IFile file = (IFile) dest;
             String targetName = path.lastSegment();
             if (dest instanceof IFile) {
                 if (dest.exists() && isIdentical(Files.toByteArray(src), file)) {
-                    String label = String.format(
-                            "Not overwriting %1$s because the files are identical", targetName);
+                    String label = String.format("Not overwriting %1$s because the files are identical", targetName);
                     NullChange change = new NullChange(label);
                     change.setEnabled(false);
                     mOtherChanges.add(change);
@@ -1128,12 +1091,8 @@ class TemplateHandler {
                 }
             }
 
-            if (targetName.endsWith(DOT_XML)
-                    || targetName.endsWith(DOT_JAVA)
-                    || targetName.endsWith(DOT_TXT)
-                    || targetName.endsWith(DOT_RS)
-                    || targetName.endsWith(DOT_AIDL)
-                    || targetName.endsWith(DOT_SVG)) {
+            if (targetName.endsWith(DOT_XML) || targetName.endsWith(DOT_JAVA) || targetName.endsWith(DOT_TXT)
+                    || targetName.endsWith(DOT_RS) || targetName.endsWith(DOT_AIDL) || targetName.endsWith(DOT_SVG)) {
 
                 String newFile = Files.toString(src, Charsets.UTF_8);
                 newFile = format(mProject, newFile, path);
@@ -1190,8 +1149,7 @@ class TemplateHandler {
         }
 
         @Override
-        public void closeTemplateSource(Object templateSource) throws IOException {
-        }
+        public void closeTemplateSource(Object templateSource) throws IOException {}
     }
 
     /**
@@ -1209,27 +1167,28 @@ class TemplateHandler {
             return null;
         }
         if (!template.isSupported()) {
-            String versionString = AndmoreAndroidPlugin.getDefault().getBundle().getHeaders().get(
-                    Constants.BUNDLE_VERSION);
+            String versionString = AndmoreAndroidPlugin.getDefault().getBundle().getHeaders()
+                    .get(Constants.BUNDLE_VERSION);
             Version version = new Version(versionString);
             return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    String.format("This template requires a more recent version of the " +
-                            "Android Eclipse plugin. Please update from version %1$d.%2$d.%3$d.",
+                    String.format(
+                            "This template requires a more recent version of the "
+                                    + "Android Eclipse plugin. Please update from version %1$d.%2$d.%3$d.",
                             version.getMajor(), version.getMinor(), version.getMicro()));
         }
         int templateMinSdk = template.getMinSdk();
         if (templateMinSdk > currentMinSdk && currentMinSdk >= 1) {
             return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    String.format("This template requires a minimum SDK version of at " +
-                            "least %1$d, and the current min version is %2$d",
+                    String.format(
+                            "This template requires a minimum SDK version of at "
+                                    + "least %1$d, and the current min version is %2$d",
                             templateMinSdk, currentMinSdk));
         }
         int templateMinBuildApi = template.getMinBuildApi();
-        if (templateMinBuildApi >  buildApi && buildApi >= 1) {
+        if (templateMinBuildApi > buildApi && buildApi >= 1) {
             return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    String.format("This template requires a build target API version of at " +
-                            "least %1$d, and the current version is %2$d",
-                            templateMinBuildApi, buildApi));
+                    String.format("This template requires a build target API version of at "
+                            + "least %1$d, and the current version is %2$d", templateMinBuildApi, buildApi));
         }
 
         return null;

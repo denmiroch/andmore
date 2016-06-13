@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,6 +50,15 @@ import static com.android.SdkConstants.VALUE_FILL_PARENT;
 import static com.android.SdkConstants.VALUE_MATCH_PARENT;
 import static com.android.SdkConstants.VALUE_WRAP_CONTENT;
 
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
@@ -77,49 +83,32 @@ import com.android.ide.common.api.Segment;
 import com.android.ide.common.api.SegmentType;
 import com.android.utils.Pair;
 
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * A {@link IViewRule} for all layouts.
  */
 public class BaseLayoutRule extends BaseViewRule {
-    private static final String ACTION_FILL_WIDTH = "_fillW";  //$NON-NLS-1$
+    private static final String ACTION_FILL_WIDTH = "_fillW"; //$NON-NLS-1$
     private static final String ACTION_FILL_HEIGHT = "_fillH"; //$NON-NLS-1$
-    private static final String ACTION_MARGIN = "_margin";     //$NON-NLS-1$
-    private static final URL ICON_MARGINS =
-        BaseLayoutRule.class.getResource("margins.png"); //$NON-NLS-1$
-    private static final URL ICON_GRAVITY =
-        BaseLayoutRule.class.getResource("gravity.png"); //$NON-NLS-1$
-    private static final URL ICON_FILL_WIDTH =
-        BaseLayoutRule.class.getResource("fillwidth.png"); //$NON-NLS-1$
-    private static final URL ICON_FILL_HEIGHT =
-        BaseLayoutRule.class.getResource("fillheight.png"); //$NON-NLS-1$
+    private static final String ACTION_MARGIN = "_margin"; //$NON-NLS-1$
+    private static final URL ICON_MARGINS = BaseLayoutRule.class.getResource("margins.png"); //$NON-NLS-1$
+    private static final URL ICON_GRAVITY = BaseLayoutRule.class.getResource("gravity.png"); //$NON-NLS-1$
+    private static final URL ICON_FILL_WIDTH = BaseLayoutRule.class.getResource("fillwidth.png"); //$NON-NLS-1$
+    private static final URL ICON_FILL_HEIGHT = BaseLayoutRule.class.getResource("fillheight.png"); //$NON-NLS-1$
 
     // ==== Layout Actions support ====
 
     // The Margin layout parameters are available for LinearLayout, FrameLayout, RelativeLayout,
     // and their subclasses.
-    protected final RuleAction createMarginAction(final INode parentNode,
-            final List<? extends INode> children) {
+    protected final RuleAction createMarginAction(final INode parentNode, final List<? extends INode> children) {
 
-        final List<? extends INode> targets = children == null || children.size() == 0 ?
-                Collections.singletonList(parentNode)
-                : children;
+        final List<? extends INode> targets = children == null || children.size() == 0
+                ? Collections.singletonList(parentNode) : children;
         final INode first = targets.get(0);
 
         IMenuCallback actionCallback = new IMenuCallback() {
             @Override
-            public void action(@NonNull RuleAction action,
-                    @NonNull List<? extends INode> selectedNodes,
-                    final @Nullable String valueId,
-                    final @Nullable Boolean newValue) {
+            public void action(@NonNull RuleAction action, @NonNull List<? extends INode> selectedNodes,
+                    final @Nullable String valueId, final @Nullable Boolean newValue) {
                 parentNode.editXml("Change Margins", new INodeHandler() {
                     @Override
                     public void handle(@NonNull INode n) {
@@ -129,8 +118,7 @@ public class BaseLayoutRule extends BaseViewRule {
                         String right = first.getStringAttr(uri, ATTR_LAYOUT_MARGIN_RIGHT);
                         String top = first.getStringAttr(uri, ATTR_LAYOUT_MARGIN_TOP);
                         String bottom = first.getStringAttr(uri, ATTR_LAYOUT_MARGIN_BOTTOM);
-                        String[] margins = mRulesEngine.displayMarginInput(all, left,
-                                right, top, bottom);
+                        String[] margins = mRulesEngine.displayMarginInput(all, left, right, top, bottom);
                         if (margins != null) {
                             assert margins.length == 5;
                             for (INode child : targets) {
@@ -146,14 +134,12 @@ public class BaseLayoutRule extends BaseViewRule {
             }
         };
 
-        return RuleAction.createAction(ACTION_MARGIN, "Change Margins...", actionCallback,
-                ICON_MARGINS, 40, false);
+        return RuleAction.createAction(ACTION_MARGIN, "Change Margins...", actionCallback, ICON_MARGINS, 40, false);
     }
 
     // Both LinearLayout and RelativeLayout have a gravity (but RelativeLayout applies it
     // to the parent whereas for LinearLayout it's on the children)
-    protected final RuleAction createGravityAction(final List<? extends INode> targets, final
-            String attributeName) {
+    protected final RuleAction createGravityAction(final List<? extends INode> targets, final String attributeName) {
         if (targets != null && targets.size() > 0) {
             final INode first = targets.get(0);
             ChoiceProvider provider = new ChoiceProvider() {
@@ -173,36 +159,27 @@ public class BaseLayoutRule extends BaseViewRule {
             };
 
             return RuleAction.createChoices("_gravity", "Change Gravity", //$NON-NLS-1$
-                    new PropertyCallback(targets, "Change Gravity", ANDROID_URI,
-                            attributeName),
-                    provider,
-                    first.getStringAttr(ANDROID_URI, attributeName), ICON_GRAVITY,
-                    43, false);
+                    new PropertyCallback(targets, "Change Gravity", ANDROID_URI, attributeName), provider,
+                    first.getStringAttr(ANDROID_URI, attributeName), ICON_GRAVITY, 43, false);
         }
 
         return null;
     }
 
     @Override
-    public void addLayoutActions(
-            @NonNull List<RuleAction> actions,
-            final @NonNull INode parentNode,
+    public void addLayoutActions(@NonNull List<RuleAction> actions, final @NonNull INode parentNode,
             final @NonNull List<? extends INode> children) {
         super.addLayoutActions(actions, parentNode, children);
 
-        final List<? extends INode> targets = children == null || children.size() == 0 ?
-                Collections.singletonList(parentNode)
-                : children;
+        final List<? extends INode> targets = children == null || children.size() == 0
+                ? Collections.singletonList(parentNode) : children;
         final INode first = targets.get(0);
 
         // Shared action callback
         IMenuCallback actionCallback = new IMenuCallback() {
             @Override
-            public void action(
-                    @NonNull RuleAction action,
-                    @NonNull List<? extends INode> selectedNodes,
-                    final @Nullable String valueId,
-                    final @Nullable Boolean newValue) {
+            public void action(@NonNull RuleAction action, @NonNull List<? extends INode> selectedNodes,
+                    final @Nullable String valueId, final @Nullable Boolean newValue) {
                 final String actionId = action.getId();
                 final String undoLabel;
                 if (actionId.equals(ACTION_FILL_WIDTH)) {
@@ -215,8 +192,7 @@ public class BaseLayoutRule extends BaseViewRule {
                 parentNode.editXml(undoLabel, new INodeHandler() {
                     @Override
                     public void handle(@NonNull INode n) {
-                        String attribute = actionId.equals(ACTION_FILL_WIDTH)
-                                ? ATTR_LAYOUT_WIDTH : ATTR_LAYOUT_HEIGHT;
+                        String attribute = actionId.equals(ACTION_FILL_WIDTH) ? ATTR_LAYOUT_WIDTH : ATTR_LAYOUT_HEIGHT;
                         String value;
                         if (newValue) {
                             if (supportsMatchParent()) {
@@ -235,8 +211,8 @@ public class BaseLayoutRule extends BaseViewRule {
             }
         };
 
-        actions.add(RuleAction.createToggle(ACTION_FILL_WIDTH, "Toggle Fill Width",
-                isFilled(first, ATTR_LAYOUT_WIDTH), actionCallback, ICON_FILL_WIDTH, 10, false));
+        actions.add(RuleAction.createToggle(ACTION_FILL_WIDTH, "Toggle Fill Width", isFilled(first, ATTR_LAYOUT_WIDTH),
+                actionCallback, ICON_FILL_WIDTH, 10, false));
         actions.add(RuleAction.createToggle(ACTION_FILL_HEIGHT, "Toggle Fill Height",
                 isFilled(first, ATTR_LAYOUT_HEIGHT), actionCallback, ICON_FILL_HEIGHT, 20, false));
     }
@@ -253,8 +229,7 @@ public class BaseLayoutRule extends BaseViewRule {
      * Derived layouts should override this behavior if not appropriate.
      */
     @Override
-    public void onPaste(@NonNull INode targetNode, @Nullable Object targetView,
-            @NonNull IDragElement[] elements) {
+    public void onPaste(@NonNull INode targetNode, @Nullable Object targetView, @NonNull IDragElement[] elements) {
         DropFeedback feedback = onDropEnter(targetNode, targetView, elements);
         if (feedback != null) {
             Point p = targetNode.getBounds().getTopLeft();
@@ -279,8 +254,7 @@ public class BaseLayoutRule extends BaseViewRule {
      * @param targetNode the first selected node
      * @param elements the elements being pasted
      */
-    public void onPasteBeforeChild(INode parentNode, Object parentView, INode targetNode,
-            IDragElement[] elements) {
+    public void onPasteBeforeChild(INode parentNode, Object parentView, INode targetNode, IDragElement[] elements) {
         DropFeedback feedback = onDropEnter(parentNode, parentView, elements);
         if (feedback != null) {
             Point parentP = parentNode.getBounds().getTopLeft();
@@ -330,8 +304,8 @@ public class BaseLayoutRule extends BaseViewRule {
      * old-id => tuple (String new-id, String fqcn) where fqcn is the FQCN of
      * the element.
      */
-    protected static Map<String, Pair<String, String>> getDropIdMap(INode targetNode,
-            IDragElement[] elements, boolean createNewIds) {
+    protected static Map<String, Pair<String, String>> getDropIdMap(INode targetNode, IDragElement[] elements,
+            boolean createNewIds) {
         Map<String, Pair<String, String>> idMap = new HashMap<String, Pair<String, String>>();
 
         if (createNewIds) {
@@ -350,8 +324,7 @@ public class BaseLayoutRule extends BaseViewRule {
      *
      * @see #getDropIdMap
      */
-    protected static Map<String, Pair<String, String>> collectIds(
-            Map<String, Pair<String, String>> idMap,
+    protected static Map<String, Pair<String, String>> collectIds(Map<String, Pair<String, String>> idMap,
             IDragElement[] elements) {
         for (IDragElement element : elements) {
             IDragAttribute attr = element.getAttribute(ANDROID_URI, ATTR_ID);
@@ -371,8 +344,7 @@ public class BaseLayoutRule extends BaseViewRule {
     /**
      * Used by #getDropIdMap to find new IDs in case of conflict.
      */
-    protected static Map<String, Pair<String, String>> remapIds(INode node,
-            Map<String, Pair<String, String>> idMap) {
+    protected static Map<String, Pair<String, String>> remapIds(INode node, Map<String, Pair<String, String>> idMap) {
         // Visit the document to get a list of existing ids
         Set<String> existingIdSet = new HashSet<String>();
         collectExistingIds(node.getRoot(), existingIdSet);
@@ -463,38 +435,21 @@ public class BaseLayoutRule extends BaseViewRule {
     }
 
     private static final String[] EXCLUDED_ATTRIBUTES = new String[] {
-        // Common
-        ATTR_LAYOUT_GRAVITY,
+            // Common
+            ATTR_LAYOUT_GRAVITY,
 
-        // from AbsoluteLayout
-        ATTR_LAYOUT_X,
-        ATTR_LAYOUT_Y,
+            // from AbsoluteLayout
+            ATTR_LAYOUT_X, ATTR_LAYOUT_Y,
 
-        // from RelativeLayout
-        ATTR_LAYOUT_ABOVE,
-        ATTR_LAYOUT_BELOW,
-        ATTR_LAYOUT_TO_LEFT_OF,
-        ATTR_LAYOUT_TO_RIGHT_OF,
-        ATTR_LAYOUT_ALIGN_BASELINE,
-        ATTR_LAYOUT_ALIGN_TOP,
-        ATTR_LAYOUT_ALIGN_BOTTOM,
-        ATTR_LAYOUT_ALIGN_LEFT,
-        ATTR_LAYOUT_ALIGN_RIGHT,
-        ATTR_LAYOUT_ALIGN_PARENT_TOP,
-        ATTR_LAYOUT_ALIGN_PARENT_BOTTOM,
-        ATTR_LAYOUT_ALIGN_PARENT_LEFT,
-        ATTR_LAYOUT_ALIGN_PARENT_RIGHT,
-        ATTR_LAYOUT_ALIGN_WITH_PARENT_MISSING,
-        ATTR_LAYOUT_CENTER_HORIZONTAL,
-        ATTR_LAYOUT_CENTER_IN_PARENT,
-        ATTR_LAYOUT_CENTER_VERTICAL,
+            // from RelativeLayout
+            ATTR_LAYOUT_ABOVE, ATTR_LAYOUT_BELOW, ATTR_LAYOUT_TO_LEFT_OF, ATTR_LAYOUT_TO_RIGHT_OF,
+            ATTR_LAYOUT_ALIGN_BASELINE, ATTR_LAYOUT_ALIGN_TOP, ATTR_LAYOUT_ALIGN_BOTTOM, ATTR_LAYOUT_ALIGN_LEFT,
+            ATTR_LAYOUT_ALIGN_RIGHT, ATTR_LAYOUT_ALIGN_PARENT_TOP, ATTR_LAYOUT_ALIGN_PARENT_BOTTOM,
+            ATTR_LAYOUT_ALIGN_PARENT_LEFT, ATTR_LAYOUT_ALIGN_PARENT_RIGHT, ATTR_LAYOUT_ALIGN_WITH_PARENT_MISSING,
+            ATTR_LAYOUT_CENTER_HORIZONTAL, ATTR_LAYOUT_CENTER_IN_PARENT, ATTR_LAYOUT_CENTER_VERTICAL,
 
-        // From GridLayout
-        ATTR_LAYOUT_ROW,
-        ATTR_LAYOUT_ROW_SPAN,
-        ATTR_LAYOUT_COLUMN,
-        ATTR_LAYOUT_COLUMN_SPAN
-    };
+            // From GridLayout
+            ATTR_LAYOUT_ROW, ATTR_LAYOUT_ROW_SPAN, ATTR_LAYOUT_COLUMN, ATTR_LAYOUT_COLUMN_SPAN };
 
     /**
      * Default attribute filter used by the various layouts to filter out some properties
@@ -523,8 +478,8 @@ public class BaseLayoutRule extends BaseViewRule {
      * transform the value of all attributes of Format.REFERENCE. If filter is
      * non-null, it's a filter that can rewrite the attribute string.
      */
-    protected static void addAttributes(INode newNode, IDragElement oldElement,
-            Map<String, Pair<String, String>> idMap, AttributeFilter filter) {
+    protected static void addAttributes(INode newNode, IDragElement oldElement, Map<String, Pair<String, String>> idMap,
+            AttributeFilter filter) {
 
         for (IDragAttribute attr : oldElement.getAttributes()) {
             String uri = attr.getUri();
@@ -575,13 +530,12 @@ public class BaseLayoutRule extends BaseViewRule {
      * @param initialInsertPos index among targetnode's children which to insert the
      *            children
      */
-    public static void insertAt(final INode targetNode, final IDragElement[] elements,
-            final boolean createNewIds, final int initialInsertPos) {
+    public static void insertAt(final INode targetNode, final IDragElement[] elements, final boolean createNewIds,
+            final int initialInsertPos) {
 
         // Collect IDs from dropped elements and remap them to new IDs
         // if this is a copy or from a different canvas.
-        final Map<String, Pair<String, String>> idMap = getDropIdMap(targetNode, elements,
-                createNewIds);
+        final Map<String, Pair<String, String>> idMap = getDropIdMap(targetNode, elements, createNewIds);
 
         targetNode.editXml("Insert Elements", new INodeHandler() {
 
@@ -616,41 +570,35 @@ public class BaseLayoutRule extends BaseViewRule {
     }
 
     @Override
-    public DropFeedback onResizeBegin(@NonNull INode child, @NonNull INode parent,
-            @Nullable SegmentType horizontalEdge, @Nullable SegmentType verticalEdge,
-            @Nullable Object childView, @Nullable Object parentView) {
+    public DropFeedback onResizeBegin(@NonNull INode child, @NonNull INode parent, @Nullable SegmentType horizontalEdge,
+            @Nullable SegmentType verticalEdge, @Nullable Object childView, @Nullable Object parentView) {
         ResizeState state = createResizeState(parent, parentView, child);
         state.horizontalEdgeType = horizontalEdge;
         state.verticalEdgeType = verticalEdge;
 
         // Compute preferred (wrap_content) size such that we can offer guidelines to
         // snap to the preferred size
-        Map<INode, Rect> sizes = mRulesEngine.measureChildren(parent,
-                new IClientRulesEngine.AttributeFilter() {
-                    @Override
-                    public String getAttribute(@NonNull INode node, @Nullable String namespace,
-                            @NonNull String localName) {
-                        // Change attributes to wrap_content
-                        if (ATTR_LAYOUT_WIDTH.equals(localName)
-                                && SdkConstants.NS_RESOURCES.equals(namespace)) {
-                            return VALUE_WRAP_CONTENT;
-                        }
-                        if (ATTR_LAYOUT_HEIGHT.equals(localName)
-                                && SdkConstants.NS_RESOURCES.equals(namespace)) {
-                            return VALUE_WRAP_CONTENT;
-                        }
+        Map<INode, Rect> sizes = mRulesEngine.measureChildren(parent, new IClientRulesEngine.AttributeFilter() {
+            @Override
+            public String getAttribute(@NonNull INode node, @Nullable String namespace, @NonNull String localName) {
+                // Change attributes to wrap_content
+                if (ATTR_LAYOUT_WIDTH.equals(localName) && SdkConstants.NS_RESOURCES.equals(namespace)) {
+                    return VALUE_WRAP_CONTENT;
+                }
+                if (ATTR_LAYOUT_HEIGHT.equals(localName) && SdkConstants.NS_RESOURCES.equals(namespace)) {
+                    return VALUE_WRAP_CONTENT;
+                }
 
-                        return null;
-                    }
-                });
+                return null;
+            }
+        });
         if (sizes != null) {
             state.wrapBounds = sizes.get(child);
         }
 
         return new DropFeedback(state, new IFeedbackPainter() {
             @Override
-            public void paint(@NonNull IGraphics gc, @NonNull INode node,
-                    @NonNull DropFeedback feedback) {
+            public void paint(@NonNull IGraphics gc, @NonNull INode node, @NonNull DropFeedback feedback) {
                 ResizeState resizeState = (ResizeState) feedback.userData;
                 if (resizeState != null && resizeState.bounds != null) {
                     paintResizeFeedback(gc, node, resizeState);
@@ -693,7 +641,8 @@ public class BaseLayoutRule extends BaseViewRule {
                     case BOTTOM:
                         y = b.y + wrapHeight;
                         break;
-                    default: assert false : resizeState.horizontalEdgeType;
+                    default:
+                        assert false : resizeState.horizontalEdgeType;
                 }
                 if (resizeState.verticalEdgeType != null) {
                     switch (resizeState.verticalEdgeType) {
@@ -703,7 +652,8 @@ public class BaseLayoutRule extends BaseViewRule {
                         case RIGHT:
                             gc.drawLine(b.x, y, b.x + wrapWidth, y);
                             break;
-                        default: assert false : resizeState.verticalEdgeType;
+                        default:
+                            assert false : resizeState.verticalEdgeType;
                     }
                 } else {
                     gc.drawLine(b.x, y, b.x + b.w, y);
@@ -718,7 +668,8 @@ public class BaseLayoutRule extends BaseViewRule {
                     case RIGHT:
                         x = b.x + wrapWidth;
                         break;
-                    default: assert false : resizeState.verticalEdgeType;
+                    default:
+                        assert false : resizeState.verticalEdgeType;
                 }
                 if (resizeState.horizontalEdgeType != null) {
                     switch (resizeState.horizontalEdgeType) {
@@ -728,7 +679,8 @@ public class BaseLayoutRule extends BaseViewRule {
                         case BOTTOM:
                             gc.drawLine(x, b.y, x, b.y + wrapHeight);
                             break;
-                        default: assert false : resizeState.horizontalEdgeType;
+                        default:
+                            assert false : resizeState.horizontalEdgeType;
                     }
                 } else {
                     gc.drawLine(x, b.y, x, b.y + b.h);
@@ -749,8 +701,8 @@ public class BaseLayoutRule extends BaseViewRule {
     }
 
     @Override
-    public void onResizeUpdate(@Nullable DropFeedback feedback, @NonNull INode child,
-            @NonNull INode parent, @NonNull Rect newBounds, int modifierMask) {
+    public void onResizeUpdate(@Nullable DropFeedback feedback, @NonNull INode child, @NonNull INode parent,
+            @NonNull Rect newBounds, int modifierMask) {
         ResizeState state = (ResizeState) feedback.userData;
         state.bounds = newBounds;
         state.modifierMask = modifierMask;
@@ -785,9 +737,8 @@ public class BaseLayoutRule extends BaseViewRule {
         state.fillHeight = false;
         if (state.horizontalEdgeType == SegmentType.BOTTOM && !state.wrapHeight) {
             Rect parentBounds = parent.getBounds();
-            state.horizontalFillSegment = new Segment(parentBounds.y2(), newBounds.x,
-                newBounds.x2(),
-                null /*node*/, null /*id*/, SegmentType.BOTTOM, MarginType.NO_MARGIN);
+            state.horizontalFillSegment = new Segment(parentBounds.y2(), newBounds.x, newBounds.x2(), null /*node*/,
+                    null /*id*/, SegmentType.BOTTOM, MarginType.NO_MARGIN);
             if (Math.abs(newBounds.y2() - parentBounds.y2()) < getMaxMatchDistance()) {
                 state.fillHeight = true;
                 newBounds.h = parentBounds.y2() - newBounds.y;
@@ -797,30 +748,29 @@ public class BaseLayoutRule extends BaseViewRule {
         state.fillWidth = false;
         if (state.verticalEdgeType == SegmentType.RIGHT && !state.wrapWidth) {
             Rect parentBounds = parent.getBounds();
-            state.verticalFillSegment = new Segment(parentBounds.x2(), newBounds.y,
-                newBounds.y2(),
-                null /*node*/, null /*id*/, SegmentType.RIGHT, MarginType.NO_MARGIN);
+            state.verticalFillSegment = new Segment(parentBounds.x2(), newBounds.y, newBounds.y2(), null /*node*/,
+                    null /*id*/, SegmentType.RIGHT, MarginType.NO_MARGIN);
             if (Math.abs(newBounds.x2() - parentBounds.x2()) < getMaxMatchDistance()) {
                 state.fillWidth = true;
                 newBounds.w = parentBounds.x2() - newBounds.x;
             }
         }
 
-        feedback.tooltip = getResizeUpdateMessage(state, child, parent,
-                newBounds, state.horizontalEdgeType, state.verticalEdgeType);
+        feedback.tooltip = getResizeUpdateMessage(state, child, parent, newBounds, state.horizontalEdgeType,
+                state.verticalEdgeType);
     }
 
     @Override
-    public void onResizeEnd(@Nullable DropFeedback feedback, @NonNull INode child,
-            final @NonNull INode parent, final @NonNull Rect newBounds) {
+    public void onResizeEnd(@Nullable DropFeedback feedback, @NonNull INode child, final @NonNull INode parent,
+            final @NonNull Rect newBounds) {
         final Rect oldBounds = child.getBounds();
         if (oldBounds.w != newBounds.w || oldBounds.h != newBounds.h) {
             final ResizeState state = (ResizeState) feedback.userData;
             child.editXml("Resize", new INodeHandler() {
                 @Override
                 public void handle(@NonNull INode n) {
-                    setNewSizeBounds(state, n, parent, oldBounds, newBounds,
-                            state.horizontalEdgeType, state.verticalEdgeType);
+                    setNewSizeBounds(state, n, parent, oldBounds, newBounds, state.horizontalEdgeType,
+                            state.verticalEdgeType);
                 }
             });
         }
@@ -837,8 +787,8 @@ public class BaseLayoutRule extends BaseViewRule {
      * @param verticalEdge the vertical edge being resized
      * @return the message to display for the current resize bounds
      */
-    protected String getResizeUpdateMessage(ResizeState resizeState, INode child, INode parent,
-            Rect newBounds, SegmentType horizontalEdge, SegmentType verticalEdge) {
+    protected String getResizeUpdateMessage(ResizeState resizeState, INode child, INode parent, Rect newBounds,
+            SegmentType horizontalEdge, SegmentType verticalEdge) {
         String width = resizeState.getWidthAttribute();
         String height = resizeState.getHeightAttribute();
 
@@ -864,14 +814,13 @@ public class BaseLayoutRule extends BaseViewRule {
      * @param horizontalEdge the horizontal edge being resized
      * @param verticalEdge the vertical edge being resized
      */
-    protected void setNewSizeBounds(ResizeState resizeState, INode node, INode layout,
-            Rect oldBounds, Rect newBounds, SegmentType horizontalEdge, SegmentType verticalEdge) {
-        if (verticalEdge != null
-            && (newBounds.w != oldBounds.w || resizeState.wrapWidth || resizeState.fillWidth)) {
+    protected void setNewSizeBounds(ResizeState resizeState, INode node, INode layout, Rect oldBounds, Rect newBounds,
+            SegmentType horizontalEdge, SegmentType verticalEdge) {
+        if (verticalEdge != null && (newBounds.w != oldBounds.w || resizeState.wrapWidth || resizeState.fillWidth)) {
             node.setAttribute(ANDROID_URI, ATTR_LAYOUT_WIDTH, resizeState.getWidthAttribute());
         }
         if (horizontalEdge != null
-            && (newBounds.h != oldBounds.h || resizeState.wrapHeight || resizeState.fillHeight)) {
+                && (newBounds.h != oldBounds.h || resizeState.wrapHeight || resizeState.fillHeight)) {
             node.setAttribute(ANDROID_URI, ATTR_LAYOUT_HEIGHT, resizeState.getHeightAttribute());
         }
     }

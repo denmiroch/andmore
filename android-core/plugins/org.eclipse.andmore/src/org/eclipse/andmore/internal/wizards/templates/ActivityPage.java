@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,8 +18,10 @@ import static org.eclipse.andmore.internal.wizards.templates.NewProjectWizard.IS
 import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.PREVIEW_PADDING;
 import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.PREVIEW_WIDTH;
 
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.gle2.ImageControl;
@@ -43,10 +42,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 class ActivityPage extends WizardPage implements SelectionListener {
     private final NewProjectWizardState mValues;
@@ -80,8 +77,7 @@ class ActivityPage extends WizardPage implements SelectionListener {
             setTitle("Create Android Object");
         }
         if (onlyActivities && askCreate) {
-            setDescription(
-                    "Select whether to create an activity, and if so, what kind of activity.");
+            setDescription("Select whether to create an activity, and if so, what kind of activity.");
         } else {
             setDescription("Select which template to use");
         }
@@ -113,7 +109,6 @@ class ActivityPage extends WizardPage implements SelectionListener {
 
         mList = new List(container, SWT.BORDER | SWT.V_SCROLL);
         mList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-
 
         TemplateManager manager = mValues.template.getManager();
         java.util.List<File> templates = manager.getTemplates(CATEGORY_ACTIVITIES);
@@ -259,26 +254,22 @@ class ActivityPage extends WizardPage implements SelectionListener {
         validatePage();
     }
 
-
     private void validatePage() {
         IStatus status = null;
 
         if (mValues.createActivity) {
             if (mList.getSelectionCount() < 1) {
-                status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                        "Select an activity type");
+                status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, "Select an activity type");
             } else {
                 TemplateHandler templateHandler = mValues.activityValues.getTemplateHandler();
-                status = templateHandler.validateTemplate(mValues.minSdkLevel,
-                        mValues.getBuildApi());
+                status = templateHandler.validateTemplate(mValues.minSdkLevel, mValues.getBuildApi());
             }
         }
 
         setPageComplete(status == null || status.getSeverity() != IStatus.ERROR);
         if (status != null) {
             setMessage(status.getMessage(),
-                    status.getSeverity() == IStatus.ERROR
-                        ? IMessageProvider.ERROR : IMessageProvider.WARNING);
+                    status.getSeverity() == IStatus.ERROR ? IMessageProvider.ERROR : IMessageProvider.WARNING);
         } else {
             setErrorMessage(null);
             setMessage(null);
@@ -321,6 +312,5 @@ class ActivityPage extends WizardPage implements SelectionListener {
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 }

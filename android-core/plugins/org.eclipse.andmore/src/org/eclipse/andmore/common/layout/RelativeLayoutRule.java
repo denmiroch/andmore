@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,6 +35,19 @@ import static com.android.SdkConstants.ATTR_LAYOUT_TO_LEFT_OF;
 import static com.android.SdkConstants.ATTR_LAYOUT_TO_RIGHT_OF;
 import static com.android.SdkConstants.VALUE_TRUE;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.andmore.common.layout.relative.ConstraintPainter;
+import org.eclipse.andmore.common.layout.relative.DeletionHandler;
+import org.eclipse.andmore.common.layout.relative.GuidelinePainter;
+import org.eclipse.andmore.common.layout.relative.MoveHandler;
+import org.eclipse.andmore.common.layout.relative.ResizeHandler;
+
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.ide.common.api.DropFeedback;
@@ -54,19 +64,6 @@ import com.android.ide.common.api.RuleAction;
 import com.android.ide.common.api.SegmentType;
 import com.android.utils.Pair;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import org.eclipse.andmore.common.layout.relative.ConstraintPainter;
-import org.eclipse.andmore.common.layout.relative.DeletionHandler;
-import org.eclipse.andmore.common.layout.relative.GuidelinePainter;
-import org.eclipse.andmore.common.layout.relative.MoveHandler;
-import org.eclipse.andmore.common.layout.relative.ResizeHandler;
-
 /**
  * An {@link IViewRule} for android.widget.RelativeLayout and all its derived
  * classes.
@@ -76,14 +73,10 @@ public class RelativeLayoutRule extends BaseLayoutRule {
     private static final String ACTION_SHOW_CONSTRAINTS = "_constraints"; //$NON-NLS-1$
     private static final String ACTION_CENTER_VERTICAL = "_centerVert"; //$NON-NLS-1$
     private static final String ACTION_CENTER_HORIZONTAL = "_centerHoriz"; //$NON-NLS-1$
-    private static final URL ICON_CENTER_VERTICALLY =
-        RelativeLayoutRule.class.getResource("centerVertically.png"); //$NON-NLS-1$
-    private static final URL ICON_CENTER_HORIZONTALLY =
-        RelativeLayoutRule.class.getResource("centerHorizontally.png"); //$NON-NLS-1$
-    private static final URL ICON_SHOW_STRUCTURE =
-        BaseLayoutRule.class.getResource("structure.png"); //$NON-NLS-1$
-    private static final URL ICON_SHOW_CONSTRAINTS =
-        BaseLayoutRule.class.getResource("constraints.png"); //$NON-NLS-1$
+    private static final URL ICON_CENTER_VERTICALLY = RelativeLayoutRule.class.getResource("centerVertically.png"); //$NON-NLS-1$
+    private static final URL ICON_CENTER_HORIZONTALLY = RelativeLayoutRule.class.getResource("centerHorizontally.png"); //$NON-NLS-1$
+    private static final URL ICON_SHOW_STRUCTURE = BaseLayoutRule.class.getResource("structure.png"); //$NON-NLS-1$
+    private static final URL ICON_SHOW_CONSTRAINTS = BaseLayoutRule.class.getResource("constraints.png"); //$NON-NLS-1$
 
     public static boolean sShowStructure = false;
     public static boolean sShowConstraints = true;
@@ -150,8 +143,7 @@ public class RelativeLayoutRule extends BaseLayoutRule {
     @Override
     public DropFeedback onDropEnter(@NonNull INode targetNode, @Nullable Object targetView,
             @Nullable IDragElement[] elements) {
-        return new DropFeedback(new MoveHandler(targetNode, elements, mRulesEngine),
-                new GuidelinePainter());
+        return new DropFeedback(new MoveHandler(targetNode, elements, mRulesEngine), new GuidelinePainter());
     }
 
     @Override
@@ -174,8 +166,7 @@ public class RelativeLayoutRule extends BaseLayoutRule {
 
     @Override
     public void onDropLeave(@NonNull INode targetNode, @NonNull IDragElement[] elements,
-            @Nullable DropFeedback feedback) {
-    }
+            @Nullable DropFeedback feedback) {}
 
     @Override
     public void onDropped(final @NonNull INode targetNode, final @NonNull IDragElement[] elements,
@@ -239,8 +230,7 @@ public class RelativeLayoutRule extends BaseLayoutRule {
     }
 
     @Override
-    public void onChildInserted(@NonNull INode node, @NonNull INode parent,
-            @NonNull InsertType insertType) {
+    public void onChildInserted(@NonNull INode node, @NonNull INode parent, @NonNull InsertType insertType) {
         // TODO: Handle more generically some way to ensure that widgets with no
         // intrinsic size get some minimum size until they are attached on multiple
         // opposing sides.
@@ -251,13 +241,11 @@ public class RelativeLayoutRule extends BaseLayoutRule {
     }
 
     @Override
-    public void onRemovingChildren(@NonNull List<INode> deleted, @NonNull INode parent,
-            boolean moved) {
+    public void onRemovingChildren(@NonNull List<INode> deleted, @NonNull INode parent, boolean moved) {
         super.onRemovingChildren(deleted, parent, moved);
 
         if (!moved) {
-            DeletionHandler handler = new DeletionHandler(deleted, Collections.<INode>emptyList(),
-                    parent);
+            DeletionHandler handler = new DeletionHandler(deleted, Collections.<INode> emptyList(), parent);
             handler.updateConstraints();
         }
     }
@@ -268,15 +256,13 @@ public class RelativeLayoutRule extends BaseLayoutRule {
     public DropFeedback onResizeBegin(@NonNull INode child, @NonNull INode parent,
             @Nullable SegmentType horizontalEdgeType, @Nullable SegmentType verticalEdgeType,
             @Nullable Object childView, @Nullable Object parentView) {
-        ResizeHandler state = new ResizeHandler(parent, child, mRulesEngine,
-                horizontalEdgeType, verticalEdgeType);
+        ResizeHandler state = new ResizeHandler(parent, child, mRulesEngine, horizontalEdgeType, verticalEdgeType);
         return new DropFeedback(state, new GuidelinePainter());
     }
 
     @Override
-    public void onResizeUpdate(@Nullable DropFeedback feedback, @NonNull INode child,
-            @NonNull INode parent, @NonNull Rect newBounds,
-            int modifierMask) {
+    public void onResizeUpdate(@Nullable DropFeedback feedback, @NonNull INode child, @NonNull INode parent,
+            @NonNull Rect newBounds, int modifierMask) {
         if (feedback == null) {
             return;
         }
@@ -286,8 +272,8 @@ public class RelativeLayoutRule extends BaseLayoutRule {
     }
 
     @Override
-    public void onResizeEnd(@Nullable DropFeedback feedback, @NonNull INode child,
-            @NonNull INode parent, final @NonNull Rect newBounds) {
+    public void onResizeEnd(@Nullable DropFeedback feedback, @NonNull INode child, @NonNull INode parent,
+            final @NonNull Rect newBounds) {
         if (feedback == null) {
             return;
         }
@@ -305,25 +291,20 @@ public class RelativeLayoutRule extends BaseLayoutRule {
     // ==== Layout Actions Bar ====
 
     @Override
-    public void addLayoutActions(
-            @NonNull List<RuleAction> actions,
-            final @NonNull INode parentNode,
+    public void addLayoutActions(@NonNull List<RuleAction> actions, final @NonNull INode parentNode,
             final @NonNull List<? extends INode> children) {
         super.addLayoutActions(actions, parentNode, children);
 
-        actions.add(createGravityAction(Collections.<INode>singletonList(parentNode),
-                ATTR_GRAVITY));
+        actions.add(createGravityAction(Collections.<INode> singletonList(parentNode), ATTR_GRAVITY));
         actions.add(RuleAction.createSeparator(25));
         actions.add(createMarginAction(parentNode, children));
 
         IMenuCallback callback = new IMenuCallback() {
             @Override
-            public void action(@NonNull RuleAction action,
-                    @NonNull List<? extends INode> selectedNodes,
-                    final @Nullable String valueId,
-                    final @Nullable Boolean newValue) {
+            public void action(@NonNull RuleAction action, @NonNull List<? extends INode> selectedNodes,
+                    final @Nullable String valueId, final @Nullable Boolean newValue) {
                 final String id = action.getId();
-                if (id.equals(ACTION_CENTER_VERTICAL)|| id.equals(ACTION_CENTER_HORIZONTAL)) {
+                if (id.equals(ACTION_CENTER_VERTICAL) || id.equals(ACTION_CENTER_HORIZONTAL)) {
                     parentNode.editXml("Center", new INodeHandler() {
                         @Override
                         public void handle(@NonNull INode n) {
@@ -353,18 +334,18 @@ public class RelativeLayoutRule extends BaseLayoutRule {
 
         // Centering actions
         if (children != null && children.size() > 0) {
-                        actions.add(RuleAction.createSeparator(150));
-            actions.add(RuleAction.createAction(ACTION_CENTER_VERTICAL, "Center Vertically",
-                    callback, ICON_CENTER_VERTICALLY, 160, false));
-            actions.add(RuleAction.createAction(ACTION_CENTER_HORIZONTAL, "Center Horizontally",
-                    callback, ICON_CENTER_HORIZONTALLY, 170, false));
+            actions.add(RuleAction.createSeparator(150));
+            actions.add(RuleAction.createAction(ACTION_CENTER_VERTICAL, "Center Vertically", callback,
+                    ICON_CENTER_VERTICALLY, 160, false));
+            actions.add(RuleAction.createAction(ACTION_CENTER_HORIZONTAL, "Center Horizontally", callback,
+                    ICON_CENTER_HORIZONTALLY, 170, false));
         }
 
         actions.add(RuleAction.createSeparator(80));
-        actions.add(RuleAction.createToggle(ACTION_SHOW_CONSTRAINTS, "Show Constraints",
-                sShowConstraints, callback, ICON_SHOW_CONSTRAINTS, 180, false));
-        actions.add(RuleAction.createToggle(ACTION_SHOW_STRUCTURE, "Show All Relationships",
-                sShowStructure, callback, ICON_SHOW_STRUCTURE, 190, false));
+        actions.add(RuleAction.createToggle(ACTION_SHOW_CONSTRAINTS, "Show Constraints", sShowConstraints, callback,
+                ICON_SHOW_CONSTRAINTS, 180, false));
+        actions.add(RuleAction.createToggle(ACTION_SHOW_STRUCTURE, "Show All Relationships", sShowStructure, callback,
+                ICON_SHOW_STRUCTURE, 190, false));
     }
 
     private void centerHorizontally(INode node) {
@@ -380,8 +361,7 @@ public class RelativeLayoutRule extends BaseLayoutRule {
 
         if (VALUE_TRUE.equals(node.getStringAttr(ANDROID_URI, ATTR_LAYOUT_CENTER_IN_PARENT))) {
             // Already done
-        } else if (VALUE_TRUE.equals(node.getStringAttr(ANDROID_URI,
-                ATTR_LAYOUT_CENTER_VERTICAL))) {
+        } else if (VALUE_TRUE.equals(node.getStringAttr(ANDROID_URI, ATTR_LAYOUT_CENTER_VERTICAL))) {
             node.setAttribute(ANDROID_URI, ATTR_LAYOUT_CENTER_VERTICAL, null);
             node.setAttribute(ANDROID_URI, ATTR_LAYOUT_CENTER_IN_PARENT, VALUE_TRUE);
         } else {
@@ -403,8 +383,7 @@ public class RelativeLayoutRule extends BaseLayoutRule {
         // Center vertically
         if (VALUE_TRUE.equals(node.getStringAttr(ANDROID_URI, ATTR_LAYOUT_CENTER_IN_PARENT))) {
             // ALready done
-        } else if (VALUE_TRUE.equals(node.getStringAttr(ANDROID_URI,
-                ATTR_LAYOUT_CENTER_HORIZONTAL))) {
+        } else if (VALUE_TRUE.equals(node.getStringAttr(ANDROID_URI, ATTR_LAYOUT_CENTER_HORIZONTAL))) {
             node.setAttribute(ANDROID_URI, ATTR_LAYOUT_CENTER_HORIZONTAL, null);
             node.setAttribute(ANDROID_URI, ATTR_LAYOUT_CENTER_IN_PARENT, VALUE_TRUE);
         } else {

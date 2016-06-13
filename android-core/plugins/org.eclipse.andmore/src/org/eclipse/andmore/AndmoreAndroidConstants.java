@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.eclipse.org/org/documents/epl-v10.php
+ * http://www.eclipse.org/org/documents/epl-v10.php
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -75,12 +75,10 @@ public class AndmoreAndroidConstants {
     public final static String ADT_NATURE = "com.android.ide.eclipse.adt.AndroidNature"; //$NON-NLS-1$
 
     /** The container id for the android framework jar file */
-    public final static String CONTAINER_FRAMEWORK =
-            "org.eclipse.andmore.ANDROID_FRAMEWORK"; //$NON-NLS-1$
+    public final static String CONTAINER_FRAMEWORK = "org.eclipse.andmore.ANDROID_FRAMEWORK"; //$NON-NLS-1$
 
     /** The container id for the android framework jar file */
-    public final static String ADT_CONTAINER_FRAMEWORK =
-            "com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"; //$NON-NLS-1$
+    public final static String ADT_CONTAINER_FRAMEWORK = "com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"; //$NON-NLS-1$
 
     /** The container id for the libraries */
     public final static String CONTAINER_PRIVATE_LIBRARIES = "org.eclipse.andmore.LIBRARIES"; //$NON-NLS-1$
@@ -90,7 +88,6 @@ public class AndmoreAndroidConstants {
     public final static String CONTAINER_DEPENDENCIES = "org.eclipse.andmore.DEPENDENCIES";
 
     public final static String ADT_CONTAINER_DEPENDENCIES = "com.android.ide.eclipse.adt.DEPENDENCIES";
-
 
     /** Separator for workspace path, i.e. "/". */
     public final static String WS_SEP = "/"; //$NON-NLS-1$
@@ -103,13 +100,11 @@ public class AndmoreAndroidConstants {
     /** Temporary packaged resources file name, i.e. "resources.ap_" */
     public final static String FN_RESOURCES_AP_ = "resources.ap_"; //$NON-NLS-1$
 
-    public final static String FN_TRACEVIEW =
-            (SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_WINDOWS) ?
-                    "traceview.bat" : "traceview"; //$NON-NLS-1$ //$NON-NLS-2$
+    public final static String FN_TRACEVIEW = (SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_WINDOWS)
+            ? "traceview.bat" : "traceview"; //$NON-NLS-1$ //$NON-NLS-2$
 
-    public final static String FN_HPROF_CONV =
-            (SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_WINDOWS) ?
-                    "hprof-conv.exe" : "hprof-conv"; //$NON-NLS-1$ //$NON-NLS-2$
+    public final static String FN_HPROF_CONV = (SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_WINDOWS)
+            ? "hprof-conv.exe" : "hprof-conv"; //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Absolute path of the workspace root, i.e. "/" */
     public final static String WS_ROOT = WS_SEP;
@@ -117,16 +112,14 @@ public class AndmoreAndroidConstants {
     /** Absolute path of the resource folder, e.g. "/res".<br> This is a workspace path. */
     public final static String WS_RESOURCES = WS_SEP + SdkConstants.FD_RESOURCES;
 
-    public final static String FD_CRUNCH = "crunch";  //$NON-NLS-1$
-    public final static String FD_BC = "bc";  //$NON-NLS-1$
+    public final static String FD_CRUNCH = "crunch"; //$NON-NLS-1$
+    public final static String FD_BC = "bc"; //$NON-NLS-1$
 
     /** Path of crunch cache folder relative to the output folder.<br> This is a workspace path. */
-    public final static String WS_BIN_RELATIVE_CRUNCHCACHE = SdkConstants.FD_RESOURCES
-            + WS_SEP + FD_CRUNCH;
+    public final static String WS_BIN_RELATIVE_CRUNCHCACHE = SdkConstants.FD_RESOURCES + WS_SEP + FD_CRUNCH;
 
     /** Path of bc output folder relative to the output folder.<br> This is a workspace path. */
-    public final static String WS_BIN_RELATIVE_BC = SdkConstants.FD_RESOURCES
-            + WS_SEP + FD_BC;
+    public final static String WS_BIN_RELATIVE_BC = SdkConstants.FD_RESOURCES + WS_SEP + FD_BC;
 
     /** Path of rs libs output folder relative to the output folder.<br> This is a workspace path. */
     public final static String WS_BIN_RELATIVE_RS_LIBS = SdkConstants.FD_RS_LIBS;
@@ -195,7 +188,6 @@ public class AndmoreAndroidConstants {
      * LibraryClasspathContainer */
     public final static String MARKER_DEPENDENCY = AndmoreAndroidPlugin.PLUGIN_ID + ".dependencyProblem"; //$NON-NLS-1$
 
-
     /** aapt marker error when running the compile command, only to be used
      * in {@link PreCompilerBuilder} */
     public final static String MARKER_AAPT_COMPILE = LEGACY_PLUGIN_ID + ".aaptProblem"; //$NON-NLS-1$
@@ -212,7 +204,6 @@ public class AndmoreAndroidConstants {
     /** android marker error, only to be used in the Manifest parsing
      * from the {@link PreCompilerBuilder} */
     public final static String MARKER_ANDROID = LEGACY_PLUGIN_ID + ".androidProblem"; //$NON-NLS-1$
-
 
     /** aapt marker error when running the package command, only to be used in
      * {@link PostCompilerBuilder} */
@@ -248,15 +239,11 @@ public class AndmoreAndroidConstants {
     /**
      * List of valid compiler level
      */
-    public final static String[] COMPILER_COMPLIANCE = {
-            JavaCore.VERSION_1_5,
-            JavaCore.VERSION_1_6,
-            JavaCore.VERSION_1_7,
-            JavaCore.VERSION_1_8
-    };
+    public final static String[] COMPILER_COMPLIANCE = { JavaCore.VERSION_1_5, JavaCore.VERSION_1_6,
+            JavaCore.VERSION_1_7, JavaCore.VERSION_1_8 };
 
     /** The base URL where to find the Android class & manifest documentation */
-    public static final String CODESITE_BASE_URL = "http://developer.android.com/reference/packages.html";  //$NON-NLS-1$
+    public static final String CODESITE_BASE_URL = "http://developer.android.com/reference/packages.html"; //$NON-NLS-1$
 
     public static final String LIBRARY_TEST_RUNNER = "android.test.runner"; //$NON-NLS-1$
 

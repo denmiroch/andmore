@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +11,9 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.welcome;
+
+import java.io.File;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AndmoreAndroidPlugin.CheckSdkErrorHandler;
@@ -31,9 +31,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-
-import java.io.File;
-import java.util.concurrent.atomic.AtomicReference;
 
 /** Main page shown in the {@link WelcomeWizard} */
 public class WelcomeWizardPage extends WizardPage implements ModifyListener, SelectionListener {
@@ -71,7 +68,8 @@ public class WelcomeWizardPage extends WizardPage implements ModifyListener, Sel
         GridData gdOverviewLabel = new GridData(SWT.FILL, SWT.CENTER, false, false, 4, 1);
         gdOverviewLabel.widthHint = 580;
         overviewLabel.setLayoutData(gdOverviewLabel);
-        overviewLabel.setText("To develop for Android, you need an Android SDK, and at least one version of the Android APIs to compile against. You may also want additional versions of Android to test with.");
+        overviewLabel.setText(
+                "To develop for Android, you need an Android SDK, and at least one version of the Android APIs to compile against. You may also want additional versions of Android to test with.");
 
         Label spacing = new Label(container, SWT.NONE);
         spacing.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
@@ -89,15 +87,14 @@ public class WelcomeWizardPage extends WizardPage implements ModifyListener, Sel
 
         mInstallLatestCheckbox = new Button(container, SWT.CHECK);
         mInstallLatestCheckbox.setSelection(true);
-        mInstallLatestCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3,
-                1));
-        mInstallLatestCheckbox.setText("Install the latest available version of Android APIs (supports all the latest features)");
+        mInstallLatestCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        mInstallLatestCheckbox
+                .setText("Install the latest available version of Android APIs (supports all the latest features)");
         mInstallLatestCheckbox.addSelectionListener(this);
 
         new Label(container, SWT.NONE);
         mInstallCommonCheckbox = new Button(container, SWT.CHECK);
-        mInstallCommonCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3,
-                1));
+        mInstallCommonCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         mInstallCommonCheckbox.setText("Install Android 2.2, a version which is supported by ~96% phones and tablets");
         mInstallCommonCheckbox.addSelectionListener(this);
 
@@ -202,8 +199,7 @@ public class WelcomeWizardPage extends WizardPage implements ModifyListener, Sel
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 
     @Override
     public void modifyText(ModifyEvent e) {
@@ -244,8 +240,7 @@ public class WelcomeWizardPage extends WizardPage implements ModifyListener, Sel
                 }
             }
 
-            if (error == null && !mInstallLatestCheckbox.getSelection()
-                    && !mInstallCommonCheckbox.getSelection()) {
+            if (error == null && !mInstallLatestCheckbox.getSelection() && !mInstallCommonCheckbox.getSelection()) {
                 error = "You must choose at least one Android version to install";
             }
         } else {
@@ -262,24 +257,20 @@ public class WelcomeWizardPage extends WizardPage implements ModifyListener, Sel
                     final AtomicReference<String> warningReference = new AtomicReference<String>();
                     AndmoreAndroidPlugin.getDefault().checkSdkLocationAndId(path,
                             new AndmoreAndroidPlugin.CheckSdkErrorHandler() {
-                        @Override
-                        public boolean handleError(
-                                CheckSdkErrorHandler.Solution solution,
-                                String message) {
-                            message = message.replaceAll("\n", " "); //$NON-NLS-1$ //$NON-NLS-2$
-                            errorReference.set(message);
-                            return false;  // Apply/OK must be disabled
-                        }
+                                @Override
+                                public boolean handleError(CheckSdkErrorHandler.Solution solution, String message) {
+                                    message = message.replaceAll("\n", " "); //$NON-NLS-1$ //$NON-NLS-2$
+                                    errorReference.set(message);
+                                    return false; // Apply/OK must be disabled
+                                }
 
-                        @Override
-                        public boolean handleWarning(
-                                CheckSdkErrorHandler.Solution solution,
-                                String message) {
-                            message = message.replaceAll("\n", " "); //$NON-NLS-1$ //$NON-NLS-2$
-                            warningReference.set(message);
-                            return true;  // Apply/OK must be enabled
-                        }
-                    });
+                                @Override
+                                public boolean handleWarning(CheckSdkErrorHandler.Solution solution, String message) {
+                                    message = message.replaceAll("\n", " "); //$NON-NLS-1$ //$NON-NLS-2$
+                                    warningReference.set(message);
+                                    return true; // Apply/OK must be enabled
+                                }
+                            });
                     error = errorReference.get();
                     if (warning == null) {
                         warning = warningReference.get();

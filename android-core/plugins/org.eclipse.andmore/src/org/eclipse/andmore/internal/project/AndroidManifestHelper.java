@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,11 +13,10 @@
 
 package org.eclipse.andmore.internal.project;
 
-import com.android.ide.common.xml.AndroidManifestParser;
-import com.android.ide.common.xml.ManifestData;
-import com.android.io.FileWrapper;
-import com.android.io.IAbstractFile;
-import com.android.io.StreamException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.project.XmlErrorHandler.XmlErrorListener;
@@ -30,10 +26,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaProject;
 import org.xml.sax.SAXException;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
+import com.android.ide.common.xml.AndroidManifestParser;
+import com.android.ide.common.xml.ManifestData;
+import com.android.io.FileWrapper;
+import com.android.io.IAbstractFile;
+import com.android.io.StreamException;
 
 public class AndroidManifestHelper {
 
@@ -57,15 +54,13 @@ public class AndroidManifestHelper {
      * @throws IOException
      * @throws SAXException
      */
-    public static ManifestData parseUnchecked(
-            IAbstractFile manifestFile,
-            boolean gatherData,
-            XmlErrorListener errorListener) throws SAXException, IOException,
-            StreamException, ParserConfigurationException {
+    public static ManifestData parseUnchecked(IAbstractFile manifestFile, boolean gatherData,
+            XmlErrorListener errorListener)
+            throws SAXException, IOException, StreamException, ParserConfigurationException {
         if (manifestFile != null) {
             IFile eclipseFile = null;
             if (manifestFile instanceof IFileWrapper) {
-                eclipseFile = ((IFileWrapper)manifestFile).getIFile();
+                eclipseFile = ((IFileWrapper) manifestFile).getIFile();
             }
             XmlErrorHandler errorHandler = null;
             if (errorListener != null) {
@@ -94,35 +89,24 @@ public class AndroidManifestHelper {
      * look for XML errors.
      * @return an {@link ManifestData} or null if the parsing failed.
      */
-    public static ManifestData parse(
-            IAbstractFile manifestFile,
-            boolean gatherData,
-            XmlErrorListener errorListener) {
+    public static ManifestData parse(IAbstractFile manifestFile, boolean gatherData, XmlErrorListener errorListener) {
         try {
             return parseUnchecked(manifestFile, gatherData, errorListener);
         } catch (ParserConfigurationException e) {
             AndmoreAndroidPlugin.logAndPrintError(e, AndroidManifestHelper.class.getCanonicalName(),
-                    "Bad parser configuration for %s: %s",
-                    manifestFile.getOsLocation(),
-                    e.getMessage());
+                    "Bad parser configuration for %s: %s", manifestFile.getOsLocation(), e.getMessage());
         } catch (SAXException e) {
             AndmoreAndroidPlugin.logAndPrintError(e, AndroidManifestHelper.class.getCanonicalName(),
-                    "Parser exception for %s: %s",
-                    manifestFile.getOsLocation(),
-                    e.getMessage());
+                    "Parser exception for %s: %s", manifestFile.getOsLocation(), e.getMessage());
         } catch (IOException e) {
             // Don't log a console error when failing to read a non-existing file
             if (!(e instanceof FileNotFoundException)) {
                 AndmoreAndroidPlugin.logAndPrintError(e, AndroidManifestHelper.class.getCanonicalName(),
-                        "I/O error for %s: %s",
-                        manifestFile.getOsLocation(),
-                        e.getMessage());
+                        "I/O error for %s: %s", manifestFile.getOsLocation(), e.getMessage());
             }
         } catch (StreamException e) {
             AndmoreAndroidPlugin.logAndPrintError(e, AndroidManifestHelper.class.getCanonicalName(),
-                    "Unable to read %s: %s",
-                    manifestFile.getOsLocation(),
-                    e.getMessage());
+                    "Unable to read %s: %s", manifestFile.getOsLocation(), e.getMessage());
         }
 
         return null;
@@ -145,10 +129,7 @@ public class AndroidManifestHelper {
      * look for XML errors.
      * @return an {@link ManifestData} or null if the parsing failed.
      */
-    public static ManifestData parse(
-            IJavaProject javaProject,
-            boolean gatherData,
-            XmlErrorListener errorListener) {
+    public static ManifestData parse(IJavaProject javaProject, boolean gatherData, XmlErrorListener errorListener) {
 
         IFile manifestFile = ProjectHelper.getManifest(javaProject.getProject());
         if (manifestFile != null) {

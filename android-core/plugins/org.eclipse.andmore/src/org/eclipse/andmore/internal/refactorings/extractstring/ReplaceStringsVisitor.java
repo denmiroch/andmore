@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,10 @@
  */
 
 package org.eclipse.andmore.internal.refactorings.extractstring;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -41,10 +42,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.text.edits.TextEditGroup;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
-
 /**
  * Visitor used by {@link ExtractStringRefactoring} to extract a string from an existing
  * Java source and replace it by an Android XML string reference.
@@ -53,10 +50,9 @@ import java.util.TreeMap;
  */
 class ReplaceStringsVisitor extends ASTVisitor {
 
-    private static final String CLASS_ANDROID_CONTEXT    = "android.content.Context"; //$NON-NLS-1$
-    private static final String CLASS_JAVA_CHAR_SEQUENCE = "java.lang.CharSequence";  //$NON-NLS-1$
-    private static final String CLASS_JAVA_STRING        = "java.lang.String";        //$NON-NLS-1$
-
+    private static final String CLASS_ANDROID_CONTEXT = "android.content.Context"; //$NON-NLS-1$
+    private static final String CLASS_JAVA_CHAR_SEQUENCE = "java.lang.CharSequence"; //$NON-NLS-1$
+    private static final String CLASS_JAVA_STRING = "java.lang.String"; //$NON-NLS-1$
 
     private final AST mAst;
     private final ASTRewrite mRewriter;
@@ -65,12 +61,8 @@ class ReplaceStringsVisitor extends ASTVisitor {
     private final String mXmlId;
     private final ArrayList<TextEditGroup> mEditGroups;
 
-    public ReplaceStringsVisitor(AST ast,
-            ASTRewrite astRewrite,
-            ArrayList<TextEditGroup> editGroups,
-            String oldString,
-            String rQualifier,
-            String xmlId) {
+    public ReplaceStringsVisitor(AST ast, ASTRewrite astRewrite, ArrayList<TextEditGroup> editGroups, String oldString,
+            String rQualifier, String xmlId) {
         mAst = ast;
         mRewriter = astRewrite;
         mEditGroups = editGroups;
@@ -88,11 +80,10 @@ class ReplaceStringsVisitor extends ASTVisitor {
             // just replace the string literal by the named int constant (R.id.foo)
             // or if we should generate a Context.getString() call.
             boolean useGetResource = false;
-            useGetResource = examineVariableDeclaration(node) ||
-                                examineMethodInvocation(node) ||
-                                examineAssignment(node);
+            useGetResource = examineVariableDeclaration(node) || examineMethodInvocation(node)
+                    || examineAssignment(node);
 
-            Name qualifierName = mAst.newName(mRQualifier + ".string");     //$NON-NLS-1$
+            Name qualifierName = mAst.newName(mRQualifier + ".string"); //$NON-NLS-1$
             SimpleName idName = mAst.newSimpleName(mXmlId);
             ASTNode newNode = mAst.newQualifiedName(qualifierName, idName);
             boolean disabledChange = false;
@@ -110,13 +101,13 @@ class ReplaceStringsVisitor extends ASTVisitor {
                         // If not, let's  write Context.getString(), which is technically
                         // invalid but makes it a good clue on how to fix it. Since these
                         // will not compile, we create a disabled change by default.
-                        context = mAst.newSimpleName("Context");            //$NON-NLS-1$
+                        context = mAst.newSimpleName("Context"); //$NON-NLS-1$
                         disabledChange = true;
                     }
                 }
 
                 MethodInvocation mi2 = mAst.newMethodInvocation();
-                mi2.setName(mAst.newSimpleName("getString"));               //$NON-NLS-1$
+                mi2.setName(mAst.newSimpleName("getString")); //$NON-NLS-1$
                 mi2.setExpression(context);
                 mi2.arguments().add(newNode);
 
@@ -143,8 +134,7 @@ class ReplaceStringsVisitor extends ASTVisitor {
      * a string.
      */
     private boolean examineVariableDeclaration(StringLiteral node) {
-        VariableDeclarationFragment fragment = findParentClass(node,
-                VariableDeclarationFragment.class);
+        VariableDeclarationFragment fragment = findParentClass(node, VariableDeclarationFragment.class);
 
         if (fragment != null) {
             ASTNode parent = fragment.getParent();
@@ -217,7 +207,7 @@ class ReplaceStringsVisitor extends ASTVisitor {
             // Walk up the hierarchy again to find the immediate child of the parent,
             // which should turn out to be one of the invocation arguments.
             ASTNode child = null;
-            for (ASTNode n = node; n != parent; ) {
+            for (ASTNode n = node; n != parent;) {
                 ASTNode p = n.getParent();
                 if (p == parent) {
                     child = n;
@@ -260,7 +250,8 @@ class ReplaceStringsVisitor extends ASTVisitor {
             if (useStringType) {
                 String name = methodBinding.getName();
                 ITypeBinding clazz = methodBinding.getDeclaringClass();
-                nextMethod: for (IMethodBinding mb2 : clazz.getDeclaredMethods()) {
+                nextMethod:
+                for (IMethodBinding mb2 : clazz.getDeclaredMethods()) {
                     if (methodBinding == mb2 || !mb2.getName().equals(name)) {
                         continue;
                     }
@@ -272,7 +263,7 @@ class ReplaceStringsVisitor extends ASTVisitor {
                         for (int i = 0; i < len2; i++) {
                             if (i == index) {
                                 ITypeBinding type2 = types2[i];
-                                if (!("int".equals(type2.getQualifiedName()))) {   //$NON-NLS-1$
+                                if (!("int".equals(type2.getQualifiedName()))) { //$NON-NLS-1$
                                     // The argument at 'index' is not an int.
                                     continue nextMethod;
                                 }
@@ -367,9 +358,7 @@ class ReplaceStringsVisitor extends ASTVisitor {
      * @param superType The recursion index.
      *                  0 for the immediate class, 1 for its super class, etc.
      */
-    private void findContextCandidates(TreeMap<Integer, Expression> results,
-            ITypeBinding clazzType,
-            int superType) {
+    private void findContextCandidates(TreeMap<Integer, Expression> results, ITypeBinding clazzType, int superType) {
         for (IMethodBinding mb : clazzType.getDeclaredMethods()) {
             // If we're looking at supertypes, we can't use private methods.
             if (superType != 0 && Modifier.isPrivate(mb.getModifiers())) {
@@ -470,8 +459,8 @@ class ReplaceStringsVisitor extends ASTVisitor {
      */
     private boolean isJavaString(ITypeBinding type) {
         for (; type != null; type = type.getSuperclass()) {
-            if (CLASS_JAVA_STRING.equals(type.getQualifiedName()) ||
-                CLASS_JAVA_CHAR_SEQUENCE.equals(type.getQualifiedName())) {
+            if (CLASS_JAVA_STRING.equals(type.getQualifiedName())
+                    || CLASS_JAVA_CHAR_SEQUENCE.equals(type.getQualifiedName())) {
                 return true;
             }
         }

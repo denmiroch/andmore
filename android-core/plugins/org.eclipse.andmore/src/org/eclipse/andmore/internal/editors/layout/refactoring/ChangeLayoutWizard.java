@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +21,9 @@ import static com.android.SdkConstants.VIEW_FRAGMENT;
 import static com.android.SdkConstants.VIEW_INCLUDE;
 import static com.android.SdkConstants.VIEW_MERGE;
 
-import com.android.utils.Pair;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.descriptors.ViewElementDescriptor;
@@ -40,9 +39,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.android.utils.Pair;
 
 class ChangeLayoutWizard extends VisualRefactoringWizard {
 
@@ -67,7 +64,7 @@ class ChangeLayoutWizard extends VisualRefactoringWizard {
         private List<Pair<String, ViewElementDescriptor>> mClassNames;
 
         public InputPage(IProject project, String oldType) {
-            super("ChangeLayoutInputPage");  //$NON-NLS-1$
+            super("ChangeLayoutInputPage"); //$NON-NLS-1$
             mProject = project;
             mOldType = oldType;
         }
@@ -102,8 +99,7 @@ class ChangeLayoutWizard extends VisualRefactoringWizard {
             mTypeCombo.addSelectionListener(mSelectionValidateListener);
 
             mFlatten = new Button(composite, SWT.CHECK);
-            mFlatten.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER,
-                    false, false, 2, 1));
+            mFlatten.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
             mFlatten.setText("Flatten hierarchy");
             mFlatten.addSelectionListener(selectionListener);
             // Should flattening be selected by default?
@@ -150,8 +146,8 @@ class ChangeLayoutWizard extends VisualRefactoringWizard {
                     }
                 }
             }
-            mFlatten.setVisible(mTypeCombo.getText().equals(RELATIVE_LAYOUT)
-                    || mTypeCombo.getText().equals(GRID_LAYOUT));
+            mFlatten.setVisible(
+                    mTypeCombo.getText().equals(RELATIVE_LAYOUT) || mTypeCombo.getText().equals(GRID_LAYOUT));
 
             setControl(composite);
             validatePage();
@@ -170,15 +166,13 @@ class ChangeLayoutWizard extends VisualRefactoringWizard {
                 setErrorMessage(null);
 
                 // Record state
-                ChangeLayoutRefactoring refactoring =
-                    (ChangeLayoutRefactoring) getRefactoring();
+                ChangeLayoutRefactoring refactoring = (ChangeLayoutRefactoring) getRefactoring();
                 refactoring.setType(type);
                 refactoring.setFlatten(mFlatten.getSelection());
 
                 ViewElementDescriptor descriptor = mClassNames.get(selectionIndex).getSecond();
                 if (descriptor instanceof PaletteMetadataDescriptor) {
-                    PaletteMetadataDescriptor paletteDescriptor =
-                        (PaletteMetadataDescriptor) descriptor;
+                    PaletteMetadataDescriptor paletteDescriptor = (PaletteMetadataDescriptor) descriptor;
                     String initializedAttributes = paletteDescriptor.getInitializedAttributes();
                     if (initializedAttributes != null && initializedAttributes.length() > 0) {
                         refactoring.setInitializedAttributes(initializedAttributes);

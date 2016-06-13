@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +13,13 @@
 
 package org.eclipse.andmore.internal.resources.manager;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.resources.IntArrayWrapper;
-import com.android.ide.common.xml.ManifestData;
-import com.android.resources.ResourceType;
-import com.android.util.Pair;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -39,13 +36,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.resources.IntArrayWrapper;
+import com.android.ide.common.xml.ManifestData;
+import com.android.resources.ResourceType;
+import com.android.util.Pair;
 
 /**
  * A monitor for the compiled resources. This only monitors changes in the resources of type
@@ -67,9 +64,7 @@ public final class CompiledResourcesMonitor implements IFileListener, IProjectLi
     /**
      * private constructor to prevent construction.
      */
-    private CompiledResourcesMonitor() {
-    }
-
+    private CompiledResourcesMonitor() {}
 
     /* (non-Javadoc)
      * Sent when a file changed : if the file is the R class, then it is parsed again to update
@@ -83,8 +78,8 @@ public final class CompiledResourcesMonitor implements IFileListener, IProjectLi
      * @see IFileListener#fileChanged
      */
     @Override
-    public void fileChanged(@NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas,
-            int kind, @Nullable String extension, int flags, boolean isAndroidProject) {
+    public void fileChanged(@NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas, int kind,
+            @Nullable String extension, int flags, boolean isAndroidProject) {
         if (!isAndroidProject || flags == IResourceDelta.MARKERS) {
             // Not Android or only the markers changed: not relevant
             return;
@@ -97,8 +92,7 @@ public final class CompiledResourcesMonitor implements IFileListener, IProjectLi
             String className = getRClassName(project);
             if (className == null) {
                 // We need to abort.
-                AndmoreAndroidPlugin.log(IStatus.ERROR,
-                        "fileChanged: failed to find manifest package for project %1$s", //$NON-NLS-1$
+                AndmoreAndroidPlugin.log(IStatus.ERROR, "fileChanged: failed to find manifest package for project %1$s", //$NON-NLS-1$
                         project.getName());
                 return;
             }
@@ -122,9 +116,8 @@ public final class CompiledResourcesMonitor implements IFileListener, IProjectLi
         String pathWithoutExtension = path.substring(0, path.indexOf(SdkConstants.DOT_CLASS));
 
         // then split the components of each path by their separators
-        String [] pathArray = pathWithoutExtension.split(Pattern.quote(File.separator));
-        String [] packageArray = packageName.split(AndmoreAndroidConstants.RE_DOT);
-
+        String[] pathArray = pathWithoutExtension.split(Pattern.quote(File.separator));
+        String[] packageArray = packageName.split(AndmoreAndroidConstants.RE_DOT);
 
         int pathIndex = 0;
         int packageIndex = 0;
@@ -201,36 +194,30 @@ public final class CompiledResourcesMonitor implements IFileListener, IProjectLi
         // nothing to do.
     }
 
-
     private void loadAndParseRClass(IProject project, String className) {
         try {
             // first check there's a ProjectResources to store the content
-            ProjectResources projectResources = ResourceManager.getInstance().getProjectResources(
-                    project);
+            ProjectResources projectResources = ResourceManager.getInstance().getProjectResources(project);
 
             if (projectResources != null) {
                 // create a temporary class loader to load the class
-                ProjectClassLoader loader = new ProjectClassLoader(null /* parentClassLoader */,
-                        project);
+                ProjectClassLoader loader = new ProjectClassLoader(null /* parentClassLoader */, project);
 
                 try {
                     Class<?> clazz = loader.loadClass(className);
 
                     if (clazz != null) {
                         // create the maps to store the result of the parsing
-                        Map<ResourceType, Map<String, Integer>> resourceValueMap =
-                            new EnumMap<ResourceType, Map<String, Integer>>(ResourceType.class);
-                        Map<Integer, Pair<ResourceType, String>> genericValueToNameMap =
-                            new HashMap<Integer, Pair<ResourceType, String>>();
-                        Map<IntArrayWrapper, String> styleableValueToNameMap =
-                            new HashMap<IntArrayWrapper, String>();
+                        Map<ResourceType, Map<String, Integer>> resourceValueMap = new EnumMap<ResourceType, Map<String, Integer>>(
+                                ResourceType.class);
+                        Map<Integer, Pair<ResourceType, String>> genericValueToNameMap = new HashMap<Integer, Pair<ResourceType, String>>();
+                        Map<IntArrayWrapper, String> styleableValueToNameMap = new HashMap<IntArrayWrapper, String>();
 
                         // parse the class
-                        if (parseClass(clazz, genericValueToNameMap, styleableValueToNameMap,
-                                resourceValueMap)) {
+                        if (parseClass(clazz, genericValueToNameMap, styleableValueToNameMap, resourceValueMap)) {
                             // now we associate the maps to the project.
-                            projectResources.setCompiledResources(genericValueToNameMap,
-                                    styleableValueToNameMap, resourceValueMap);
+                            projectResources.setCompiledResources(genericValueToNameMap, styleableValueToNameMap,
+                                    resourceValueMap);
                         }
                     }
                 } catch (Error e) {
@@ -251,10 +238,9 @@ public final class CompiledResourcesMonitor implements IFileListener, IProjectLi
      * @param resourceValueMap
      * @return True if we managed to parse the R class.
      */
-    private boolean parseClass(Class<?> rClass,
-            Map<Integer, Pair<ResourceType, String>> genericValueToNameMap,
-            Map<IntArrayWrapper, String> styleableValueToNameMap, Map<ResourceType,
-            Map<String, Integer>> resourceValueMap) {
+    private boolean parseClass(Class<?> rClass, Map<Integer, Pair<ResourceType, String>> genericValueToNameMap,
+            Map<IntArrayWrapper, String> styleableValueToNameMap,
+            Map<ResourceType, Map<String, Integer>> resourceValueMap) {
         try {
             for (Class<?> inner : rClass.getDeclaredClasses()) {
                 String resTypeName = inner.getSimpleName();
@@ -271,9 +257,7 @@ public final class CompiledResourcesMonitor implements IFileListener, IProjectLi
                             Class<?> type = f.getType();
                             if (type.isArray() && type.getComponentType() == int.class) {
                                 // if the object is an int[] we put it in the styleable map
-                                styleableValueToNameMap.put(
-                                        new IntArrayWrapper((int[]) f.get(null)),
-                                        f.getName());
+                                styleableValueToNameMap.put(new IntArrayWrapper((int[]) f.get(null)), f.getName());
                             } else if (type == int.class) {
                                 Integer value = (Integer) f.get(null);
                                 genericValueToNameMap.put(value, Pair.of(resType, f.getName()));
@@ -287,9 +271,7 @@ public final class CompiledResourcesMonitor implements IFileListener, IProjectLi
             }
 
             return true;
-        } catch (IllegalArgumentException e) {
-        } catch (IllegalAccessException e) {
-        }
+        } catch (IllegalArgumentException e) {} catch (IllegalAccessException e) {}
         return false;
     }
 

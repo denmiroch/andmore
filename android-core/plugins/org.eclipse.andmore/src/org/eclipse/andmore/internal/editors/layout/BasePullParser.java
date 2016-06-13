@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +13,12 @@
 
 package org.eclipse.andmore.internal.editors.layout;
 
-import com.android.ide.common.rendering.legacy.ILegacyPullParser;
+import java.io.InputStream;
+import java.io.Reader;
 
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.InputStream;
-import java.io.Reader;
+import com.android.ide.common.rendering.legacy.ILegacyPullParser;
 
 /**
  * Base implementation of an {@link ILegacyPullParser} for cases where the parser is not sitting
@@ -33,13 +30,14 @@ public abstract class BasePullParser implements ILegacyPullParser {
 
     protected int mParsingState = START_DOCUMENT;
 
-    public BasePullParser() {
-    }
+    public BasePullParser() {}
 
     // --- new methods to override ---
 
     public abstract void onNextFromStartDocument();
+
     public abstract void onNextFromStartTag();
+
     public abstract void onNextFromEndTag();
 
     // --- basic implementation of IXmlPullParser ---
@@ -82,14 +80,12 @@ public abstract class BasePullParser implements ILegacyPullParser {
     }
 
     @Override
-    public void setInput(InputStream inputStream, String inputEncoding)
-            throws XmlPullParserException {
+    public void setInput(InputStream inputStream, String inputEncoding) throws XmlPullParserException {
         throw new XmlPullParserException("setInput() not supported");
     }
 
     @Override
-    public void defineEntityReplacementText(String entityName, String replacementText)
-            throws XmlPullParserException {
+    public void defineEntityReplacementText(String entityName, String replacementText) throws XmlPullParserException {
         throw new XmlPullParserException("defineEntityReplacementText() not supported");
     }
 
@@ -210,23 +206,20 @@ public abstract class BasePullParser implements ILegacyPullParser {
     @Override
     public String nextText() throws XmlPullParserException {
         if (getEventType() != START_TAG) {
-            throw new XmlPullParserException("parser must be on START_TAG to read next text", this,
-                    null);
+            throw new XmlPullParserException("parser must be on START_TAG to read next text", this, null);
         }
         int eventType = next();
         if (eventType == TEXT) {
             String result = getText();
             eventType = next();
             if (eventType != END_TAG) {
-                throw new XmlPullParserException(
-                        "event TEXT it must be immediately followed by END_TAG", this, null);
+                throw new XmlPullParserException("event TEXT it must be immediately followed by END_TAG", this, null);
             }
             return result;
         } else if (eventType == END_TAG) {
             return "";
         } else {
-            throw new XmlPullParserException("parser must be on START_TAG or TEXT to read text",
-                    this, null);
+            throw new XmlPullParserException("parser must be on START_TAG or TEXT to read text", this, null);
         }
     }
 
@@ -238,7 +231,8 @@ public abstract class BasePullParser implements ILegacyPullParser {
     @Override
     public void require(int type, String namespace, String name) throws XmlPullParserException {
         if (type != getEventType() || (namespace != null && !namespace.equals(getNamespace()))
-                || (name != null && !name.equals(getName())))
+                || (name != null && !name.equals(getName()))) {
             throw new XmlPullParserException("expected " + TYPES[type] + getPositionDescription());
+        }
     }
 }

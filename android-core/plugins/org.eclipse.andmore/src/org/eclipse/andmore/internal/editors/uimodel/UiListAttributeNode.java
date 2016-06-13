@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.editors.uimodel;
-
-import com.android.SdkConstants;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -41,6 +36,8 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 
+import com.android.SdkConstants;
+
 /**
  * Represents an XML attribute which has possible built-in values, and can be modified by
  * an editable Combo box.
@@ -51,8 +48,7 @@ public class UiListAttributeNode extends UiAbstractTextAttributeNode {
 
     protected Combo mCombo;
 
-    public UiListAttributeNode(ListAttributeDescriptor attributeDescriptor,
-            UiElementNode uiParent) {
+    public UiListAttributeNode(ListAttributeDescriptor attributeDescriptor, UiElementNode uiParent) {
         super(attributeDescriptor, uiParent);
     }
 
@@ -113,8 +109,7 @@ public class UiListAttributeNode extends UiAbstractTextAttributeNode {
         String[] values = getPossibleValues(null);
 
         if (values == null) {
-            AndmoreAndroidPlugin.log(IStatus.ERROR,
-                    "FrameworkResourceManager did not provide values yet for %1$s",
+            AndmoreAndroidPlugin.log(IStatus.ERROR, "FrameworkResourceManager did not provide values yet for %1$s",
                     getDescriptor().getXmlLocalName());
         } else {
             for (String value : values) {
@@ -148,8 +143,8 @@ public class UiListAttributeNode extends UiAbstractTextAttributeNode {
 
         String[] values = null;
 
-        if (descriptor instanceof ListAttributeDescriptor &&
-                ((ListAttributeDescriptor) descriptor).getValues() != null) {
+        if (descriptor instanceof ListAttributeDescriptor
+                && ((ListAttributeDescriptor) descriptor).getValues() != null) {
             // Get enum values from the descriptor
             values = ((ListAttributeDescriptor) descriptor).getValues();
         }
@@ -169,8 +164,7 @@ public class UiListAttributeNode extends UiAbstractTextAttributeNode {
                 if (grandParentNode != null) {
                     UiElementNode greatGrandParentNode = grandParentNode.getUiParent();
                     if (greatGrandParentNode != null) {
-                        greatGrandParentNodeName =
-                            greatGrandParentNode.getDescriptor().getXmlName();
+                        greatGrandParentNodeName = greatGrandParentNode.getDescriptor().getXmlName();
                     }
                 }
 
@@ -209,11 +203,8 @@ public class UiListAttributeNode extends UiAbstractTextAttributeNode {
      * The container SectionPart will collect these flag and manage them.
      */
     private void onComboChange() {
-        if (!isInInternalTextModification() &&
-                !isDirty() &&
-                mCombo != null &&
-                getCurrentValue() != null &&
-                !mCombo.getText().equals(getCurrentValue())) {
+        if (!isInInternalTextModification() && !isDirty() && mCombo != null && getCurrentValue() != null
+                && !mCombo.getText().equals(getCurrentValue())) {
             setDirty(true);
         }
     }

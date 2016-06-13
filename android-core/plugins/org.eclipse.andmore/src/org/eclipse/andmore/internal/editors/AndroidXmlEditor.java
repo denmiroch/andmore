@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,12 +15,13 @@ package org.eclipse.andmore.internal.editors;
 
 import static org.eclipse.wst.sse.ui.internal.actions.StructuredTextEditorActionConstants.ACTION_NAME_FORMAT_DOCUMENT;
 
-import com.android.annotations.Nullable;
-import com.android.sdklib.IAndroidTarget;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collections;
 
+import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
 import org.eclipse.andmore.internal.lint.EclipseLintRunner;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
@@ -92,9 +90,8 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collections;
+import com.android.annotations.Nullable;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * Multi-page form editor for Android XML files.
@@ -273,7 +270,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
     public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
         Object result = super.getAdapter(adapter);
 
-        if (result != null && adapter.equals(IGotoMarker.class) ) {
+        if (result != null && adapter.equals(IGotoMarker.class)) {
             final IGotoMarker gotoMarker = (IGotoMarker) result;
             return new IGotoMarker() {
                 @Override
@@ -376,16 +373,13 @@ public abstract class AndroidXmlEditor extends FormEditor {
 
             bars.setGlobalActionHandler(ActionFactory.DELETE.getId(),
                     mTextEditor.getAction(ActionFactory.DELETE.getId()));
-            bars.setGlobalActionHandler(ActionFactory.CUT.getId(),
-                    mTextEditor.getAction(ActionFactory.CUT.getId()));
-            bars.setGlobalActionHandler(ActionFactory.COPY.getId(),
-                    mTextEditor.getAction(ActionFactory.COPY.getId()));
+            bars.setGlobalActionHandler(ActionFactory.CUT.getId(), mTextEditor.getAction(ActionFactory.CUT.getId()));
+            bars.setGlobalActionHandler(ActionFactory.COPY.getId(), mTextEditor.getAction(ActionFactory.COPY.getId()));
             bars.setGlobalActionHandler(ActionFactory.PASTE.getId(),
                     mTextEditor.getAction(ActionFactory.PASTE.getId()));
             bars.setGlobalActionHandler(ActionFactory.SELECT_ALL.getId(),
                     mTextEditor.getAction(ActionFactory.SELECT_ALL.getId()));
-            bars.setGlobalActionHandler(ActionFactory.FIND.getId(),
-                    mTextEditor.getAction(ActionFactory.FIND.getId()));
+            bars.setGlobalActionHandler(ActionFactory.FIND.getId(), mTextEditor.getAction(ActionFactory.FIND.getId()));
             bars.setGlobalActionHandler(IDEActionFactory.BOOKMARK.getId(),
                     mTextEditor.getAction(IDEActionFactory.BOOKMARK.getId()));
 
@@ -461,11 +455,11 @@ public abstract class AndroidXmlEditor extends FormEditor {
     }
 
     /** The layout editor */
-    public static final int CATEGORY_LAYOUT   = 1 << 0;
+    public static final int CATEGORY_LAYOUT = 1 << 0;
     /** The manifest editor */
     public static final int CATEGORY_MANIFEST = 1 << 1;
     /** Any other XML editor */
-    public static final int CATEGORY_OTHER    = 1 << 2;
+    public static final int CATEGORY_OTHER = 1 << 2;
 
     /**
      * Returns the persistence category to use for this editor; this should be
@@ -497,7 +491,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
      */
     protected void removePages() {
         int count = getPageCount();
-        for (int i = count - 1 ; i >= 0 ; i--) {
+        for (int i = count - 1; i >= 0; i--) {
             removePage(i);
         }
     }
@@ -655,8 +649,8 @@ public abstract class AndroidXmlEditor extends FormEditor {
     public Job startLintJob() {
         IFile file = getInputFile();
         if (file != null) {
-            return EclipseLintRunner.startLint(Collections.singletonList(file), file,
-                    getStructuredDocument(), false /*fatalOnly*/, false /*show*/);
+            return EclipseLintRunner.startLint(Collections.singletonList(file), file, getStructuredDocument(),
+                    false /*fatalOnly*/, false /*show*/);
         }
 
         return null;
@@ -730,7 +724,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
 
     /**
      * Returns the page index of the text editor (always the last page)
-
+    
      * @return the page index of the text editor (always the last page)
      */
     public int getTextPageIndex() {
@@ -738,7 +732,6 @@ public abstract class AndroidXmlEditor extends FormEditor {
     }
 
     // ---- Local methods ----
-
 
     /**
      * Helper method that creates a new hyper-link Listener.
@@ -764,10 +757,10 @@ public abstract class AndroidXmlEditor extends FormEditor {
             public void linkActivated(HyperlinkEvent e) {
                 super.linkActivated(e);
                 String link = e.data.toString();
-                if (link.startsWith("http") ||          //$NON-NLS-1$
-                        link.startsWith("file:/")) {    //$NON-NLS-1$
+                if (link.startsWith("http") || //$NON-NLS-1$
+                link.startsWith("file:/")) { //$NON-NLS-1$
                     openLinkInBrowser(link);
-                } else if (link.startsWith("page:")) {  //$NON-NLS-1$
+                } else if (link.startsWith("page:")) { //$NON-NLS-1$
                     // Switch to an internal page
                     setActivePage(link.substring(5 /* strlen("page:") */));
                 }
@@ -818,8 +811,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
             int index = addPage(mTextEditor, getEditorInput());
             mTextPageIndex = index;
             setPageText(index, mTextEditor.getTitle());
-            setPageImage(index,
-                    IconFactory.getInstance().getIcon(ICON_XML_PAGE));
+            setPageImage(index, IconFactory.getInstance().getIcon(ICON_XML_PAGE));
 
             if (!(mTextEditor.getTextViewer().getDocument() instanceof IStructuredDocument)) {
                 Status status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
@@ -840,8 +832,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
                 }
             }
         } catch (PartInitException e) {
-            ErrorDialog.openError(getSite().getShell(),
-                    "Android XML Editor Error", null, e.getStatus());
+            ErrorDialog.openError(getSite().getShell(), "Android XML Editor Error", null, e.getStatus());
         }
     }
 
@@ -1041,7 +1032,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
                 } catch (Throwable t) {
                     // This is never supposed to happen unless we suddenly don't have a model.
                     // If it does, we don't want to even try to modify anyway.
-                    AndmoreAndroidPlugin.log(t, "XML Editor failed to get model to edit");  //$NON-NLS-1$
+                    AndmoreAndroidPlugin.log(t, "XML Editor failed to get model to edit"); //$NON-NLS-1$
                     return;
                 }
             }
@@ -1070,8 +1061,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
                                         end = begin + 1;
                                     }
 
-                                    if (mFormatChildren
-                                         && node == node.getOwnerDocument().getDocumentElement()) {
+                                    if (mFormatChildren && node == node.getOwnerDocument().getDocumentElement()) {
                                         reformatDocument();
                                     } else {
                                         reformatRegion(begin, end);
@@ -1282,7 +1272,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
      */
     public boolean show(Node xmlNode) {
         if (xmlNode instanceof IndexedRegion) {
-            IndexedRegion region = (IndexedRegion)xmlNode;
+            IndexedRegion region = (IndexedRegion) xmlNode;
 
             IEditorPart textPage = getEditor(mTextPageIndex);
             if (textPage instanceof StructuredTextEditor) {
@@ -1347,7 +1337,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
             if (xmlNode instanceof NodeContainer) {
                 // The easy way to get the source of an SSE XML node.
                 data = ((NodeContainer) xmlNode).getSource();
-            } else  if (xmlNode instanceof IndexedRegion && document != null) {
+            } else if (xmlNode instanceof IndexedRegion && document != null) {
                 // Try harder.
                 IndexedRegion region = (IndexedRegion) xmlNode;
                 int start = region.getStartOffset();
@@ -1523,7 +1513,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
      */
     public static String getIndent(IDocument document, Node xmlNode) {
         if (xmlNode instanceof IndexedRegion) {
-            IndexedRegion region = (IndexedRegion)xmlNode;
+            IndexedRegion region = (IndexedRegion) xmlNode;
             int startOffset = region.getStartOffset();
             return getIndentAtOffset(document, startOffset);
         }
@@ -1581,8 +1571,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
             if (page != null) {
                 IEditorPart editor = page.getActiveEditor();
                 if (editor instanceof AndroidXmlEditor) {
-                    ISourceViewer ssviewer =
-                        ((AndroidXmlEditor) editor).getStructuredSourceViewer();
+                    ISourceViewer ssviewer = ((AndroidXmlEditor) editor).getStructuredSourceViewer();
                     if (ssviewer == viewer) {
                         return (AndroidXmlEditor) editor;
                     }
@@ -1595,8 +1584,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
                     for (IEditorReference editorRef : page2.getEditorReferences()) {
                         IEditorPart editor = editorRef.getEditor(false /*restore*/);
                         if (editor instanceof AndroidXmlEditor) {
-                            ISourceViewer ssviewer =
-                                ((AndroidXmlEditor) editor).getStructuredSourceViewer();
+                            ISourceViewer ssviewer = ((AndroidXmlEditor) editor).getStructuredSourceViewer();
                             if (ssviewer == viewer) {
                                 return (AndroidXmlEditor) editor;
                             }
@@ -1617,8 +1605,7 @@ public abstract class AndroidXmlEditor extends FormEditor {
     }
 
     /** Called when this editor is deactivated */
-    public void deactivated() {
-    }
+    public void deactivated() {}
 
     /**
      * Listen to changes in the underlying XML model in the structured editor.

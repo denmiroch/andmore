@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,42 +28,42 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
  * Command to open the Andmore Web Resources in a Web Browser Editor
  */
 public class OpenWebResources extends AbstractHandler {
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
-	 * ExecutionEvent)
-	 */
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		if (!Platform.getOS().equals(Platform.OS_LINUX)) {
-			IWorkbenchWindow activeWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-			if (activeWindow != null) {
-				IWorkbenchPage activePage = activeWindow.getActivePage();
-				AndmorePerspective.openAndmoreInfoOnWebBrowserEditor(activePage);
-			}
-		} else {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
+     * ExecutionEvent)
+     */
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        if (!Platform.getOS().equals(Platform.OS_LINUX)) {
+            IWorkbenchWindow activeWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            if (activeWindow != null) {
+                IWorkbenchPage activePage = activeWindow.getActivePage();
+                AndmorePerspective.openAndmoreInfoOnWebBrowserEditor(activePage);
+            }
+        } else {
 
-			IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
+            IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
 
-			/*
-			 * open the browser
-			 */
-			IWebBrowser browser;
-			try {
-				browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR
-						| IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.AS_EXTERNAL, "Andmore",
-						null, null);
+            /*
+             * open the browser
+             */
+            IWebBrowser browser;
+            try {
+                browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR
+                        | IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.AS_EXTERNAL, "Andmore",
+                        null, null);
 
-				browser.openURL(AndmorePerspective.getWebResourcesURL());
+                browser.openURL(AndmorePerspective.getWebResourcesURL());
 
-			} catch (PartInitException e) {
-				AndmoreLogger.error("Error opening the Web Resources page: " + e.getMessage());
-			}
+            } catch (PartInitException e) {
+                AndmoreLogger.error("Error opening the Web Resources page: " + e.getMessage());
+            }
 
-		}
-		return null;
-	}
+        }
+        return null;
+    }
 
 }

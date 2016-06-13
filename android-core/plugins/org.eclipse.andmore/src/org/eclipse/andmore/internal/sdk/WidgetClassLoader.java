@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,10 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.sdk;
-
-import com.android.SdkConstants;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -31,6 +24,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.management.InvalidAttributeValueException;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import com.android.SdkConstants;
 
 /**
  * Parser for the text file containing the list of widgets, layouts and layout params.
@@ -52,8 +49,7 @@ public final class WidgetClassLoader implements IAndroidClassLoader {
         private String mSimpleName;
         private ClassDescriptor mSuperClass;
         private ClassDescriptor mEnclosingClass;
-        private final ArrayList<IClassDescriptor> mDeclaredClasses =
-                new ArrayList<IClassDescriptor>();
+        private final ArrayList<IClassDescriptor> mDeclaredClasses = new ArrayList<IClassDescriptor>();
         private boolean mIsInstantiable = false;
 
         ClassDescriptor(String fqcn) {
@@ -109,7 +105,7 @@ public final class WidgetClassLoader implements IAndroidClassLoader {
         @Override
         public boolean equals(Object clazz) {
             if (clazz instanceof ClassDescriptor) {
-                return mFqcn.equals(((ClassDescriptor)clazz).mFqcn);
+                return mFqcn.equals(((ClassDescriptor) clazz).mFqcn);
             }
             return super.equals(clazz);
         }
@@ -130,7 +126,7 @@ public final class WidgetClassLoader implements IAndroidClassLoader {
 
         private String getSimpleName(String fqcn) {
             String[] segments = fqcn.split("\\.");
-            return segments[segments.length-1];
+            return segments[segments.length - 1];
         }
     }
 
@@ -143,8 +139,7 @@ public final class WidgetClassLoader implements IAndroidClassLoader {
     /** Output map of FQCN => descriptor on ViewGroup classes */
     private final Map<String, ClassDescriptor> mLayoutMap = new TreeMap<String, ClassDescriptor>();
     /** Output map of FQCN => descriptor on LayoutParams classes */
-    private final Map<String, ClassDescriptor> mLayoutParamsMap =
-        new HashMap<String, ClassDescriptor>();
+    private final Map<String, ClassDescriptor> mLayoutParamsMap = new HashMap<String, ClassDescriptor>();
     /** File path of the source text file */
     private String mOsFilePath;
 
@@ -203,7 +198,7 @@ public final class WidgetClassLoader implements IAndroidClassLoader {
                             // comment, do nothing
                             break;
                         default:
-                                throw new IllegalArgumentException();
+                            throw new IllegalArgumentException();
                     }
                 }
             }
@@ -212,12 +207,10 @@ public final class WidgetClassLoader implements IAndroidClassLoader {
             postProcess();
 
             return true;
-        } catch (IOException e) {
-        } finally {
+        } catch (IOException e) {} finally {
             try {
                 mReader.close();
-            } catch (IOException e) {
-            }
+            } catch (IOException e) {}
         }
 
         return false;
@@ -230,8 +223,7 @@ public final class WidgetClassLoader implements IAndroidClassLoader {
      * @param index the index of the class to process in the <code>classes</code> array.
      * @param map an optional map in which to put every {@link ClassDescriptor} created.
      */
-    private ClassDescriptor processClass(String[] classes, int index,
-            Map<String, ClassDescriptor> map) {
+    private ClassDescriptor processClass(String[] classes, int index, Map<String, ClassDescriptor> map) {
         if (index >= classes.length) {
             return null;
         }
@@ -255,7 +247,7 @@ public final class WidgetClassLoader implements IAndroidClassLoader {
         }
 
         // get the super class
-        ClassDescriptor superClass = processClass(classes, index+1, map);
+        ClassDescriptor superClass = processClass(classes, index + 1, map);
         if (superClass != null) {
             clazz.setSuperClass(superClass);
         }
@@ -310,10 +302,8 @@ public final class WidgetClassLoader implements IAndroidClassLoader {
      */
     @Override
     public HashMap<String, ArrayList<IClassDescriptor>> findClassesDerivingFrom(String rootPackage,
-            String[] superClasses) throws IOException, InvalidAttributeValueException,
-            ClassFormatError {
-        HashMap<String, ArrayList<IClassDescriptor>> map =
-                new HashMap<String, ArrayList<IClassDescriptor>>();
+            String[] superClasses) throws IOException, InvalidAttributeValueException, ClassFormatError {
+        HashMap<String, ArrayList<IClassDescriptor>> map = new HashMap<String, ArrayList<IClassDescriptor>>();
 
         ArrayList<IClassDescriptor> list = new ArrayList<IClassDescriptor>();
         list.addAll(mWidgetMap.values());

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -108,16 +105,15 @@ import com.google.common.base.Strings;
  * The {@linkplain ConfigurationChooser} allows the user to pick a
  * {@link Configuration} by configuring various constraints.
  */
-public class ConfigurationChooser extends Composite
-        implements DevicesChangedListener, DisposeListener {
-    private static final String ICON_SQUARE = "square";           //$NON-NLS-1$
-    private static final String ICON_LANDSCAPE = "landscape";     //$NON-NLS-1$
-    private static final String ICON_PORTRAIT = "portrait";       //$NON-NLS-1$
+public class ConfigurationChooser extends Composite implements DevicesChangedListener, DisposeListener {
+    private static final String ICON_SQUARE = "square"; //$NON-NLS-1$
+    private static final String ICON_LANDSCAPE = "landscape"; //$NON-NLS-1$
+    private static final String ICON_PORTRAIT = "portrait"; //$NON-NLS-1$
     private static final String ICON_LANDSCAPE_FLIP = "flip_landscape";//$NON-NLS-1$
     private static final String ICON_PORTRAIT_FLIP = "flip_portrait";//$NON-NLS-1$
-    private static final String ICON_DISPLAY = "display";         //$NON-NLS-1$
-    private static final String ICON_THEMES = "themes";           //$NON-NLS-1$
-    private static final String ICON_ACTIVITY = "activity";       //$NON-NLS-1$
+    private static final String ICON_DISPLAY = "display"; //$NON-NLS-1$
+    private static final String ICON_THEMES = "themes"; //$NON-NLS-1$
+    private static final String ICON_ACTIVITY = "activity"; //$NON-NLS-1$
 
     /** The configuration state associated with this editor */
     private @NonNull Configuration mConfiguration = Configuration.create(this);
@@ -141,7 +137,7 @@ public class ConfigurationChooser extends Composite
     private final List<String> mThemeList = new ArrayList<String>();
 
     /** List of available locales */
-    private final List<Locale > mLocaleList = new ArrayList<Locale>();
+    private final List<Locale> mLocaleList = new ArrayList<Locale>();
 
     /** The file being edited */
     private IFile mEditedFile;
@@ -187,10 +183,7 @@ public class ConfigurationChooser extends Composite
      * @param initialState The initial state (serialized form) to use for the
      *            configuration
      */
-    public ConfigurationChooser(
-            @NonNull ConfigurationClient client,
-            Composite parent,
-            @Nullable String initialState) {
+    public ConfigurationChooser(@NonNull ConfigurationClient client, Composite parent, @Nullable String initialState) {
         super(parent, SWT.NONE);
         mClient = client;
 
@@ -205,7 +198,7 @@ public class ConfigurationChooser extends Composite
         ToolBar toolBar = new ToolBar(this, SWT.WRAP | SWT.FLAT | SWT.RIGHT | SWT.HORIZONTAL);
         toolBar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-        mConfigCombo = new ToolItem(toolBar, SWT.DROP_DOWN );
+        mConfigCombo = new ToolItem(toolBar, SWT.DROP_DOWN);
         mConfigCombo.setImage(icons.getIcon("android_file")); //$NON-NLS-1$
         mConfigCombo.setToolTipText("Configuration to render this layout with in Eclipse");
 
@@ -275,12 +268,10 @@ public class ConfigurationChooser extends Composite
                 } else if (source == mTargetCombo) {
                     TargetMenuListener.show(ConfigurationChooser.this, mTargetCombo);
                 } else if (source == mThemeCombo) {
-                    ThemeMenuAction.showThemeMenu(ConfigurationChooser.this, mThemeCombo,
-                            mThemeList);
+                    ThemeMenuAction.showThemeMenu(ConfigurationChooser.this, mThemeCombo, mThemeList);
                 } else if (source == mOrientationCombo) {
                     if (e.detail == SWT.ARROW) {
-                        OrientationMenuAction.showMenu(ConfigurationChooser.this,
-                                mOrientationCombo);
+                        OrientationMenuAction.showMenu(ConfigurationChooser.this, mOrientationCombo);
                     } else {
                         gotoNextState();
                     }
@@ -522,8 +513,7 @@ public class ConfigurationChooser extends Composite
             if (sdkStatus == LoadStatus.LOADED) {
                 setVisible(true);
 
-                LoadStatus targetStatus = Sdk.getCurrent().checkAndLoadTargetData(mProjectTarget,
-                        null /*project*/);
+                LoadStatus targetStatus = Sdk.getCurrent().checkAndLoadTargetData(mProjectTarget, null /*project*/);
 
                 if (targetStatus == LoadStatus.LOADED) {
 
@@ -591,8 +581,7 @@ public class ConfigurationChooser extends Composite
         if (resFolder != null) {
             mConfiguration.setEditedConfig(resFolder.getConfiguration());
         } else {
-            FolderConfiguration config = FolderConfiguration.getConfig(
-                    parent.getName().split(RES_QUALIFIER_SEP));
+            FolderConfiguration config = FolderConfiguration.getConfig(parent.getName().split(RES_QUALIFIER_SEP));
             if (config != null) {
                 mConfiguration.setEditedConfig(config);
             } else {
@@ -602,7 +591,6 @@ public class ConfigurationChooser extends Composite
 
         onXmlModelLoaded();
     }
-
 
     /**
      * Sets the current configuration to match the given folder configuration,
@@ -644,8 +632,7 @@ public class ConfigurationChooser extends Composite
                 selectTarget(configuration.getTarget());
                 selectActivity(configuration.getActivity());
                 if (canvas != null && mConfiguration != oldConfiguration) {
-                    canvas.getPreviewManager().updateChooserConfig(mConfiguration,
-                            oldConfiguration);
+                    canvas.getPreviewManager().updateChooserConfig(mConfiguration, oldConfiguration);
                 }
                 return;
             } else {
@@ -751,8 +738,8 @@ public class ConfigurationChooser extends Composite
                         if (resFolder != null) {
                             mConfiguration.setEditedConfig(resFolder.getConfiguration());
                         } else {
-                            FolderConfiguration config = FolderConfiguration.getConfig(
-                                    parent.getName().split(RES_QUALIFIER_SEP));
+                            FolderConfiguration config = FolderConfiguration
+                                    .getConfig(parent.getName().split(RES_QUALIFIER_SEP));
                             if (config != null) {
                                 mConfiguration.setEditedConfig(config);
                             } else {
@@ -765,8 +752,8 @@ public class ConfigurationChooser extends Composite
 
                     // get the file stored state
                     ensureInitialized();
-                    boolean loadedConfigData = mConfiguration.getDevice() != null &&
-                            mConfiguration.getDeviceState() != null;
+                    boolean loadedConfigData = mConfiguration.getDevice() != null
+                            && mConfiguration.getDeviceState() != null;
 
                     // Load locale list. This must be run after we initialize the
                     // configuration above, since it attempts to sync the UI with
@@ -887,7 +874,7 @@ public class ConfigurationChooser extends Composite
         Sdk currentSdk = Sdk.getCurrent();
         if (currentSdk != null) {
             IAndroidTarget[] targets = currentSdk.getTargets();
-            for (int i = 0 ; i < targets.length; i++) {
+            for (int i = 0; i < targets.length; i++) {
                 if (targets[i].hasRenderingLibrary()) {
                     mTargetList.add(targets[i]);
                 }
@@ -968,7 +955,6 @@ public class ConfigurationChooser extends Composite
         parent.redraw();
     }
 
-
     Image getOrientationIcon(ScreenOrientation orientation, boolean flip) {
         IconFactory icons = IconFactory.getInstance();
         switch (orientation) {
@@ -1030,8 +1016,7 @@ public class ConfigurationChooser extends Composite
             mOrientationCombo.setData(state);
 
             State nextState = mConfiguration.getNextDeviceState(state);
-            mOrientationCombo.setImage(getOrientationIcon(getOrientation(state),
-                    nextState != state));
+            mOrientationCombo.setImage(getOrientationIcon(getOrientation(state), nextState != state));
         } finally {
             mDisableUpdates--;
         }
@@ -1094,7 +1079,7 @@ public class ConfigurationChooser extends Composite
         assert isUiThread();
         try {
             mDisableUpdates++;
-            assert theme == null ||  theme.startsWith(STYLE_RESOURCE_PREFIX)
+            assert theme == null || theme.startsWith(STYLE_RESOURCE_PREFIX)
                     || theme.startsWith(ANDROID_STYLE_RESOURCE_PREFIX) : theme;
             mThemeCombo.setData(theme);
             if (theme != null) {
@@ -1147,7 +1132,7 @@ public class ConfigurationChooser extends Composite
             if (current.equals(FD_RES_LAYOUT)) {
                 current = "default";
             }
-
+        
             // Pretty things up a bit
             //if (current == null || current.equals("default")) {
             //    current = "Default Configuration";
@@ -1254,9 +1239,7 @@ public class ConfigurationChooser extends Composite
             }
         }
 
-        String label = String.format("API %1$d: %2$s",
-                version.getApiLevel(),
-                target.getShortClasspathName());
+        String label = String.format("API %1$d: %2$s", version.getApiLevel(), target.getShortClasspathName());
 
         return label;
     }
@@ -1304,9 +1287,7 @@ public class ConfigurationChooser extends Composite
      * @return the label
      */
     @Nullable
-    public static String getLocaleLabel(
-            @Nullable ConfigurationChooser chooser,
-            @Nullable Locale locale,
+    public static String getLocaleLabel(@Nullable ConfigurationChooser chooser, @Nullable Locale locale,
             boolean brief) {
         if (locale == null) {
             return null;
@@ -1319,8 +1300,7 @@ public class ConfigurationChooser extends Composite
             }
 
             boolean hasLocale = false;
-            ResourceRepository projectRes = chooser != null ? chooser.mClient.getProjectResources()
-                    : null;
+            ResourceRepository projectRes = chooser != null ? chooser.mClient.getProjectResources() : null;
             if (projectRes != null) {
                 hasLocale = projectRes.getLanguages().size() > 0;
             }
@@ -1353,11 +1333,10 @@ public class ConfigurationChooser extends Composite
             if (!brief && languageName != null) {
                 String regionName = LocaleManager.getRegionName(regionCode);
                 if (regionName != null) {
-                    return String.format("%1$s (%2$s) in %3$s (%4$s)", languageName, languageCode,
-                            regionName, regionCode);
+                    return String.format("%1$s (%2$s) in %3$s (%4$s)", languageName, languageCode, regionName,
+                            regionCode);
                 }
-                return String.format("%1$s (%2$s) in %3$s", languageName, languageCode,
-                        regionCode);
+                return String.format("%1$s (%2$s) in %3$s", languageName, languageCode, regionCode);
             }
             return String.format("%1$s / %2$s", languageCode, regionCode);
         }
@@ -1433,12 +1412,8 @@ public class ConfigurationChooser extends Composite
      * @param includeSelf whether the updated file itself should be updated
      * @param async whether the updates should be performed asynchronously
      */
-    public void syncToVariations(
-            final int flags,
-            final @NonNull IFile updatedFile,
-            final @NonNull Configuration base,
-            final boolean includeSelf,
-            boolean async) {
+    public void syncToVariations(final int flags, final @NonNull IFile updatedFile, final @NonNull Configuration base,
+            final boolean includeSelf, boolean async) {
         if (async) {
             getDisplay().asyncExec(new Runnable() {
                 @Override
@@ -1451,8 +1426,7 @@ public class ConfigurationChooser extends Composite
         }
     }
 
-    private void doSyncToVariations(int flags, IFile updatedFile, boolean includeSelf,
-            Configuration base) {
+    private void doSyncToVariations(int flags, IFile updatedFile, boolean includeSelf, Configuration base) {
         // Synchronize the given changes to other configurations as well
         List<IFile> files = AdtUtils.getResourceVariations(updatedFile, includeSelf);
         for (IFile file : files) {
@@ -1469,8 +1443,7 @@ public class ConfigurationChooser extends Composite
                     }
                 }
                 if (editor instanceof GraphicalEditorPart) {
-                    ConfigurationChooser chooser =
-                        ((GraphicalEditorPart) editor).getConfigurationChooser();
+                    ConfigurationChooser chooser = ((GraphicalEditorPart) editor).getConfigurationChooser();
                     chooser.setConfiguration(configuration);
                     found = true;
                 }
@@ -1538,7 +1511,6 @@ public class ConfigurationChooser extends Composite
         mConfiguration.saveRenderState();
     }
 
-
     void onThemeChange() {
         if (mDisableUpdates > 0) {
             return;
@@ -1554,8 +1526,7 @@ public class ConfigurationChooser extends Composite
                 selectTheme(prev);
                 return;
             } else {
-                syncToVariations(CFG_DEVICE|CFG_DEVICE_STATE, mEditedFile, mConfiguration,
-                        false, true);
+                syncToVariations(CFG_DEVICE | CFG_DEVICE_STATE, mEditedFile, mConfiguration, false, true);
             }
         }
 
@@ -1751,8 +1722,7 @@ public class ConfigurationChooser extends Composite
             return; // can't do anything without it.
         }
 
-        ResourceRepository frameworkRes = mClient.getFrameworkResources(
-                mConfiguration.getTarget());
+        ResourceRepository frameworkRes = mClient.getFrameworkResources(mConfiguration.getTarget());
 
         mDisableUpdates++;
 
@@ -1773,13 +1743,12 @@ public class ConfigurationChooser extends Composite
             // in cases where the opened file is not linked to a project, this could be null.
             if (projectRes != null) {
                 // get the configured resources for the project
-                Map<ResourceType, Map<String, ResourceValue>> configuredProjectRes =
-                    mClient.getConfiguredProjectResources();
+                Map<ResourceType, Map<String, ResourceValue>> configuredProjectRes = mClient
+                        .getConfiguredProjectResources();
 
                 if (configuredProjectRes != null) {
                     // get the styles.
-                    Map<String, ResourceValue> styleMap = configuredProjectRes.get(
-                            ResourceType.STYLE);
+                    Map<String, ResourceValue> styleMap = configuredProjectRes.get(ResourceType.STYLE);
 
                     if (styleMap != null) {
                         // collect the themes out of all the styles, ie styles that extend,
@@ -1807,8 +1776,8 @@ public class ConfigurationChooser extends Composite
             // get the themes, and languages from the Framework.
             if (frameworkRes != null) {
                 // get the configured resources for the framework
-                Map<ResourceType, Map<String, ResourceValue>> frameworResources =
-                    frameworkRes.getConfiguredResources(mConfiguration.getFullConfig());
+                Map<ResourceType, Map<String, ResourceValue>> frameworResources = frameworkRes
+                        .getConfiguredResources(mConfiguration.getFullConfig());
 
                 if (frameworResources != null) {
                     // get the styles.
@@ -2014,7 +1983,7 @@ public class ConfigurationChooser extends Composite
     private static boolean isTheme(ResourceValue value, Map<String, ResourceValue> styleMap,
             IdentityHashMap<ResourceValue, Boolean> seen) {
         if (value instanceof StyleResourceValue) {
-            StyleResourceValue style = (StyleResourceValue)value;
+            StyleResourceValue style = (StyleResourceValue) value;
 
             boolean frameworkStyle = false;
             String parentStyle = style.getParentStyle();
@@ -2081,8 +2050,7 @@ public class ConfigurationChooser extends Composite
      * @return true if the given config is the best match for the given file
      */
     public boolean isBestMatchFor(IFile file, FolderConfiguration config) {
-        ResourceFile match = mResources.getMatchingFile(mEditedFile.getName(),
-                ResourceType.LAYOUT, config);
+        ResourceFile match = mResources.getMatchingFile(mEditedFile.getName(), ResourceType.LAYOUT, config);
         if (match != null) {
             return match.getFile().equals(mEditedFile);
         }

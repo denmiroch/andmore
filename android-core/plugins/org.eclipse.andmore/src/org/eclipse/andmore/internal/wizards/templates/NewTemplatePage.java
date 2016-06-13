@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,10 +21,12 @@ import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.ATT
 import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.PREVIEW_PADDING;
 import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.PREVIEW_WIDTH;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.tools.lint.detector.api.LintUtils;
-import com.google.common.collect.Lists;
+import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.IconFactory;
@@ -84,19 +83,16 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.ByteArrayInputStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.tools.lint.detector.api.LintUtils;
+import com.google.common.collect.Lists;
 
 /**
  * First wizard page in the "New Project From Template" wizard (which is parameterized
  * via template.xml files)
  */
-public class NewTemplatePage extends WizardPage
-        implements ModifyListener, SelectionListener, FocusListener {
+public class NewTemplatePage extends WizardPage implements ModifyListener, SelectionListener, FocusListener {
     /** The default width to use for the wizard page */
     static final int WIZARD_PAGE_WIDTH = 600;
 
@@ -198,8 +194,7 @@ public class NewTemplatePage extends WizardPage
             projectLabel.setText("Project:");
             projectLabel.setToolTipText(tooltip);
 
-            ProjectChooserHelper helper =
-                    new ProjectChooserHelper(getShell(), null /* filter */);
+            ProjectChooserHelper helper = new ProjectChooserHelper(getShell(), null /* filter */);
             mProjectButton = new ProjectCombo(helper, container, mValues.project);
             mProjectButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
             mProjectButton.setToolTipText(tooltip);
@@ -270,8 +265,7 @@ public class NewTemplatePage extends WizardPage
 
                         // TODO: Handle package and id better later
                         Label label = new Label(container, SWT.NONE);
-                        label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false,
-                                1, 1));
+                        label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
                         label.setText(name);
 
                         Text text = new Text(container, SWT.BORDER);
@@ -279,16 +273,14 @@ public class NewTemplatePage extends WizardPage
                         parameter.control = text;
 
                         if (parameter.constraints.contains(Constraint.EXISTS)) {
-                            text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false,
-                                    1, 1));
+                            text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
                             Button button = new Button(container, SWT.FLAT);
                             button.setData(parameter);
                             button.setText("...");
                             button.addSelectionListener(this);
                         } else {
-                            text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false,
-                                    2, 1));
+                            text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
                         }
 
                         boolean hasValue = false;
@@ -322,15 +314,13 @@ public class NewTemplatePage extends WizardPage
                     }
                     case BOOLEAN: {
                         Label label = new Label(container, SWT.NONE);
-                        label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false,
-                                1, 1));
+                        label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
                         Button checkBox = new Button(container, SWT.CHECK);
                         checkBox.setText(name);
                         checkBox.setData(parameter);
                         parameter.control = checkBox;
-                        checkBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false,
-                                2, 1));
+                        checkBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 
                         if (value instanceof Boolean) {
                             Boolean selected = (Boolean) value;
@@ -347,21 +337,17 @@ public class NewTemplatePage extends WizardPage
 
                         if (help != null && !help.isEmpty()) {
                             checkBox.setToolTipText(help);
-                            ControlDecoration decoration = createFieldDecoration(id, checkBox,
-                                    help);
+                            ControlDecoration decoration = createFieldDecoration(id, checkBox, help);
                         }
                         break;
                     }
                     case ENUM: {
                         Label label = new Label(container, SWT.NONE);
-                        label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false,
-                                1, 1));
+                        label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
                         label.setText(name);
 
-                        Combo combo = createOptionCombo(parameter, container, mValues.parameters,
-                                this, this);
-                        combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false,
-                                2, 1));
+                        Combo combo = createOptionCombo(parameter, container, mValues.parameters, this, this);
+                        combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 
                         if (mFirst == null) {
                             mFirst = combo;
@@ -416,11 +402,8 @@ public class NewTemplatePage extends WizardPage
     }
 
     @NonNull
-    static Combo createOptionCombo(
-            @NonNull Parameter parameter,
-            @NonNull Composite container,
-            @NonNull Map<String, Object> valueMap,
-            @NonNull SelectionListener selectionListener,
+    static Combo createOptionCombo(@NonNull Parameter parameter, @NonNull Composite container,
+            @NonNull Map<String, Object> valueMap, @NonNull SelectionListener selectionListener,
             @NonNull FocusListener focusListener) {
         Combo combo = new Combo(container, SWT.READ_ONLY);
 
@@ -436,13 +419,11 @@ public class NewTemplatePage extends WizardPage
             String optionId = option.getAttribute(ATTR_ID);
             assert optionId != null && !optionId.isEmpty() : ATTR_ID;
             String isDefault = option.getAttribute(ATTR_DEFAULT);
-            if (isDefault != null && !isDefault.isEmpty() &&
-                    Boolean.valueOf(isDefault)) {
+            if (isDefault != null && !isDefault.isEmpty() && Boolean.valueOf(isDefault)) {
                 selected = i;
             }
             NodeList childNodes = option.getChildNodes();
-            assert childNodes.getLength() == 1 &&
-                    childNodes.item(0).getNodeType() == Node.TEXT_NODE;
+            assert childNodes.getLength() == 1 && childNodes.item(0).getNodeType() == Node.TEXT_NODE;
             String optionLabel = childNodes.item(0).getNodeValue().trim();
 
             String minApiString = option.getAttribute(ATTR_MIN_API);
@@ -478,8 +459,7 @@ public class NewTemplatePage extends WizardPage
         parameter.control = combo;
         combo.setData(ATTR_ID, ids.toArray(new String[ids.size()]));
         combo.setData(ATTR_MIN_API, minSdks.toArray(new Integer[minSdks.size()]));
-        combo.setData(ATTR_MIN_BUILD_API, minBuildApis.toArray(
-                new Integer[minBuildApis.size()]));
+        combo.setData(ATTR_MIN_BUILD_API, minBuildApis.toArray(new Integer[minBuildApis.size()]));
         assert labels.size() > 0;
         combo.setItems(labels.toArray(new String[labels.size()]));
         combo.select(selected);
@@ -493,7 +473,7 @@ public class NewTemplatePage extends WizardPage
             combo.setToolTipText(parameter.help);
         }
 
-        return  combo;
+        return combo;
     }
 
     private void setPreview(String thumb) {
@@ -508,8 +488,7 @@ public class NewTemplatePage extends WizardPage
             byte[] data = mValues.getTemplateHandler().readTemplateResource(thumb);
             if (data != null) {
                 try {
-                    mPreviewImage = new Image(getControl().getDisplay(),
-                            new ByteArrayInputStream(data));
+                    mPreviewImage = new Image(getControl().getDisplay(), new ByteArrayInputStream(data));
                     mDisposePreviewImage = true;
                 } catch (Exception e) {
                     AndmoreAndroidPlugin.log(e, null);
@@ -539,12 +518,11 @@ public class NewTemplatePage extends WizardPage
         }
     }
 
-    private ControlDecoration createFieldDecoration(String id, Control control,
-            String description) {
+    private ControlDecoration createFieldDecoration(String id, Control control, String description) {
         ControlDecoration decoration = new ControlDecoration(control, SWT.LEFT);
         decoration.setMarginWidth(2);
-        FieldDecoration errorFieldIndicator = FieldDecorationRegistry.getDefault().
-           getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
+        FieldDecoration errorFieldIndicator = FieldDecorationRegistry.getDefault()
+                .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
         decoration.setImage(errorFieldIndicator.getImage());
         decoration.setDescriptionText(description);
         control.setToolTipText(description);
@@ -603,8 +581,7 @@ public class NewTemplatePage extends WizardPage
 
         if (status == null || status.isOK()) {
             if (mChooseProject && mValues.project == null) {
-                status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                        "Please select an Android project.");
+                status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, "Please select an Android project.");
             }
         }
 
@@ -614,20 +591,20 @@ public class NewTemplatePage extends WizardPage
             }
             IInputValidator validator = parameter.getValidator(mValues.project);
             if (validator != null) {
-               ControlDecoration decoration = mDecorations.get(parameter.id);
-               String value = parameter.value == null ? "" : parameter.value.toString();
-               String error = validator.isValid(value);
-               if (error != null) {
-                   IStatus s = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, error);
-                   if (decoration != null) {
-                       updateDecorator(decoration, s, parameter.help);
-                   }
-                   if (status == null || status.isOK()) {
-                       status = s;
-                   }
-               } else if (decoration != null) {
-                   updateDecorator(decoration, null, parameter.help);
-               }
+                ControlDecoration decoration = mDecorations.get(parameter.id);
+                String value = parameter.value == null ? "" : parameter.value.toString();
+                String error = validator.isValid(value);
+                if (error != null) {
+                    IStatus s = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, error);
+                    if (decoration != null) {
+                        updateDecorator(decoration, s, parameter.help);
+                    }
+                    if (status == null || status.isOK()) {
+                        status = s;
+                    }
+                } else if (decoration != null) {
+                    updateDecorator(decoration, null, parameter.help);
+                }
             }
 
             if (status == null || status.isOK()) {
@@ -640,8 +617,7 @@ public class NewTemplatePage extends WizardPage
         setPageComplete(status == null || status.getSeverity() != IStatus.ERROR);
         if (status != null) {
             setMessage(status.getMessage(),
-                    status.getSeverity() == IStatus.ERROR
-                        ? IMessageProvider.ERROR : IMessageProvider.WARNING);
+                    status.getSeverity() == IStatus.ERROR ? IMessageProvider.ERROR : IMessageProvider.WARNING);
         } else {
             setErrorMessage(null);
             setMessage(null);
@@ -656,8 +632,7 @@ public class NewTemplatePage extends WizardPage
     }
 
     /** Validates the given combo assuming the value at the given index is chosen */
-    static IStatus validateCombo(IStatus status, Parameter parameter, int index,
-            int minSdk, int buildApi) {
+    static IStatus validateCombo(IStatus status, Parameter parameter, int index, int minSdk, int buildApi) {
         Combo combo = (Combo) parameter.control;
         Integer[] optionIds = (Integer[]) combo.getData(ATTR_MIN_API);
         // Check minSdk
@@ -665,10 +640,10 @@ public class NewTemplatePage extends WizardPage
             Integer requiredMinSdk = optionIds[index];
             if (requiredMinSdk > minSdk) {
                 status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    String.format(
-                            "%1$s \"%2$s\" requires a minimum SDK version of at " +
-                            "least %3$d, and the current min version is %4$d",
-                            parameter.name, combo.getItems()[index], requiredMinSdk, minSdk));
+                        String.format(
+                                "%1$s \"%2$s\" requires a minimum SDK version of at "
+                                        + "least %3$d, and the current min version is %4$d",
+                                parameter.name, combo.getItems()[index], requiredMinSdk, minSdk));
             }
         }
 
@@ -678,10 +653,10 @@ public class NewTemplatePage extends WizardPage
             Integer requiredBuildApi = optionIds[index];
             if (requiredBuildApi > buildApi) {
                 status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    String.format(
-                        "%1$s \"%2$s\"  requires a build target API version of at " +
-                        "least %3$d, and the current version is %4$d",
-                        parameter.name, combo.getItems()[index], requiredBuildApi, buildApi));
+                        String.format(
+                                "%1$s \"%2$s\"  requires a build target API version of at "
+                                        + "least %3$d, and the current version is %4$d",
+                                parameter.name, combo.getItems()[index], requiredBuildApi, buildApi));
             }
         }
         return status;
@@ -708,8 +683,7 @@ public class NewTemplatePage extends WizardPage
             } else {
                 id = FieldDecorationRegistry.DEC_INFORMATION;
             }
-            FieldDecoration errorFieldIndicator = FieldDecorationRegistry.getDefault().
-                    getFieldDecoration(id);
+            FieldDecoration errorFieldIndicator = FieldDecorationRegistry.getDefault().getFieldDecoration(id);
             decorator.setImage(errorFieldIndicator.getImage());
         } else {
             if (status == null || status.isOK()) {
@@ -812,10 +786,7 @@ public class NewTemplatePage extends WizardPage
             }
 
             Shell parent = AndmoreAndroidPlugin.getShell();
-            final SelectionDialog dialog = JavaUI.createTypeDialog(
-                    parent,
-                    new ProgressMonitorDialog(parent),
-                    scope,
+            final SelectionDialog dialog = JavaUI.createTypeDialog(parent, new ProgressMonitorDialog(parent), scope,
                     IJavaElementSearchConstants.CONSIDER_CLASSES, false,
                     // Use ? as a default filter to fill dialog with matches
                     "?", //$NON-NLS-1$
@@ -826,8 +797,7 @@ public class NewTemplatePage extends WizardPage
                                 @Override
                                 public boolean select(ITypeInfoRequestor typeInfoRequestor) {
                                     int modifiers = typeInfoRequestor.getModifiers();
-                                    if (!Flags.isPublic(modifiers)
-                                            || Flags.isInterface(modifiers)
+                                    if (!Flags.isPublic(modifiers) || Flags.isInterface(modifiers)
                                             || Flags.isEnum(modifiers)) {
                                         return false;
                                     }
@@ -866,8 +836,7 @@ public class NewTemplatePage extends WizardPage
             // Update dependent variables, if any
             List<Parameter> parameters = mShowingTemplate.getParameters();
             for (Parameter p : parameters) {
-                if (p == parameter || p.suggest == null || p.edited ||
-                        p.type == Parameter.Type.SEPARATOR) {
+                if (p == parameter || p.suggest == null || p.edited || p.type == Parameter.Type.SEPARATOR) {
                     continue;
                 }
                 if (!p.suggest.contains(id)) {
@@ -913,8 +882,7 @@ public class NewTemplatePage extends WizardPage
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 
     // ---- Implements FocusListener ----
 

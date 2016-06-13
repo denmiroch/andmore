@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,12 +36,13 @@ import static com.android.SdkConstants.TAG_RESOURCES;
 import static com.android.SdkConstants.XMLNS_PREFIX;
 import static org.eclipse.andmore.AndmoreAndroidConstants.WS_SEP;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.rendering.api.ResourceValue;
-import com.android.ide.common.resources.ResourceResolver;
-import com.android.ide.common.xml.XmlFormatStyle;
-import com.android.utils.Pair;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -78,13 +76,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import com.android.annotations.NonNull;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.rendering.api.ResourceValue;
+import com.android.ide.common.resources.ResourceResolver;
+import com.android.ide.common.xml.XmlFormatStyle;
+import com.android.utils.Pair;
 
 /**
  * Extracts the selection and writes it out as a separate layout file, then adds an
@@ -105,11 +102,11 @@ import java.util.TreeMap;
  */
 @SuppressWarnings("restriction") // XML model
 public class ExtractStyleRefactoring extends VisualRefactoring {
-    private static final String KEY_NAME = "name";                        //$NON-NLS-1$
+    private static final String KEY_NAME = "name"; //$NON-NLS-1$
     private static final String KEY_REMOVE_EXTRACTED = "removeextracted"; //$NON-NLS-1$
-    private static final String KEY_REMOVE_ALL = "removeall";             //$NON-NLS-1$
-    private static final String KEY_APPLY_STYLE = "applystyle";           //$NON-NLS-1$
-    private static final String KEY_PARENT = "parent";           //$NON-NLS-1$
+    private static final String KEY_REMOVE_ALL = "removeall"; //$NON-NLS-1$
+    private static final String KEY_APPLY_STYLE = "applystyle"; //$NON-NLS-1$
+    private static final String KEY_PARENT = "parent"; //$NON-NLS-1$
     private String mStyleName;
     /** The name of the file in res/values/ that the style will be added to. Normally
      * res/values/styles.xml - but unit tests pick other names */
@@ -144,10 +141,7 @@ public class ExtractStyleRefactoring extends VisualRefactoring {
         }
     }
 
-    public ExtractStyleRefactoring(
-            IFile file,
-            LayoutEditorDelegate delegate,
-            ITextSelection selection,
+    public ExtractStyleRefactoring(IFile file, LayoutEditorDelegate delegate, ITextSelection selection,
             ITreeSelection treeSelection) {
         super(file, delegate, selection, treeSelection);
     }
@@ -158,8 +152,8 @@ public class ExtractStyleRefactoring extends VisualRefactoring {
     }
 
     @Override
-    public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+    public RefactoringStatus checkInitialConditions(IProgressMonitor pm)
+            throws CoreException, OperationCanceledException {
         RefactoringStatus status = new RefactoringStatus();
 
         try {
@@ -187,10 +181,9 @@ public class ExtractStyleRefactoring extends VisualRefactoring {
     @Override
     protected VisualRefactoringDescriptor createDescriptor() {
         String comment = getName();
-        return new Descriptor(
-                mProject.getName(), //project
-                comment,            //description
-                comment,            //comment
+        return new Descriptor(mProject.getName(), //project
+                comment, //description
+                comment, //comment
                 createArgumentMap());
     }
 
@@ -251,9 +244,8 @@ public class ExtractStyleRefactoring extends VisualRefactoring {
         Set<Attr> withinSelection = new HashSet<Attr>();
         for (Element element : getElements()) {
             IndexedRegion elementRegion = getRegion(element);
-            boolean allIncluded =
-                (mOriginalSelectionStart <= elementRegion.getStartOffset() &&
-                 mOriginalSelectionEnd >= elementRegion.getEndOffset());
+            boolean allIncluded = (mOriginalSelectionStart <= elementRegion.getStartOffset()
+                    && mOriginalSelectionEnd >= elementRegion.getEndOffset());
 
             NamedNodeMap attributeMap = element.getAttributes();
             for (int i = 0, n = attributeMap.getLength(); i < n; i++) {
@@ -280,8 +272,8 @@ public class ExtractStyleRefactoring extends VisualRefactoring {
 
                 if (!allIncluded) {
                     IndexedRegion region = getRegion(attribute);
-                    boolean attributeIncluded = mOriginalSelectionStart < region.getEndOffset() &&
-                        mOriginalSelectionEnd >= region.getStartOffset();
+                    boolean attributeIncluded = mOriginalSelectionStart < region.getEndOffset()
+                            && mOriginalSelectionEnd >= region.getStartOffset();
                     if (attributeIncluded) {
                         withinSelection.add(attribute);
                     }
@@ -309,20 +301,14 @@ public class ExtractStyleRefactoring extends VisualRefactoring {
      * @return true if the name is one that the user can extract
      */
     public static boolean isStylableAttribute(String name) {
-        return !(name == null
-                || name.equals(ATTR_ID)
-                || name.startsWith(ATTR_STYLE)
-                || (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX) &&
-                        !name.startsWith(ATTR_LAYOUT_MARGIN))
-                || name.equals(ATTR_TEXT)
-                || name.equals(ATTR_HINT)
-                || name.equals(ATTR_SRC)
+        return !(name == null || name.equals(ATTR_ID) || name.startsWith(ATTR_STYLE)
+                || (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX) && !name.startsWith(ATTR_LAYOUT_MARGIN))
+                || name.equals(ATTR_TEXT) || name.equals(ATTR_HINT) || name.equals(ATTR_SRC)
                 || name.equals(ATTR_ON_CLICK));
     }
 
     IFile getStyleFile(IProject project) {
-        return project.getFile(new Path(FD_RESOURCES + WS_SEP + FD_RES_VALUES + WS_SEP
-                + mStyleFileName));
+        return project.getFile(new Path(FD_RESOURCES + WS_SEP + FD_RES_VALUES + WS_SEP + mStyleFileName));
     }
 
     @Override
@@ -511,8 +497,7 @@ public class ExtractStyleRefactoring extends VisualRefactoring {
     }
 
     public static class Descriptor extends VisualRefactoringDescriptor {
-        public Descriptor(String project, String description, String comment,
-                Map<String, String> arguments) {
+        public Descriptor(String project, String description, String comment, Map<String, String> arguments) {
             super("org.eclipse.andmore.refactoring.extract.style", //$NON-NLS-1$
                     project, description, comment, arguments);
         }
@@ -558,8 +543,7 @@ public class ExtractStyleRefactoring extends VisualRefactoring {
 
             ResourceResolver resolver = mDelegate.getGraphicalEditor().getResourceResolver();
             // Look up the theme item name, which for a Button would be "buttonStyle", and so on.
-            String n = Character.toLowerCase(view.charAt(0)) + view.substring(1)
-                + "Style"; //$NON-NLS-1$
+            String n = Character.toLowerCase(view.charAt(0)) + view.substring(1) + "Style"; //$NON-NLS-1$
             ResourceValue value = resolver.findItemInTheme(n);
             if (value != null) {
                 ResourceValue resolvedValue = resolver.resolveResValue(value);

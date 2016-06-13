@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,18 +16,13 @@ import static com.android.SdkConstants.DOT_CLASS;
 import static com.android.SdkConstants.DOT_JAVA;
 import static com.android.SdkConstants.DOT_XML;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.tools.lint.client.api.IssueRegistry;
-import com.android.tools.lint.client.api.LintDriver;
-import com.android.tools.lint.client.api.LintRequest;
-import com.android.tools.lint.detector.api.Issue;
-import com.android.tools.lint.detector.api.Scope;
-import com.android.utils.SdkUtils;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -41,10 +33,15 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.tools.lint.client.api.IssueRegistry;
+import com.android.tools.lint.client.api.LintDriver;
+import com.android.tools.lint.client.api.LintRequest;
+import com.android.tools.lint.detector.api.Issue;
+import com.android.tools.lint.detector.api.Scope;
+import com.android.utils.SdkUtils;
 
 /** Job to check lint on a set of resources */
 public final class LintJob extends Job {
@@ -57,11 +54,8 @@ public final class LintJob extends Job {
     private LintDriver mLint;
     private boolean mFatal;
 
-    public LintJob(
-            @NonNull EclipseLintClient client,
-            @NonNull List<? extends IResource> resources,
-            @Nullable IResource source,
-            @NonNull IssueRegistry registry) {
+    public LintJob(@NonNull EclipseLintClient client, @NonNull List<? extends IResource> resources,
+            @Nullable IResource source, @NonNull IssueRegistry registry) {
         super("Running Android Lint");
         mClient = client;
         mResources = resources;
@@ -69,9 +63,7 @@ public final class LintJob extends Job {
         mRegistry = registry;
     }
 
-    public LintJob(
-            @NonNull EclipseLintClient client,
-            @NonNull List<? extends IResource> resources,
+    public LintJob(@NonNull EclipseLintClient client, @NonNull List<? extends IResource> resources,
             @Nullable IResource source) {
         this(client, resources, source, EclipseLintClient.getRegistry());
     }
@@ -130,7 +122,7 @@ public final class LintJob extends Job {
                         }
                     } else {
                         return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, IStatus.ERROR,
-                            "Only XML & Java files are supported for single file lint", null); //$NON-NLS-1$
+                                "Only XML & Java files are supported for single file lint", null); //$NON-NLS-1$
                     }
                 }
             }
@@ -164,8 +156,7 @@ public final class LintJob extends Job {
             mFatal = mClient.hasFatalErrors();
             return Status.OK_STATUS;
         } catch (Exception e) {
-            return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, IStatus.ERROR,
-                              "Failed", e); //$NON-NLS-1$
+            return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, IStatus.ERROR, "Failed", e); //$NON-NLS-1$
         } finally {
             if (monitor != null) {
                 monitor.done();

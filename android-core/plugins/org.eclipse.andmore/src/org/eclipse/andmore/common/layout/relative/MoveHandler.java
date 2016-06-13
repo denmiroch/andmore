@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,8 @@
  */
 package org.eclipse.andmore.common.layout.relative;
 
+import static com.android.SdkConstants.ANDROID_URI;
+import static com.android.SdkConstants.ATTR_ID;
 import static com.android.ide.common.api.MarginType.NO_MARGIN;
 import static com.android.ide.common.api.SegmentType.BASELINE;
 import static com.android.ide.common.api.SegmentType.BOTTOM;
@@ -23,10 +22,13 @@ import static com.android.ide.common.api.SegmentType.CENTER_VERTICAL;
 import static com.android.ide.common.api.SegmentType.LEFT;
 import static com.android.ide.common.api.SegmentType.RIGHT;
 import static com.android.ide.common.api.SegmentType.TOP;
-import static com.android.SdkConstants.ATTR_ID;
 import static java.lang.Math.abs;
 
-import static com.android.SdkConstants.ANDROID_URI;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.andmore.common.layout.BaseLayoutRule;
+import org.eclipse.andmore.common.layout.relative.DependencyGraph.ViewData;
 
 import com.android.ide.common.api.DropFeedback;
 import com.android.ide.common.api.IClientRulesEngine;
@@ -34,12 +36,6 @@ import com.android.ide.common.api.IDragElement;
 import com.android.ide.common.api.INode;
 import com.android.ide.common.api.Rect;
 import com.android.ide.common.api.Segment;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.andmore.common.layout.BaseLayoutRule;
-import org.eclipse.andmore.common.layout.relative.DependencyGraph.ViewData;
 
 /**
  * A {@link MoveHandler} is a {@link GuidelineHandler} which handles move and drop
@@ -161,7 +157,7 @@ public class MoveHandler extends GuidelineHandler {
                 newBounds.y = y - newBounds.h / 2;
             }
         } else if (hEdge.edgeType == BASELINE) {
-                newBounds.y = y - mDraggedBaseline;
+            newBounds.y = y - mDraggedBaseline;
         } else {
             assert false : hEdge;
         }
@@ -176,8 +172,7 @@ public class MoveHandler extends GuidelineHandler {
      * @param offsetY the new mouse Y coordinate
      * @param modifierMask the keyboard modifiers pressed during the drag
      */
-    public void updateMove(DropFeedback feedback, IDragElement[] elements,
-            int offsetX, int offsetY, int modifierMask) {
+    public void updateMove(DropFeedback feedback, IDragElement[] elements, int offsetX, int offsetY, int modifierMask) {
         mSnap = (modifierMask & DropFeedback.MODIFIER2) == 0;
 
         Rect firstBounds = elements[0].getBounds();
@@ -228,16 +223,14 @@ public class MoveHandler extends GuidelineHandler {
             int baseline = firstNode.getBaseline();
             if (baseline != -1) {
                 mDraggedBaseline = baseline;
-                edge = new Segment(b.y + baseline, b.x, b.x2(), firstNode, null, BASELINE,
-                        NO_MARGIN);
+                edge = new Segment(b.y + baseline, b.x, b.x2(), firstNode, null, BASELINE, NO_MARGIN);
                 addClosest(edge, mHorizontalEdges, horizontalMatches);
             }
         } else {
             int baseline = feedback.dragBaseline;
             if (baseline != -1) {
                 mDraggedBaseline = baseline;
-                edge = new Segment(offsetY + baseline, b.x, b.x2(), null, null, BASELINE,
-                        NO_MARGIN);
+                edge = new Segment(offsetY + baseline, b.x, b.x2(), null, null, BASELINE, NO_MARGIN);
                 addClosest(edge, mHorizontalEdges, horizontalMatches);
             }
         }

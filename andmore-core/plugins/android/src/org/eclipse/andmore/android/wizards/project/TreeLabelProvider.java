@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,53 +26,53 @@ import com.android.sdklib.IAndroidTarget;
  * Label Provider for the Tree of Project Templates
  */
 public class TreeLabelProvider extends LabelProvider {
-	private static final String MOTOROLA_BRAND = "motorola";
+    private static final String MOTOROLA_BRAND = "motorola";
 
-	private static final Image category = new Image(null, PlatformUI.getWorkbench().getSharedImages()
-			.getImage(SharedImages.IMG_OBJ_PROJECT).getImageData());
+    private static final Image category = new Image(null,
+            PlatformUI.getWorkbench().getSharedImages().getImage(SharedImages.IMG_OBJ_PROJECT).getImageData());
 
-	private static final Image studio = new Image(null, AndroidPlugin.getImageDescriptor(
-			AndroidPlugin.ANDROID_MOTOROLA_BRAND_ICON_PATH).getImageData());
+    private static final Image studio = new Image(null,
+            AndroidPlugin.getImageDescriptor(AndroidPlugin.ANDROID_MOTOROLA_BRAND_ICON_PATH).getImageData());
 
-	private static final Image android = AndmoreAndroidPlugin.getAndroidLogo();
+    private static final Image android = AndmoreAndroidPlugin.getAndroidLogo();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
-	 */
-	@Override
-	public Image getImage(Object obj) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
+     */
+    @Override
+    public Image getImage(Object obj) {
 
-		Image image = null;
-		if (obj instanceof Sample) {
-			String targetName = ((Sample) obj).getTarget().getVendor();
-			if (targetName.toLowerCase().contains(MOTOROLA_BRAND)) {
-				image = studio;
-			} else {
-				image = android;
-			}
-		} else if (obj instanceof IAndroidTarget) {
-			image = category;
-		}
-		return image;
-	}
+        Image image = null;
+        if (obj instanceof Sample) {
+            String targetName = ((Sample) obj).getTarget().getVendor();
+            if (targetName.toLowerCase().contains(MOTOROLA_BRAND)) {
+                image = studio;
+            } else {
+                image = android;
+            }
+        } else if (obj instanceof IAndroidTarget) {
+            image = category;
+        }
+        return image;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
-	 */
-	@Override
-	public String getText(Object obj) {
-		String text;
-		if (obj instanceof Sample) {
-			text = ((Sample) obj).getName();
-		} else if (obj instanceof IAndroidTarget) {
-			text = ((IAndroidTarget) obj).getName();
-		} else {
-			text = ""; //$NON-NLS-1$
-		}
-		return text;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+     */
+    @Override
+    public String getText(Object obj) {
+        String text;
+        if (obj instanceof Sample) {
+            text = ((Sample) obj).getName();
+        } else if (obj instanceof IAndroidTarget) {
+            text = ((IAndroidTarget) obj).getName();
+        } else {
+            text = ""; //$NON-NLS-1$
+        }
+        return text;
+    }
 }

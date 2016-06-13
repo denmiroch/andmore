@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +13,13 @@
 
 package org.eclipse.andmore.internal.editors.layout;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.annotations.VisibleForTesting;
-import com.android.annotations.VisibleForTesting.Visibility;
-import com.android.resources.ResourceFolderType;
-import com.android.sdklib.IAndroidTarget;
-import com.android.tools.lint.client.api.IssueRegistry;
+import java.io.File;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -85,19 +82,19 @@ import org.eclipse.wst.sse.ui.StructuredTextEditor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.annotations.VisibleForTesting;
+import com.android.annotations.VisibleForTesting.Visibility;
+import com.android.resources.ResourceFolderType;
+import com.android.sdklib.IAndroidTarget;
+import com.android.tools.lint.client.api.IssueRegistry;
 
 /**
  * Multi-page form editor for /res/layout XML files.
  */
 public class LayoutEditorDelegate extends CommonXmlDelegate
-         implements IShowEditorInput, CommonXmlDelegate.IActionContributorDelegate {
+        implements IShowEditorInput, CommonXmlDelegate.IActionContributorDelegate {
 
     /** The prefix for layout folders that are not the default layout folder */
     private static final String LAYOUT_FOLDER_PREFIX = "layout-"; //$NON-NLS-1$
@@ -105,8 +102,7 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
     public static class Creator implements IDelegateCreator {
         @Override
         @SuppressWarnings("unchecked")
-        public LayoutEditorDelegate createForFile(
-                @NonNull CommonXmlEditor delegator,
+        public LayoutEditorDelegate createForFile(@NonNull CommonXmlEditor delegator,
                 @Nullable ResourceFolderType type) {
             if (ResourceFolderType.LAYOUT == type) {
                 return new LayoutEditorDelegate(delegator);
@@ -120,8 +116,7 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
      * Old standalone-editor ID.
      * Use {@link CommonXmlEditor#ID} instead.
      */
-    public static final String LEGACY_EDITOR_ID =
-        AndmoreAndroidConstants.EDITORS_NAMESPACE + ".layout.LayoutEditor"; //$NON-NLS-1$
+    public static final String LEGACY_EDITOR_ID = AndmoreAndroidConstants.EDITORS_NAMESPACE + ".layout.LayoutEditor"; //$NON-NLS-1$
 
     /** Root node of the UI element hierarchy */
     private UiDocumentNode mUiDocRootNode;
@@ -149,8 +144,7 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
     /** Custom implementation of {@link IPropertySheetPage} for this editor */
     private IPropertySheetPage mPropertyPage;
 
-    private final HashMap<String, ElementDescriptor> mUnknownDescriptorMap =
-        new HashMap<String, ElementDescriptor>();
+    private final HashMap<String, ElementDescriptor> mUnknownDescriptorMap = new HashMap<String, ElementDescriptor>();
 
     private EclipseLintClient mClient;
 
@@ -183,7 +177,7 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
     /**
      * Creates the form editor for resources XML files.
      */
-    @VisibleForTesting(visibility=Visibility.PRIVATE)
+    @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected LayoutEditorDelegate(CommonXmlEditor editor) {
         super(editor, new LayoutContentAssist());
         // Note that LayoutEditor has its own listeners and does not
@@ -259,14 +253,13 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
             IFile editedFile = null;
             IEditorInput input = getEditor().getEditorInput();
             if (input instanceof FileEditorInput) {
-                FileEditorInput fileInput = (FileEditorInput)input;
+                FileEditorInput fileInput = (FileEditorInput) input;
                 editedFile = fileInput.getFile();
                 if (!editedFile.isAccessible()) {
                     return;
                 }
             } else {
-                AndmoreAndroidPlugin.log(IStatus.ERROR,
-                        "Input is not of type FileEditorInput: %1$s",  //$NON-NLS-1$
+                AndmoreAndroidPlugin.log(IStatus.ERROR, "Input is not of type FileEditorInput: %1$s", //$NON-NLS-1$
                         input.toString());
             }
 
@@ -278,8 +271,7 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
                 // Instantiate GLE v2
                 mGraphicalEditor = new GraphicalEditorPart(this);
 
-                mGraphicalEditorIndex = getEditor().addPage(mGraphicalEditor,
-                                                            getEditor().getEditorInput());
+                mGraphicalEditorIndex = getEditor().addPage(mGraphicalEditor, getEditor().getEditorInput());
                 getEditor().setPageText(mGraphicalEditorIndex, mGraphicalEditor.getTitle());
 
                 mGraphicalEditor.openFile(editedFile);
@@ -345,11 +337,11 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
         // to the new model.
         // page after the graphical editor:
         int count = getEditor().getPageCount();
-        for (int i = count - 1 ; i > mGraphicalEditorIndex ; i--) {
+        for (int i = count - 1; i > mGraphicalEditorIndex; i--) {
             getEditor().removePage(i);
         }
         // Pages before the graphical editor
-        for (int i = mGraphicalEditorIndex - 1 ; i >= 0 ; i--) {
+        for (int i = mGraphicalEditorIndex - 1; i >= 0; i--) {
             getEditor().removePage(i);
         }
 
@@ -469,13 +461,11 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
         if (file != null) {
             IssueRegistry registry = EclipseLintClient.getRegistry();
             List<IFile> resources = Collections.singletonList(file);
-            mClient = new EclipseLintClient(registry,
-                    resources, getEditor().getStructuredDocument(), false /*fatal*/);
+            mClient = new EclipseLintClient(registry, resources, getEditor().getStructuredDocument(), false /*fatal*/);
 
             mClient.setCollectNodes(true);
 
-            job = EclipseLintRunner.startLint(mClient, resources, file,
-                    false /*show*/);
+            job = EclipseLintRunner.startLint(mClient, resources, file, false /*show*/);
         }
 
         if (job != null) {
@@ -565,8 +555,7 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
                 StackTraceElement[] frames = new Throwable().fillInStackTrace().getStackTrace();
                 if (frames.length > 2) {
                     StackTraceElement frame = frames[2];
-                    if (frame.getClassName().equals(
-                            "org.eclipse.wst.sse.ui.internal.contentoutline." + //$NON-NLS-1$
+                    if (frame.getClassName().equals("org.eclipse.wst.sse.ui.internal.contentoutline." + //$NON-NLS-1$
                             "ConfigurableContentOutlinePage$PostSelectionServiceListener")) { //$NON-NLS-1$
                         return mEditorOutline;
                     }
@@ -585,8 +574,7 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
                         if (getEditor().getIgnoreXmlUpdate()) {
                             return;
                         }
-                        SelectionManager manager =
-                                mGraphicalEditor.getCanvasControl().getSelectionManager();
+                        SelectionManager manager = mGraphicalEditor.getCanvasControl().getSelectionManager();
                         manager.setSelection(selection);
                     }
                 });
@@ -637,8 +625,7 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
                         }
                     });
 
-                    mEditorOutline = (IContentOutlinePage) structuredTextEditor.getAdapter(
-                            IContentOutlinePage.class);
+                    mEditorOutline = (IContentOutlinePage) structuredTextEditor.getAdapter(IContentOutlinePage.class);
                 }
             }
 
@@ -664,8 +651,7 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
 
     @Override
     public void delegatePageChange(int newPageIndex) {
-        if (getEditor().getCurrentPage() == getEditor().getTextPageIndex() &&
-                newPageIndex == mGraphicalEditorIndex) {
+        if (getEditor().getCurrentPage() == getEditor().getTextPageIndex() && newPageIndex == mGraphicalEditorIndex) {
             // You're switching from the XML editor to the WYSIWYG editor;
             // look at the caret position and figure out which node it corresponds to
             // (if any) and if found, select the corresponding visual element.
@@ -735,7 +721,6 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
         }
     }
 
-
     @Override
     public void delegateActivated() {
         if (mGraphicalEditor != null) {
@@ -757,14 +742,13 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
     @Override
     public String delegateGetPartName() {
         IEditorInput editorInput = getEditor().getEditorInput();
-        if (!AdtPrefs.getPrefs().isSharedLayoutEditor()
-              && editorInput instanceof IFileEditorInput) {
+        if (!AdtPrefs.getPrefs().isSharedLayoutEditor() && editorInput instanceof IFileEditorInput) {
             IFileEditorInput fileInput = (IFileEditorInput) editorInput;
             IFile file = fileInput.getFile();
             IContainer parent = file.getParent();
             if (parent != null) {
                 String parentName = parent.getName();
-                if  (parentName.startsWith(LAYOUT_FOLDER_PREFIX)) {
+                if (parentName.startsWith(LAYOUT_FOLDER_PREFIX)) {
                     parentName = parentName.substring(LAYOUT_FOLDER_PREFIX.length());
                     return parentName + File.separatorChar + file.getName();
                 }
@@ -785,8 +769,7 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
         IWorkbenchPage workbenchPage = workbenchSite.getPage();
 
         // check if the editor is visible in the workbench page
-        if (workbenchPage.isPartVisible(getEditor())
-                && workbenchPage.getActiveEditor() == getEditor()) {
+        if (workbenchPage.isPartVisible(getEditor()) && workbenchPage.getActiveEditor() == getEditor()) {
             // and then if the page of the editor is visible (not to be confused with
             // the workbench page)
             return mGraphicalEditorIndex == getEditor().getActivePage();
@@ -850,14 +833,13 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
         ViewElementDescriptor desc = null;
         IEditorInput editorInput = getEditor().getEditorInput();
         if (editorInput instanceof IFileEditorInput) {
-            IFileEditorInput fileInput = (IFileEditorInput)editorInput;
+            IFileEditorInput fileInput = (IFileEditorInput) editorInput;
             IProject project = fileInput.getFile().getProject();
 
             // Check if we can find a custom view specific to this project.
             // This only works if there's an actual matching custom class in the project.
             if (xmlLocalName.indexOf('.') != -1) {
-                desc = CustomViewDescriptorService.getInstance().getDescriptor(project,
-                        xmlLocalName);
+                desc = CustomViewDescriptorService.getInstance().getDescriptor(project, xmlLocalName);
             }
 
             if (desc == null) {
@@ -873,18 +855,14 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
                         AndroidTargetData data = currentSdk.getTargetData(target);
                         if (data != null) {
                             // data can be null when the target is still loading
-                            ViewElementDescriptor viewDesc =
-                                data.getLayoutDescriptors().getBaseViewDescriptor();
+                            ViewElementDescriptor viewDesc = data.getLayoutDescriptors().getBaseViewDescriptor();
 
-                            desc = new ViewElementDescriptor(
-                                    xmlLocalName, // xml local name
+                            desc = new ViewElementDescriptor(xmlLocalName, // xml local name
                                     xmlLocalName, // ui_name
                                     xmlLocalName, // canonical class name
                                     null, // tooltip
                                     null, // sdk_url
-                                    viewDesc.getAttributes(),
-                                    viewDesc.getLayoutAttributes(),
-                                    null, // children
+                                    viewDesc.getAttributes(), viewDesc.getLayoutAttributes(), null, // children
                                     false /* mandatory */);
                             desc.setSuperClass(viewDesc);
                         }
@@ -968,8 +946,7 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
      *  necessary since the view descriptor hierarchy is cyclic.
      * @return Either a matching {@link ViewElementDescriptor} or null.
      */
-    private ViewElementDescriptor internalFindFqcnViewDescriptor(String fqcn,
-            ElementDescriptor[] descriptors,
+    private ViewElementDescriptor internalFindFqcnViewDescriptor(String fqcn, ElementDescriptor[] descriptors,
             Set<ElementDescriptor> visited) {
         if (visited == null) {
             visited = new HashSet<ElementDescriptor>();
@@ -981,14 +958,13 @@ public class LayoutEditorDelegate extends CommonXmlDelegate
                     // Set.add() returns true if this a new element that was added to the set.
                     // That means we haven't visited this descriptor yet.
                     // We want a ViewElementDescriptor with a matching FQCN.
-                    if (desc instanceof ViewElementDescriptor &&
-                            fqcn.equals(((ViewElementDescriptor) desc).getFullClassName())) {
+                    if (desc instanceof ViewElementDescriptor
+                            && fqcn.equals(((ViewElementDescriptor) desc).getFullClassName())) {
                         return (ViewElementDescriptor) desc;
                     }
 
                     // Visit its children
-                    ViewElementDescriptor vd =
-                        internalFindFqcnViewDescriptor(fqcn, desc.getChildren(), visited);
+                    ViewElementDescriptor vd = internalFindFqcnViewDescriptor(fqcn, desc.getChildren(), visited);
                     if (vd != null) {
                         return vd;
                     }

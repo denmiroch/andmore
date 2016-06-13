@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,8 +59,7 @@ public abstract class SubmenuAction extends Action implements MenuListener, IMen
     }
 
     @Override
-    public void menuHidden(MenuEvent e) {
-    }
+    public void menuHidden(MenuEvent e) {}
 
     protected abstract void addMenuItems(Menu menu);
 
@@ -80,8 +76,7 @@ public abstract class SubmenuAction extends Action implements MenuListener, IMen
     protected void addDisabledMessageItem(String message) {
         IAction action = new Action(message, IAction.AS_PUSH_BUTTON) {
             @Override
-            public void run() {
-            }
+            public void run() {}
         };
         action.setEnabled(false);
         new ActionContributionItem(action).fill(mMenu, -1);

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,16 +14,6 @@ package org.eclipse.andmore.internal.assetstudio;
 
 import static org.eclipse.andmore.internal.wizards.templates.NewProjectWizard.DEFAULT_LAUNCHER_ICON;
 
-import com.android.annotations.NonNull;
-import com.android.assetstudiolib.GraphicGenerator;
-import com.android.assetstudiolib.GraphicGenerator.Shape;
-import com.android.assetstudiolib.GraphicGeneratorContext;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.internal.wizards.templates.TemplateManager;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.swt.graphics.RGB;
-
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
@@ -36,6 +23,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.internal.wizards.templates.TemplateManager;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.graphics.RGB;
+
+import com.android.annotations.NonNull;
+import com.android.assetstudiolib.GraphicGenerator;
+import com.android.assetstudiolib.GraphicGenerator.Shape;
+import com.android.assetstudiolib.GraphicGeneratorContext;
 
 /**
  * Value object for the AssetStudio wizard. These values are both set by the
@@ -169,8 +166,7 @@ public class CreateAssetSetWizardState implements GraphicGeneratorContext {
         }
     }
 
-    BufferedImage getCachedImage(String path, boolean isPluginRelative)
-            throws IOException {
+    BufferedImage getCachedImage(String path, boolean isPluginRelative) throws IOException {
         BufferedImage image = mImageCache != null ? mImageCache.get(path) : null;
         if (image == null) {
             image = getImage(path, isPluginRelative);
@@ -184,15 +180,14 @@ public class CreateAssetSetWizardState implements GraphicGeneratorContext {
     }
 
     @NonNull
-    static BufferedImage getImage(@NonNull String path, boolean isPluginRelative)
-            throws IOException {
+    static BufferedImage getImage(@NonNull String path, boolean isPluginRelative) throws IOException {
         BufferedImage image = null;
         if (isPluginRelative) {
             image = GraphicGenerator.getStencilImage(path);
         } else {
             if (path.equals(DEFAULT_LAUNCHER_ICON)) {
-                File file = TemplateManager.getTemplateLocation(
-                  "projects/NewAndroidApplication/root/res/drawable-xhdpi/ic_launcher.png"); //$NON-NLS-1$
+                File file = TemplateManager
+                        .getTemplateLocation("projects/NewAndroidApplication/root/res/drawable-xhdpi/ic_launcher.png"); //$NON-NLS-1$
                 if (file != null) {
                     path = file.getPath();
                 } else {
@@ -213,7 +208,7 @@ public class CreateAssetSetWizardState implements GraphicGeneratorContext {
         }
 
         if (image == null) {
-            image = new BufferedImage(1,1, BufferedImage.TYPE_INT_ARGB);
+            image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         }
 
         return image;

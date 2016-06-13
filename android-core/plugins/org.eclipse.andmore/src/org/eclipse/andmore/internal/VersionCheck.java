@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,18 +13,6 @@
 
 package org.eclipse.andmore.internal;
 
-import com.android.SdkConstants;
-import com.android.sdklib.repository.FullRevision;
-import com.android.sdklib.repository.FullRevision.PreviewComparison;
-import com.android.sdklib.repository.PkgProps;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.Messages;
-import org.eclipse.andmore.AndmoreAndroidPlugin.CheckSdkErrorHandler;
-import org.eclipse.andmore.AndmoreAndroidPlugin.CheckSdkErrorHandler.Solution;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Version;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,6 +20,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.AndmoreAndroidPlugin.CheckSdkErrorHandler;
+import org.eclipse.andmore.AndmoreAndroidPlugin.CheckSdkErrorHandler.Solution;
+import org.eclipse.andmore.Messages;
+import org.osgi.framework.Version;
+
+import com.android.SdkConstants;
+import com.android.sdklib.repository.FullRevision;
+import com.android.sdklib.repository.FullRevision.PreviewComparison;
+import com.android.sdklib.repository.PkgProps;
 
 /**
  * Class handling the version check for the plugin vs. the SDK.<br>
@@ -57,10 +53,8 @@ public class VersionCheck {
      * Pattern to get the minimum plugin version supported by the SDK. This is read from
      * the file <code>$SDK/tools/lib/plugin.prop</code>.
      */
-    private final static Pattern sPluginVersionPattern = Pattern.compile(
-            "^plugin.version=(\\d+)\\.(\\d+)\\.(\\d+).*$"); //$NON-NLS-1$
-    private final static Pattern sSourcePropPattern = Pattern.compile(
-            "^" + PkgProps.PKG_REVISION + "=(.*)$"); //$NON-NLS-1$
+    private final static Pattern sPluginVersionPattern = Pattern.compile("^plugin.version=(\\d+)\\.(\\d+)\\.(\\d+).*$"); //$NON-NLS-1$
+    private final static Pattern sSourcePropPattern = Pattern.compile("^" + PkgProps.PKG_REVISION + "=(.*)$"); //$NON-NLS-1$
 
     /**
      * Checks the plugin and the SDK have compatible versions.
@@ -97,42 +91,37 @@ public class VersionCheck {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException e) {
-                } finally {
+                } catch (IOException e) {} finally {
                     reader = null;
                 }
             }
         }
 
         // Failed to get the min plugin version number?
-        if (minMajorVersion == -1 || minMinorVersion == -1 || minMicroVersion ==-1) {
-            return errorHandler.handleWarning(
-                    Solution.OPEN_SDK_MANAGER,
-                    Messages.VersionCheck_Plugin_Version_Failed);
+        if (minMajorVersion == -1 || minMinorVersion == -1 || minMicroVersion == -1) {
+            return errorHandler.handleWarning(Solution.OPEN_SDK_MANAGER, Messages.VersionCheck_Plugin_Version_Failed);
         }
 
         // Are the build tools installed? We can't query Sdk#getLatestBuildTool yet, since
         // SDK initialization typically hasn't completed yet and Sdk.getCurrent() is null.
         File buildToolsFolder = new File(osSdkPath, SdkConstants.FD_BUILD_TOOLS);
         if (!buildToolsFolder.isDirectory()) {
-            return errorHandler.handleWarning(
-                    Solution.OPEN_SDK_MANAGER,
-                    Messages.VersionCheck_Build_Tool_Missing);
+            return errorHandler.handleWarning(Solution.OPEN_SDK_MANAGER, Messages.VersionCheck_Build_Tool_Missing);
         }
 
         // test the plugin number
-//        String versionString = plugin.getBundle().getHeaders().get(
-//                Constants.BUNDLE_VERSION);
-//        Version version = new Version(versionString);
+        //        String versionString = plugin.getBundle().getHeaders().get(
+        //                Constants.BUNDLE_VERSION);
+        //        Version version = new Version(versionString);
 
-//        boolean valid = compatibleVersion(minMajorVersion, minMinorVersion, minMicroVersion, version);
-//
-//        if (valid == false) {
-//            return errorHandler.handleError(
-//                    Solution.OPEN_P2_UPDATE,
-//                    String.format(Messages.VersionCheck_Plugin_Too_Old,
-//                            minMajorVersion, minMinorVersion, minMicroVersion, versionString));
-//        }
+        //        boolean valid = compatibleVersion(minMajorVersion, minMinorVersion, minMicroVersion, version);
+        //
+        //        if (valid == false) {
+        //            return errorHandler.handleError(
+        //                    Solution.OPEN_P2_UPDATE,
+        //                    String.format(Messages.VersionCheck_Plugin_Too_Old,
+        //                            minMajorVersion, minMinorVersion, minMicroVersion, versionString));
+        //        }
 
         // now check whether the tools are new enough.
         String osTools = osSdkPath + SdkConstants.OS_SDK_TOOLS_FOLDER;
@@ -157,8 +146,7 @@ public class VersionCheck {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException e) {
-                } finally {
+                } catch (IOException e) {} finally {
                     reader = null;
                 }
             }
@@ -167,18 +155,16 @@ public class VersionCheck {
         if (toolsRevision.compareTo(MIN_TOOLS_REV, PreviewComparison.IGNORE) < 0) {
             // this is a warning only as we need to parse the SDK to allow updating
             // of the tools!
-            return errorHandler.handleWarning(
-                    Solution.OPEN_SDK_MANAGER,
-                    String.format(Messages.VersionCheck_Tools_Too_Old,
-                            MIN_TOOLS_REV, toolsRevision));
+            return errorHandler.handleWarning(Solution.OPEN_SDK_MANAGER,
+                    String.format(Messages.VersionCheck_Tools_Too_Old, MIN_TOOLS_REV, toolsRevision));
         }
 
         return true; // no error!
     }
 
-	private static boolean compatibleVersion(int minMajorVersion, int minMinorVersion, int minMicroVersion,
-			Version version) {
-		boolean valid = true;
+    private static boolean compatibleVersion(int minMajorVersion, int minMinorVersion, int minMicroVersion,
+            Version version) {
+        boolean valid = true;
         if (version.getMajor() < minMajorVersion) {
             valid = false;
         } else if (version.getMajor() == minMajorVersion) {
@@ -190,6 +176,6 @@ public class VersionCheck {
                 }
             }
         }
-		return valid;
-	}
+        return valid;
+    }
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -103,8 +100,7 @@ import com.android.utils.SdkUtils;
 @SuppressWarnings("restriction") // DOM model
 public class LintFixGenerator implements IMarkerResolutionGenerator2, IQuickAssistProcessor {
     /** Constructs a new {@link LintFixGenerator} */
-    public LintFixGenerator() {
-    }
+    public LintFixGenerator() {}
 
     // ---- Implements IMarkerResolutionGenerator2 ----
 
@@ -112,16 +108,14 @@ public class LintFixGenerator implements IMarkerResolutionGenerator2, IQuickAssi
     public boolean hasResolutions(IMarker marker) {
         try {
             assert marker.getType().equals(AndmoreAndroidConstants.MARKER_LINT);
-        } catch (CoreException e) {
-        }
+        } catch (CoreException e) {}
 
         return true;
     }
 
     @Override
     public IMarkerResolution[] getResolutions(IMarker marker) {
-        String id = marker.getAttribute(EclipseLintRunner.MARKER_CHECKID_PROPERTY,
-                ""); //$NON-NLS-1$
+        String id = marker.getAttribute(EclipseLintRunner.MARKER_CHECKID_PROPERTY, ""); //$NON-NLS-1$
         IResource resource = marker.getResource();
 
         List<IMarkerResolution> resolutions = new ArrayList<IMarkerResolution>();
@@ -161,8 +155,7 @@ public class LintFixGenerator implements IMarkerResolutionGenerator2, IQuickAssi
     }
 
     @Override
-    public ICompletionProposal[] computeQuickAssistProposals(
-            IQuickAssistInvocationContext invocationContext) {
+    public ICompletionProposal[] computeQuickAssistProposals(IQuickAssistInvocationContext invocationContext) {
         ISourceViewer sourceViewer = invocationContext.getSourceViewer();
         AndroidXmlEditor editor = AndroidXmlEditor.fromTextViewer(sourceViewer);
         if (editor != null) {
@@ -171,13 +164,12 @@ public class LintFixGenerator implements IMarkerResolutionGenerator2, IQuickAssi
                 return null;
             }
             IDocument document = sourceViewer.getDocument();
-            List<IMarker> markers = AdtUtils.findMarkersOnLine(AndmoreAndroidConstants.MARKER_LINT,
-                    file, document, invocationContext.getOffset());
+            List<IMarker> markers = AdtUtils.findMarkersOnLine(AndmoreAndroidConstants.MARKER_LINT, file, document,
+                    invocationContext.getOffset());
             List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
             if (markers.size() > 0) {
                 for (IMarker marker : markers) {
-                    String id = marker.getAttribute(EclipseLintRunner.MARKER_CHECKID_PROPERTY,
-                            ""); //$NON-NLS-1$
+                    String id = marker.getAttribute(EclipseLintRunner.MARKER_CHECKID_PROPERTY, ""); //$NON-NLS-1$
 
                     // TODO: Allow for more than one fix?
                     List<LintFix> fixes = LintFix.getFixes(id, marker);
@@ -214,13 +206,12 @@ public class LintFixGenerator implements IMarkerResolutionGenerator2, IQuickAssi
      * @param resource the resource associated with the markers
      * @param thisFileOnly if true, only suppress this issue in this file
      */
-    public static void suppressDetector(String id, boolean updateMarkers, IResource resource,
-            boolean thisFileOnly) {
+    public static void suppressDetector(String id, boolean updateMarkers, IResource resource, boolean thisFileOnly) {
         IssueRegistry registry = EclipseLintClient.getRegistry();
         Issue issue = registry.getIssue(id);
         if (issue != null) {
-            EclipseLintClient mClient = new EclipseLintClient(registry,
-                    Collections.singletonList(resource), null, false);
+            EclipseLintClient mClient = new EclipseLintClient(registry, Collections.singletonList(resource), null,
+                    false);
             Project project = null;
             IProject eclipseProject = resource.getProject();
             if (eclipseProject != null) {
@@ -268,8 +259,7 @@ public class LintFixGenerator implements IMarkerResolutionGenerator2, IQuickAssi
                 IEditorPart part = null;
                 if (activeEditor != null) {
                     IEditorInput input = activeEditor.getEditorInput();
-                    if (input instanceof FileEditorInput
-                            && ((FileEditorInput)input).getFile().equals(file)) {
+                    if (input instanceof FileEditorInput && ((FileEditorInput) input).getFile().equals(file)) {
                         part = activeEditor;
                     }
                 }
@@ -293,8 +283,7 @@ public class LintFixGenerator implements IMarkerResolutionGenerator2, IQuickAssi
                     assert isXml;
                     if (part instanceof AndroidXmlEditor) {
                         AndroidXmlEditor editor = (AndroidXmlEditor) part;
-                        List<AddSuppressAttribute> fixes = AddSuppressAttribute.createFixes(editor,
-                                marker, id);
+                        List<AddSuppressAttribute> fixes = AddSuppressAttribute.createFixes(editor, marker, id);
                         if (fixes.size() > 0) {
                             IStructuredDocument document = editor.getStructuredDocument();
                             fixes.get(0).apply(document);
@@ -447,13 +436,12 @@ public class LintFixGenerator implements IMarkerResolutionGenerator2, IQuickAssi
                 sb.append("Clears all lint warnings from this file.");
             }
             sb.append("<br><br>"); //$NON-NLS-1$
-            sb.append("This temporarily hides the problem, but does not suppress it. " +
-                    "Running Lint again can bring the error back.");
+            sb.append("This temporarily hides the problem, but does not suppress it. "
+                    + "Running Lint again can bring the error back.");
             if (AdtPrefs.getPrefs().isLintOnSave()) {
                 sb.append(' ');
-                sb.append("This will happen the next time the file is saved since lint-on-save " +
-                        "is enabled. You can turn this off in the \"Lint Error Checking\" " +
-                        "preference page.");
+                sb.append("This will happen the next time the file is saved since lint-on-save "
+                        + "is enabled. You can turn this off in the \"Lint Error Checking\" " + "preference page.");
             }
 
             return sb.toString();
@@ -503,8 +491,7 @@ public class LintFixGenerator implements IMarkerResolutionGenerator2, IQuickAssi
                 sb.append(issue.getMoreInfo());
             }
 
-            MessageDialog.openInformation(AndmoreAndroidPlugin.getShell(), "More Info",
-                    sb.toString());
+            MessageDialog.openInformation(AndmoreAndroidPlugin.getShell(), "More Info", sb.toString());
         }
 
         @Override
@@ -543,10 +530,8 @@ public class LintFixGenerator implements IMarkerResolutionGenerator2, IQuickAssi
 
         @Override
         public String getAdditionalProposalInfo() {
-            return "Provides more information about this issue."
-                    + "<br><br>" //$NON-NLS-1$
-                    + EclipseLintClient.getRegistry().getIssue(mId).getExplanation(
-                            TextFormat.HTML);
+            return "Provides more information about this issue." + "<br><br>" //$NON-NLS-2$
+                    + EclipseLintClient.getRegistry().getIssue(mId).getExplanation(TextFormat.HTML);
         }
 
         @Override

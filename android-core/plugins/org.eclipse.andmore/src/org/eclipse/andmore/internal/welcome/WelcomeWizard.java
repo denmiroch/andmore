@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,20 +12,21 @@
  */
 
 /*******************************************************************************
-* Copyright (c) 2015 David Carver and others
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Eclipse Public License v1.0
-* which accompanies this distribution, and is available at
-* http://www.eclipse.org/legal/epl-v10.html
-*
-* Contributors:
-* David Carver - removing usage tracker implementation.
-*******************************************************************************/
+ * Copyright (c) 2015 David Carver and others
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * David Carver - removing usage tracker implementation.
+ *******************************************************************************/
 
 package org.eclipse.andmore.internal.welcome;
 
-import com.android.sdkstats.DdmsPreferenceStore;
-import com.android.sdkuilib.internal.repository.ui.AdtUpdateDialog;
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
@@ -42,9 +40,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import com.android.sdkstats.DdmsPreferenceStore;
+import com.android.sdkuilib.internal.repository.ui.AdtUpdateDialog;
 
 /**
  * Wizard shown on first start for new users: configure SDK location, accept or
@@ -108,8 +105,7 @@ public class WelcomeWizard extends Wizard {
                             }
                             installSdk(path, apiLevels);
                         } catch (Exception e) {
-                            AndmoreAndroidPlugin.logAndPrintError(e, "Andmore Welcome Wizard",
-                                    "Installation failed");
+                            AndmoreAndroidPlugin.logAndPrintError(e, "Andmore Welcome Wizard", "Installation failed");
                         }
                     }
 
@@ -131,8 +127,7 @@ public class WelcomeWizard extends Wizard {
     private boolean installSdk(File path, Set<Integer> apiLevels) {
         if (!path.isDirectory()) {
             if (!path.mkdirs()) {
-                AndmoreAndroidPlugin.logAndPrintError(null, "Andmore Welcome Wizard",
-                        "Failed to create directory %1$s",
+                AndmoreAndroidPlugin.logAndPrintError(null, "Andmore Welcome Wizard", "Failed to create directory %1$s",
                         path.getAbsolutePath());
                 return false;
             }
@@ -156,10 +151,7 @@ public class WelcomeWizard extends Wizard {
             disposeShell = true;
         }
 
-        AdtUpdateDialog updater = new AdtUpdateDialog(
-                shell,
-                new AdtConsoleSdkLog(),
-                path.getAbsolutePath());
+        AdtUpdateDialog updater = new AdtUpdateDialog(shell, new AdtConsoleSdkLog(), path.getAbsolutePath());
         // Note: we don't have to specify tools & platform-tools since they
         // are required dependencies of any platform.
         boolean result = updater.installNewSdk(apiLevels);

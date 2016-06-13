@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,16 +13,9 @@
 
 package org.eclipse.andmore.internal.actions;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.sdklib.io.FileOp;
-import com.android.sdklib.repository.ISdkChangeListener;
-import com.android.utils.GrabProcessOutput;
-import com.android.utils.GrabProcessOutput.IProcessOutput;
-import com.android.utils.GrabProcessOutput.Wait;
-import com.android.sdkuilib.repository.SdkUpdaterWindow;
-import com.android.sdkuilib.repository.SdkUpdaterWindow.SdkInvocationContext;
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
@@ -44,9 +34,16 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.sdklib.io.FileOp;
+import com.android.sdklib.repository.ISdkChangeListener;
+import com.android.sdkuilib.repository.SdkUpdaterWindow;
+import com.android.sdkuilib.repository.SdkUpdaterWindow.SdkInvocationContext;
+import com.android.utils.GrabProcessOutput;
+import com.android.utils.GrabProcessOutput.IProcessOutput;
+import com.android.utils.GrabProcessOutput.Wait;
 
 /**
  * Delegate for the toolbar/menu action "Android SDK Manager".
@@ -80,8 +77,7 @@ public class SdkManagerAction implements IWorkbenchWindowActionDelegate, IObject
             // the internal one.
             if (AndmoreAndroidPlugin.getDefault().checkSdkLocationAndId()) {
                 // The SDK check was successful, yet the sdk manager fail to launch anyway.
-                AndmoreAndroidPlugin.displayError(
-                        "Android SDK",
+                AndmoreAndroidPlugin.displayError("Android SDK",
                         "Failed to run the Android SDK Manager. Check the Android Console View for details.");
             }
         }
@@ -135,14 +131,12 @@ public class SdkManagerAction implements IWorkbenchWindowActionDelegate, IObject
         // By default openExternalSdkManager will return false.
         final AtomicBoolean returnValue = new AtomicBoolean(false);
 
-        final CloseableProgressMonitorDialog p =
-            new CloseableProgressMonitorDialog(AndmoreAndroidPlugin.getShell());
+        final CloseableProgressMonitorDialog p = new CloseableProgressMonitorDialog(AndmoreAndroidPlugin.getShell());
         p.setOpenOnRun(true);
         try {
             p.run(true /*fork*/, true /*cancelable*/, new IRunnableWithProgress() {
                 @Override
-                public void run(IProgressMonitor monitor)
-                        throws InvocationTargetException, InterruptedException {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
                     // Get the SDK locatiom from the current SDK or as fallback
                     // directly from the ADT preferences.
@@ -160,18 +154,16 @@ public class SdkManagerAction implements IWorkbenchWindowActionDelegate, IObject
                         return;
                     }
 
-                    final int numIter = 30;  //30*100=3s to wait for window
+                    final int numIter = 30; //30*100=3s to wait for window
                     final int sleepMs = 100;
                     monitor.beginTask("Starting Android SDK Manager", numIter);
 
-                    File androidBat = FileOp.append(
-                            osSdkLocation,
-                            SdkConstants.FD_TOOLS,
+                    File androidBat = FileOp.append(osSdkLocation, SdkConstants.FD_TOOLS,
                             SdkConstants.androidCmdName());
 
                     if (!androidBat.exists()) {
-                        AndmoreAndroidPlugin.printErrorToConsole("SDK Manager",
-                                "Missing %s file in Android SDK.", SdkConstants.androidCmdName());
+                        AndmoreAndroidPlugin.printErrorToConsole("SDK Manager", "Missing %s file in Android SDK.",
+                                SdkConstants.androidCmdName());
                         return;
                     }
 
@@ -186,32 +178,26 @@ public class SdkManagerAction implements IWorkbenchWindowActionDelegate, IObject
                     try {
                         final AdtConsoleSdkLog logger = new AdtConsoleSdkLog();
 
-                        String command[] = new String[] {
-                                androidBat.getAbsolutePath(),
-                                "sdk"   //$NON-NLS-1$
+                        String command[] = new String[] { androidBat.getAbsolutePath(), "sdk" //$NON-NLS-1$
                         };
                         Process process = Runtime.getRuntime().exec(command);
-                        GrabProcessOutput.grabProcessOutput(
-                                process,
-                                Wait.ASYNC,
-                                new IProcessOutput() {
-                                    @Override
-                                    public void out(@Nullable String line) {
-                                        // Ignore stdout
-                                    }
+                        GrabProcessOutput.grabProcessOutput(process, Wait.ASYNC, new IProcessOutput() {
+                            @Override
+                            public void out(@Nullable String line) {
+                                // Ignore stdout
+                            }
 
-                                    @Override
-                                    public void err(@Nullable String line) {
-                                        if (line != null) {
-                                            logger.info("[SDK Manager] %s", line);
-                                        }
-                                    }
-                                });
+                            @Override
+                            public void err(@Nullable String line) {
+                                if (line != null) {
+                                    logger.info("[SDK Manager] %s", line);
+                                }
+                            }
+                        });
 
                         // Set openExternalSdkManager to return true.
                         returnValue.set(true);
-                    } catch (Exception ignore) {
-                    }
+                    } catch (Exception ignore) {}
 
                     // This small wait prevents the progress dialog from closing too fast.
                     for (int i = 0; i < numIter; i++) {
@@ -235,7 +221,7 @@ public class SdkManagerAction implements IWorkbenchWindowActionDelegate, IObject
                 }
             });
         } catch (Exception e) {
-            AndmoreAndroidPlugin.log(e, "SDK Manager exec failed");    //$NON-NLS-1#
+            AndmoreAndroidPlugin.log(e, "SDK Manager exec failed"); //$NON-NLS-1#
             return false;
         }
 
@@ -260,20 +246,17 @@ public class SdkManagerAction implements IWorkbenchWindowActionDelegate, IObject
         // (normal log is just dropped, which is fine since the SDK Manager has its own
         // log window now.)
 
-        SdkUpdaterWindow window = new SdkUpdaterWindow(
-                AndmoreAndroidPlugin.getShell(),
-                new AdtConsoleSdkLog() {
-                    @Override
-                    public void info(@NonNull String msgFormat, Object... args) {
-                        // Do not show non-error/warning log in Eclipse.
-                    };
-                    @Override
-                    public void verbose(@NonNull String msgFormat, Object... args) {
-                        // Do not show non-error/warning log in Eclipse.
-                    };
-                },
-                sdk.getSdkOsLocation(),
-                SdkInvocationContext.IDE);
+        SdkUpdaterWindow window = new SdkUpdaterWindow(AndmoreAndroidPlugin.getShell(), new AdtConsoleSdkLog() {
+            @Override
+            public void info(@NonNull String msgFormat, Object... args) {
+                // Do not show non-error/warning log in Eclipse.
+            };
+
+            @Override
+            public void verbose(@NonNull String msgFormat, Object... args) {
+                // Do not show non-error/warning log in Eclipse.
+            };
+        }, sdk.getSdkOsLocation(), SdkInvocationContext.IDE);
 
         ISdkChangeListener listener = new ISdkChangeListener() {
             @Override
@@ -322,8 +305,7 @@ public class SdkManagerAction implements IWorkbenchWindowActionDelegate, IObject
              * {@inheritDoc}
              */
             @Override
-            public void postInstallHook() {
-            }
+            public void postInstallHook() {}
 
             /**
              * Reparse the SDK in case anything was add/removed.

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +11,15 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.editors.formatting;
+
+import org.eclipse.andmore.internal.editors.layout.gle2.DomUtilities;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.text.TextUtilities;
+import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
+import org.eclipse.wst.xml.core.internal.provisional.document.IDOMNode;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
@@ -25,15 +31,6 @@ import com.android.resources.ResourceFolderType;
 import com.android.resources.ResourceType;
 import com.android.utils.SdkUtils;
 import com.android.utils.XmlUtils;
-
-import org.eclipse.andmore.internal.editors.layout.gle2.DomUtilities;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.text.TextUtilities;
-import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
-import org.eclipse.wst.xml.core.internal.provisional.document.IDOMNode;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * Eclipse customization of the {@link EclipseXmlPrettyPrinter} which takes advantage of the
@@ -53,10 +50,7 @@ public class EclipseXmlPrettyPrinter extends XmlPrettyPrinter {
      * @param lineSeparator the line separator to use, such as "\n" (can be null, in which case the
      *                      system default is looked up via the line.separator property)
      */
-    public EclipseXmlPrettyPrinter(
-            XmlFormatPreferences prefs,
-            XmlFormatStyle style,
-            String lineSeparator) {
+    public EclipseXmlPrettyPrinter(XmlFormatPreferences prefs, XmlFormatStyle style, String lineSeparator) {
         super(prefs, style, lineSeparator == null ? getDefaultLineSeparator() : lineSeparator);
     }
 
@@ -73,15 +67,11 @@ public class EclipseXmlPrettyPrinter extends XmlPrettyPrinter {
      *     unformatted document)
      */
     @NonNull
-    public static String prettyPrint(
-            @NonNull String xml,
-            @NonNull XmlFormatPreferences prefs,
-            @NonNull XmlFormatStyle style,
-            @Nullable String lineSeparator) {
+    public static String prettyPrint(@NonNull String xml, @NonNull XmlFormatPreferences prefs,
+            @NonNull XmlFormatStyle style, @Nullable String lineSeparator) {
         Document document = DomUtilities.parseStructuredDocument(xml);
         if (document != null) {
-            EclipseXmlPrettyPrinter printer = new EclipseXmlPrettyPrinter(prefs, style,
-                    lineSeparator);
+            EclipseXmlPrettyPrinter printer = new EclipseXmlPrettyPrinter(prefs, style, lineSeparator);
             if (xml.endsWith("\n")) { //$NON-NLS-1$
                 printer.setEndWithNewline(true);
             }
@@ -97,8 +87,7 @@ public class EclipseXmlPrettyPrinter extends XmlPrettyPrinter {
 
     @NonNull
     public static String prettyPrint(@NonNull Node node, boolean endWithNewline) {
-        return prettyPrint(node, EclipseXmlFormatPreferences.create(), XmlFormatStyle.get(node),
-                null, endWithNewline);
+        return prettyPrint(node, EclipseXmlFormatPreferences.create(), XmlFormatStyle.get(node), null, endWithNewline);
     }
 
     private static String getDefaultLineSeparator() {
@@ -122,12 +111,8 @@ public class EclipseXmlPrettyPrinter extends XmlPrettyPrinter {
      * @return a formatted string
      */
     @NonNull
-    public static String prettyPrint(
-            @NonNull Node node,
-            @NonNull XmlFormatPreferences prefs,
-            @NonNull XmlFormatStyle style,
-            @Nullable String lineSeparator,
-            boolean endWithNewline) {
+    public static String prettyPrint(@NonNull Node node, @NonNull XmlFormatPreferences prefs,
+            @NonNull XmlFormatStyle style, @Nullable String lineSeparator, boolean endWithNewline) {
         XmlPrettyPrinter printer = new EclipseXmlPrettyPrinter(prefs, style, lineSeparator);
         printer.setEndWithNewline(endWithNewline);
         StringBuilder sb = new StringBuilder(1000);

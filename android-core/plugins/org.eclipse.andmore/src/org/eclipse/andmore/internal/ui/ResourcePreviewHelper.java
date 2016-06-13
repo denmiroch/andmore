@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,9 +15,11 @@ package org.eclipse.andmore.internal.ui;
 import static com.android.SdkConstants.DOT_9PNG;
 import static com.android.utils.SdkUtils.endsWithIgnoreCase;
 
-import com.android.ide.common.rendering.api.ResourceValue;
-import com.android.ide.common.resources.ResourceResolver;
-import com.android.resources.ResourceType;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.gle2.GraphicalEditorPart;
@@ -41,11 +40,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
+import com.android.ide.common.rendering.api.ResourceValue;
+import com.android.ide.common.resources.ResourceResolver;
+import com.android.resources.ResourceType;
 
 /**
  * The {@link ResourcePreviewHelper} provides help to {@link TrayDialog} resource choosers
@@ -80,8 +77,8 @@ public class ResourcePreviewHelper {
      *            configuration data for the rendering.
      */
     public ResourcePreviewHelper(TrayDialog trayDialog, GraphicalEditorPart editor) {
-        this.mTrayDialog = trayDialog;
-        this.mEditor = editor;
+        mTrayDialog = trayDialog;
+        mEditor = editor;
     }
 
     /**
@@ -103,8 +100,8 @@ public class ResourcePreviewHelper {
                         panel.setLayout(new GridLayout(3, false));
                         Label dummy1 = new Label(panel, SWT.NONE);
                         dummy1.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
-                        mPreviewImageControl = new ImageControl(panel, SWT.NONE, SwtUtils
-                                .createEmptyImage(parent.getDisplay(), WIDTH, HEIGHT));
+                        mPreviewImageControl = new ImageControl(panel, SWT.NONE,
+                                SwtUtils.createEmptyImage(parent.getDisplay(), WIDTH, HEIGHT));
                         GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1);
                         gd.widthHint = WIDTH;
                         gd.heightHint = HEIGHT;
@@ -144,8 +141,7 @@ public class ResourcePreviewHelper {
                         // Special-case image files (other than 9-patch files) and render these
                         // directly, in order to provide proper aspect ratio handling and
                         // to handle scaling to show the full contents:
-                        if (ImageUtils.hasImageExtension(path)
-                                && !endsWithIgnoreCase(path, DOT_9PNG)) {
+                        if (ImageUtils.hasImageExtension(path) && !endsWithIgnoreCase(path, DOT_9PNG)) {
                             File file = new File(path);
                             if (file.exists()) {
                                 try {

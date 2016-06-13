@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,8 @@
 
 package org.eclipse.andmore.internal.launch;
 
-import com.android.SdkConstants;
+import java.io.IOException;
+import java.net.URL;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -27,8 +25,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate;
 import org.osgi.framework.Bundle;
 
-import java.io.IOException;
-import java.net.URL;
+import com.android.SdkConstants;
 
 /**
  * <p>
@@ -128,8 +125,7 @@ public class JUnitLaunchConfigDelegate extends JUnitLaunchConfigurationDelegate 
             // plugin explicitly; the error is logged here so that the user can
             // trace back the cause when the test fails to run
             AndmoreAndroidPlugin.log(e, "Could not find a valid junit.jar");
-            AndmoreAndroidPlugin.printErrorToConsole(projectName,
-                    "Could not find a valid junit.jar");
+            AndmoreAndroidPlugin.printErrorToConsole(projectName, "Could not find a valid junit.jar");
             // Return the classpath as-is (with no junit.jar) anyway because we
             // will let the actual launch config fails.
         }

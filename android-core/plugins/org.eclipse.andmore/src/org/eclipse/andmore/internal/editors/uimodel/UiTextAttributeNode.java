@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,9 +59,8 @@ public class UiTextAttributeNode extends UiAbstractTextAttributeNode {
     public void createUiControl(Composite parent, IManagedForm managedForm) {
         setManagedForm(managedForm);
         TextAttributeDescriptor desc = (TextAttributeDescriptor) getDescriptor();
-        Text text = SectionHelper.createLabelAndText(parent, managedForm.getToolkit(),
-                desc.getUiName(), getCurrentValue(),
-                DescriptorsUtils.formatTooltip(desc.getTooltip()));
+        Text text = SectionHelper.createLabelAndText(parent, managedForm.getToolkit(), desc.getUiName(),
+                getCurrentValue(), DescriptorsUtils.formatTooltip(desc.getTooltip()));
 
         setTextWidget(text);
     }
@@ -84,7 +80,7 @@ public class UiTextAttributeNode extends UiAbstractTextAttributeNode {
      * This is usually set by createUiControl.
      */
     protected void setManagedForm(IManagedForm managedForm) {
-         mManagedForm = managedForm;
+        mManagedForm = managedForm;
     }
 
     /**
@@ -130,11 +126,10 @@ public class UiTextAttributeNode extends UiAbstractTextAttributeNode {
             // Sets the with hint for the text field. Derived classes can always override it.
             // This helps the grid layout to resize correctly on smaller screen sizes.
             Object data = textWidget.getLayoutData();
-            if (data == null) {
-            } else if (data instanceof GridData) {
-                ((GridData)data).widthHint = AndroidXmlEditor.TEXT_WIDTH_HINT;
+            if (data == null) {} else if (data instanceof GridData) {
+                ((GridData) data).widthHint = AndroidXmlEditor.TEXT_WIDTH_HINT;
             } else if (data instanceof TableWrapData) {
-                ((TableWrapData)data).maxWidth = 100;
+                ((TableWrapData) data).maxWidth = 100;
             }
 
             mText.addModifyListener(new ModifyListener() {
@@ -147,11 +142,8 @@ public class UiTextAttributeNode extends UiAbstractTextAttributeNode {
                  */
                 @Override
                 public void modifyText(ModifyEvent e) {
-                    if (!isInInternalTextModification() &&
-                            !isDirty() &&
-                            mText != null &&
-                            getCurrentValue() != null &&
-                            !mText.getText().equals(getCurrentValue())) {
+                    if (!isInInternalTextModification() && !isDirty() && mText != null && getCurrentValue() != null
+                            && !mText.getText().equals(getCurrentValue())) {
                         setDirty(true);
                     }
                 }
@@ -183,8 +175,7 @@ public class UiTextAttributeNode extends UiAbstractTextAttributeNode {
      *
      * @param text The {@link Text} widget to validate.
      */
-    protected void onAddValidators(Text text) {
-    }
+    protected void onAddValidators(Text text) {}
 
     /**
      * Returns the text widget.

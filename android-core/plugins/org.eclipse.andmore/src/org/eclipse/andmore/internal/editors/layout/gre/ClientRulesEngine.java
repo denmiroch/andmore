@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,18 +22,13 @@ import static com.android.SdkConstants.CLASS_VIEW;
 import static com.android.SdkConstants.NEW_ID_PREFIX;
 import static com.android.SdkConstants.URI_PREFIX;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.IClientRulesEngine;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.IValidator;
-import com.android.ide.common.api.IViewMetadata;
-import com.android.ide.common.api.IViewRule;
-import com.android.ide.common.api.Margins;
-import com.android.ide.common.api.Rect;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.resources.ResourceType;
-import com.android.sdklib.IAndroidTarget;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.common.layout.BaseViewRule;
@@ -105,13 +97,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.IClientRulesEngine;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.IValidator;
+import com.android.ide.common.api.IViewMetadata;
+import com.android.ide.common.api.IViewRule;
+import com.android.ide.common.api.Margins;
+import com.android.ide.common.api.Rect;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.resources.ResourceType;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * Implementation of {@link IClientRulesEngine}. This provides {@link IViewRule} clients
@@ -138,10 +135,7 @@ class ClientRulesEngine implements IClientRulesEngine {
 
     @Override
     public void debugPrintf(@NonNull String msg, Object... params) {
-        AndmoreAndroidPlugin.printToConsole(
-                mFqcn == null ? "<unknown>" : mFqcn,
-                String.format(msg, params)
-                );
+        AndmoreAndroidPlugin.printToConsole(mFqcn == null ? "<unknown>" : mFqcn, String.format(msg, params));
     }
 
     @Override
@@ -151,9 +145,7 @@ class ClientRulesEngine implements IClientRulesEngine {
 
     @Override
     public void displayAlert(@NonNull String message) {
-        MessageDialog.openInformation(
-                AndmoreAndroidPlugin.getShell(),
-                mFqcn,  // title
+        MessageDialog.openInformation(AndmoreAndroidPlugin.getShell(), mFqcn, // title
                 message);
     }
 
@@ -167,8 +159,7 @@ class ClientRulesEngine implements IClientRulesEngine {
     }
 
     @Override
-    public String displayInput(@NonNull String message, @Nullable String value,
-            final @Nullable IValidator filter) {
+    public String displayInput(@NonNull String message, @Nullable String value, final @Nullable IValidator filter) {
         IInputValidator validator = null;
         if (filter != null) {
             validator = new IInputValidator() {
@@ -185,12 +176,9 @@ class ClientRulesEngine implements IClientRulesEngine {
             };
         }
 
-        InputDialog d = new InputDialog(
-                    AndmoreAndroidPlugin.getShell(),
-                    mFqcn,  // title
-                    message,
-                    value == null ? "" : value, //$NON-NLS-1$
-                    validator) {
+        InputDialog d = new InputDialog(AndmoreAndroidPlugin.getShell(), mFqcn, // title
+                message, value == null ? "" : value, //$NON-NLS-1$
+                validator) {
             @Override
             protected void createButtonsForButtonBar(Composite parent) {
                 createButton(parent, CLEAR_BUTTON_ID, "Clear", false /*defaultButton*/);
@@ -269,8 +257,7 @@ class ClientRulesEngine implements IClientRulesEngine {
     }
 
     @Override
-    public IValidator getResourceValidator(
-            @NonNull final String resourceTypeName, final boolean uniqueInProject,
+    public IValidator getResourceValidator(@NonNull final String resourceTypeName, final boolean uniqueInProject,
             final boolean uniqueInLayout, final boolean exists, final String... allowed) {
         return new IValidator() {
             private ResourceNameValidator mValidator;
@@ -333,16 +320,12 @@ class ClientRulesEngine implements IClientRulesEngine {
         IProject project = delegate.getEditor().getProject();
         if (project != null) {
             // get the resource repository for this project and the system resources.
-            ResourceRepository projectRepository =
-                ResourceManager.getInstance().getProjectResources(project);
+            ResourceRepository projectRepository = ResourceManager.getInstance().getProjectResources(project);
             Shell shell = AndmoreAndroidPlugin.getShell();
             if (shell == null) {
                 return null;
             }
-            ReferenceChooserDialog dlg = new ReferenceChooserDialog(
-                    project,
-                    projectRepository,
-                    shell);
+            ReferenceChooserDialog dlg = new ReferenceChooserDialog(project, projectRepository, shell);
             dlg.setPreviewHelper(new ResourcePreviewHelper(dlg, graphicalEditor));
 
             dlg.setCurrentResource(currentValue);
@@ -356,21 +339,19 @@ class ClientRulesEngine implements IClientRulesEngine {
     }
 
     @Override
-    public String displayResourceInput(@NonNull String resourceTypeName,
-            @Nullable String currentValue) {
+    public String displayResourceInput(@NonNull String resourceTypeName, @Nullable String currentValue) {
         return displayResourceInput(resourceTypeName, currentValue, null);
     }
 
-    private String displayResourceInput(String resourceTypeName, String currentValue,
-            IInputValidator validator) {
+    private String displayResourceInput(String resourceTypeName, String currentValue, IInputValidator validator) {
         ResourceType type = ResourceType.getEnum(resourceTypeName);
         GraphicalEditorPart graphicalEditor = mRulesEngine.getEditor();
         return ResourceChooser.chooseResource(graphicalEditor, type, currentValue, validator);
     }
 
     @Override
-    public String[] displayMarginInput(@Nullable String all, @Nullable String left,
-            @Nullable String right, @Nullable String top, @Nullable String bottom) {
+    public String[] displayMarginInput(@Nullable String all, @Nullable String left, @Nullable String right,
+            @Nullable String top, @Nullable String bottom) {
         GraphicalEditorPart editor = mRulesEngine.getEditor();
         IProject project = editor.getProject();
         if (project != null) {
@@ -379,8 +360,7 @@ class ClientRulesEngine implements IClientRulesEngine {
                 return null;
             }
             AndroidTargetData data = editor.getEditorDelegate().getEditor().getTargetData();
-            MarginChooser dialog = new MarginChooser(shell, editor, data, all, left, right,
-                    top, bottom);
+            MarginChooser dialog = new MarginChooser(shell, editor, data, all, left, right, top, bottom);
             if (dialog.open() == Window.OK) {
                 return dialog.getMargins();
             }
@@ -429,25 +409,21 @@ class ClientRulesEngine implements IClientRulesEngine {
                 // No, this should be using the min SDK instead!
                 if (target.getVersion().getApiLevel() < 11 && oldFragmentType == null) {
                     // Compatibility library must be present
-                    MessageDialog dialog =
-                        new MessageDialog(
-                                Display.getCurrent().getActiveShell(),
-                          "Fragment Warning",
-                          null,
-                          "Fragments require API level 11 or higher, or a compatibility "
-                          + "library for older versions.\n\n"
-                          + " Do you want to install the compatibility library?",
-                          MessageDialog.QUESTION,
-                          new String[] { "Install", "Cancel" },
-                          1 /* default button: Cancel */);
-                      int answer = dialog.open();
-                      if (answer == 0) {
-                          if (!AddSupportJarAction.install(project)) {
-                              return null;
-                          }
-                      } else {
-                          return null;
-                      }
+                    MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(), "Fragment Warning",
+                            null,
+                            "Fragments require API level 11 or higher, or a compatibility "
+                                    + "library for older versions.\n\n"
+                                    + " Do you want to install the compatibility library?",
+                            MessageDialog.QUESTION, new String[] { "Install", "Cancel" },
+                            1 /* default button: Cancel */);
+                    int answer = dialog.open();
+                    if (answer == 0) {
+                        if (!AddSupportJarAction.install(project)) {
+                            return null;
+                        }
+                    } else {
+                        return null;
+                    }
                 }
 
                 // Look up sub-types of each (new fragment class and compatibility fragment
@@ -456,32 +432,24 @@ class ClientRulesEngine implements IClientRulesEngine {
                 IType[] fragmentTypes = new IType[0];
                 IType[] oldFragmentTypes = new IType[0];
                 if (oldFragmentType != null) {
-                    ITypeHierarchy hierarchy =
-                        oldFragmentType.newTypeHierarchy(new NullProgressMonitor());
+                    ITypeHierarchy hierarchy = oldFragmentType.newTypeHierarchy(new NullProgressMonitor());
                     oldFragmentTypes = hierarchy.getAllSubtypes(oldFragmentType);
                 }
                 IType fragmentType = javaProject.findType(CLASS_FRAGMENT);
                 if (fragmentType != null) {
-                    ITypeHierarchy hierarchy =
-                        fragmentType.newTypeHierarchy(new NullProgressMonitor());
+                    ITypeHierarchy hierarchy = fragmentType.newTypeHierarchy(new NullProgressMonitor());
                     fragmentTypes = hierarchy.getAllSubtypes(fragmentType);
                 }
                 IType[] subTypes = new IType[fragmentTypes.length + oldFragmentTypes.length];
                 System.arraycopy(fragmentTypes, 0, subTypes, 0, fragmentTypes.length);
-                System.arraycopy(oldFragmentTypes, 0, subTypes, fragmentTypes.length,
-                        oldFragmentTypes.length);
+                System.arraycopy(oldFragmentTypes, 0, subTypes, fragmentTypes.length, oldFragmentTypes.length);
                 scope = SearchEngine.createJavaSearchScope(subTypes, IJavaSearchScope.SOURCES);
             }
 
             Shell parent = AndmoreAndroidPlugin.getShell();
-            final AtomicReference<String> returnValue =
-                new AtomicReference<String>();
-            final AtomicReference<SelectionDialog> dialogHolder =
-                new AtomicReference<SelectionDialog>();
-            final SelectionDialog dialog = JavaUI.createTypeDialog(
-                    parent,
-                    new ProgressMonitorDialog(parent),
-                    scope,
+            final AtomicReference<String> returnValue = new AtomicReference<String>();
+            final AtomicReference<SelectionDialog> dialogHolder = new AtomicReference<SelectionDialog>();
+            final SelectionDialog dialog = JavaUI.createTypeDialog(parent, new ProgressMonitorDialog(parent), scope,
                     IJavaElementSearchConstants.CONSIDER_CLASSES, false,
                     // Use ? as a default filter to fill dialog with matches
                     "?", //$NON-NLS-1$
@@ -511,10 +479,8 @@ class ClientRulesEngine implements IClientRulesEngine {
                                 @Override
                                 public boolean select(ITypeInfoRequestor typeInfoRequestor) {
                                     int modifiers = typeInfoRequestor.getModifiers();
-                                    if (!Flags.isPublic(modifiers)
-                                            || Flags.isInterface(modifiers)
-                                            || Flags.isEnum(modifiers)
-                                            || Flags.isAbstract(modifiers)) {
+                                    if (!Flags.isPublic(modifiers) || Flags.isInterface(modifiers)
+                                            || Flags.isEnum(modifiers) || Flags.isAbstract(modifiers)) {
                                         return false;
                                     }
                                     return true;
@@ -558,22 +524,16 @@ class ClientRulesEngine implements IClientRulesEngine {
                 IType[] viewTypes = new IType[0];
                 IType fragmentType = javaProject.findType(CLASS_VIEW);
                 if (fragmentType != null) {
-                    ITypeHierarchy hierarchy =
-                        fragmentType.newTypeHierarchy(new NullProgressMonitor());
+                    ITypeHierarchy hierarchy = fragmentType.newTypeHierarchy(new NullProgressMonitor());
                     viewTypes = hierarchy.getAllSubtypes(fragmentType);
                 }
                 scope = SearchEngine.createJavaSearchScope(viewTypes, IJavaSearchScope.SOURCES);
             }
 
             Shell parent = AndmoreAndroidPlugin.getShell();
-            final AtomicReference<String> returnValue =
-                new AtomicReference<String>();
-            final AtomicReference<SelectionDialog> dialogHolder =
-                new AtomicReference<SelectionDialog>();
-            final SelectionDialog dialog = JavaUI.createTypeDialog(
-                    parent,
-                    new ProgressMonitorDialog(parent),
-                    scope,
+            final AtomicReference<String> returnValue = new AtomicReference<String>();
+            final AtomicReference<SelectionDialog> dialogHolder = new AtomicReference<SelectionDialog>();
+            final SelectionDialog dialog = JavaUI.createTypeDialog(parent, new ProgressMonitorDialog(parent), scope,
                     IJavaElementSearchConstants.CONSIDER_CLASSES, false,
                     // Use ? as a default filter to fill dialog with matches
                     "?", //$NON-NLS-1$
@@ -603,10 +563,8 @@ class ClientRulesEngine implements IClientRulesEngine {
                                 @Override
                                 public boolean select(ITypeInfoRequestor typeInfoRequestor) {
                                     int modifiers = typeInfoRequestor.getModifiers();
-                                    if (!Flags.isPublic(modifiers)
-                                            || Flags.isInterface(modifiers)
-                                            || Flags.isEnum(modifiers)
-                                            || Flags.isAbstract(modifiers)) {
+                                    if (!Flags.isPublic(modifiers) || Flags.isInterface(modifiers)
+                                            || Flags.isEnum(modifiers) || Flags.isAbstract(modifiers)) {
                                         return false;
                                     }
                                     return true;

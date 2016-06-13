@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,11 @@
  */
 
 package org.eclipse.andmore.internal.editors.ui.tree;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
@@ -36,16 +38,10 @@ import org.eclipse.wst.xml.core.internal.document.NodeContainer;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-
-
 /**
  * Provides Cut and Copy actions for the tree nodes.
  */
-@SuppressWarnings({"restriction", "deprecation"})
+@SuppressWarnings({ "restriction", "deprecation" })
 public class CopyCutAction extends Action {
     private List<UiElementNode> mUiNodes;
     private boolean mPerformCut;
@@ -59,8 +55,8 @@ public class CopyCutAction extends Action {
      * @param selected The UI node to cut or copy. It *must* have a non-null XML node.
      * @param performCut True if the operation is cut, false if it is copy.
      */
-    public CopyCutAction(AndroidXmlEditor editor, Clipboard clipboard, ICommitXml xmlCommit,
-            UiElementNode selected, boolean performCut) {
+    public CopyCutAction(AndroidXmlEditor editor, Clipboard clipboard, ICommitXml xmlCommit, UiElementNode selected,
+            boolean performCut) {
         this(editor, clipboard, xmlCommit, toList(selected), performCut);
     }
 
@@ -82,13 +78,11 @@ public class CopyCutAction extends Action {
         if (performCut) {
             setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_CUT));
             setHoverImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_CUT_HOVER));
-            setDisabledImageDescriptor(
-                    images.getImageDescriptor(ISharedImages.IMG_TOOL_CUT_DISABLED));
+            setDisabledImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_CUT_DISABLED));
         } else {
             setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
             setHoverImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY_HOVER));
-            setDisabledImageDescriptor(
-                    images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY_DISABLED));
+            setDisabledImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY_DISABLED));
         }
 
         mUiNodes = selected;
@@ -147,9 +141,7 @@ public class CopyCutAction extends Action {
         } // for uiNode
 
         if (allText != null && allText.length() > 0) {
-            mClipboard.setContents(
-                    new Object[] { allText.toString() },
-                    new Transfer[] { TextTransfer.getInstance() });
+            mClipboard.setContents(new Object[] { allText.toString() }, new Transfer[] { TextTransfer.getInstance() });
             if (mPerformCut) {
                 for (UiElementNode uiNode : nodesToCut) {
                     uiNode.deleteXmlNode();
@@ -167,7 +159,7 @@ public class CopyCutAction extends Action {
             if (xml_node instanceof NodeContainer) {
                 // The easy way to get the source of an SSE XML node.
                 data = ((NodeContainer) xml_node).getSource();
-            } else  if (xml_node instanceof IndexedRegion && sse_doc != null) {
+            } else if (xml_node instanceof IndexedRegion && sse_doc != null) {
                 // Try harder.
                 IndexedRegion region = (IndexedRegion) xml_node;
                 int start = region.getStartOffset();
@@ -196,9 +188,7 @@ public class CopyCutAction extends Action {
         String data;
         StringWriter sw = new StringWriter();
         XMLSerializer serializer = new XMLSerializer(sw,
-                new OutputFormat(Method.XML,
-                        OutputFormat.Defaults.Encoding /* utf-8 */,
-                        true /* indent */));
+                new OutputFormat(Method.XML, OutputFormat.Defaults.Encoding /* utf-8 */, true /* indent */));
         // Serialize will throw an IOException if it fails.
         serializer.serialize((Element) xml_node);
         data = sw.toString();
@@ -217,4 +207,3 @@ public class CopyCutAction extends Action {
         return list;
     }
 }
-

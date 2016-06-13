@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +15,7 @@ package org.eclipse.andmore.internal.refactorings.core;
 import static com.android.SdkConstants.PREFIX_RESOURCE_REF;
 import static com.android.SdkConstants.R_CLASS;
 
-import com.android.resources.ResourceType;
+import java.util.Set;
 
 import org.eclipse.andmore.internal.resources.ResourceNameValidator;
 import org.eclipse.jdt.internal.ui.refactoring.TextInputWizardPage;
@@ -35,7 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import java.util.Set;
+import com.android.resources.ResourceType;
 
 @SuppressWarnings("restriction") // JDT refactoring UI
 class RenameResourcePage extends TextInputWizardPage implements SelectionListener {
@@ -57,8 +54,7 @@ class RenameResourcePage extends TextInputWizardPage implements SelectionListene
         mType = type;
         mCanClear = canClear;
 
-        mValidator = ResourceNameValidator.create(false /*allowXmlExtension*/,
-                (Set<String>) null, mType);
+        mValidator = ResourceNameValidator.create(false /*allowXmlExtension*/, (Set<String>) null, mType);
     }
 
     @SuppressWarnings("unused") // SWT constructors aren't really unused, they have side effects
@@ -100,8 +96,7 @@ class RenameResourcePage extends TextInputWizardPage implements SelectionListene
         if (visible) {
             RenameResourceProcessor processor = getProcessor();
             String newName = processor.getNewName();
-            if (newName != null && newName.length() > 0
-                    && !newName.equals(getInitialValue())) {
+            if (newName != null && newName.length() > 0 && !newName.equals(getInitialValue())) {
                 Text textField = getTextField();
                 textField.setText(newName);
                 textField.setSelection(0, newName.length());
@@ -115,8 +110,7 @@ class RenameResourcePage extends TextInputWizardPage implements SelectionListene
     protected RefactoringStatus validateTextField(String newName) {
         if (newName.isEmpty() && isEmptyInputValid()) {
             getProcessor().setNewName("");
-            return RefactoringStatus.createWarningStatus(
-                    "The resource definition will be deleted");
+            return RefactoringStatus.createWarningStatus("The resource definition will be deleted");
         }
 
         String error = mValidator.isValid(newName);
@@ -142,8 +136,7 @@ class RenameResourcePage extends TextInputWizardPage implements SelectionListene
     @Override
     protected boolean isInitialInputValid() {
         RenameResourceProcessor processor = getProcessor();
-        return processor.getNewName() != null
-                && !processor.getNewName().equals(processor.getCurrentName());
+        return processor.getNewName() != null && !processor.getNewName().equals(processor.getCurrentName());
     }
 
     @Override
@@ -172,6 +165,5 @@ class RenameResourcePage extends TextInputWizardPage implements SelectionListene
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 }

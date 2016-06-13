@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +13,8 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.SdkConstants;
-import com.android.ide.common.api.DropFeedback;
-import com.android.ide.common.api.IViewRule;
-import com.android.ide.common.api.Rect;
-import com.android.ide.common.api.SegmentType;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.internal.editors.layout.gre.NodeProxy;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -50,8 +43,12 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorSite;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.SdkConstants;
+import com.android.ide.common.api.DropFeedback;
+import com.android.ide.common.api.IViewRule;
+import com.android.ide.common.api.Rect;
+import com.android.ide.common.api.SegmentType;
+import com.android.utils.Pair;
 
 /**
  * The {@link GestureManager} is is the central manager of gestures; it is responsible
@@ -316,8 +313,7 @@ public class GestureManager {
 
         if (!selectionManager.isEmpty()) {
             Display display = mCanvas.getDisplay();
-            Pair<SelectionItem, SelectionHandle> handlePair =
-                selectionManager.findHandle(controlPoint);
+            Pair<SelectionItem, SelectionHandle> handlePair = selectionManager.findHandle(controlPoint);
             if (handlePair != null) {
                 SelectionHandle handle = handlePair.getSecond();
                 int cursorType = handle.getSwtCursorType();
@@ -331,8 +327,7 @@ public class GestureManager {
             // See if it's over a selected view
             LayoutPoint layoutPoint = controlPoint.toLayout();
             for (SelectionItem item : selectionManager.getSelections()) {
-                if (item.getRect().contains(layoutPoint.x, layoutPoint.y)
-                        && !item.isRoot()) {
+                if (item.getRect().contains(layoutPoint.x, layoutPoint.y) && !item.isRoot()) {
                     Cursor cursor = display.getSystemCursor(SWT.CURSOR_HAND);
                     if (cursor != mCanvas.getCursor()) {
                         mCanvas.setCursor(cursor);
@@ -382,7 +377,7 @@ public class GestureManager {
 
         // Tooltip
         if (feedback != null && feedback.tooltip != null) {
-            Pair<Boolean,Boolean> position = mCurrentGesture.getTooltipPosition();
+            Pair<Boolean, Boolean> position = mCurrentGesture.getTooltipPosition();
             boolean below = position.getFirst();
             if (feedback.tooltipY != null) {
                 below = feedback.tooltipY == SegmentType.BOTTOM;
@@ -434,8 +429,7 @@ public class GestureManager {
      * Helper class which implements the {@link MouseMoveListener},
      * {@link MouseListener} and {@link KeyListener} interfaces.
      */
-    private class Listener implements MouseMoveListener, MouseListener, MouseTrackListener,
-            KeyListener {
+    private class Listener implements MouseMoveListener, MouseListener, MouseTrackListener, KeyListener {
 
         // --- MouseMoveListener ---
 
@@ -471,8 +465,7 @@ public class GestureManager {
                 }
 
                 // Just a click, select
-                Pair<SelectionItem, SelectionHandle> handlePair =
-                    mCanvas.getSelectionManager().findHandle(mousePos);
+                Pair<SelectionItem, SelectionHandle> handlePair = mCanvas.getSelectionManager().findHandle(mousePos);
                 if (handlePair == null) {
                     mCanvas.getSelectionManager().select(e);
                 }
@@ -531,8 +524,7 @@ public class GestureManager {
         }
 
         @Override
-        public void mouseHover(MouseEvent e) {
-        }
+        public void mouseHover(MouseEvent e) {}
 
         // --- KeyListener ---
 
@@ -558,8 +550,7 @@ public class GestureManager {
             if (mCurrentGesture != null) {
                 // unless it's "Escape", which cancels the gesture
                 if (e.keyCode == SWT.ESC) {
-                    ControlPoint controlPoint = ControlPoint.create(mCanvas,
-                            mLastMouseX, mLastMouseY);
+                    ControlPoint controlPoint = ControlPoint.create(mCanvas, mLastMouseX, mLastMouseY);
                     finishGesture(controlPoint, true);
                     return;
                 }
@@ -599,8 +590,7 @@ public class GestureManager {
 
     /** Listener for Drag &amp; Drop events. */
     private class CanvasDropListener implements DropTargetListener {
-        public CanvasDropListener() {
-        }
+        public CanvasDropListener() {}
 
         /**
          * The cursor has entered the drop target boundaries. {@inheritDoc}
@@ -617,8 +607,7 @@ public class GestureManager {
                 } else {
                     mZombieGesture = null;
                 }
-                startGesture(ControlPoint.create(mCanvas, event),
-                        newGesture, 0);
+                startGesture(ControlPoint.create(mCanvas, event), newGesture, 0);
             }
 
             if (mCurrentGesture instanceof DropGesture) {
@@ -724,11 +713,10 @@ public class GestureManager {
 
             // See if the mouse is over a selection handle; if so, start a resizing
             // gesture.
-            Pair<SelectionItem, SelectionHandle> handle =
-                selectionManager.findHandle(controlPoint);
+            Pair<SelectionItem, SelectionHandle> handle = selectionManager.findHandle(controlPoint);
             if (handle != null) {
-                startGesture(controlPoint, new ResizeGesture(mCanvas, handle.getFirst(),
-                        handle.getSecond()), mLastStateMask);
+                startGesture(controlPoint, new ResizeGesture(mCanvas, handle.getFirst(), handle.getSecond()),
+                        mLastStateMask);
                 e.detail = DND.DROP_NONE;
                 e.doit = false;
                 mCanvas.redraw();
@@ -806,23 +794,19 @@ public class GestureManager {
             if (e.doit) {
                 mDragElements = SelectionItem.getAsElements(mDragSelection, primary);
                 GlobalCanvasDragInfo.getInstance().startDrag(mDragElements,
-                        mDragSelection.toArray(new SelectionItem[imageCount]),
-                        mCanvas, new Runnable() {
+                        mDragSelection.toArray(new SelectionItem[imageCount]), mCanvas, new Runnable() {
                             @Override
                             public void run() {
-                                mCanvas.getClipboardSupport().deleteSelection("Remove",
-                                        mDragSelection);
+                                mCanvas.getClipboardSupport().deleteSelection("Remove", mDragSelection);
                             }
                         });
             }
 
             // If you drag on the -background-, we make that into a marquee
             // selection
-            if (!e.doit || (imageCount == 1
-                    && (mDragSelection.get(0).isRoot() || mDragSelection.get(0).isHidden()))) {
+            if (!e.doit || (imageCount == 1 && (mDragSelection.get(0).isRoot() || mDragSelection.get(0).isHidden()))) {
                 boolean toggle = (mLastStateMask & (SWT.CTRL | SWT.SHIFT | SWT.COMMAND)) != 0;
-                startGesture(controlPoint,
-                        new MarqueeGesture(mCanvas, toggle), mLastStateMask);
+                startGesture(controlPoint, new MarqueeGesture(mCanvas, toggle), mLastStateMask);
                 e.detail = DND.DROP_NONE;
                 e.doit = false;
             } else {
@@ -854,8 +838,7 @@ public class GestureManager {
                         }
                         Rectangle boundingBox = ImageUtils.getBoundingRectangle(rectangles);
                         double scale = mCanvas.getHorizontalTransform().getScale();
-                        e.image = SwtUtils.drawRectangles(image, rectangles, boundingBox, scale,
-                                DRAG_TRANSPARENCY);
+                        e.image = SwtUtils.drawRectangles(image, rectangles, boundingBox, scale, DRAG_TRANSPARENCY);
 
                         // Set the image offset such that we preserve the relative
                         // distance between the mouse pointer and the top left corner of
@@ -875,8 +858,7 @@ public class GestureManager {
 
                         // Record the baseline such that we can perform baseline alignment
                         // on the node as it's dragged around
-                        NodeProxy firstNode =
-                            mCanvas.getNodeFactory().create(mDragSelection.get(0).getViewInfo());
+                        NodeProxy firstNode = mCanvas.getNodeFactory().create(mDragSelection.get(0).getViewInfo());
                         dragInfo.setDragBaseline(firstNode.getBaseline());
                     }
                 }

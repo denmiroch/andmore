@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,19 +13,21 @@
 
 package org.eclipse.andmore.internal.editors.layout;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.resources.ResourceFile;
-import com.android.ide.common.resources.ResourceFolder;
-import com.android.resources.ResourceType;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor;
-import org.eclipse.andmore.internal.resources.manager.ResourceManager;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IFileListener;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IResourceEventListener;
+import org.eclipse.andmore.internal.resources.manager.ResourceManager;
 import org.eclipse.andmore.internal.resources.manager.ResourceManager.IResourceListener;
 import org.eclipse.andmore.internal.sdk.ProjectState;
 import org.eclipse.andmore.internal.sdk.Sdk;
@@ -38,14 +37,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.resources.ResourceFile;
+import com.android.ide.common.resources.ResourceFolder;
+import com.android.resources.ResourceType;
 
 /**
  * Monitor for file changes that could trigger a layout redraw, or a UI update
@@ -58,8 +55,7 @@ public final class LayoutReloadMonitor {
     /**
      * Map of listeners by IProject.
      */
-    private final Map<IProject, List<ILayoutReloadListener>> mListenerMap =
-        new HashMap<IProject, List<ILayoutReloadListener>>();
+    private final Map<IProject, List<ILayoutReloadListener>> mListenerMap = new HashMap<IProject, List<ILayoutReloadListener>>();
 
     public final static class ChangeFlags {
         public boolean code = false;
@@ -108,8 +104,7 @@ public final class LayoutReloadMonitor {
 
         // also listen for .class file changed in case the layout has custom view classes.
         GlobalProjectMonitor monitor = GlobalProjectMonitor.getMonitor();
-        monitor.addFileListener(mFileListener,
-                IResourceDelta.ADDED | IResourceDelta.CHANGED | IResourceDelta.REMOVED);
+        monitor.addFileListener(mFileListener, IResourceDelta.ADDED | IResourceDelta.CHANGED | IResourceDelta.REMOVED);
 
         monitor.addResourceEventListener(mResourceEventListener);
     }
@@ -174,12 +169,11 @@ public final class LayoutReloadMonitor {
          * This records the changes for each project, but does not notify listeners.
          */
         @Override
-        public void fileChanged(@NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas,
-                int kind, @Nullable String extension, int flags, boolean isAndroidProject) {
+        public void fileChanged(@NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas, int kind,
+                @Nullable String extension, int flags, boolean isAndroidProject) {
             // This listener only cares about .class files and AndroidManifest.xml files
-            if (!(SdkConstants.EXT_CLASS.equals(extension)
-                    || SdkConstants.EXT_XML.equals(extension)
-                        && SdkConstants.FN_ANDROID_MANIFEST_XML.equals(file.getName()))) {
+            if (!(SdkConstants.EXT_CLASS.equals(extension) || SdkConstants.EXT_XML.equals(extension)
+                    && SdkConstants.FN_ANDROID_MANIFEST_XML.equals(file.getName()))) {
                 return;
             }
 
@@ -241,8 +235,8 @@ public final class LayoutReloadMonitor {
 
                     changeFlags.code = true;
                 }
-            } else if (SdkConstants.FN_ANDROID_MANIFEST_XML.equals(file.getName()) &&
-                    file.getParent().equals(project)) {
+            } else if (SdkConstants.FN_ANDROID_MANIFEST_XML.equals(file.getName())
+                    && file.getParent().equals(project)) {
                 // this is a manifest change!
                 if (changeFlags == null) {
                     changeFlags = new ChangeFlags();
@@ -306,8 +300,7 @@ public final class LayoutReloadMonitor {
          * @param libraryChanged a flag indicating if the change flags are for the give project,
          * or if they are for a library dependency.
          */
-        private void notifyForProject(IProject project, ChangeFlags flags,
-                boolean libraryChanged) {
+        private void notifyForProject(IProject project, ChangeFlags flags, boolean libraryChanged) {
             synchronized (mListenerMap) {
                 List<ILayoutReloadListener> listeners = mListenerMap.get(project);
 

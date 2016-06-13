@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,7 @@
 
 package org.eclipse.andmore.internal.editors.manifest.model;
 
-import com.android.ide.common.xml.ManifestData;
+import java.util.TreeSet;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.descriptors.AttributeDescriptor;
@@ -32,7 +29,6 @@ import org.eclipse.andmore.internal.wizards.actions.NewProjectAction;
 import org.eclipse.andmore.internal.wizards.newproject.NewProjectWizard;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -63,7 +59,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.part.FileEditorInput;
 
-import java.util.TreeSet;
+import com.android.ide.common.xml.ManifestData;
 
 /**
  * Represents an XML attribute to select an existing manifest package, that can be modified using
@@ -95,11 +91,11 @@ public class UiManifestPkgAttrNode extends UiTextAttributeNode {
         TextAttributeDescriptor desc = (TextAttributeDescriptor) getDescriptor();
 
         StringBuilder label = new StringBuilder();
-        label.append("<form><p><a href='unused'>");  //$NON-NLS-1$
+        label.append("<form><p><a href='unused'>"); //$NON-NLS-1$
         label.append(desc.getUiName());
-        label.append("</a></p></form>");  //$NON-NLS-1$
-        FormText formText = SectionHelper.createFormText(parent, toolkit, true /* isHtml */,
-                label.toString(), true /* setupLayoutData */);
+        label.append("</a></p></form>"); //$NON-NLS-1$
+        FormText formText = SectionHelper.createFormText(parent, toolkit, true /* isHtml */, label.toString(),
+                true /* setupLayoutData */);
         formText.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
             public void linkActivated(HyperlinkEvent e) {
@@ -121,7 +117,7 @@ public class UiManifestPkgAttrNode extends UiTextAttributeNode {
 
         final Text text = toolkit.createText(composite, getCurrentValue());
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalIndent = 1;  // Needed by the fixed composite borders under GTK
+        gd.horizontalIndent = 1; // Needed by the fixed composite borders under GTK
         text.setLayoutData(gd);
 
         setTextWidget(text);
@@ -149,8 +145,8 @@ public class UiManifestPkgAttrNode extends UiTextAttributeNode {
                 String package_name = text.getText();
                 if (package_name.indexOf('.') < 1) {
                     getManagedForm().getMessageManager().addMessage(text,
-                            "Package name should contain at least two identifiers.",
-                            null /* data */, IMessageProvider.ERROR, text);
+                            "Package name should contain at least two identifiers.", null /* data */,
+                            IMessageProvider.ERROR, text);
                 } else {
                     getManagedForm().getMessageManager().removeMessage(text, text);
                 }
@@ -177,8 +173,7 @@ public class UiManifestPkgAttrNode extends UiTextAttributeNode {
     private void doBrowseClick() {
 
         // Display the list of AndroidManifest packages in a selection dialog
-        ElementListSelectionDialog dialog = new ElementListSelectionDialog(
-                getTextWidget().getShell(),
+        ElementListSelectionDialog dialog = new ElementListSelectionDialog(getTextWidget().getShell(),
                 new ILabelProvider() {
                     @Override
                     public Image getImage(Object element) {
@@ -191,12 +186,10 @@ public class UiManifestPkgAttrNode extends UiTextAttributeNode {
                     }
 
                     @Override
-                    public void addListener(ILabelProviderListener listener) {
-                    }
+                    public void addListener(ILabelProviderListener listener) {}
 
                     @Override
-                    public void dispose() {
-                    }
+                    public void dispose() {}
 
                     @Override
                     public boolean isLabelProperty(Object element, String property) {
@@ -204,8 +197,7 @@ public class UiManifestPkgAttrNode extends UiTextAttributeNode {
                     }
 
                     @Override
-                    public void removeListener(ILabelProviderListener listener) {
-                    }
+                    public void removeListener(ILabelProviderListener listener) {}
                 });
 
         dialog.setTitle("Android Manifest Package Selection");
@@ -268,14 +260,10 @@ public class UiManifestPkgAttrNode extends UiTextAttributeNode {
                     IWorkbenchPage page = win.getActivePage();
                     if (page != null) {
                         try {
-                            page.openEditor(
-                                    new FileEditorInput(manifestFile),
-                                    ManifestEditor.ID,
-                                    true, /* activate */
+                            page.openEditor(new FileEditorInput(manifestFile), ManifestEditor.ID, true, /* activate */
                                     IWorkbenchPage.MATCH_INPUT);
                         } catch (PartInitException e) {
-                            AndmoreAndroidPlugin.log(e,
-                                    "Opening editor failed for %s",  //$NON-NLS-1$
+                            AndmoreAndroidPlugin.log(e, "Opening editor failed for %s", //$NON-NLS-1$
                                     manifestFile.getFullPath());
                         }
                     }
@@ -328,4 +316,3 @@ public class UiManifestPkgAttrNode extends UiTextAttributeNode {
         return packages.toArray(new String[packages.size()]);
     }
 }
-

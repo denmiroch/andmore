@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,17 +23,14 @@ import static com.android.SdkConstants.VALUE_MATCH_PARENT;
 import static org.eclipse.andmore.AndmoreAndroidConstants.WS_SEP_CHAR;
 import static org.eclipse.andmore.internal.wizards.newxmlfile.ChooseConfigurationPage.RES_FOLDER_ABS;
 
-import com.android.SdkConstants;
-import com.android.ide.common.resources.configuration.FolderConfiguration;
-import com.android.ide.common.resources.configuration.ResourceQualifier;
-import com.android.resources.ResourceFolderType;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
-import com.android.utils.SdkUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
+import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.andmore.internal.editors.descriptors.DocumentDescriptor;
@@ -82,10 +76,13 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import com.android.SdkConstants;
+import com.android.ide.common.resources.configuration.FolderConfiguration;
+import com.android.ide.common.resources.configuration.ResourceQualifier;
+import com.android.resources.ResourceFolderType;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
+import com.android.utils.SdkUtils;
 
 /**
  * This is the first page of the {@link NewXmlFileWizard} which provides the ability to create
@@ -121,14 +118,8 @@ class NewXmlFileCreationPage extends WizardPage {
         private final String mDefaultRoot;
         private final int mTargetApiLevel;
 
-        public TypeInfo(String uiName,
-                        String tooltip,
-                        ResourceFolderType resFolderType,
-                        Object rootSeed,
-                        String defaultRoot,
-                        String xmlns,
-                        String defaultAttrs,
-                        int targetApiLevel) {
+        public TypeInfo(String uiName, String tooltip, ResourceFolderType resFolderType, Object rootSeed,
+                String defaultRoot, String xmlns, String defaultAttrs, int targetApiLevel) {
             mUiName = uiName;
             mResFolderType = resFolderType;
             mTooltip = tooltip;
@@ -241,158 +232,147 @@ class NewXmlFileCreationPage extends WizardPage {
     /**
      * TypeInfo, information for each "type" of file that can be created.
      */
-    private static final TypeInfo[] sTypes = {
-        new TypeInfo(
-                "Layout",                                                   // UI name
-                "An XML file that describes a screen layout.",              // tooltip
-                ResourceFolderType.LAYOUT,                                  // folder type
-                AndroidTargetData.DESCRIPTOR_LAYOUT,                        // root seed
-                LINEAR_LAYOUT,                                              // default root
-                SdkConstants.NS_RESOURCES,                                  // xmlns
-                "",                                                         // not used, see below
-                1                                                           // target API level
-                ) {
+    private static final TypeInfo[] sTypes = { new TypeInfo("Layout", // UI name
+            "An XML file that describes a screen layout.", // tooltip
+            ResourceFolderType.LAYOUT, // folder type
+            AndroidTargetData.DESCRIPTOR_LAYOUT, // root seed
+            LINEAR_LAYOUT, // default root
+            SdkConstants.NS_RESOURCES, // xmlns
+            "", // not used, see below
+            1 // target API level
+            ) {
 
-                @Override
-                String getDefaultRoot(IProject project) {
-                    // TODO: Use GridLayout by default for new SDKs
-                    // (when we've ironed out all the usability issues)
-                    //Sdk currentSdk = Sdk.getCurrent();
-                    //if (project != null && currentSdk != null) {
-                    //    IAndroidTarget target = currentSdk.getTarget(project);
-                    //    // fill_parent was renamed match_parent in API level 8
-                    //    if (target != null && target.getVersion().getApiLevel() >= 13) {
-                    //        return GRID_LAYOUT;
-                    //    }
-                    //}
+        @Override
+        String getDefaultRoot(IProject project) {
+            // TODO: Use GridLayout by default for new SDKs
+            // (when we've ironed out all the usability issues)
+            //Sdk currentSdk = Sdk.getCurrent();
+            //if (project != null && currentSdk != null) {
+            //    IAndroidTarget target = currentSdk.getTarget(project);
+            //    // fill_parent was renamed match_parent in API level 8
+            //    if (target != null && target.getVersion().getApiLevel() >= 13) {
+            //        return GRID_LAYOUT;
+            //    }
+            //}
 
-                    return LINEAR_LAYOUT;
-                };
+            return LINEAR_LAYOUT;
+        };
 
-                // The default attributes must be determined dynamically since whether
-                // we use match_parent or fill_parent depends on the API level of the
-                // project
-                @Override
-                String getDefaultAttrs(IProject project, String root) {
-                    Sdk currentSdk = Sdk.getCurrent();
-                    String fill = VALUE_FILL_PARENT;
-                    if (currentSdk != null) {
-                        IAndroidTarget target = currentSdk.getTarget(project);
-                        // fill_parent was renamed match_parent in API level 8
-                        if (target != null && target.getVersion().getApiLevel() >= 8) {
-                            fill = VALUE_MATCH_PARENT;
-                        }
-                    }
-
-                    // Only set "vertical" orientation of LinearLayouts by default;
-                    // for GridLayouts for example we want to rely on the real default
-                    // of the layout
-                    String size = String.format(
-                            "android:layout_width=\"%1$s\"\n"        //$NON-NLS-1$
-                            + "android:layout_height=\"%2$s\"",        //$NON-NLS-1$
-                            fill, fill);
-                    if (LINEAR_LAYOUT.equals(root)) {
-                        return "android:orientation=\"vertical\"\n" + size; //$NON-NLS-1$
-                    } else {
-                        return size;
-                    }
+        // The default attributes must be determined dynamically since whether
+        // we use match_parent or fill_parent depends on the API level of the
+        // project
+        @Override
+        String getDefaultAttrs(IProject project, String root) {
+            Sdk currentSdk = Sdk.getCurrent();
+            String fill = VALUE_FILL_PARENT;
+            if (currentSdk != null) {
+                IAndroidTarget target = currentSdk.getTarget(project);
+                // fill_parent was renamed match_parent in API level 8
+                if (target != null && target.getVersion().getApiLevel() >= 8) {
+                    fill = VALUE_MATCH_PARENT;
                 }
+            }
 
-                @Override
-                String getChild(IProject project, String root) {
-                    // Create vertical linear layouts inside new scroll views
-                    if (SCROLL_VIEW.equals(root) || HORIZONTAL_SCROLL_VIEW.equals(root)) {
-                        return "    <LinearLayout "         //$NON-NLS-1$
-                            + getDefaultAttrs(project, root).replace('\n', ' ')
-                            + " android:orientation=\"vertical\"" //$NON-NLS-1$
-                            + "></LinearLayout>\n";         //$NON-NLS-1$
-                    }
-                    return null;
-                }
-        },
-        new TypeInfo("Values",                                              // UI name
-                "An XML file with simple values: colors, strings, dimensions, etc.", // tooltip
-                ResourceFolderType.VALUES,                                  // folder type
-                SdkConstants.TAG_RESOURCES,                                 // root seed
-                null,                                                       // default root
-                null,                                                       // xmlns
-                null,                                                       // default attributes
-                1                                                           // target API level
-                ),
-        new TypeInfo("Drawable",                                            // UI name
-                "An XML file that describes a drawable.",                   // tooltip
-                ResourceFolderType.DRAWABLE,                                // folder type
-                AndroidTargetData.DESCRIPTOR_DRAWABLE,                      // root seed
-                null,                                                       // default root
-                SdkConstants.NS_RESOURCES,                                  // xmlns
-                null,                                                       // default attributes
-                1                                                           // target API level
-                ),
-        new TypeInfo("Menu",                                                // UI name
-                "An XML file that describes an menu.",                      // tooltip
-                ResourceFolderType.MENU,                                    // folder type
-                SdkConstants.TAG_MENU,                                      // root seed
-                null,                                                       // default root
-                SdkConstants.NS_RESOURCES,                                  // xmlns
-                null,                                                       // default attributes
-                1                                                           // target API level
-                ),
-        new TypeInfo("Color List",                                          // UI name
-                "An XML file that describes a color state list.",           // tooltip
-                ResourceFolderType.COLOR,                                   // folder type
-                AndroidTargetData.DESCRIPTOR_COLOR,                         // root seed
-                "selector",  //$NON-NLS-1$                                  // default root
-                SdkConstants.NS_RESOURCES,                                  // xmlns
-                null,                                                       // default attributes
-                1                                                           // target API level
-                ),
-        new TypeInfo("Property Animation",                                  // UI name
-                "An XML file that describes a property animation",          // tooltip
-                ResourceFolderType.ANIMATOR,                                // folder type
-                AndroidTargetData.DESCRIPTOR_ANIMATOR,                      // root seed
-                "set", //$NON-NLS-1$                                        // default root
-                SdkConstants.NS_RESOURCES,                                  // xmlns
-                null,                                                       // default attributes
-                11                                                          // target API level
-                ),
-        new TypeInfo("Tween Animation",                                     // UI name
-                "An XML file that describes a tween animation.",            // tooltip
-                ResourceFolderType.ANIM,                                    // folder type
-                AndroidTargetData.DESCRIPTOR_ANIM,                          // root seed
-                "set", //$NON-NLS-1$                                        // default root
-                null,                                                       // xmlns
-                null,                                                       // default attributes
-                1                                                           // target API level
-                ),
-        new TypeInfo("AppWidget Provider",                                  // UI name
-                "An XML file that describes a widget provider.",            // tooltip
-                ResourceFolderType.XML,                                     // folder type
-                AndroidTargetData.DESCRIPTOR_APPWIDGET_PROVIDER,            // root seed
-                null,                                                       // default root
-                SdkConstants.NS_RESOURCES,                                  // xmlns
-                null,                                                       // default attributes
-                3                                                           // target API level
-                ),
-        new TypeInfo("Preference",                                          // UI name
-                "An XML file that describes preferences.",                  // tooltip
-                ResourceFolderType.XML,                                     // folder type
-                AndroidTargetData.DESCRIPTOR_PREFERENCES,                   // root seed
-                SdkConstants.CLASS_NAME_PREFERENCE_SCREEN,                  // default root
-                SdkConstants.NS_RESOURCES,                                  // xmlns
-                null,                                                       // default attributes
-                1                                                           // target API level
-                ),
-        new TypeInfo("Searchable",                                          // UI name
-                "An XML file that describes a searchable.",                 // tooltip
-                ResourceFolderType.XML,                                     // folder type
-                AndroidTargetData.DESCRIPTOR_SEARCHABLE,                    // root seed
-                null,                                                       // default root
-                SdkConstants.NS_RESOURCES,                                  // xmlns
-                null,                                                       // default attributes
-                1                                                           // target API level
-                ),
-        // Still missing: Interpolator, Raw and Mipmap. Raw should probably never be in
-        // this menu since it's not often used for creating XML files.
+            // Only set "vertical" orientation of LinearLayouts by default;
+            // for GridLayouts for example we want to rely on the real default
+            // of the layout
+            String size = String.format(
+                    "android:layout_width=\"%1$s\"\n" //$NON-NLS-1$
+                            + "android:layout_height=\"%2$s\"", //$NON-NLS-1$
+                    fill, fill);
+            if (LINEAR_LAYOUT.equals(root)) {
+                return "android:orientation=\"vertical\"\n" + size; //$NON-NLS-1$
+            } else {
+                return size;
+            }
+        }
+
+        @Override
+        String getChild(IProject project, String root) {
+            // Create vertical linear layouts inside new scroll views
+            if (SCROLL_VIEW.equals(root) || HORIZONTAL_SCROLL_VIEW.equals(root)) {
+                return "    <LinearLayout " //$NON-NLS-1$
+                        + getDefaultAttrs(project, root).replace('\n', ' ') + " android:orientation=\"vertical\"" //$NON-NLS-1$
+                        + "></LinearLayout>\n"; //$NON-NLS-1$
+            }
+            return null;
+        }
+    }, new TypeInfo("Values", // UI name
+            "An XML file with simple values: colors, strings, dimensions, etc.", // tooltip
+            ResourceFolderType.VALUES, // folder type
+            SdkConstants.TAG_RESOURCES, // root seed
+            null, // default root
+            null, // xmlns
+            null, // default attributes
+            1 // target API level
+            ),
+            new TypeInfo("Drawable", // UI name
+                    "An XML file that describes a drawable.", // tooltip
+                    ResourceFolderType.DRAWABLE, // folder type
+                    AndroidTargetData.DESCRIPTOR_DRAWABLE, // root seed
+                    null, // default root
+                    SdkConstants.NS_RESOURCES, // xmlns
+                    null, // default attributes
+                    1 // target API level
+            ), new TypeInfo("Menu", // UI name
+                    "An XML file that describes an menu.", // tooltip
+                    ResourceFolderType.MENU, // folder type
+                    SdkConstants.TAG_MENU, // root seed
+                    null, // default root
+                    SdkConstants.NS_RESOURCES, // xmlns
+                    null, // default attributes
+                    1 // target API level
+            ), new TypeInfo("Color List", // UI name
+                    "An XML file that describes a color state list.", // tooltip
+                    ResourceFolderType.COLOR, // folder type
+                    AndroidTargetData.DESCRIPTOR_COLOR, // root seed
+                    "selector", //$NON-NLS-1$                                  // default root
+                    SdkConstants.NS_RESOURCES, // xmlns
+                    null, // default attributes
+                    1 // target API level
+            ), new TypeInfo("Property Animation", // UI name
+                    "An XML file that describes a property animation", // tooltip
+                    ResourceFolderType.ANIMATOR, // folder type
+                    AndroidTargetData.DESCRIPTOR_ANIMATOR, // root seed
+                    "set", //$NON-NLS-1$                                        // default root
+                    SdkConstants.NS_RESOURCES, // xmlns
+                    null, // default attributes
+                    11 // target API level
+            ), new TypeInfo("Tween Animation", // UI name
+                    "An XML file that describes a tween animation.", // tooltip
+                    ResourceFolderType.ANIM, // folder type
+                    AndroidTargetData.DESCRIPTOR_ANIM, // root seed
+                    "set", //$NON-NLS-1$                                        // default root
+                    null, // xmlns
+                    null, // default attributes
+                    1 // target API level
+            ), new TypeInfo("AppWidget Provider", // UI name
+                    "An XML file that describes a widget provider.", // tooltip
+                    ResourceFolderType.XML, // folder type
+                    AndroidTargetData.DESCRIPTOR_APPWIDGET_PROVIDER, // root seed
+                    null, // default root
+                    SdkConstants.NS_RESOURCES, // xmlns
+                    null, // default attributes
+                    3 // target API level
+            ), new TypeInfo("Preference", // UI name
+                    "An XML file that describes preferences.", // tooltip
+                    ResourceFolderType.XML, // folder type
+                    AndroidTargetData.DESCRIPTOR_PREFERENCES, // root seed
+                    SdkConstants.CLASS_NAME_PREFERENCE_SCREEN, // default root
+                    SdkConstants.NS_RESOURCES, // xmlns
+                    null, // default attributes
+                    1 // target API level
+            ), new TypeInfo("Searchable", // UI name
+                    "An XML file that describes a searchable.", // tooltip
+                    ResourceFolderType.XML, // folder type
+                    AndroidTargetData.DESCRIPTOR_SEARCHABLE, // root seed
+                    null, // default root
+                    SdkConstants.NS_RESOURCES, // xmlns
+                    null, // default attributes
+                    1 // target API level
+            ),
+            // Still missing: Interpolator, Raw and Mipmap. Raw should probably never be in
+            // this menu since it's not often used for creating XML files.
     };
 
     private NewXmlFileWizard.Values mValues;
@@ -476,8 +456,7 @@ class NewXmlFileCreationPage extends WizardPage {
         projectLabel.setText("Project:");
         projectLabel.setToolTipText(tooltip);
 
-        ProjectChooserHelper helper =
-                new ProjectChooserHelper(getShell(), null /* filter */);
+        ProjectChooserHelper helper = new ProjectChooserHelper(getShell(), null /* filter */);
 
         mProjectButton = new ProjectCombo(helper, composite, mValues.project);
         mProjectButton.setToolTipText(tooltip);
@@ -629,7 +608,7 @@ class NewXmlFileCreationPage extends WizardPage {
         int targetScore = 0;
         for (Object element : selection.toList()) {
             if (element instanceof IAdaptable) {
-                IResource res = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+                IResource res = ((IAdaptable) element).getAdapter(IResource.class);
                 IProject project = res != null ? res.getProject() : null;
 
                 // Is this an Android project?
@@ -657,9 +636,8 @@ class NewXmlFileCreationPage extends WizardPage {
                 }
 
                 // Disregard this folder selection if it doesn't point to /res/something
-                if (wsFolderPath != null &&
-                        wsFolderPath.segmentCount() > 1 &&
-                        SdkConstants.FD_RESOURCES.equals(wsFolderPath.segment(0))) {
+                if (wsFolderPath != null && wsFolderPath.segmentCount() > 1
+                        && SdkConstants.FD_RESOURCES.equals(wsFolderPath.segment(0))) {
                     score += 2;
                 } else {
                     wsFolderPath = null;
@@ -674,10 +652,10 @@ class NewXmlFileCreationPage extends WizardPage {
                     targetWsFolderPath = wsFolderPath != null ? wsFolderPath.toString() : null;
                     targetFileName = fileName;
                 }
-            } else if (element instanceof Pair<?,?>) {
+            } else if (element instanceof Pair<?, ?>) {
                 // Pair of Project/String
                 @SuppressWarnings("unchecked")
-                Pair<IProject,String> pair = (Pair<IProject,String>)element;
+                Pair<IProject, String> pair = (Pair<IProject, String>) element;
                 targetScore = 1;
                 targetProject = pair.getFirst();
                 targetWsFolderPath = pair.getSecond();
@@ -831,8 +809,7 @@ class NewXmlFileCreationPage extends WizardPage {
                     // is an old project for which a target hasn't been affected or if the
                     // target no longer exists in this SDK. Simply log the error and dismiss.
 
-                    AndmoreAndroidPlugin.log(IStatus.INFO,
-                            "NewXmlFile wizard: no platform target for project %s",  //$NON-NLS-1$
+                    AndmoreAndroidPlugin.log(IStatus.INFO, "NewXmlFile wizard: no platform target for project %s", //$NON-NLS-1$
                             project.getName());
                     continue;
                 } else {
@@ -845,14 +822,13 @@ class NewXmlFileCreationPage extends WizardPage {
                         // doesn't have any data yet.
                         // Lets log a warning and silently ignore this root.
 
-                        AndmoreAndroidPlugin.log(IStatus.INFO,
-                              "NewXmlFile wizard: no data for target %s, project %s",  //$NON-NLS-1$
-                              target.getName(), project.getName());
+                        AndmoreAndroidPlugin.log(IStatus.INFO, "NewXmlFile wizard: no data for target %s, project %s", //$NON-NLS-1$
+                                target.getName(), project.getName());
                         continue;
                     }
                 }
 
-                IDescriptorProvider provider = data.getDescriptorProvider((Integer)rootSeed);
+                IDescriptorProvider provider = data.getDescriptorProvider((Integer) rootSeed);
                 ElementDescriptor descriptor = provider.getDescriptor();
                 if (descriptor != null) {
                     HashSet<ElementDescriptor> visited = new HashSet<ElementDescriptor>();
@@ -871,8 +847,8 @@ class NewXmlFileCreationPage extends WizardPage {
      * Also avoids inserting the top {@link DocumentDescriptor} which is generally synthetic
      * and not a valid root element.
      */
-    private void initRootElementDescriptor(ArrayList<String> roots,
-            ElementDescriptor desc, HashSet<ElementDescriptor> visited) {
+    private void initRootElementDescriptor(ArrayList<String> roots, ElementDescriptor desc,
+            HashSet<ElementDescriptor> visited) {
         if (!(desc instanceof DocumentDescriptor)) {
             String xmlName = desc.getXmlName();
             if (xmlName != null && xmlName.length() > 0) {
@@ -987,9 +963,8 @@ class NewXmlFileCreationPage extends WizardPage {
             // The configuration is invalid. We still update the path but this time
             // do it manually on the string.
             if (wsFolderPath.startsWith(RES_FOLDER_ABS)) {
-                wsFolderPath = wsFolderPath.replaceFirst(
-                        "^(" + RES_FOLDER_ABS +")[^-]*(.*)",         //$NON-NLS-1$ //$NON-NLS-2$
-                        "\\1" + type.getResFolderName() + "\\2");    //$NON-NLS-1$ //$NON-NLS-2$
+                wsFolderPath = wsFolderPath.replaceFirst("^(" + RES_FOLDER_ABS + ")[^-]*(.*)", //$NON-NLS-1$ //$NON-NLS-2$
+                        "\\1" + type.getResFolderName() + "\\2"); //$NON-NLS-1$ //$NON-NLS-2$
             } else {
                 newPath = RES_FOLDER_ABS + config.getFolderName(type.getResFolderType());
             }
@@ -1111,8 +1086,8 @@ class NewXmlFileCreationPage extends WizardPage {
 
             assert type != null;
             if (type.getTargetApiLevel() > currentApiLevel) {
-                error = "The API level of the selected type (e.g. AppWidget, etc.) is not " +
-                        "compatible with the API level of the project.";
+                error = "The API level of the selected type (e.g. AppWidget, etc.) is not "
+                        + "compatible with the API level of the project.";
             }
         }
 

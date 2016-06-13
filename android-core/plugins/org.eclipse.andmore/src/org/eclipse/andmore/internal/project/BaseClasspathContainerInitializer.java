@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +31,6 @@ import org.eclipse.jdt.core.ClasspathContainerInitializer;
  */
 abstract class BaseClasspathContainerInitializer extends ClasspathContainerInitializer {
 
-
     /**
      * Adds an error to a project, or remove all markers if error message is null
      * @param project the project to modify
@@ -42,8 +38,8 @@ abstract class BaseClasspathContainerInitializer extends ClasspathContainerIniti
      * @param markerType the marker type to be used.
      * @param outputToConsole whether to output to the console.
      */
-    protected static void processError(final IProject project, final String errorMessage,
-            final String markerType, boolean outputToConsole) {
+    protected static void processError(final IProject project, final String errorMessage, final String markerType,
+            boolean outputToConsole) {
         if (errorMessage != null) {
             // log the error and put the marker on the project if we can.
             if (outputToConsole) {
@@ -56,9 +52,7 @@ abstract class BaseClasspathContainerInitializer extends ClasspathContainerIniti
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
-                        BaseProjectHelper.markProject(project,
-                                markerType,
-                                fmessage, IMarker.SEVERITY_ERROR,
+                        BaseProjectHelper.markProject(project, markerType, fmessage, IMarker.SEVERITY_ERROR,
                                 IMarker.PRIORITY_HIGH);
                     } catch (CoreException e2) {
                         AndmoreAndroidPlugin.log(e2, null);
@@ -82,8 +76,7 @@ abstract class BaseClasspathContainerInitializer extends ClasspathContainerIniti
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
                         if (project.isAccessible()) {
-                            project.deleteMarkers(markerType, true,
-                                    IResource.DEPTH_INFINITE);
+                            project.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
                         }
                     } catch (CoreException e2) {
                         AndmoreAndroidPlugin.log(e2, null);

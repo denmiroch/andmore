@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,9 @@
 
 package org.eclipse.andmore.internal.editors.menu;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.resources.ResourceFolderType;
-import com.android.xml.AndroidXPathFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -32,9 +28,10 @@ import org.eclipse.ui.PartInitException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.resources.ResourceFolderType;
+import com.android.xml.AndroidXPathFactory;
 
 /**
  * Multi-page form editor for /res/menu XML files.
@@ -44,9 +41,7 @@ public class MenuEditorDelegate extends CommonXmlDelegate {
     public static class Creator implements IDelegateCreator {
         @Override
         @SuppressWarnings("unchecked")
-        public MenuEditorDelegate createForFile(
-                @NonNull CommonXmlEditor delegator,
-                @Nullable ResourceFolderType type) {
+        public MenuEditorDelegate createForFile(@NonNull CommonXmlEditor delegator, @Nullable ResourceFolderType type) {
             if (ResourceFolderType.MENU == type) {
                 return new MenuEditorDelegate(delegator);
             }
@@ -59,8 +54,7 @@ public class MenuEditorDelegate extends CommonXmlDelegate {
      * Old standalone-editor ID.
      * Use {@link CommonXmlEditor#ID} instead.
      */
-    public static final String LEGACY_EDITOR_ID =
-        AndmoreAndroidConstants.EDITORS_NAMESPACE + ".menu.MenuEditor"; //$NON-NLS-1$
+    public static final String LEGACY_EDITOR_ID = AndmoreAndroidConstants.EDITORS_NAMESPACE + ".menu.MenuEditor"; //$NON-NLS-1$
 
     /**
      * Creates the form editor for resources XML files.
@@ -81,7 +75,7 @@ public class MenuEditorDelegate extends CommonXmlDelegate {
             AndmoreAndroidPlugin.log(e, "Error creating nested page"); //$NON-NLS-1$
         }
 
-     }
+    }
 
     private boolean mUpdatingModel;
 
@@ -107,9 +101,8 @@ public class MenuEditorDelegate extends CommonXmlDelegate {
                 ElementDescriptor root_desc = getUiRootNode().getDescriptor();
                 try {
                     XPath xpath = AndroidXPathFactory.newXPath();
-                    Node node = (Node) xpath.evaluate("/" + root_desc.getXmlName(),  //$NON-NLS-1$
-                            xml_doc,
-                            XPathConstants.NODE);
+                    Node node = (Node) xpath.evaluate("/" + root_desc.getXmlName(), //$NON-NLS-1$
+                            xml_doc, XPathConstants.NODE);
                     if (node == null && root_desc.getMandatory() != Mandatory.NOT_MANDATORY) {
                         // Create the root element if it doesn't exist yet (for empty new documents)
                         node = getUiRootNode().createXmlNode();

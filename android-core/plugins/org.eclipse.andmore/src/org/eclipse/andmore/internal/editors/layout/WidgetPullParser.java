@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +13,13 @@
 
 package org.eclipse.andmore.internal.editors.layout;
 
-import com.android.SdkConstants;
-import com.android.ide.common.rendering.api.ILayoutPullParser;
-import com.android.layoutlib.api.ILayoutResult.ILayoutViewInfo;
-
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.internal.editors.layout.descriptors.ViewElementDescriptor;
 import org.xmlpull.v1.XmlPullParserException;
+
+import com.android.SdkConstants;
+import com.android.ide.common.rendering.api.ILayoutPullParser;
+import com.android.layoutlib.api.ILayoutResult.ILayoutViewInfo;
 
 /**
  * {@link ILayoutPullParser} implementation to render android widget bitmap.
@@ -35,17 +32,14 @@ import org.xmlpull.v1.XmlPullParserException;
 public class WidgetPullParser extends BasePullParser {
 
     private final ViewElementDescriptor mDescriptor;
-    private String[][] mAttributes = new String[][] {
-            { "text", null },
-            { "layout_width", "wrap_content" },
-            { "layout_height", "wrap_content" },
-    };
+    private String[][] mAttributes = new String[][] { { "text", null }, { "layout_width", "wrap_content" },
+            { "layout_height", "wrap_content" }, };
 
     public WidgetPullParser(ViewElementDescriptor descriptor) {
         mDescriptor = descriptor;
 
         String[] segments = mDescriptor.getFullClassName().split(AndmoreAndroidConstants.RE_DOT);
-        mAttributes[0][1] = segments[segments.length-1];
+        mAttributes[0][1] = segments[segments.length - 1];
     }
 
     @Override
@@ -150,8 +144,7 @@ public class WidgetPullParser extends BasePullParser {
             return true;
         }
 
-        throw new XmlPullParserException("Call to isEmptyElementTag while not in START_TAG",
-                this, null);
+        throw new XmlPullParserException("Call to isEmptyElementTag while not in START_TAG", this, null);
     }
 
     @Override

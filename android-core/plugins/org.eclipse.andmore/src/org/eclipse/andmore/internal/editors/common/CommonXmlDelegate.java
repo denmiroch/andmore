@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,10 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.editors.common;
-
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.resources.ResourceFolderType;
 
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
@@ -35,6 +28,10 @@ import org.eclipse.ui.part.EditorActionBarContributor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.w3c.dom.Document;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.resources.ResourceFolderType;
 
 /**
  * Implementation of form editor for /res XML files.
@@ -66,9 +63,8 @@ public abstract class CommonXmlDelegate {
          *   if it can be determined. Null otherwise.
          * @return A new delegate that can handle that file or null.
          */
-        public @Nullable <T extends CommonXmlDelegate> T createForFile(
-                            @NonNull CommonXmlEditor delegator,
-                            @Nullable ResourceFolderType type);
+        public @Nullable <T extends CommonXmlDelegate> T createForFile(@NonNull CommonXmlEditor delegator,
+                @Nullable ResourceFolderType type);
     }
 
     /** Implemented by delegates that need to support {@link EditorActionBarContributor} */
@@ -77,15 +73,12 @@ public abstract class CommonXmlDelegate {
         public void setActiveEditor(IEditorPart part, IActionBars bars);
     }
 
-    protected CommonXmlDelegate(
-            CommonXmlEditor editor,
-            IContentAssistProcessor contentAssist) {
+    protected CommonXmlDelegate(CommonXmlEditor editor, IContentAssistProcessor contentAssist) {
         mEditor = editor;
         mContentAssist = contentAssist;
     }
 
-    public void dispose() {
-    }
+    public void dispose() {}
 
     /**
      * Returns the editor that created this delegate.
@@ -155,6 +148,7 @@ public abstract class CommonXmlDelegate {
     public void delegatePostPageChange(int newPageIndex) {
         // pass
     }
+
     /**
      * Save the XML.
      * <p/>
@@ -176,7 +170,6 @@ public abstract class CommonXmlDelegate {
     public Job delegateRunLint() {
         return getEditor().startLintJob();
     }
-
 
     /**
      * Returns the custom IContentOutlinePage or IPropertySheetPage when asked for it.
@@ -220,12 +213,10 @@ public abstract class CommonXmlDelegate {
     }
 
     /** Called after an editor has been activated */
-    public void delegateActivated() {
-    }
+    public void delegateActivated() {}
 
     /** Called after an editor has been deactivated */
-    public void delegateDeactivated() {
-    }
+    public void delegateDeactivated() {}
 
     /**
      * Returns the name of the editor to be shown in the editor tab etc. Return

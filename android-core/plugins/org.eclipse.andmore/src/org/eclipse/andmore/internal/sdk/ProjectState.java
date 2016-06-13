@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,18 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.sdk;
-
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.internal.project.ProjectProperties;
-import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +22,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
+
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.internal.project.ProjectProperties;
+import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
 
 /**
  * Centralized state for Android Eclipse project.
@@ -140,15 +137,15 @@ public final class ProjectState {
         public boolean equals(Object obj) {
             if (obj instanceof LibraryState) {
                 // the only thing that's always non-null is the relative path.
-                LibraryState objState = (LibraryState)obj;
-                return mRelativePath.equals(objState.mRelativePath) &&
-                        getMainProjectState().equals(objState.getMainProjectState());
+                LibraryState objState = (LibraryState) obj;
+                return mRelativePath.equals(objState.mRelativePath)
+                        && getMainProjectState().equals(objState.getMainProjectState());
             }
-            
+
             if (obj instanceof ProjectState || obj instanceof IProject) {
                 return mProjectState != null && mProjectState.equals(obj);
             }
-            
+
             if (obj instanceof String) {
                 return normalizePath(mRelativePath).equals(normalizePath((String) obj));
             }
@@ -324,7 +321,7 @@ public final class ProjectState {
                 // to the same folder).
                 String convertedPath = convertPath(rootPath);
                 boolean found = false;
-                for (int i = 0 ; i < oldLibraries.size(); i++) {
+                for (int i = 0; i < oldLibraries.size(); i++) {
                     LibraryState libState = oldLibraries.get(i);
                     if (libState.equals(convertedPath)) {
                         // it's a match. move it back to mLibraries and remove it from the
@@ -449,7 +446,6 @@ public final class ProjectState {
         return null;
     }
 
-
     /**
      * Returns whether a given library project is needed by the receiver.
      * <p/>If the library is needed, this finds the matching {@link LibraryState}, initializes it
@@ -499,8 +495,8 @@ public final class ProjectState {
     public boolean dependsOn(ProjectState library) {
         synchronized (mLibraries) {
             for (LibraryState state : mLibraries) {
-                if (state != null && state.getProjectState() != null &&
-                        library.getProject().equals(state.getProjectState().getProject())) {
+                if (state != null && state.getProjectState() != null
+                        && library.getProject().equals(state.getProjectState().getProject())) {
                     return true;
                 }
             }
@@ -508,7 +504,6 @@ public final class ProjectState {
 
         return false;
     }
-
 
     /**
      * Updates a library with a new path.
@@ -529,8 +524,7 @@ public final class ProjectState {
      *
      * @see LibraryState#getProjectState()
      */
-    public LibraryState updateLibrary(String oldRelativePath, String newRelativePath,
-            ProjectState newLibraryState) {
+    public LibraryState updateLibrary(String oldRelativePath, String newRelativePath, ProjectState newLibraryState) {
         // compute current location
         File projectFile = mProject.getLocation().toFile();
 
@@ -577,7 +571,6 @@ public final class ProjectState {
 
         return null;
     }
-
 
     private void addParentProject(ProjectState parentState) {
         mParentProjects.add(parentState);
@@ -646,9 +639,9 @@ public final class ProjectState {
                     // reload the properties with the new values from the disk.
                     mProperties.reload();
                 } catch (Exception e) {
-                    return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, String.format(
-                            "Failed to save %1$s for project %2$s",
-                                    mProperties.getType() .getFilename(), mProject.getName()),
+                    return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
+                            String.format("Failed to save %1$s for project %2$s", mProperties.getType().getFilename(),
+                                    mProject.getName()),
                             e);
 
                 }
@@ -679,11 +672,10 @@ public final class ProjectState {
      * @param inLibraries the libraries to resolve
      * @param outLibraries where to store all the libraries.
      */
-    private void buildFullLibraryDependencies(List<LibraryState> inLibraries,
-            ArrayList<IProject> outLibraries) {
+    private void buildFullLibraryDependencies(List<LibraryState> inLibraries, ArrayList<IProject> outLibraries) {
         // loop in the inverse order to resolve dependencies on the libraries, so that if a library
         // is required by two higher level libraries it can be inserted in the correct place
-        for (int i = inLibraries.size() - 1  ; i >= 0 ; i--) {
+        for (int i = inLibraries.size() - 1; i >= 0; i--) {
             LibraryState library = inLibraries.get(i);
 
             // get its libraries if possible
@@ -701,7 +693,6 @@ public final class ProjectState {
             }
         }
     }
-
 
     /**
      * Converts a path containing only / by the proper platform separator.
@@ -726,7 +717,7 @@ public final class ProjectState {
         if (obj instanceof ProjectState) {
             return mProject.equals(((ProjectState) obj).mProject);
         }
-        
+
         if (obj instanceof IProject) {
             return mProject.equals(obj);
         }

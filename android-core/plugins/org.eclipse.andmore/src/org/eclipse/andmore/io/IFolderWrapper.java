@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +13,7 @@
 
 package org.eclipse.andmore.io;
 
-import com.android.io.IAbstractFile;
-import com.android.io.IAbstractFolder;
-import com.android.io.IAbstractResource;
+import java.util.ArrayList;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -28,7 +23,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
-import java.util.ArrayList;
+import com.android.io.IAbstractFile;
+import com.android.io.IAbstractFolder;
+import com.android.io.IAbstractResource;
 
 /**
  * An implementation of {@link IAbstractFolder} on top of either an {@link IFolder} or an
@@ -44,7 +41,7 @@ public class IFolderWrapper implements IAbstractFolder {
     }
 
     public IFolderWrapper(IContainer container) {
-        mFolder = container instanceof IFolder ? (IFolder)container : null;
+        mFolder = container instanceof IFolder ? (IFolder) container : null;
         mContainer = container;
     }
 
@@ -68,7 +65,6 @@ public class IFolderWrapper implements IAbstractFolder {
         }
     }
 
-
     @Override
     public IAbstractResource[] listMembers() {
         try {
@@ -76,7 +72,7 @@ public class IFolderWrapper implements IAbstractFolder {
             final int count = members.length;
             IAbstractResource[] afiles = new IAbstractResource[count];
 
-            for (int i = 0 ; i < count ; i++) {
+            for (int i = 0; i < count; i++) {
                 IResource f = members[i];
                 if (f instanceof IFile) {
                     afiles[i] = new IFileWrapper((IFile) f);
@@ -131,7 +127,7 @@ public class IFolderWrapper implements IAbstractFolder {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof IFolderWrapper) {
-            return mFolder.equals(((IFolderWrapper)obj).mFolder);
+            return mFolder.equals(((IFolderWrapper) obj).mFolder);
         }
 
         if (obj instanceof IFolder) {

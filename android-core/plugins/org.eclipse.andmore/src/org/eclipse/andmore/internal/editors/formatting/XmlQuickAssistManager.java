@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,9 @@
  */
 package org.eclipse.andmore.internal.editors.formatting;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.andmore.internal.build.AaptQuickFix;
 import org.eclipse.andmore.internal.editors.layout.refactoring.RefactoringAssistant;
 import org.eclipse.andmore.internal.lint.LintFixGenerator;
@@ -22,9 +22,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
 import org.eclipse.jface.text.quickassist.IQuickAssistProcessor;
 import org.eclipse.jface.text.source.Annotation;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class implements Quick Assists for XML files. It does not perform any
@@ -43,11 +40,8 @@ public class XmlQuickAssistManager implements IQuickAssistProcessor {
 
     /** Constructs a new {@link XmlQuickAssistManager} which orders the quick fixes */
     public XmlQuickAssistManager() {
-        mProcessors = new IQuickAssistProcessor[] {
-                new AaptQuickFix(),
-                new LintFixGenerator(),
-                new RefactoringAssistant()
-        };
+        mProcessors = new IQuickAssistProcessor[] { new AaptQuickFix(), new LintFixGenerator(),
+                new RefactoringAssistant() };
     }
 
     @Override
@@ -78,13 +72,11 @@ public class XmlQuickAssistManager implements IQuickAssistProcessor {
     }
 
     @Override
-    public ICompletionProposal[] computeQuickAssistProposals(
-            IQuickAssistInvocationContext invocationContext) {
+    public ICompletionProposal[] computeQuickAssistProposals(IQuickAssistInvocationContext invocationContext) {
         List<ICompletionProposal> allProposals = null;
         for (IQuickAssistProcessor processor : mProcessors) {
             if (processor.canAssist(invocationContext)) {
-                ICompletionProposal[] proposals =
-                        processor.computeQuickAssistProposals(invocationContext);
+                ICompletionProposal[] proposals = processor.computeQuickAssistProposals(invocationContext);
                 if (proposals != null && proposals.length > 0) {
                     if (allProposals == null) {
                         allProposals = new ArrayList<ICompletionProposal>();

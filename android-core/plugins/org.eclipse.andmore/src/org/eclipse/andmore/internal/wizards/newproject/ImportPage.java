@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +12,10 @@
  */
 package org.eclipse.andmore.internal.wizards.newproject;
 
-import com.android.tools.lint.detector.api.LintUtils;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.core.resources.IProject;
@@ -63,14 +63,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkingSet;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.android.tools.lint.detector.api.LintUtils;
 
 /** WizardPage for importing Android projects */
-class ImportPage extends WizardPage implements SelectionListener, IStructuredContentProvider,
-        ICheckStateListener, KeyListener, TraverseListener, ControlListener {
+class ImportPage extends WizardPage implements SelectionListener, IStructuredContentProvider, ICheckStateListener,
+        KeyListener, TraverseListener, ControlListener {
     private static final int DIR_COLUMN = 0;
     private static final int NAME_COLUMN = 1;
 
@@ -210,7 +207,7 @@ class ImportPage extends WizardPage implements SelectionListener, IStructuredCon
         validatePage();
     }
 
-    private void updateValidity(){
+    private void updateValidity() {
         List<ImportedProject> selected = new ArrayList<ImportedProject>();
         List<ImportedProject> disabled = new ArrayList<ImportedProject>();
         for (ImportedProject project : mProjectPaths) {
@@ -272,14 +269,12 @@ class ImportPage extends WizardPage implements SelectionListener, IStructuredCon
             status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
                     "Select a directory to search for existing Android projects");
         } else if (mValues.importProjects == null || mValues.importProjects.isEmpty()) {
-            status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    "Select at least one project");
+            status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, "Select at least one project");
         } else {
             for (ImportedProject project : mValues.importProjects) {
                 if (mCheckboxTableViewer.getGrayed(project)) {
-                    status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                            String.format("Cannot import %1$s because the project name is in use",
-                                    project.getProjectName()));
+                    status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, String
+                            .format("Cannot import %1$s because the project name is in use", project.getProjectName()));
                     break;
                 } else {
                     status = ProjectNamePage.validateProjectName(project.getProjectName());
@@ -287,10 +282,8 @@ class ImportPage extends WizardPage implements SelectionListener, IStructuredCon
                         // Need to insert project name to make it clear which project name
                         // is in violation
                         if (mValues.importProjects.size() > 1) {
-                            String message = String.format("%1$s: %2$s",
-                                    project.getProjectName(), status.getMessage());
-                            status = new Status(status.getSeverity(), AndmoreAndroidPlugin.PLUGIN_ID,
-                                    message);
+                            String message = String.format("%1$s: %2$s", project.getProjectName(), status.getMessage());
+                            status = new Status(status.getSeverity(), AndmoreAndroidPlugin.PLUGIN_ID, message);
                         }
                         break;
                     } else {
@@ -304,8 +297,7 @@ class ImportPage extends WizardPage implements SelectionListener, IStructuredCon
         setPageComplete(status == null || status.getSeverity() != IStatus.ERROR);
         if (status != null) {
             setMessage(status.getMessage(),
-                    status.getSeverity() == IStatus.ERROR
-                        ? IMessageProvider.ERROR : IMessageProvider.WARNING);
+                    status.getSeverity() == IStatus.ERROR ? IMessageProvider.ERROR : IMessageProvider.WARNING);
         } else {
             setErrorMessage(null);
             setMessage(null);
@@ -373,8 +365,7 @@ class ImportPage extends WizardPage implements SelectionListener, IStructuredCon
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 
     // ---- KeyListener ----
 
@@ -388,8 +379,7 @@ class ImportPage extends WizardPage implements SelectionListener, IStructuredCon
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-    }
+    public void keyReleased(KeyEvent e) {}
 
     // ---- TraverseListener ----
 
@@ -405,8 +395,7 @@ class ImportPage extends WizardPage implements SelectionListener, IStructuredCon
     // ---- Implements IStructuredContentProvider ----
 
     @Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-    }
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
     @Override
     public Object[] getElements(Object inputElement) {
@@ -434,8 +423,7 @@ class ImportPage extends WizardPage implements SelectionListener, IStructuredCon
     // ---- Implements ControlListener ----
 
     @Override
-    public void controlMoved(ControlEvent e) {
-    }
+    public void controlMoved(ControlEvent e) {}
 
     @Override
     public void controlResized(ControlEvent e) {

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,18 +14,10 @@ package org.eclipse.andmore.internal.wizards.newproject;
 
 import static com.android.SdkConstants.ATTR_NAME;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.xml.AndroidManifestParser;
-import com.android.ide.common.xml.ManifestData;
-import com.android.ide.common.xml.ManifestData.Activity;
-import com.android.io.FolderWrapper;
-import com.android.sdklib.AndroidVersion;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.internal.project.ProjectProperties;
-import com.android.sdklib.internal.project.ProjectProperties.PropertyType;
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
+import java.io.File;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.gle2.DomUtilities;
@@ -43,10 +32,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.xml.AndroidManifestParser;
+import com.android.ide.common.xml.ManifestData;
+import com.android.ide.common.xml.ManifestData.Activity;
+import com.android.io.FolderWrapper;
+import com.android.sdklib.AndroidVersion;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.internal.project.ProjectProperties;
+import com.android.sdklib.internal.project.ProjectProperties.PropertyType;
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 
 /** An Android project to be imported */
 class ImportedProject {
@@ -192,8 +189,7 @@ class ImportedProject {
         // Pick a target:
         // First try to find the one requested by project.properties
         IAndroidTarget[] targets = Sdk.getCurrent().getTargets();
-        ProjectProperties properties = ProjectProperties.load(mLocation.getPath(),
-                PropertyType.PROJECT);
+        ProjectProperties properties = ProjectProperties.load(mLocation.getPath(), PropertyType.PROJECT);
         if (properties != null) {
             String targetProperty = properties.getProperty(ProjectProperties.PROPERTY_TARGET);
             if (targetProperty != null) {

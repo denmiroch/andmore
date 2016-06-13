@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,6 +28,15 @@ import static com.android.SdkConstants.VALUE_WRAP_CONTENT;
 import static com.android.SdkConstants.VALUE_ZERO_DP;
 import static org.eclipse.andmore.AdtUtils.formatFloatAttribute;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
@@ -53,15 +59,6 @@ import com.android.ide.common.api.RuleAction;
 import com.android.ide.common.api.RuleAction.Choices;
 import com.android.ide.common.api.SegmentType;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-
 /**
  * An {@link IViewRule} for android.widget.LinearLayout and all its derived
  * classes.
@@ -74,20 +71,13 @@ public class LinearLayoutRule extends BaseLayoutRule {
     private static final String ACTION_CLEAR = "_clear"; //$NON-NLS-1$
     private static final String ACTION_DOMINATE = "_dominate"; //$NON-NLS-1$
 
-    private static final URL ICON_HORIZONTAL =
-        LinearLayoutRule.class.getResource("hlinear.png"); //$NON-NLS-1$
-    private static final URL ICON_VERTICAL =
-        LinearLayoutRule.class.getResource("vlinear.png"); //$NON-NLS-1$
-    private static final URL ICON_WEIGHTS =
-        LinearLayoutRule.class.getResource("weights.png"); //$NON-NLS-1$
-    private static final URL ICON_DISTRIBUTE =
-        LinearLayoutRule.class.getResource("distribute.png"); //$NON-NLS-1$
-    private static final URL ICON_BASELINE =
-        LinearLayoutRule.class.getResource("baseline.png"); //$NON-NLS-1$
-    private static final URL ICON_CLEAR_WEIGHTS =
-            LinearLayoutRule.class.getResource("clearweights.png"); //$NON-NLS-1$
-    private static final URL ICON_DOMINATE =
-            LinearLayoutRule.class.getResource("allweight.png"); //$NON-NLS-1$
+    private static final URL ICON_HORIZONTAL = LinearLayoutRule.class.getResource("hlinear.png"); //$NON-NLS-1$
+    private static final URL ICON_VERTICAL = LinearLayoutRule.class.getResource("vlinear.png"); //$NON-NLS-1$
+    private static final URL ICON_WEIGHTS = LinearLayoutRule.class.getResource("weights.png"); //$NON-NLS-1$
+    private static final URL ICON_DISTRIBUTE = LinearLayoutRule.class.getResource("distribute.png"); //$NON-NLS-1$
+    private static final URL ICON_BASELINE = LinearLayoutRule.class.getResource("baseline.png"); //$NON-NLS-1$
+    private static final URL ICON_CLEAR_WEIGHTS = LinearLayoutRule.class.getResource("clearweights.png"); //$NON-NLS-1$
+    private static final URL ICON_DOMINATE = LinearLayoutRule.class.getResource("allweight.png"); //$NON-NLS-1$
 
     /**
      * Returns the current orientation, regardless of whether it has been defined in XML
@@ -111,8 +101,7 @@ public class LinearLayoutRule extends BaseLayoutRule {
      */
     protected boolean isVertical(INode node) {
         // Horizontal is the default, so if no value is specified it is horizontal.
-        return VALUE_VERTICAL.equals(node.getStringAttr(ANDROID_URI,
-                ATTR_ORIENTATION));
+        return VALUE_VERTICAL.equals(node.getStringAttr(ANDROID_URI, ATTR_ORIENTATION));
     }
 
     /**
@@ -125,35 +114,26 @@ public class LinearLayoutRule extends BaseLayoutRule {
     }
 
     @Override
-    public void addLayoutActions(
-            @NonNull List<RuleAction> actions,
-            final @NonNull INode parentNode,
+    public void addLayoutActions(@NonNull List<RuleAction> actions, final @NonNull INode parentNode,
             final @NonNull List<? extends INode> children) {
         super.addLayoutActions(actions, parentNode, children);
         if (supportsOrientation()) {
-            Choices action = RuleAction.createChoices(
-                    ACTION_ORIENTATION, "Orientation",  //$NON-NLS-1$
-                    new PropertyCallback(Collections.singletonList(parentNode),
-                            "Change LinearLayout Orientation",
+            Choices action = RuleAction.createChoices(ACTION_ORIENTATION, "Orientation", //$NON-NLS-1$
+                    new PropertyCallback(Collections.singletonList(parentNode), "Change LinearLayout Orientation",
                             ANDROID_URI, ATTR_ORIENTATION),
-                    Arrays.<String>asList("Set Horizontal Orientation","Set Vertical Orientation"),
-                    Arrays.<URL>asList(ICON_HORIZONTAL, ICON_VERTICAL),
-                    Arrays.<String>asList("horizontal", "vertical"),
-                    getCurrentOrientation(parentNode),
-                    null /* icon */,
-                    -10,
-                    false /* supportsMultipleNodes */
+                    Arrays.<String> asList("Set Horizontal Orientation", "Set Vertical Orientation"),
+                    Arrays.<URL> asList(ICON_HORIZONTAL, ICON_VERTICAL),
+                    Arrays.<String> asList("horizontal", "vertical"), getCurrentOrientation(parentNode),
+                    null /* icon */, -10, false /* supportsMultipleNodes */
             );
             action.setRadio(true);
             actions.add(action);
         }
         if (!isVertical(parentNode)) {
             String current = parentNode.getStringAttr(ANDROID_URI, ATTR_BASELINE_ALIGNED);
-            boolean isAligned =  current == null || Boolean.valueOf(current);
-            actions.add(RuleAction.createToggle(ACTION_BASELINE, "Toggle Baseline Alignment",
-                    isAligned,
-                    new PropertyCallback(Collections.singletonList(parentNode),
-                            "Change Baseline Alignment",
+            boolean isAligned = current == null || Boolean.valueOf(current);
+            actions.add(RuleAction.createToggle(ACTION_BASELINE, "Toggle Baseline Alignment", isAligned,
+                    new PropertyCallback(Collections.singletonList(parentNode), "Change Baseline Alignment",
                             ANDROID_URI, ATTR_BASELINE_ALIGNED), // TODO: Also set index?
                     ICON_BASELINE, 38, false));
         }
@@ -171,30 +151,24 @@ public class LinearLayoutRule extends BaseLayoutRule {
             // Weights
             IMenuCallback actionCallback = new IMenuCallback() {
                 @Override
-                public void action(
-                        final @NonNull RuleAction action,
-                        @NonNull List<? extends INode> selectedNodes,
-                        final @Nullable String valueId,
-                        final @Nullable Boolean newValue) {
+                public void action(final @NonNull RuleAction action, @NonNull List<? extends INode> selectedNodes,
+                        final @Nullable String valueId, final @Nullable Boolean newValue) {
                     parentNode.editXml("Change Weight", new INodeHandler() {
                         @Override
                         public void handle(@NonNull INode n) {
                             String id = action.getId();
                             if (id.equals(ACTION_WEIGHT)) {
-                                String weight =
-                                    children.get(0).getStringAttr(ANDROID_URI, ATTR_LAYOUT_WEIGHT);
+                                String weight = children.get(0).getStringAttr(ANDROID_URI, ATTR_LAYOUT_WEIGHT);
                                 if (weight == null || weight.length() == 0) {
                                     weight = "0.0"; //$NON-NLS-1$
                                 }
-                                weight = mRulesEngine.displayInput("Enter Weight Value:", weight,
-                                        null);
+                                weight = mRulesEngine.displayInput("Enter Weight Value:", weight, null);
                                 if (weight != null) {
                                     if (weight.isEmpty()) {
                                         weight = null; // remove attribute
                                     }
                                     for (INode child : children) {
-                                        child.setAttribute(ANDROID_URI,
-                                                ATTR_LAYOUT_WEIGHT, weight);
+                                        child.setAttribute(ANDROID_URI, ATTR_LAYOUT_WEIGHT, weight);
                                     }
                                 }
                             } else if (id.equals(ACTION_DISTRIBUTE)) {
@@ -203,8 +177,7 @@ public class LinearLayoutRule extends BaseLayoutRule {
                                 clearWeights(parentNode);
                             } else if (id.equals(ACTION_CLEAR) || id.equals(ACTION_DOMINATE)) {
                                 clearWeights(parentNode);
-                                distributeWeights(parentNode,
-                                        children.toArray(new INode[children.size()]));
+                                distributeWeights(parentNode, children.toArray(new INode[children.size()]));
                             } else {
                                 assert id.equals(ACTION_BASELINE);
                             }
@@ -213,21 +186,20 @@ public class LinearLayoutRule extends BaseLayoutRule {
                 }
             };
             actions.add(RuleAction.createSeparator(50));
-            actions.add(RuleAction.createAction(ACTION_DISTRIBUTE, "Distribute Weights Evenly",
-                    actionCallback, ICON_DISTRIBUTE, 60, false /*supportsMultipleNodes*/));
-            actions.add(RuleAction.createAction(ACTION_DOMINATE, "Assign All Weight",
-                    actionCallback, ICON_DOMINATE, 70, false));
-            actions.add(RuleAction.createAction(ACTION_WEIGHT, "Change Layout Weight",
-                    actionCallback, ICON_WEIGHTS, 80, false));
-            actions.add(RuleAction.createAction(ACTION_CLEAR, "Clear All Weights",
-                     actionCallback, ICON_CLEAR_WEIGHTS, 90, false));
+            actions.add(RuleAction.createAction(ACTION_DISTRIBUTE, "Distribute Weights Evenly", actionCallback,
+                    ICON_DISTRIBUTE, 60, false /*supportsMultipleNodes*/));
+            actions.add(RuleAction.createAction(ACTION_DOMINATE, "Assign All Weight", actionCallback, ICON_DOMINATE, 70,
+                    false));
+            actions.add(RuleAction.createAction(ACTION_WEIGHT, "Change Layout Weight", actionCallback, ICON_WEIGHTS, 80,
+                    false));
+            actions.add(RuleAction.createAction(ACTION_CLEAR, "Clear All Weights", actionCallback, ICON_CLEAR_WEIGHTS,
+                    90, false));
         }
     }
 
     private void distributeWeights(INode parentNode, INode[] targets) {
         // Any XML to get weight sum?
-        String weightSum = parentNode.getStringAttr(ANDROID_URI,
-                ATTR_WEIGHT_SUM);
+        String weightSum = parentNode.getStringAttr(ANDROID_URI, ATTR_WEIGHT_SUM);
         double sum = -1.0;
         if (weightSum != null) {
             // Distribute
@@ -247,8 +219,7 @@ public class LinearLayoutRule extends BaseLayoutRule {
             share = sum / numTargets;
         }
         String value = formatFloatAttribute((float) share);
-        String sizeAttribute = isVertical(parentNode) ?
-                ATTR_LAYOUT_HEIGHT : ATTR_LAYOUT_WIDTH;
+        String sizeAttribute = isVertical(parentNode) ? ATTR_LAYOUT_HEIGHT : ATTR_LAYOUT_WIDTH;
         for (INode target : targets) {
             target.setAttribute(ANDROID_URI, ATTR_LAYOUT_WEIGHT, value);
             // Also set the width/height to 0dp to ensure actual equal
@@ -262,8 +233,7 @@ public class LinearLayoutRule extends BaseLayoutRule {
 
     private void clearWeights(INode parentNode) {
         // Clear attributes
-        String sizeAttribute = isVertical(parentNode)
-                ? ATTR_LAYOUT_HEIGHT : ATTR_LAYOUT_WIDTH;
+        String sizeAttribute = isVertical(parentNode) ? ATTR_LAYOUT_HEIGHT : ATTR_LAYOUT_WIDTH;
         for (INode target : parentNode.getChildren()) {
             target.setAttribute(ANDROID_URI, ATTR_LAYOUT_WEIGHT, null);
             String size = target.getStringAttr(ANDROID_URI, sizeAttribute);
@@ -352,17 +322,15 @@ public class LinearLayoutRule extends BaseLayoutRule {
         }
 
         int posCount = targetNode.getChildren().length + 1;
-        return new DropFeedback(new LinearDropData(indexes, posCount, isVertical, selfPos),
-                new IFeedbackPainter() {
+        return new DropFeedback(new LinearDropData(indexes, posCount, isVertical, selfPos), new IFeedbackPainter() {
 
-                    @Override
-                    public void paint(@NonNull IGraphics gc, @NonNull INode node,
-                            @NonNull DropFeedback feedback) {
-                        // Paint callback for the LinearLayout. This is called
-                        // by the canvas when a draw is needed.
-                        drawFeedback(gc, node, elements, feedback);
-                    }
-                });
+            @Override
+            public void paint(@NonNull IGraphics gc, @NonNull INode node, @NonNull DropFeedback feedback) {
+                // Paint callback for the LinearLayout. This is called
+                // by the canvas when a draw is needed.
+                drawFeedback(gc, node, elements, feedback);
+            }
+        });
     }
 
     void drawFeedback(IGraphics gc, INode node, IDragElement[] elements, DropFeedback feedback) {
@@ -446,8 +414,7 @@ public class LinearLayoutRule extends BaseLayoutRule {
                 gc.useStyle(DrawingStyle.DROP_PREVIEW);
                 for (IDragElement element : elements) {
                     Rect bounds = element.getBounds();
-                    if (bounds.isValid() && (bounds.w > b.w || bounds.h > b.h) &&
-                            node.getChildren().length == 0) {
+                    if (bounds.isValid() && (bounds.w > b.w || bounds.h > b.h) && node.getChildren().length == 0) {
                         // The bounds of the child does not fully fit inside the target.
                         // Limit the bounds to the layout bounds (but only when there
                         // are no children, since otherwise positioning around the existing
@@ -496,14 +463,16 @@ public class LinearLayoutRule extends BaseLayoutRule {
             int i = index.getDistance();
             int pos = index.getPosition();
             int dist = (isVertical ? p.y : p.x) - i;
-            if (dist < 0)
+            if (dist < 0) {
                 dist = -dist;
+            }
             if (dist < bestDist) {
                 bestDist = dist;
                 bestIndex = i;
                 bestPos = pos;
-                if (bestDist <= 0)
+                if (bestDist <= 0) {
                     break;
+                }
             }
         }
 
@@ -525,8 +494,7 @@ public class LinearLayoutRule extends BaseLayoutRule {
 
             data.setInsertPos(bestPos);
 
-            feedback.requestPaint = !equals(oldX, data.getCurrX())
-                    || !equals(oldY, data.getCurrY());
+            feedback.requestPaint = !equals(oldX, data.getCurrX()) || !equals(oldY, data.getCurrY());
         }
 
         return feedback;
@@ -559,8 +527,7 @@ public class LinearLayoutRule extends BaseLayoutRule {
     }
 
     @Override
-    public void onChildInserted(@NonNull INode node, @NonNull INode parent,
-            @NonNull InsertType insertType) {
+    public void onChildInserted(@NonNull INode node, @NonNull INode parent, @NonNull InsertType insertType) {
         if (insertType == InsertType.MOVE_WITHIN) {
             // Don't adjust widths/heights/weights when just moving within a single
             // LinearLayout
@@ -642,8 +609,8 @@ public class LinearLayoutRule extends BaseLayoutRule {
         @Override
         public String toString() {
             return "MatchPos [distance=" + mDistance //$NON-NLS-1$
-                    + ", position=" + mPosition      //$NON-NLS-1$
-                    + "]";                           //$NON-NLS-1$
+                    + ", position=" + mPosition //$NON-NLS-1$
+                    + "]"; //$NON-NLS-1$
         }
 
         private int getDistance() {
@@ -684,8 +651,7 @@ public class LinearLayoutRule extends BaseLayoutRule {
         /** height of match line if it's a vertical one */
         private Integer mHeight;
 
-        public LinearDropData(List<MatchPos> indexes, int numPositions,
-                boolean isVertical, int selfPos) {
+        public LinearDropData(List<MatchPos> indexes, int numPositions, boolean isVertical, int selfPos) {
             mIndexes = indexes;
             mNumPositions = numPositions;
             mVertical = isVertical;
@@ -782,25 +748,21 @@ public class LinearLayoutRule extends BaseLayoutRule {
         /** List of nodes which should have their weights cleared */
         public List<INode> mClearWeights;
 
-        private LinearResizeState(BaseLayoutRule rule, INode layout, Object layoutView,
-                INode node) {
+        private LinearResizeState(BaseLayoutRule rule, INode layout, Object layoutView, INode node) {
             super(rule, layout, layoutView, node);
 
-            unweightedSizes = mRulesEngine.measureChildren(layout,
-                    new IClientRulesEngine.AttributeFilter() {
-                        @Override
-                        public String getAttribute(@NonNull INode n, @Nullable String namespace,
-                                @NonNull String localName) {
-                            // Clear out layout weights; we need to measure the unweighted sizes
-                            // of the children
-                            if (ATTR_LAYOUT_WEIGHT.equals(localName)
-                                    && SdkConstants.NS_RESOURCES.equals(namespace)) {
-                                return ""; //$NON-NLS-1$
-                            }
+            unweightedSizes = mRulesEngine.measureChildren(layout, new IClientRulesEngine.AttributeFilter() {
+                @Override
+                public String getAttribute(@NonNull INode n, @Nullable String namespace, @NonNull String localName) {
+                    // Clear out layout weights; we need to measure the unweighted sizes
+                    // of the children
+                    if (ATTR_LAYOUT_WEIGHT.equals(localName) && SdkConstants.NS_RESOURCES.equals(namespace)) {
+                        return ""; //$NON-NLS-1$
+                    }
 
-                            return null;
-                        }
-                    });
+                    return null;
+                }
+            });
 
             // Compute total required size required by the siblings *without* weights
             totalLength = 0;
@@ -857,8 +819,7 @@ public class LinearLayoutRule extends BaseLayoutRule {
             }
 
             if (mNewWeightSum > 0.0) {
-                layout.setAttribute(ANDROID_URI, ATTR_WEIGHT_SUM,
-                        formatFloatAttribute(mNewWeightSum));
+                layout.setAttribute(ANDROID_URI, ATTR_WEIGHT_SUM, formatFloatAttribute(mNewWeightSum));
             }
         }
     }
@@ -868,9 +829,8 @@ public class LinearLayoutRule extends BaseLayoutRule {
         return new LinearResizeState(this, layout, layoutView, node);
     }
 
-    protected void updateResizeState(LinearResizeState resizeState, final INode node, INode layout,
-            Rect oldBounds, Rect newBounds, SegmentType horizontalEdge,
-            SegmentType verticalEdge) {
+    protected void updateResizeState(LinearResizeState resizeState, final INode node, INode layout, Rect oldBounds,
+            Rect newBounds, SegmentType horizontalEdge, SegmentType verticalEdge) {
         // Update the resize state.
         // This method attempts to compute a new layout weight to be used in the direction
         // of the linear layout. If the superclass has already determined that we can snap to
@@ -921,8 +881,8 @@ public class LinearLayoutRule extends BaseLayoutRule {
         Map<INode, Rect> sizes = resizeState.unweightedSizes;
         Rect nodePreferredSize = sizes.get(node);
         if (nodePreferredSize != null) {
-            if (horizontalEdge != null && newBounds.h < nodePreferredSize.h ||
-                    verticalEdge != null && newBounds.w < nodePreferredSize.w) {
+            if (horizontalEdge != null && newBounds.h < nodePreferredSize.h
+                    || verticalEdge != null && newBounds.w < nodePreferredSize.w) {
                 return;
             }
         }
@@ -975,12 +935,10 @@ public class LinearLayoutRule extends BaseLayoutRule {
      * layout_height (for vertical LinearLayouts).
      */
     @Override
-    protected void setNewSizeBounds(ResizeState state, final INode node, INode layout,
-            Rect oldBounds, Rect newBounds, SegmentType horizontalEdge,
-            SegmentType verticalEdge) {
+    protected void setNewSizeBounds(ResizeState state, final INode node, INode layout, Rect oldBounds, Rect newBounds,
+            SegmentType horizontalEdge, SegmentType verticalEdge) {
         LinearResizeState resizeState = (LinearResizeState) state;
-        updateResizeState(resizeState, node, layout, oldBounds, newBounds,
-                horizontalEdge, verticalEdge);
+        updateResizeState(resizeState, node, layout, oldBounds, newBounds, horizontalEdge, verticalEdge);
 
         if (resizeState.useWeight) {
             resizeState.apply();
@@ -988,31 +946,26 @@ public class LinearLayoutRule extends BaseLayoutRule {
             // Handle resizing in the opposite dimension of the layout
             final boolean isVertical = isVertical(layout);
             if (!isVertical && horizontalEdge != null) {
-                if (newBounds.h != oldBounds.h || resizeState.wrapHeight
-                        || resizeState.fillHeight) {
-                    node.setAttribute(ANDROID_URI, ATTR_LAYOUT_HEIGHT,
-                            resizeState.getHeightAttribute());
+                if (newBounds.h != oldBounds.h || resizeState.wrapHeight || resizeState.fillHeight) {
+                    node.setAttribute(ANDROID_URI, ATTR_LAYOUT_HEIGHT, resizeState.getHeightAttribute());
                 }
             }
             if (isVertical && verticalEdge != null) {
                 if (newBounds.w != oldBounds.w || resizeState.wrapWidth || resizeState.fillWidth) {
-                    node.setAttribute(ANDROID_URI, ATTR_LAYOUT_WIDTH,
-                            resizeState.getWidthAttribute());
+                    node.setAttribute(ANDROID_URI, ATTR_LAYOUT_WIDTH, resizeState.getWidthAttribute());
                 }
             }
         } else {
             node.setAttribute(ANDROID_URI, ATTR_LAYOUT_WEIGHT, null);
-            super.setNewSizeBounds(resizeState, node, layout, oldBounds, newBounds,
-                    horizontalEdge, verticalEdge);
+            super.setNewSizeBounds(resizeState, node, layout, oldBounds, newBounds, horizontalEdge, verticalEdge);
         }
     }
 
     @Override
-    protected String getResizeUpdateMessage(ResizeState state, INode child, INode parent,
-            Rect newBounds, SegmentType horizontalEdge, SegmentType verticalEdge) {
+    protected String getResizeUpdateMessage(ResizeState state, INode child, INode parent, Rect newBounds,
+            SegmentType horizontalEdge, SegmentType verticalEdge) {
         LinearResizeState resizeState = (LinearResizeState) state;
-        updateResizeState(resizeState, child, parent, child.getBounds(), newBounds,
-                horizontalEdge, verticalEdge);
+        updateResizeState(resizeState, child, parent, child.getBounds(), newBounds, horizontalEdge, verticalEdge);
 
         if (resizeState.useWeight) {
             String weight = formatFloatAttribute(resizeState.mWeight);
@@ -1037,8 +990,7 @@ public class LinearLayoutRule extends BaseLayoutRule {
                 return String.format("%s \u00D7 %s", width, height);
             }
         } else {
-            return super.getResizeUpdateMessage(state, child, parent, newBounds,
-                    horizontalEdge, verticalEdge);
+            return super.getResizeUpdateMessage(state, child, parent, newBounds, horizontalEdge, verticalEdge);
         }
     }
 
@@ -1066,8 +1018,7 @@ public class LinearLayoutRule extends BaseLayoutRule {
      * @return the total sum of all the layout weights in the given layout
      */
     private static float getWeightSum(INode linearLayout) {
-        String weightSum = linearLayout.getStringAttr(ANDROID_URI,
-                ATTR_WEIGHT_SUM);
+        String weightSum = linearLayout.getStringAttr(ANDROID_URI, ATTR_WEIGHT_SUM);
         float sum = -1.0f;
         if (weightSum != null) {
             // Distribute

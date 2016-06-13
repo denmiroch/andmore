@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,7 +11,6 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.lint;
-
 
 import java.lang.reflect.Constructor;
 import java.util.Collections;
@@ -144,12 +140,10 @@ abstract class LintFix implements ICompletionProposal {
 
     // --- Access to available fixes ---
 
-    private static final Map<String, Class<? extends LintFix>> sFixes =
-            new HashMap<String, Class<? extends LintFix>>();
+    private static final Map<String, Class<? extends LintFix>> sFixes = new HashMap<String, Class<? extends LintFix>>();
     // Keep this map in sync with BuiltinIssueRegistry's hasAutoFix() data
     static {
-        sFixes.put(InefficientWeightDetector.INEFFICIENT_WEIGHT.getId(),
-                LinearLayoutWeightFix.class);
+        sFixes.put(InefficientWeightDetector.INEFFICIENT_WEIGHT.getId(), LinearLayoutWeightFix.class);
         sFixes.put(AccessibilityDetector.ISSUE.getId(), SetAttributeFix.class);
         sFixes.put(InefficientWeightDetector.BASELINE_WEIGHTS.getId(), SetAttributeFix.class);
         sFixes.put(ManifestDetector.ALLOW_BACKUP.getId(), SetAttributeFix.class);
@@ -169,8 +163,7 @@ abstract class LintFix implements ICompletionProposal {
         sFixes.put(TypographyDetector.FRACTIONS.getId(), TypographyFix.class);
         sFixes.put(TypographyDetector.OTHER.getId(), TypographyFix.class);
         sFixes.put(TypographyDetector.QUOTES.getId(), TypographyFix.class);
-        sFixes.put(UseCompoundDrawableDetector.ISSUE.getId(),
-                UseCompoundDrawableDetectorFix.class);
+        sFixes.put(UseCompoundDrawableDetector.ISSUE.getId(), UseCompoundDrawableDetectorFix.class);
         sFixes.put(TypoDetector.ISSUE.getId(), TypoFix.class);
         sFixes.put(DosLineEndingDetector.ISSUE.getId(), DosLineEndingsFix.class);
         // ApiDetector.UNSUPPORTED is provided as a marker resolution rather than
@@ -193,8 +186,7 @@ abstract class LintFix implements ICompletionProposal {
         Class<? extends LintFix> clazz = sFixes.get(id);
         if (clazz != null) {
             try {
-                Constructor<? extends LintFix> constructor = clazz.getDeclaredConstructor(
-                        String.class, IMarker.class);
+                Constructor<? extends LintFix> constructor = clazz.getDeclaredConstructor(String.class, IMarker.class);
                 constructor.setAccessible(true);
                 LintFix fix = constructor.newInstance(id, marker);
                 List<LintFix> alternatives = fix.getAllFixes();

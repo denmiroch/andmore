@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +13,13 @@
 
 package org.eclipse.andmore.internal.editors.uimodel;
 
-import com.android.ide.common.xml.XmlAttributeSortOrder;
-
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.descriptors.AttributeDescriptor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.IManagedForm;
 import org.w3c.dom.Node;
+
+import com.android.ide.common.xml.XmlAttributeSortOrder;
 
 /**
  * Represents an XML attribute that can be modified by the XML editor's user interface.
@@ -168,7 +165,6 @@ public abstract class UiAttributeNode implements Comparable<UiAttributeNode> {
 
     @Override
     public int compareTo(UiAttributeNode o) {
-        return XmlAttributeSortOrder.compareAttributes(mDescriptor.getXmlLocalName(),
-                o.mDescriptor.getXmlLocalName());
+        return XmlAttributeSortOrder.compareAttributes(mDescriptor.getXmlLocalName(), o.mDescriptor.getXmlLocalName());
     }
 }

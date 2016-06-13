@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,29 +24,30 @@ import org.eclipse.andmore.android.generateviewbylayout.JavaViewBasedOnLayoutMod
  * Manager responsible to modify activity / fragment based on menu
  */
 public class JavaModifierBasedOnMenu extends JavaCodeModifier {
-	static {
-		IMPORT_LIST.add(JavaViewBasedOnLayoutModifierConstants.IMPORT_ANDROID_VIEW_VIEW);
-		IMPORT_LIST.add(JavaViewBasedOnLayoutModifierConstants.IMPORT_ANDROID_OS);
-	}
+    static {
+        IMPORT_LIST.add(JavaViewBasedOnLayoutModifierConstants.IMPORT_ANDROID_VIEW_VIEW);
+        IMPORT_LIST.add(JavaViewBasedOnLayoutModifierConstants.IMPORT_ANDROID_OS);
+    }
 
-	/**
-	 * @see org.eclipse.andmore.android.generatecode.JavaCodeModifier#
-	 *      populateListOfCodeGenerators(
-	 *      "org.eclipse.andmore.android.generatecode.AbstractCodeGeneratorData)
-	 */
-	@Override
-	public List<AbstractCodeGenerator> populateListOfCodeGenerators(AbstractCodeGeneratorData abstractCodeGeneratorData) {
-		CodeGeneratorDataBasedOnMenu codeGeneratorDataBasedOnMenu = (CodeGeneratorDataBasedOnMenu) abstractCodeGeneratorData;
-		codeGenerators.add(new MenuHandlerCodeGenerator(codeGeneratorDataBasedOnMenu, codeGeneratorDataBasedOnMenu
-				.getAbstractCodeVisitor().getTypeDeclaration()));
-		return codeGenerators;
-	}
+    /**
+     * @see org.eclipse.andmore.android.generatecode.JavaCodeModifier#
+     *      populateListOfCodeGenerators(
+     *      "org.eclipse.andmore.android.generatecode.AbstractCodeGeneratorData)
+     */
+    @Override
+    public List<AbstractCodeGenerator> populateListOfCodeGenerators(
+            AbstractCodeGeneratorData abstractCodeGeneratorData) {
+        CodeGeneratorDataBasedOnMenu codeGeneratorDataBasedOnMenu = (CodeGeneratorDataBasedOnMenu) abstractCodeGeneratorData;
+        codeGenerators.add(new MenuHandlerCodeGenerator(codeGeneratorDataBasedOnMenu,
+                codeGeneratorDataBasedOnMenu.getAbstractCodeVisitor().getTypeDeclaration()));
+        return codeGenerators;
+    }
 
-	/**
-	 * @see org.eclipse.andmore.android.generatecode.JavaCodeModifier#getDataResource()
-	 */
-	@Override
-	protected File getDataResource() {
-		return ((CodeGeneratorDataBasedOnMenu) codeGeneratorData).getMenuFile().getFile();
-	}
+    /**
+     * @see org.eclipse.andmore.android.generatecode.JavaCodeModifier#getDataResource()
+     */
+    @Override
+    protected File getDataResource() {
+        return ((CodeGeneratorDataBasedOnMenu) codeGeneratorData).getMenuFile().getFile();
+    }
 }

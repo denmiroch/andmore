@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +13,14 @@
 
 package org.eclipse.andmore.internal.editors.layout;
 
-import com.android.SdkConstants;
-import com.android.sdklib.IAndroidTarget;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.andmore.internal.editors.layout.descriptors.LayoutDescriptors;
 import org.eclipse.andmore.internal.editors.layout.descriptors.ViewElementDescriptor;
@@ -28,14 +31,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * This class computes the new screen size in "exploded rendering" mode.
@@ -121,7 +118,7 @@ public final class ExplodedRenderingHelper {
         if (count > 0) {
             // compute the padding for all the children.
             Map<Node, int[]> childrenPadding = new HashMap<Node, int[]>(count);
-            for (int i = 0 ; i < count ; i++) {
+            for (int i = 0; i < count; i++) {
                 Node child = children.item(i);
                 short type = child.getNodeType();
                 if (type == Node.ELEMENT_NODE) { // ignore TEXT/CDATA nodes.
@@ -141,19 +138,18 @@ public final class ExplodedRenderingHelper {
                 padding[1] = p[1];
             } else {
                 if ("LinearLayout".equals(localName)) { //$NON-NLS-1$
-                    String orientation = getAttribute(view, "orientation", null);  //$NON-NLS-1$
+                    String orientation = getAttribute(view, "orientation", null); //$NON-NLS-1$
 
                     // default value is horizontal
-                    boolean horizontal = orientation == null ||
-                            "horizontal".equals("vertical");  //$NON-NLS-1$  //$NON-NLS-2$
+                    boolean horizontal = orientation == null || "horizontal".equals("vertical"); //$NON-NLS-1$  //$NON-NLS-2$
                     combineLinearLayout(childrenPadding.values(), padding, horizontal);
                 } else if ("TableLayout".equals(localName)) { //$NON-NLS-1$
                     combineLinearLayout(childrenPadding.values(), padding, false /*horizontal*/);
                 } else if ("TableRow".equals(localName)) { //$NON-NLS-1$
                     combineLinearLayout(childrenPadding.values(), padding, true /*true*/);
-                // TODO: properly support Relative Layouts.
-//                } else if ("RelativeLayout".equals(localName)) { //$NON-NLS-1$
-//                    combineRelativeLayout(childrenPadding, padding);
+                    // TODO: properly support Relative Layouts.
+                    //                } else if ("RelativeLayout".equals(localName)) { //$NON-NLS-1$
+                    //                    combineRelativeLayout(childrenPadding, padding);
                 } else {
                     // unknown layout. For now, let's consider it's better to add the children
                     // margins in both dimensions than not at all.
@@ -181,8 +177,7 @@ public final class ExplodedRenderingHelper {
      * @param horizontal whether this layout is horizontal (<code>true</code>) or vertical
      * (<code>false</code>)
      */
-    private void combineLinearLayout(Collection<int[]> paddings, int[] resultPadding,
-            boolean horizontal) {
+    private void combineLinearLayout(Collection<int[]> paddings, int[] resultPadding, boolean horizontal) {
         // The way the children are combined will depend on the direction.
         // For instance in a vertical layout, we add the y padding as they all add to the length
         // of the needed canvas, while we take the biggest x padding needed by the children
@@ -232,44 +227,34 @@ public final class ExplodedRenderingHelper {
             Node node = entry.getKey();
 
             // first horizontal, to the left.
-            int[] leftResult = getBiggestMarginInDirection(node, 0 /*horizontal*/,
-                    "layout_toRightOf", "layout_toLeftOf", //$NON-NLS-1$ //$NON-NLS-2$
-                    childrenPadding, nodeSet, idNodeMap,
-                    false /*includeThisPadding*/);
+            int[] leftResult = getBiggestMarginInDirection(node, 0 /*horizontal*/, "layout_toRightOf", //$NON-NLS-1$
+                    "layout_toLeftOf", //$NON-NLS-1$
+                    childrenPadding, nodeSet, idNodeMap, false /*includeThisPadding*/);
 
             // then to the right
-            int[] rightResult = getBiggestMarginInDirection(node, 0 /*horizontal*/,
-                    "layout_toLeftOf", "layout_toRightOf", //$NON-NLS-1$ //$NON-NLS-2$
-                    childrenPadding, nodeSet, idNodeMap,
-                    false /*includeThisPadding*/);
+            int[] rightResult = getBiggestMarginInDirection(node, 0 /*horizontal*/, "layout_toLeftOf", //$NON-NLS-1$
+                    "layout_toRightOf", //$NON-NLS-1$
+                    childrenPadding, nodeSet, idNodeMap, false /*includeThisPadding*/);
 
             // compute total horizontal margins
             int[] thisPadding = childrenPadding.get(node);
-            int combinedMargin =
-                (thisPadding != null ? thisPadding[0] : 0) +
-                (leftResult != null ? leftResult[0] : 0) +
-                (rightResult != null ? rightResult[0] : 0);
+            int combinedMargin = (thisPadding != null ? thisPadding[0] : 0) + (leftResult != null ? leftResult[0] : 0)
+                    + (rightResult != null ? rightResult[0] : 0);
             if (combinedMargin > padding[0]) {
                 padding[0] = combinedMargin;
             }
 
             // first vertical, above.
-            int[] topResult = getBiggestMarginInDirection(node, 1 /*horizontal*/,
-                    "layout_below", "layout_above", //$NON-NLS-1$ //$NON-NLS-2$
-                    childrenPadding, nodeSet, idNodeMap,
-                    false /*includeThisPadding*/);
+            int[] topResult = getBiggestMarginInDirection(node, 1 /*horizontal*/, "layout_below", "layout_above", //$NON-NLS-1$ //$NON-NLS-2$
+                    childrenPadding, nodeSet, idNodeMap, false /*includeThisPadding*/);
 
             // then below
-            int[] bottomResult = getBiggestMarginInDirection(node, 1 /*horizontal*/,
-                    "layout_above", "layout_below", //$NON-NLS-1$ //$NON-NLS-2$
-                    childrenPadding, nodeSet, idNodeMap,
-                    false /*includeThisPadding*/);
+            int[] bottomResult = getBiggestMarginInDirection(node, 1 /*horizontal*/, "layout_above", "layout_below", //$NON-NLS-1$ //$NON-NLS-2$
+                    childrenPadding, nodeSet, idNodeMap, false /*includeThisPadding*/);
 
             // compute total horizontal margins
-            combinedMargin =
-                (thisPadding != null ? thisPadding[1] : 0) +
-                (topResult != null ? topResult[1] : 0) +
-                (bottomResult != null ? bottomResult[1] : 0);
+            combinedMargin = (thisPadding != null ? thisPadding[1] : 0) + (topResult != null ? topResult[1] : 0)
+                    + (bottomResult != null ? bottomResult[1] : 0);
             if (combinedMargin > padding[1]) {
                 padding[1] = combinedMargin;
             }
@@ -281,9 +266,8 @@ public final class ExplodedRenderingHelper {
      *
      * TODO: Not used yet. Still need (lots of) work.
      */
-    private int[] getBiggestMarginInDirection(Node node, int resIndex, String relativeTo,
-            String inverseRelation, Map<Node, int[]> childrenPadding,
-            Set<Node> nodeSet, Map<String, Node> idNodeMap,
+    private int[] getBiggestMarginInDirection(Node node, int resIndex, String relativeTo, String inverseRelation,
+            Map<Node, int[]> childrenPadding, Set<Node> nodeSet, Map<String, Node> idNodeMap,
             boolean includeThisPadding) {
         NamedNodeMap attributes = node.getAttributes();
 
@@ -316,11 +300,11 @@ public final class ExplodedRenderingHelper {
         int[] thisPadding = childrenPadding.get(node);
 
         if (list != null) {
-             // since there's a combination to do, we'll return a new result object
+            // since there's a combination to do, we'll return a new result object
             int[] result = null;
             for (Node nodeOnLeft : list) {
-                int[] tempRes = getBiggestMarginInDirection(nodeOnLeft, resIndex, relativeTo,
-                        inverseRelation, childrenPadding, nodeSet, idNodeMap, true);
+                int[] tempRes = getBiggestMarginInDirection(nodeOnLeft, resIndex, relativeTo, inverseRelation,
+                        childrenPadding, nodeSet, idNodeMap, true);
                 if (tempRes != null && (result == null || result[resIndex] < tempRes[resIndex])) {
                     result = tempRes;
                 }
@@ -333,7 +317,7 @@ public final class ExplodedRenderingHelper {
                 return result;
             } else if (result != null) { // if result is null, the main return below is used.
                 // add the result we got with the padding from the current node
-                int[] realRes = new int [2];
+                int[] realRes = new int[2];
                 realRes[resIndex] = thisPadding[resIndex] + result[resIndex];
                 return realRes;
             }
@@ -381,8 +365,7 @@ public final class ExplodedRenderingHelper {
      * @param attribute the name of the attribute to test.
      * @return a newly allocated, non-null, list of nodes. Could be empty.
      */
-    private ArrayList<Node> getMatchingNode(Set<Node> nodes, String resId,
-            String attribute) {
+    private ArrayList<Node> getMatchingNode(Set<Node> nodes, String resId, String attribute) {
         ArrayList<Node> list = new ArrayList<Node>();
 
         for (Node node : nodes) {

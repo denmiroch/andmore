@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,13 +38,8 @@ public class ManifestElementDescriptor extends ElementDescriptor {
      * @param children The list of allowed children. Can be null or empty.
      * @param mandatory Whether this node must always exist (even for empty models).
      */
-    public ManifestElementDescriptor(String xml_name,
-            String ui_name,
-            String tooltip,
-            String sdk_url,
-            AttributeDescriptor[] attributes,
-            ElementDescriptor[] children,
-            Mandatory mandatory) {
+    public ManifestElementDescriptor(String xml_name, String ui_name, String tooltip, String sdk_url,
+            AttributeDescriptor[] attributes, ElementDescriptor[] children, Mandatory mandatory) {
         super(xml_name, ui_name, tooltip, sdk_url, attributes, children, mandatory);
     }
 
@@ -62,13 +54,8 @@ public class ManifestElementDescriptor extends ElementDescriptor {
      * @param children The list of allowed children. Can be null or empty.
      * @param mandatory Whether this node must always exist (even for empty models).
      */
-    public ManifestElementDescriptor(String xml_name,
-            String ui_name,
-            String tooltip,
-            String sdk_url,
-            AttributeDescriptor[] attributes,
-            ElementDescriptor[] children,
-            boolean mandatory) {
+    public ManifestElementDescriptor(String xml_name, String ui_name, String tooltip, String sdk_url,
+            AttributeDescriptor[] attributes, ElementDescriptor[] children, boolean mandatory) {
         super(xml_name, ui_name, tooltip, sdk_url, attributes, children, mandatory);
     }
 
@@ -82,12 +69,8 @@ public class ManifestElementDescriptor extends ElementDescriptor {
      * @param attributes The list of allowed attributes. Can be null or empty.
      * @param children The list of allowed children. Can be null or empty.
      */
-    public ManifestElementDescriptor(String xml_name,
-            String ui_name,
-            String tooltip,
-            String sdk_url,
-            AttributeDescriptor[] attributes,
-            ElementDescriptor[] children) {
+    public ManifestElementDescriptor(String xml_name, String ui_name, String tooltip, String sdk_url,
+            AttributeDescriptor[] attributes, ElementDescriptor[] children) {
         super(xml_name, ui_name, tooltip, sdk_url, attributes, children, false);
     }
 

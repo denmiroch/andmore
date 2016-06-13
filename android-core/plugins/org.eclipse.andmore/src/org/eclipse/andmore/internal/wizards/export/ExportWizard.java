@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,14 +13,18 @@
 
 package org.eclipse.andmore.internal.wizards.export;
 
-import com.android.annotations.Nullable;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.BuildToolInfo.PathId;
-import com.android.sdklib.internal.build.DebugKeyProvider.IKeyGenOutput;
-import com.android.sdklib.internal.build.KeystoreHelper;
-import com.android.utils.GrabProcessOutput;
-import com.android.utils.GrabProcessOutput.IProcessOutput;
-import com.android.utils.GrabProcessOutput.Wait;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.security.KeyStore;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.preferences.AdtPrefs.BuildVerbosity;
@@ -48,18 +49,14 @@ import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.security.KeyStore;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
+import com.android.annotations.Nullable;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.BuildToolInfo.PathId;
+import com.android.sdklib.internal.build.DebugKeyProvider.IKeyGenOutput;
+import com.android.sdklib.internal.build.KeystoreHelper;
+import com.android.utils.GrabProcessOutput;
+import com.android.utils.GrabProcessOutput.IProcessOutput;
+import com.android.utils.GrabProcessOutput.Wait;
 
 /**
  * Export wizard to export an apk signed with a release key/certificate.
@@ -101,13 +98,13 @@ public final class ExportWizard extends Wizard implements IExportWizard {
                 int len = e.text.length();
 
                 // first limit to 127 characters max
-                if (len + ((Text)e.getSource()).getText().length() > 127) {
+                if (len + ((Text) e.getSource()).getText().length() > 127) {
                     e.doit = false;
                     return;
                 }
 
                 // now only take non control characters
-                for (int i = 0 ; i < len ; i++) {
+                for (int i = 0; i < len; i++) {
                     if (e.text.charAt(i) < 32) {
                         e.doit = false;
                         return;
@@ -191,8 +188,7 @@ public final class ExportWizard extends Wizard implements IExportWizard {
     @Override
     public void addPages() {
         addPage(mPages[0] = new ProjectCheckPage(this, PAGE_PROJECT_CHECK));
-        addPage(mKeystoreSelectionPage = mPages[1] = new KeystoreSelectionPage(this,
-                PAGE_KEYSTORE_SELECTION));
+        addPage(mKeystoreSelectionPage = mPages[1] = new KeystoreSelectionPage(this, PAGE_KEYSTORE_SELECTION));
         addPage(mKeyCreationPage = mPages[2] = new KeyCreationPage(this, PAGE_KEY_CREATION));
         addPage(mKeySelectionPage = mPages[3] = new KeySelectionPage(this, PAGE_KEY_SELECTION));
         addPage(mKeyCheckPage = mPages[4] = new KeyCheckPage(this, PAGE_KEY_CHECK));
@@ -203,8 +199,7 @@ public final class ExportWizard extends Wizard implements IExportWizard {
         // save the properties
         ProjectHelper.saveStringProperty(mProject, PROPERTY_KEYSTORE, mKeystore);
         ProjectHelper.saveStringProperty(mProject, PROPERTY_ALIAS, mKeyAlias);
-        ProjectHelper.saveStringProperty(mProject, PROPERTY_DESTINATION,
-                mDestinationFile.getAbsolutePath());
+        ProjectHelper.saveStringProperty(mProject, PROPERTY_DESTINATION, mDestinationFile.getAbsolutePath());
 
         // run the export in an UI runnable.
         IWorkbench workbench = PlatformUI.getWorkbench();
@@ -217,8 +212,7 @@ public final class ExportWizard extends Wizard implements IExportWizard {
                  * @throws InterruptedException
                  */
                 @Override
-                public void run(IProgressMonitor monitor) throws InvocationTargetException,
-                        InterruptedException {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     try {
                         result[0] = doExport(monitor);
                     } finally {
@@ -240,19 +234,13 @@ public final class ExportWizard extends Wizard implements IExportWizard {
             // if needed, create the keystore and/or key.
             if (mKeystoreCreationMode || mKeyCreationMode) {
                 final ArrayList<String> output = new ArrayList<String>();
-                boolean createdStore = KeystoreHelper.createNewStore(
-                        mKeystore,
-                        null /*storeType*/,
-                        mKeystorePassword,
-                        mKeyAlias,
-                        mKeyPassword,
-                        mDName,
-                        mValidity,
-                        new IKeyGenOutput() {
+                boolean createdStore = KeystoreHelper.createNewStore(mKeystore, null /*storeType*/, mKeystorePassword,
+                        mKeyAlias, mKeyPassword, mDName, mValidity, new IKeyGenOutput() {
                             @Override
                             public void err(String message) {
                                 output.add(message);
                             }
+
                             @Override
                             public void out(String message) {
                                 output.add(message);
@@ -270,18 +258,16 @@ public final class ExportWizard extends Wizard implements IExportWizard {
                 FileInputStream fis = new FileInputStream(mKeystore);
                 keyStore.load(fis, mKeystorePassword.toCharArray());
                 fis.close();
-                PrivateKeyEntry entry = (KeyStore.PrivateKeyEntry)keyStore.getEntry(
-                        mKeyAlias, new KeyStore.PasswordProtection(mKeyPassword.toCharArray()));
+                PrivateKeyEntry entry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(mKeyAlias,
+                        new KeyStore.PasswordProtection(mKeyPassword.toCharArray()));
 
                 if (entry != null) {
                     mPrivateKey = entry.getPrivateKey();
-                    mCertificate = (X509Certificate)entry.getCertificate();
+                    mCertificate = (X509Certificate) entry.getCertificate();
 
                     AndmoreAndroidPlugin.printToConsole(mProject,
-                            String.format("New keystore %s has been created.",
-                                    mDestinationFile.getAbsolutePath()),
-                            "Certificate fingerprints:",
-                            String.format("  MD5 : %s", getCertMd5Fingerprint()),
+                            String.format("New keystore %s has been created.", mDestinationFile.getAbsolutePath()),
+                            "Certificate fingerprints:", String.format("  MD5 : %s", getCertMd5Fingerprint()),
                             String.format("  SHA1: %s", getCertSha1Fingerprint()));
 
                 } else {
@@ -310,8 +296,7 @@ public final class ExportWizard extends Wizard implements IExportWizard {
                 }
 
                 // export the signed apk.
-                ExportHelper.exportReleaseApk(mProject, apkExportFile,
-                        mPrivateKey, mCertificate, monitor);
+                ExportHelper.exportReleaseApk(mProject, apkExportFile, mPrivateKey, mCertificate, monitor);
 
                 // align if we can
                 if (runZipAlign) {
@@ -322,11 +307,11 @@ public final class ExportWizard extends Wizard implements IExportWizard {
                     }
                 } else {
                     AndmoreAndroidPlugin.displayWarning("Export Wizard",
-                            "The zipalign tool was not found in the SDK.\n\n" +
-                            "Please update to the latest SDK and re-export your application\n" +
-                            "or run zipalign manually.\n\n" +
-                            "Aligning applications allows Android to use application resources\n" +
-                            "more efficiently.");
+                            "The zipalign tool was not found in the SDK.\n\n"
+                                    + "Please update to the latest SDK and re-export your application\n"
+                                    + "or run zipalign manually.\n\n"
+                                    + "Aligning applications allows Android to use application resources\n"
+                                    + "more efficiently.");
                 }
 
                 return true;
@@ -344,9 +329,8 @@ public final class ExportWizard extends Wizard implements IExportWizard {
         // a private key/certificate or the creation mode. In creation mode, unless
         // all the key/keystore info is valid, the user cannot reach the last page, so there's
         // no need to check them again here.
-        return ((mPrivateKey != null && mCertificate != null)
-                        || mKeystoreCreationMode || mKeyCreationMode) &&
-                mDestinationFile != null;
+        return ((mPrivateKey != null && mCertificate != null) || mKeystoreCreationMode || mKeyCreationMode)
+                && mDestinationFile != null;
     }
 
     /*
@@ -360,9 +344,9 @@ public final class ExportWizard extends Wizard implements IExportWizard {
         Object selected = selection.getFirstElement();
 
         if (selected instanceof IProject) {
-            mProject = (IProject)selected;
+            mProject = (IProject) selected;
         } else if (selected instanceof IAdaptable) {
-            IResource r = (IResource)((IAdaptable)selected).getAdapter(IResource.class);
+            IResource r = ((IAdaptable) selected).getAdapter(IResource.class);
             if (r != null) {
                 mProject = r.getProject();
             }
@@ -423,7 +407,6 @@ public final class ExportWizard extends Wizard implements IExportWizard {
     boolean getKeystoreCreationMode() {
         return mKeystoreCreationMode;
     }
-
 
     void setKeystorePassword(String password) {
         mKeystorePassword = password;
@@ -529,7 +512,7 @@ public final class ExportWizard extends Wizard implements IExportWizard {
             message = messages[0];
         } else {
             StringBuilder sb = new StringBuilder(messages[0]);
-            for (int i = 1;  i < messages.length; i++) {
+            for (int i = 1; i < messages.length; i++) {
                 sb.append('\n');
                 sb.append(messages[i]);
             }
@@ -569,25 +552,21 @@ public final class ExportWizard extends Wizard implements IExportWizard {
         try {
             final IProject project = getProject();
 
-            int status = GrabProcessOutput.grabProcessOutput(
-                    process,
-                    Wait.WAIT_FOR_READERS,
-                    new IProcessOutput() {
-                        @Override
-                        public void out(@Nullable String line) {
-                            if (line != null) {
-                                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE,
-                                        project, line);
-                            }
-                        }
+            int status = GrabProcessOutput.grabProcessOutput(process, Wait.WAIT_FOR_READERS, new IProcessOutput() {
+                @Override
+                public void out(@Nullable String line) {
+                    if (line != null) {
+                        AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project, line);
+                    }
+                }
 
-                        @Override
-                        public void err(@Nullable String line) {
-                            if (line != null) {
-                                output.add(line);
-                            }
-                        }
-                    });
+                @Override
+                public void err(@Nullable String line) {
+                    if (line != null) {
+                        output.add(line);
+                    }
+                }
+            });
 
             if (status != 0) {
                 // build a single message from the array list

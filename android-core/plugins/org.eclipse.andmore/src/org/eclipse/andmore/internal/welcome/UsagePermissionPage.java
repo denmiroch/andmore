@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,7 @@
 
 package org.eclipse.andmore.internal.welcome;
 
-import com.android.sdkstats.SdkStatsPermissionDialog;
+import java.net.URL;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -34,7 +31,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 
-import java.net.URL;
+import com.android.sdkstats.SdkStatsPermissionDialog;
 
 /** Page which displays the permission dialog for collecting usage statistics */
 public class UsagePermissionPage extends WizardPage implements SelectionListener {
@@ -86,8 +83,8 @@ public class UsagePermissionPage extends WizardPage implements SelectionListener
         GridData gdLaterLabel = new GridData(SWT.FILL, SWT.BOTTOM, false, true, 1, 1);
         gdLaterLabel.widthHint = 580;
         laterLabel.setLayoutData(gdLaterLabel);
-        laterLabel.setText("If you later decide to change this setting, you can do so in the " +
-               "options panel under Android > Usage Stats");
+        laterLabel.setText("If you later decide to change this setting, you can do so in the "
+                + "options panel under Android > Usage Stats");
 
         mLink = new Link(container, SWT.NONE);
         mLink.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -115,10 +112,8 @@ public class UsagePermissionPage extends WizardPage implements SelectionListener
                 IWebBrowser browser = workbench.getBrowserSupport().getExternalBrowser();
                 browser.openURL(new URL(event.text));
             } catch (Exception e) {
-                String message = String.format("Could not open browser. Vist\n%1$s\ninstead.",
-                        event.text);
-                MessageDialog.openError(getWizard().getContainer().getShell(),
-                        "Browser Error", message);
+                String message = String.format("Could not open browser. Vist\n%1$s\ninstead.", event.text);
+                MessageDialog.openError(getWizard().getContainer().getShell(), "Browser Error", message);
             }
         } else {
             // Radio buttons selected
@@ -127,8 +122,7 @@ public class UsagePermissionPage extends WizardPage implements SelectionListener
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 
     private void validatePage() {
         String error = null;

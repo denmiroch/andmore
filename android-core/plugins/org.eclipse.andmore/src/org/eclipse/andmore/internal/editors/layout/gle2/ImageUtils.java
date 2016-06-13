@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,14 +25,6 @@ import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR;
 import static java.awt.RenderingHints.VALUE_RENDER_QUALITY;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.Rect;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -48,6 +37,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.Rect;
 
 /**
  * Utilities related to image processing.
@@ -71,7 +68,7 @@ public class ImageUtils {
                     // One perceived luminance formula is (0.299*red + 0.587*green + 0.114*blue)
                     // In order to keep this fast since we don't need a very accurate
                     // measure, I'll just estimate this with integer math:
-                    long brightness = (299L*r + 587*g + 114*b) / 1000;
+                    long brightness = (299L * r + 587 * g + 114 * b) / 1000;
                     if (brightness < 128) {
                         return true;
                     }
@@ -93,7 +90,7 @@ public class ImageUtils {
             int g = (rgb & 0x00FF00) >> 8;
             int b = (rgb & 0x0000FF);
             // See the containsDarkPixels implementation for details
-            return (int) ((299L*r + 587*g + 114*b) / 1000);
+            return (int) ((299L * r + 587 * g + 114 * b) / 1000);
         }
 
         return 0;
@@ -137,9 +134,7 @@ public class ImageUtils {
      *         and cropping completely removed everything
      */
     @Nullable
-    public static BufferedImage cropBlank(
-            @NonNull BufferedImage image,
-            @Nullable Rect initialCrop) {
+    public static BufferedImage cropBlank(@NonNull BufferedImage image, @Nullable Rect initialCrop) {
         return cropBlank(image, initialCrop, image.getType());
     }
 
@@ -183,9 +178,7 @@ public class ImageUtils {
      *         and cropping completely removed everything
      */
     @Nullable
-    public static BufferedImage cropColor(
-            @NonNull BufferedImage image,
-            final int blankArgb,
+    public static BufferedImage cropColor(@NonNull BufferedImage image, final int blankArgb,
             @Nullable Rect initialCrop) {
         return cropColor(image, blankArgb, initialCrop, image.getType());
     }
@@ -204,8 +197,7 @@ public class ImageUtils {
      * @return a cropped version of the source image, or null if the whole image was blank
      *         and cropping completely removed everything
      */
-    public static BufferedImage cropColor(BufferedImage image,
-            final int blankArgb, Rect initialCrop, int imageType) {
+    public static BufferedImage cropColor(BufferedImage image, final int blankArgb, Rect initialCrop, int imageType) {
         CropFilter filter = new CropFilter() {
             @Override
             public boolean crop(BufferedImage bufferedImage, int x, int y) {
@@ -231,8 +223,7 @@ public class ImageUtils {
         boolean crop(BufferedImage image, int x, int y);
     }
 
-    private static BufferedImage crop(BufferedImage image, CropFilter filter, Rect initialCrop,
-            int imageType) {
+    private static BufferedImage crop(BufferedImage image, CropFilter filter, Rect initialCrop, int imageType) {
         if (image == null) {
             return null;
         }
@@ -266,7 +257,8 @@ public class ImageUtils {
         // small images.
 
         // First determine top edge
-        topEdge: for (; y1 < y2; y1++) {
+        topEdge:
+        for (; y1 < y2; y1++) {
             for (int x = x1; x < x2; x++) {
                 if (!filter.crop(image, x, y1)) {
                     break topEdge;
@@ -280,7 +272,8 @@ public class ImageUtils {
         }
 
         // Next determine left edge
-        leftEdge: for (; x1 < x2; x1++) {
+        leftEdge:
+        for (; x1 < x2; x1++) {
             for (int y = y1; y < y2; y++) {
                 if (!filter.crop(image, x1, y)) {
                     break leftEdge;
@@ -289,7 +282,8 @@ public class ImageUtils {
         }
 
         // Next determine right edge
-        rightEdge: for (; x2 > x1; x2--) {
+        rightEdge:
+        for (; x2 > x1; x2--) {
             for (int y = y1; y < y2; y++) {
                 if (!filter.crop(image, x2 - 1, y)) {
                     break rightEdge;
@@ -298,7 +292,8 @@ public class ImageUtils {
         }
 
         // Finally determine bottom edge
-        bottomEdge: for (; y2 > y1; y2--) {
+        bottomEdge:
+        for (; y2 > y1; y2--) {
             for (int x = x1; x < x2; x++) {
                 if (!filter.crop(image, x, y2 - 1)) {
                     break bottomEdge;
@@ -348,14 +343,13 @@ public class ImageUtils {
      * @param shadowRgb the RGB int to use for the shadow color
      * @return a new image with the source image on top of its shadow
      */
-    public static BufferedImage createDropShadow(BufferedImage source, int shadowSize,
-            float shadowOpacity, int shadowRgb) {
+    public static BufferedImage createDropShadow(BufferedImage source, int shadowSize, float shadowOpacity,
+            int shadowRgb) {
 
         // This code is based on
         //      http://www.jroller.com/gfx/entry/non_rectangular_shadow
 
-        BufferedImage image = new BufferedImage(source.getWidth() + shadowSize * 2,
-                source.getHeight() + shadowSize * 2,
+        BufferedImage image = new BufferedImage(source.getWidth() + shadowSize * 2, source.getHeight() + shadowSize * 2,
                 BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g2 = image.createGraphics();
@@ -484,8 +478,7 @@ public class ImageUtils {
      * @param width the width of the rectangle
      * @param height the height of the rectangle
      */
-    public static final void drawRectangleShadow(BufferedImage image,
-            int x, int y, int width, int height) {
+    public static final void drawRectangleShadow(BufferedImage image, int x, int y, int width, int height) {
         Graphics gc = image.getGraphics();
         try {
             drawRectangleShadow(gc, x, y, width, height);
@@ -506,8 +499,7 @@ public class ImageUtils {
      * @param width the width of the rectangle
      * @param height the height of the rectangle
      */
-    public static final void drawSmallRectangleShadow(BufferedImage image,
-            int x, int y, int width, int height) {
+    public static final void drawSmallRectangleShadow(BufferedImage image, int x, int y, int width, int height) {
         Graphics gc = image.getGraphics();
         try {
             drawSmallRectangleShadow(gc, x, y, width, height);
@@ -548,8 +540,7 @@ public class ImageUtils {
      * @param width the width of the rectangle
      * @param height the height of the rectangle
      */
-    public static final void drawRectangleShadow(Graphics gc,
-            int x, int y, int width, int height) {
+    public static final void drawRectangleShadow(Graphics gc, int x, int y, int width, int height) {
         if (sShadowBottomLeft == null) {
             // Shadow graphics. This was generated by creating a drop shadow in
             // Gimp, using the parameters x offset=10, y offset=10, blur radius=10,
@@ -569,11 +560,11 @@ public class ImageUtils {
             // the three corner images.
             //
             // Filenames: bl=bottom left, b=bottom, br=bottom right, r=right, tr=top right
-            sShadowBottomLeft  = readImage("shadow-bl.png"); //$NON-NLS-1$
-            sShadowBottom      = readImage("shadow-b.png");  //$NON-NLS-1$
+            sShadowBottomLeft = readImage("shadow-bl.png"); //$NON-NLS-1$
+            sShadowBottom = readImage("shadow-b.png"); //$NON-NLS-1$
             sShadowBottomRight = readImage("shadow-br.png"); //$NON-NLS-1$
-            sShadowRight       = readImage("shadow-r.png");  //$NON-NLS-1$
-            sShadowTopRight    = readImage("shadow-tr.png"); //$NON-NLS-1$
+            sShadowRight = readImage("shadow-r.png"); //$NON-NLS-1$
+            sShadowTopRight = readImage("shadow-tr.png"); //$NON-NLS-1$
             assert sShadowBottomLeft != null;
             assert sShadowBottomRight.getWidth() == SHADOW_SIZE;
             assert sShadowBottomRight.getHeight() == SHADOW_SIZE;
@@ -591,16 +582,11 @@ public class ImageUtils {
         gc.drawImage(sShadowBottomLeft, x, y + height, null);
         gc.drawImage(sShadowBottomRight, x + width, y + height, null);
         gc.drawImage(sShadowTopRight, x + width, y, null);
-        gc.drawImage(sShadowBottom,
-                x + sShadowBottomLeft.getWidth(), y + height,
-                x + width, y + height + sShadowBottom.getHeight(),
-                0, 0, sShadowBottom.getWidth(), sShadowBottom.getHeight(),
+        gc.drawImage(sShadowBottom, x + sShadowBottomLeft.getWidth(), y + height, x + width,
+                y + height + sShadowBottom.getHeight(), 0, 0, sShadowBottom.getWidth(), sShadowBottom.getHeight(),
                 null);
-        gc.drawImage(sShadowRight,
-                x + width, y + sShadowTopRight.getHeight(),
-                x + width + sShadowRight.getWidth(), y + height,
-                0, 0, sShadowRight.getWidth(), sShadowRight.getHeight(),
-                null);
+        gc.drawImage(sShadowRight, x + width, y + sShadowTopRight.getHeight(), x + width + sShadowRight.getWidth(),
+                y + height, 0, 0, sShadowRight.getWidth(), sShadowRight.getHeight(), null);
     }
 
     /**
@@ -615,8 +601,7 @@ public class ImageUtils {
      * @param width the width of the rectangle
      * @param height the height of the rectangle
      */
-    public static final void drawSmallRectangleShadow(Graphics gc,
-            int x, int y, int width, int height) {
+    public static final void drawSmallRectangleShadow(Graphics gc, int x, int y, int width, int height) {
         if (sShadow2BottomLeft == null) {
             // Shadow graphics. This was generated by creating a drop shadow in
             // Gimp, using the parameters x offset=5, y offset=%, blur radius=5,
@@ -636,11 +621,11 @@ public class ImageUtils {
             // the three corner images.
             //
             // Filenames: bl=bottom left, b=bottom, br=bottom right, r=right, tr=top right
-            sShadow2BottomLeft  = readImage("shadow2-bl.png"); //$NON-NLS-1$
-            sShadow2Bottom      = readImage("shadow2-b.png");  //$NON-NLS-1$
+            sShadow2BottomLeft = readImage("shadow2-bl.png"); //$NON-NLS-1$
+            sShadow2Bottom = readImage("shadow2-b.png"); //$NON-NLS-1$
             sShadow2BottomRight = readImage("shadow2-br.png"); //$NON-NLS-1$
-            sShadow2Right       = readImage("shadow2-r.png");  //$NON-NLS-1$
-            sShadow2TopRight    = readImage("shadow2-tr.png"); //$NON-NLS-1$
+            sShadow2Right = readImage("shadow2-r.png"); //$NON-NLS-1$
+            sShadow2TopRight = readImage("shadow2-tr.png"); //$NON-NLS-1$
             assert sShadow2BottomLeft != null;
             assert sShadow2TopRight != null;
             assert sShadow2BottomRight.getWidth() == SMALL_SHADOW_SIZE;
@@ -659,16 +644,11 @@ public class ImageUtils {
         gc.drawImage(sShadow2BottomLeft, x, y + height, null);
         gc.drawImage(sShadow2BottomRight, x + width, y + height, null);
         gc.drawImage(sShadow2TopRight, x + width, y, null);
-        gc.drawImage(sShadow2Bottom,
-                x + sShadow2BottomLeft.getWidth(), y + height,
-                x + width, y + height + sShadow2Bottom.getHeight(),
-                0, 0, sShadow2Bottom.getWidth(), sShadow2Bottom.getHeight(),
+        gc.drawImage(sShadow2Bottom, x + sShadow2BottomLeft.getWidth(), y + height, x + width,
+                y + height + sShadow2Bottom.getHeight(), 0, 0, sShadow2Bottom.getWidth(), sShadow2Bottom.getHeight(),
                 null);
-        gc.drawImage(sShadow2Right,
-                x + width, y + sShadow2TopRight.getHeight(),
-                x + width + sShadow2Right.getWidth(), y + height,
-                0, 0, sShadow2Right.getWidth(), sShadow2Right.getHeight(),
-                null);
+        gc.drawImage(sShadow2Right, x + width, y + sShadow2TopRight.getHeight(), x + width + sShadow2Right.getWidth(),
+                y + height, 0, 0, sShadow2Right.getWidth(), sShadow2Right.getHeight(), null);
     }
 
     /**
@@ -771,8 +751,7 @@ public class ImageUtils {
         // Copied from ResourceHelper in layoutlib
         if (value != null) {
             if (value.startsWith("#") == false) { //$NON-NLS-1$
-                throw new NumberFormatException(
-                        String.format("Color value '%s' must start with #", value));
+                throw new NumberFormatException(String.format("Color value '%s' must start with #", value));
             }
 
             value = value.substring(1);
@@ -780,8 +759,7 @@ public class ImageUtils {
             // make sure it's not longer than 32bit
             if (value.length() > 8) {
                 throw new NumberFormatException(String.format(
-                        "Color value '%s' is too long. Format is either" +
-                        "#AARRGGBB, #RRGGBB, #RGB, or #ARGB",
+                        "Color value '%s' is too long. Format is either" + "#AARRGGBB, #RRGGBB, #RGB, or #ARGB",
                         value));
             }
 
@@ -808,7 +786,7 @@ public class ImageUtils {
             // Integer.parseInt will fail to parse strings like "ff191919", so we use
             // a Long, but cast the result back into an int, since we know that we're only
             // dealing with 32 bit values.
-            return (int)Long.parseLong(value, 16);
+            return (int) Long.parseLong(value, 16);
         }
 
         throw new NumberFormatException();
@@ -823,7 +801,7 @@ public class ImageUtils {
      * @return the scaled image
      */
     public static BufferedImage scale(BufferedImage source, double xScale, double yScale) {
-       return scale(source, xScale, yScale, 0, 0);
+        return scale(source, xScale, yScale, 0, 0);
     }
 
     /**
@@ -836,8 +814,8 @@ public class ImageUtils {
      * @param bottomMargin extra margin to add on the bottom
      * @return the scaled image
      */
-    public static BufferedImage scale(BufferedImage source, double xScale, double yScale,
-            int rightMargin, int bottomMargin) {
+    public static BufferedImage scale(BufferedImage source, double xScale, double yScale, int rightMargin,
+            int bottomMargin) {
         int sourceWidth = source.getWidth();
         int sourceHeight = source.getHeight();
         int destWidth = Math.max(1, (int) (xScale * sourceWidth));
@@ -847,8 +825,7 @@ public class ImageUtils {
             imageType = BufferedImage.TYPE_INT_ARGB;
         }
         if (xScale > 0.5 && yScale > 0.5) {
-            BufferedImage scaled =
-                    new BufferedImage(destWidth + rightMargin, destHeight + bottomMargin, imageType);
+            BufferedImage scaled = new BufferedImage(destWidth + rightMargin, destHeight + bottomMargin, imageType);
             Graphics2D g2 = scaled.createGraphics();
             g2.setComposite(AlphaComposite.Src);
             g2.setColor(new Color(0, true));
@@ -856,8 +833,7 @@ public class ImageUtils {
             g2.setRenderingHint(KEY_INTERPOLATION, VALUE_INTERPOLATION_BILINEAR);
             g2.setRenderingHint(KEY_RENDERING, VALUE_RENDER_QUALITY);
             g2.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
-            g2.drawImage(source, 0, 0, destWidth, destHeight, 0, 0, sourceWidth, sourceHeight,
-                    null);
+            g2.drawImage(source, 0, 0, destWidth, destHeight, 0, 0, sourceWidth, sourceHeight, null);
             g2.dispose();
             return scaled;
         } else {
@@ -886,7 +862,6 @@ public class ImageUtils {
             // We end up with the expected final size, but we've been doing an exact
             // divide-in-half resizing operation at the end so there is less distortion.
 
-
             int iterations = 0; // Number of halving operations to perform after the initial resize
             int nearestWidth = destWidth; // Width closest to source width that = 2^x, x is integer
             int nearestHeight = destHeight;
@@ -908,8 +883,7 @@ public class ImageUtils {
             g2.setRenderingHint(KEY_INTERPOLATION, VALUE_INTERPOLATION_BILINEAR);
             g2.setRenderingHint(KEY_RENDERING, VALUE_RENDER_QUALITY);
             g2.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
-            g2.drawImage(source, 0, 0, nearestWidth, nearestHeight,
-                    0, 0, sourceWidth, sourceHeight, null);
+            g2.drawImage(source, 0, 0, nearestWidth, nearestHeight, 0, 0, sourceWidth, sourceHeight, null);
             g2.dispose();
 
             sourceWidth = nearestWidth;
@@ -920,19 +894,15 @@ public class ImageUtils {
                 int halfWidth = sourceWidth / 2;
                 int halfHeight = sourceHeight / 2;
                 if (iteration == 0) { // Last iteration: Add margins in final image
-                    scaled = new BufferedImage(halfWidth + rightMargin, halfHeight + bottomMargin,
-                            imageType);
+                    scaled = new BufferedImage(halfWidth + rightMargin, halfHeight + bottomMargin, imageType);
                 } else {
                     scaled = new BufferedImage(halfWidth, halfHeight, imageType);
                 }
                 g2 = scaled.createGraphics();
-                g2.setRenderingHint(KEY_INTERPOLATION,VALUE_INTERPOLATION_BILINEAR);
+                g2.setRenderingHint(KEY_INTERPOLATION, VALUE_INTERPOLATION_BILINEAR);
                 g2.setRenderingHint(KEY_RENDERING, VALUE_RENDER_QUALITY);
                 g2.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
-                g2.drawImage(source, 0, 0,
-                        halfWidth, halfHeight, 0, 0,
-                        sourceWidth, sourceHeight,
-                        null);
+                g2.drawImage(source, 0, 0, halfWidth, halfHeight, 0, 0, sourceWidth, sourceHeight, null);
                 g2.dispose();
 
                 sourceWidth = halfWidth;
@@ -953,11 +923,9 @@ public class ImageUtils {
      * @return true if the file represents an image file
      */
     public static boolean hasImageExtension(String path) {
-        return endsWithIgnoreCase(path, DOT_PNG)
-            || endsWithIgnoreCase(path, DOT_9PNG)
-            || endsWithIgnoreCase(path, DOT_GIF)
-            || endsWithIgnoreCase(path, DOT_JPG)
-            || endsWithIgnoreCase(path, DOT_BMP);
+        return endsWithIgnoreCase(path, DOT_PNG) || endsWithIgnoreCase(path, DOT_9PNG)
+                || endsWithIgnoreCase(path, DOT_GIF) || endsWithIgnoreCase(path, DOT_JPG)
+                || endsWithIgnoreCase(path, DOT_BMP);
     }
 
     /**

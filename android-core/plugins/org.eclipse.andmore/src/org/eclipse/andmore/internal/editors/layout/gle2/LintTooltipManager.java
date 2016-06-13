@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +14,9 @@ package org.eclipse.andmore.internal.editors.layout.gle2;
 
 import static org.eclipse.andmore.internal.editors.layout.gle2.LintOverlay.ICON_SIZE;
 
-import com.android.annotations.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.uimodel.UiViewElementNode;
@@ -30,9 +29,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.android.annotations.Nullable;
 
 /** Tooltip in the layout editor showing lint errors under the cursor */
 class LintTooltipManager implements Listener {
@@ -67,36 +64,36 @@ class LintTooltipManager implements Listener {
 
     @Override
     public void handleEvent(Event event) {
-        switch(event.type) {
-        case SWT.MouseMove:
-            // See if we're still overlapping this or *other* errors; if so, keep the
-            // tip up (or update it).
-            if (mShowingNodes != null) {
-                List<UiViewElementNode> nodes = computeNodes(event);
-                if (nodes != null && !nodes.isEmpty()) {
-                    if (nodes.equals(mShowingNodes)) {
-                        return;
-                    } else {
-                        show(nodes);
+        switch (event.type) {
+            case SWT.MouseMove:
+                // See if we're still overlapping this or *other* errors; if so, keep the
+                // tip up (or update it).
+                if (mShowingNodes != null) {
+                    List<UiViewElementNode> nodes = computeNodes(event);
+                    if (nodes != null && !nodes.isEmpty()) {
+                        if (nodes.equals(mShowingNodes)) {
+                            return;
+                        } else {
+                            show(nodes);
+                        }
+                        break;
                     }
-                    break;
                 }
-            }
 
-            // If not, fall through and hide the tooltip
+                // If not, fall through and hide the tooltip
 
-            //$FALL-THROUGH$
-        case SWT.Dispose:
-        case SWT.FocusOut:
-        case SWT.KeyDown:
-        case SWT.MouseExit:
-        case SWT.MouseDown:
-            hide();
-            break;
-        case SWT.MouseHover:
-            hide();
-            show(event);
-            break;
+                //$FALL-THROUGH$
+            case SWT.Dispose:
+            case SWT.FocusOut:
+            case SWT.KeyDown:
+            case SWT.MouseExit:
+            case SWT.MouseDown:
+                hide();
+                break;
+            case SWT.MouseHover:
+                hide();
+                show(event);
+                break;
         }
     }
 
@@ -165,9 +162,7 @@ class LintTooltipManager implements Listener {
                 Rectangle b = v.getAbsRect();
                 int x2 = b.x + b.width;
                 int y2 = b.y + b.height;
-                if (p.x < x2 - layoutIconSize - slop
-                        || p.x > x2 + slop
-                        || p.y < y2 - layoutIconSize - slop
+                if (p.x < x2 - layoutIconSize - slop || p.x > x2 + slop || p.y < y2 - layoutIconSize - slop
                         || p.y > y2 + slop) {
                     continue;
                 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,19 +17,12 @@ import static com.android.SdkConstants.ANDROID_WIDGET_PREFIX;
 import static com.android.SdkConstants.VIEW_MERGE;
 import static com.android.SdkConstants.VIEW_TAG;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.DropFeedback;
-import com.android.ide.common.api.IDragElement;
-import com.android.ide.common.api.IGraphics;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.IViewRule;
-import com.android.ide.common.api.InsertType;
-import com.android.ide.common.api.Point;
-import com.android.ide.common.api.Rect;
-import com.android.ide.common.api.RuleAction;
-import com.android.ide.common.api.SegmentType;
-import com.android.sdklib.IAndroidTarget;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.common.layout.ViewRule;
@@ -47,12 +37,19 @@ import org.eclipse.andmore.internal.sdk.AndroidTargetData;
 import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.core.resources.IProject;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.DropFeedback;
+import com.android.ide.common.api.IDragElement;
+import com.android.ide.common.api.IGraphics;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.IViewRule;
+import com.android.ide.common.api.InsertType;
+import com.android.ide.common.api.Point;
+import com.android.ide.common.api.Rect;
+import com.android.ide.common.api.RuleAction;
+import com.android.ide.common.api.SegmentType;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * The rule engine manages the layout rules and interacts with them.
@@ -100,9 +97,9 @@ public class RulesEngine {
         mRuleLoader = RuleLoader.get(project);
     }
 
-     /**
-     * Returns the {@link IProject} on which the {@link RulesEngine} was created.
-     */
+    /**
+    * Returns the {@link IProject} on which the {@link RulesEngine} was created.
+    */
     public IProject getProject() {
         return mProject;
     }
@@ -141,8 +138,7 @@ public class RulesEngine {
                 return rule.getDisplayName();
 
             } catch (Exception e) {
-                AndmoreAndroidPlugin.log(e, "%s.getDisplayName() failed: %s",
-                        rule.getClass().getSimpleName(),
+                AndmoreAndroidPlugin.log(e, "%s.getDisplayName() failed: %s", rule.getClass().getSimpleName(),
                         e.toString());
             }
         }
@@ -171,8 +167,7 @@ public class RulesEngine {
 
                 return actions;
             } catch (Exception e) {
-                AndmoreAndroidPlugin.log(e, "%s.getContextMenu() failed: %s",
-                        rule.getClass().getSimpleName(),
+                AndmoreAndroidPlugin.log(e, "%s.getContextMenu() failed: %s", rule.getClass().getSimpleName(),
                         e.toString());
             }
         }
@@ -195,8 +190,7 @@ public class RulesEngine {
                 mInsertType = InsertType.CREATE;
                 return rule.getDefaultActionId(selectedNode);
             } catch (Exception e) {
-                AndmoreAndroidPlugin.log(e, "%s.getDefaultAction() failed: %s",
-                        rule.getClass().getSimpleName(),
+                AndmoreAndroidPlugin.log(e, "%s.getDefaultAction() failed: %s", rule.getClass().getSimpleName(),
                         e.toString());
             }
         }
@@ -216,8 +210,8 @@ public class RulesEngine {
      *         provide any custom menu actions. Otherwise, a list of
      *         {@link RuleAction}.
      */
-    public List<RuleAction> callAddLayoutActions(List<RuleAction> actions,
-            NodeProxy parentNode, List<NodeProxy> children ) {
+    public List<RuleAction> callAddLayoutActions(List<RuleAction> actions, NodeProxy parentNode,
+            List<NodeProxy> children) {
         // try to find a rule for this element's FQCN
         IViewRule rule = loadRule(parentNode.getNode());
 
@@ -226,8 +220,7 @@ public class RulesEngine {
                 mInsertType = InsertType.CREATE;
                 rule.addLayoutActions(actions, parentNode, children);
             } catch (Exception e) {
-                AndmoreAndroidPlugin.log(e, "%s.getContextMenu() failed: %s",
-                        rule.getClass().getSimpleName(),
+                AndmoreAndroidPlugin.log(e, "%s.getContextMenu() failed: %s", rule.getClass().getSimpleName(),
                         e.toString());
             }
         }
@@ -252,8 +245,7 @@ public class RulesEngine {
                 return rule.getSelectionHint(parentNode, childNode);
 
             } catch (Exception e) {
-                AndmoreAndroidPlugin.log(e, "%s.getSelectionHint() failed: %s",
-                        rule.getClass().getSimpleName(),
+                AndmoreAndroidPlugin.log(e, "%s.getSelectionHint() failed: %s", rule.getClass().getSimpleName(),
                         e.toString());
             }
         }
@@ -261,8 +253,8 @@ public class RulesEngine {
         return null;
     }
 
-    public void callPaintSelectionFeedback(GCWrapper gcWrapper, NodeProxy parentNode,
-            List<? extends INode> childNodes, Object view) {
+    public void callPaintSelectionFeedback(GCWrapper gcWrapper, NodeProxy parentNode, List<? extends INode> childNodes,
+            Object view) {
         // try to find a rule for this element's FQCN
         IViewRule rule = loadRule(parentNode.getNode());
 
@@ -272,8 +264,7 @@ public class RulesEngine {
 
             } catch (Exception e) {
                 AndmoreAndroidPlugin.log(e, "%s.callPaintSelectionFeedback() failed: %s",
-                        rule.getClass().getSimpleName(),
-                        e.toString());
+                        rule.getClass().getSimpleName(), e.toString());
             }
         }
     }
@@ -284,8 +275,7 @@ public class RulesEngine {
      * If not interested in drop, return false.
      * Followed by a paint.
      */
-    public DropFeedback callOnDropEnter(NodeProxy targetNode,
-            Object targetView, IDragElement[] elements) {
+    public DropFeedback callOnDropEnter(NodeProxy targetNode, Object targetView, IDragElement[] elements) {
         // try to find a rule for this element's FQCN
         IViewRule rule = loadRule(targetNode.getNode());
 
@@ -294,8 +284,7 @@ public class RulesEngine {
                 return rule.onDropEnter(targetNode, targetView, elements);
 
             } catch (Exception e) {
-                AndmoreAndroidPlugin.log(e, "%s.onDropEnter() failed: %s",
-                        rule.getClass().getSimpleName(),
+                AndmoreAndroidPlugin.log(e, "%s.onDropEnter() failed: %s", rule.getClass().getSimpleName(),
                         e.toString());
             }
         }
@@ -308,9 +297,7 @@ public class RulesEngine {
      * Returns a DropFeedback passed to onDrop/Move/Leave/Paint (typically same
      * as input one).
      */
-    public DropFeedback callOnDropMove(NodeProxy targetNode,
-            IDragElement[] elements,
-            DropFeedback feedback,
+    public DropFeedback callOnDropMove(NodeProxy targetNode, IDragElement[] elements, DropFeedback feedback,
             Point where) {
         // try to find a rule for this element's FQCN
         IViewRule rule = loadRule(targetNode.getNode());
@@ -320,8 +307,7 @@ public class RulesEngine {
                 return rule.onDropMove(targetNode, elements, feedback, where);
 
             } catch (Exception e) {
-                AndmoreAndroidPlugin.log(e, "%s.onDropMove() failed: %s",
-                        rule.getClass().getSimpleName(),
+                AndmoreAndroidPlugin.log(e, "%s.onDropMove() failed: %s", rule.getClass().getSimpleName(),
                         e.toString());
             }
         }
@@ -332,9 +318,7 @@ public class RulesEngine {
     /**
      * Called when drop leaves the target without actually dropping
      */
-    public void callOnDropLeave(NodeProxy targetNode,
-            IDragElement[] elements,
-            DropFeedback feedback) {
+    public void callOnDropLeave(NodeProxy targetNode, IDragElement[] elements, DropFeedback feedback) {
         // try to find a rule for this element's FQCN
         IViewRule rule = loadRule(targetNode.getNode());
 
@@ -343,8 +327,7 @@ public class RulesEngine {
                 rule.onDropLeave(targetNode, elements, feedback);
 
             } catch (Exception e) {
-                AndmoreAndroidPlugin.log(e, "%s.onDropLeave() failed: %s",
-                        rule.getClass().getSimpleName(),
+                AndmoreAndroidPlugin.log(e, "%s.onDropLeave() failed: %s", rule.getClass().getSimpleName(),
                         e.toString());
             }
         }
@@ -353,10 +336,7 @@ public class RulesEngine {
     /**
      * Called when drop is released over the target to perform the actual drop.
      */
-    public void callOnDropped(NodeProxy targetNode,
-            IDragElement[] elements,
-            DropFeedback feedback,
-            Point where,
+    public void callOnDropped(NodeProxy targetNode, IDragElement[] elements, DropFeedback feedback, Point where,
             InsertType insertType) {
         // try to find a rule for this element's FQCN
         IViewRule rule = loadRule(targetNode.getNode());
@@ -367,9 +347,7 @@ public class RulesEngine {
                 rule.onDropped(targetNode, elements, feedback, where);
 
             } catch (Exception e) {
-                AndmoreAndroidPlugin.log(e, "%s.onDropped() failed: %s",
-                        rule.getClass().getSimpleName(),
-                        e.toString());
+                AndmoreAndroidPlugin.log(e, "%s.onDropped() failed: %s", rule.getClass().getSimpleName(), e.toString());
             }
         }
     }
@@ -377,15 +355,12 @@ public class RulesEngine {
     /**
      * Called when a paint has been requested via DropFeedback.
      */
-    public void callDropFeedbackPaint(IGraphics gc,
-            NodeProxy targetNode,
-            DropFeedback feedback) {
+    public void callDropFeedbackPaint(IGraphics gc, NodeProxy targetNode, DropFeedback feedback) {
         if (gc != null && feedback != null && feedback.painter != null) {
             try {
                 feedback.painter.paint(gc, targetNode, feedback);
             } catch (Exception e) {
-                AndmoreAndroidPlugin.log(e, "DropFeedback.painter failed: %s",
-                        e.toString());
+                AndmoreAndroidPlugin.log(e, "DropFeedback.painter failed: %s", e.toString());
             }
         }
     }
@@ -398,8 +373,7 @@ public class RulesEngine {
      * @param pastedElements The elements being pasted.
      * @return the parent node the paste was applied into
      */
-    public NodeProxy callOnPaste(NodeProxy targetNode, Object targetView,
-            SimpleElement[] pastedElements) {
+    public NodeProxy callOnPaste(NodeProxy targetNode, Object targetView, SimpleElement[] pastedElements) {
 
         // Find a target which accepts children. If you for example select a button
         // and attempt to paste, this will reselect the parent of the button as the paste
@@ -429,9 +403,7 @@ public class RulesEngine {
                 rule.onPaste(targetNode, targetView, pastedElements);
 
             } catch (Exception e) {
-                AndmoreAndroidPlugin.log(e, "%s.onPaste() failed: %s",
-                        rule.getClass().getSimpleName(),
-                        e.toString());
+                AndmoreAndroidPlugin.log(e, "%s.onPaste() failed: %s", rule.getClass().getSimpleName(), e.toString());
             }
         }
 
@@ -440,15 +412,13 @@ public class RulesEngine {
 
     // ---- Resize operations ----
 
-    public DropFeedback callOnResizeBegin(NodeProxy child, NodeProxy parent, Rect newBounds,
-            SegmentType horizontalEdge, SegmentType verticalEdge, Object childView,
-            Object parentView) {
+    public DropFeedback callOnResizeBegin(NodeProxy child, NodeProxy parent, Rect newBounds, SegmentType horizontalEdge,
+            SegmentType verticalEdge, Object childView, Object parentView) {
         IViewRule rule = loadRule(parent.getNode());
 
         if (rule != null) {
             try {
-                return rule.onResizeBegin(child, parent, horizontalEdge, verticalEdge,
-                        childView, parentView);
+                return rule.onResizeBegin(child, parent, horizontalEdge, verticalEdge, childView, parentView);
             } catch (Exception e) {
                 AndmoreAndroidPlugin.log(e, "%s.onResizeBegin() failed: %s", rule.getClass().getSimpleName(),
                         e.toString());
@@ -458,8 +428,8 @@ public class RulesEngine {
         return null;
     }
 
-    public void callOnResizeUpdate(DropFeedback feedback, NodeProxy child, NodeProxy parent,
-            Rect newBounds, int modifierMask) {
+    public void callOnResizeUpdate(DropFeedback feedback, NodeProxy child, NodeProxy parent, Rect newBounds,
+            int modifierMask) {
         IViewRule rule = loadRule(parent.getNode());
 
         if (rule != null) {
@@ -472,8 +442,7 @@ public class RulesEngine {
         }
     }
 
-    public void callOnResizeEnd(DropFeedback feedback, NodeProxy child, NodeProxy parent,
-            Rect newBounds) {
+    public void callOnResizeEnd(DropFeedback feedback, NodeProxy child, NodeProxy parent, Rect newBounds) {
         IViewRule rule = loadRule(parent.getNode());
 
         if (rule != null) {
@@ -501,10 +470,8 @@ public class RulesEngine {
      * @param overrideInsertType If not null, specifies an explicit insert type to use for
      *            edits made during the customization
      */
-    public void callCreateHooks(
-        AndroidXmlEditor editor,
-        NodeProxy parentNode, NodeProxy childNode,
-        InsertType overrideInsertType) {
+    public void callCreateHooks(AndroidXmlEditor editor, NodeProxy parentNode, NodeProxy childNode,
+            InsertType overrideInsertType) {
         IViewRule parentRule = null;
 
         if (parentNode != null) {
@@ -519,15 +486,12 @@ public class RulesEngine {
         UiViewElementNode newUiNode = childNode.getNode();
         IViewRule childRule = loadRule(newUiNode);
         if (childRule != null || parentRule != null) {
-            callCreateHooks(editor, mInsertType, parentRule, parentNode,
-                    childRule, childNode);
+            callCreateHooks(editor, mInsertType, parentRule, parentNode, childRule, childNode);
         }
     }
 
-    private static void callCreateHooks(
-            final AndroidXmlEditor editor, final InsertType insertType,
-            final IViewRule parentRule, final INode parentNode,
-            final IViewRule childRule, final INode newNode) {
+    private static void callCreateHooks(final AndroidXmlEditor editor, final InsertType insertType,
+            final IViewRule parentRule, final INode parentNode, final IViewRule childRule, final INode newNode) {
         // Notify the parent about the new child in case it wants to customize it
         // (For example, a ScrollView parent can go and set all its children's layout params to
         // fill the parent.)
@@ -535,8 +499,7 @@ public class RulesEngine {
             editor.wrapEditXmlModel(new Runnable() {
                 @Override
                 public void run() {
-                    callCreateHooks(editor, insertType,
-                            parentRule, parentNode, childRule, newNode);
+                    callCreateHooks(editor, insertType, parentRule, parentNode, childRule, newNode);
                 }
             });
             return;
@@ -579,18 +542,15 @@ public class RulesEngine {
 
     // ---- Deletion ----
 
-    public void callOnRemovingChildren(NodeProxy parentNode,
-            List<INode> children) {
+    public void callOnRemovingChildren(NodeProxy parentNode, List<INode> children) {
         if (parentNode != null) {
             UiViewElementNode parentUiNode = parentNode.getNode();
             IViewRule parentRule = loadRule(parentUiNode);
             if (parentRule != null) {
                 try {
-                    parentRule.onRemovingChildren(children, parentNode,
-                            mInsertType == InsertType.MOVE_WITHIN);
+                    parentRule.onRemovingChildren(children, parentNode, mInsertType == InsertType.MOVE_WITHIN);
                 } catch (Exception e) {
-                    AndmoreAndroidPlugin.log(e, "%s.onDispose() failed: %s",
-                            parentRule.getClass().getSimpleName(),
+                    AndmoreAndroidPlugin.log(e, "%s.onDispose() failed: %s", parentRule.getClass().getSimpleName(),
                             e.toString());
                 }
             }
@@ -631,8 +591,7 @@ public class RulesEngine {
                 try {
                     rule.onDispose();
                 } catch (Exception e) {
-                    AndmoreAndroidPlugin.log(e, "%s.onDispose() failed: %s",
-                            rule.getClass().getSimpleName(),
+                    AndmoreAndroidPlugin.log(e, "%s.onDispose() failed: %s", rule.getClass().getSimpleName(),
                             e.toString());
                 }
             }
@@ -700,9 +659,7 @@ public class RulesEngine {
         }
 
         // Get the descriptor and loop through the super class hierarchy
-        for (ViewElementDescriptor desc = targetDesc;
-                desc != null;
-                desc = desc.getSuperClassDesc()) {
+        for (ViewElementDescriptor desc = targetDesc; desc != null; desc = desc.getSuperClassDesc()) {
 
             // Get the FQCN of this View
             String fqcn = desc.getFullClassName();
@@ -775,8 +732,7 @@ public class RulesEngine {
             String ruleClassName;
             ClassLoader classLoader;
             if (realFqcn.startsWith("android.") || //$NON-NLS-1$
-                    realFqcn.equals(VIEW_MERGE) ||
-                    realFqcn.endsWith(".GridLayout") || //$NON-NLS-1$ // Temporary special case
+                    realFqcn.equals(VIEW_MERGE) || realFqcn.endsWith(".GridLayout") || //$NON-NLS-1$ // Temporary special case
                     // FIXME: Remove this special case as soon as we pull
                     // the MapViewRule out of this code base and bundle it
                     // with the add ons
@@ -790,7 +746,7 @@ public class RulesEngine {
                 packageName = packageName.substring(0, packageName.lastIndexOf('.'));
                 classLoader = RulesEngine.class.getClassLoader();
                 int dotIndex = realFqcn.lastIndexOf('.');
-                String baseName = realFqcn.substring(dotIndex+1);
+                String baseName = realFqcn.substring(dotIndex + 1);
                 // Capitalize rule class name to match naming conventions, if necessary (<merge>)
                 if (Character.isLowerCase(baseName.charAt(0))) {
                     if (baseName.equals(VIEW_TAG)) {
@@ -802,7 +758,7 @@ public class RulesEngine {
                     baseName = Character.toUpperCase(baseName.charAt(0)) + baseName.substring(1);
                 }
                 ruleClassName = packageName + "." + //$NON-NLS-1$
-                    baseName + "Rule"; //$NON-NLS-1$
+                        baseName + "Rule"; //$NON-NLS-1$
             } else {
                 // Initialize the user-classpath for 3rd party IViewRules, if necessary
                 classLoader = updateClassLoader();
@@ -866,9 +822,7 @@ public class RulesEngine {
                 rule.onDispose();
             }
         } catch (Exception e) {
-            AndmoreAndroidPlugin.log(e, "%s.onInit() failed: %s",
-                    rule.getClass().getSimpleName(),
-                    e.toString());
+            AndmoreAndroidPlugin.log(e, "%s.onInit() failed: %s", rule.getClass().getSimpleName(), e.toString());
         }
 
         return null;

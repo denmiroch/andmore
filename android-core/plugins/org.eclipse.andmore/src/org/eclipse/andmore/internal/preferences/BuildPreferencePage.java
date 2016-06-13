@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +13,12 @@
 
 package org.eclipse.andmore.internal.preferences;
 
-import com.android.prefs.AndroidLocation.AndroidLocationException;
-import com.android.sdklib.internal.build.DebugKeyProvider;
-import com.android.sdklib.internal.build.DebugKeyProvider.KeytoolException;
+import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.preferences.AdtPrefs.BuildVerbosity;
@@ -34,19 +34,15 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.Date;
+import com.android.prefs.AndroidLocation.AndroidLocationException;
+import com.android.sdklib.internal.build.DebugKeyProvider;
+import com.android.sdklib.internal.build.DebugKeyProvider.KeytoolException;
 
 /**
  * Preference page for build options.
  *
  */
-public class BuildPreferencePage extends FieldEditorPreferencePage implements
-        IWorkbenchPreferencePage {
+public class BuildPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     private IPreferenceStore mPrefStore = null;
 
@@ -70,42 +66,33 @@ public class BuildPreferencePage extends FieldEditorPreferencePage implements
     @Override
     protected void createFieldEditors() {
         addField(new BooleanFieldEditor(AdtPrefs.PREFS_BUILD_RES_AUTO_REFRESH,
-                Messages.BuildPreferencePage_Auto_Refresh_Resources_on_Build,
-                getFieldEditorParent()));
+                Messages.BuildPreferencePage_Auto_Refresh_Resources_on_Build, getFieldEditorParent()));
 
         addField(new BooleanFieldEditor(AdtPrefs.PREFS_BUILD_FORCE_ERROR_ON_NATIVELIB_IN_JAR,
-                "Force error when external jars contain native libraries",
-                getFieldEditorParent()));
+                "Force error when external jars contain native libraries", getFieldEditorParent()));
 
         addField(new BooleanFieldEditor(AdtPrefs.PREFS_BUILD_SKIP_POST_COMPILE_ON_FILE_SAVE,
                 "Skip packaging and dexing until export or launch. (Speeds up automatic builds on file save)",
                 getFieldEditorParent()));
 
-        RadioGroupFieldEditor rgfe = new RadioGroupFieldEditor(
-                AdtPrefs.PREFS_BUILD_VERBOSITY,
-                Messages.BuildPreferencePage_Build_Output, 1, new String[][] {
-                    { Messages.BuildPreferencePage_Silent, BuildVerbosity.ALWAYS.name() },
-                    { Messages.BuildPreferencePage_Normal, BuildVerbosity.NORMAL.name() },
-                    { Messages.BuildPreferencePage_Verbose, BuildVerbosity.VERBOSE.name() }
-                    },
+        RadioGroupFieldEditor rgfe = new RadioGroupFieldEditor(AdtPrefs.PREFS_BUILD_VERBOSITY,
+                Messages.BuildPreferencePage_Build_Output, 1,
+                new String[][] { { Messages.BuildPreferencePage_Silent, BuildVerbosity.ALWAYS.name() },
+                        { Messages.BuildPreferencePage_Normal, BuildVerbosity.NORMAL.name() },
+                        { Messages.BuildPreferencePage_Verbose, BuildVerbosity.VERBOSE.name() } },
                 getFieldEditorParent(), true);
         addField(rgfe);
 
         // default debug keystore fingerprints
-        Fingerprints defaultFingerprints = getFingerprints(
-                mPrefStore.getString(AdtPrefs.PREFS_DEFAULT_DEBUG_KEYSTORE));
+        Fingerprints defaultFingerprints = getFingerprints(mPrefStore.getString(AdtPrefs.PREFS_DEFAULT_DEBUG_KEYSTORE));
 
         // default debug key store fields
         mDefaultKeyStore = new ReadOnlyFieldEditor(AdtPrefs.PREFS_DEFAULT_DEBUG_KEYSTORE,
                 Messages.BuildPreferencePage_Default_KeyStore, getFieldEditorParent());
-        mDefaultFingerprintMd5 = new LabelField(
-                Messages.BuildPreferencePage_Default_Certificate_Fingerprint_MD5,
-                defaultFingerprints != null ? defaultFingerprints.md5 : "",
-                getFieldEditorParent());
-        mDefaultFingerprintSha1 = new LabelField(
-                Messages.BuildPreferencePage_Default_Certificate_Fingerprint_SHA1,
-                defaultFingerprints != null ? defaultFingerprints.sha1 : "",
-                getFieldEditorParent());
+        mDefaultFingerprintMd5 = new LabelField(Messages.BuildPreferencePage_Default_Certificate_Fingerprint_MD5,
+                defaultFingerprints != null ? defaultFingerprints.md5 : "", getFieldEditorParent());
+        mDefaultFingerprintSha1 = new LabelField(Messages.BuildPreferencePage_Default_Certificate_Fingerprint_SHA1,
+                defaultFingerprints != null ? defaultFingerprints.sha1 : "", getFieldEditorParent());
 
         addField(mDefaultKeyStore);
         addField(mDefaultFingerprintMd5);
@@ -125,14 +112,10 @@ public class BuildPreferencePage extends FieldEditorPreferencePage implements
         // custom debug key store fields
         mCustomKeyStore = new KeystoreFieldEditor(AdtPrefs.PREFS_CUSTOM_DEBUG_KEYSTORE,
                 Messages.BuildPreferencePage_Custom_Keystore, getFieldEditorParent());
-        mCustomFingerprintMd5 = new LabelField(
-                Messages.BuildPreferencePage_Default_Certificate_Fingerprint_MD5,
-                customFingerprints != null ? customFingerprints.md5 : "",
-                getFieldEditorParent());
-        mCustomFingerprintSha1 = new LabelField(
-                Messages.BuildPreferencePage_Default_Certificate_Fingerprint_SHA1,
-                customFingerprints != null ? customFingerprints.sha1 : "",
-                getFieldEditorParent());
+        mCustomFingerprintMd5 = new LabelField(Messages.BuildPreferencePage_Default_Certificate_Fingerprint_MD5,
+                customFingerprints != null ? customFingerprints.md5 : "", getFieldEditorParent());
+        mCustomFingerprintSha1 = new LabelField(Messages.BuildPreferencePage_Default_Certificate_Fingerprint_SHA1,
+                customFingerprints != null ? customFingerprints.sha1 : "", getFieldEditorParent());
 
         // set fingerprint fields
         mCustomKeyStore.setFingerprintMd5Field(mCustomFingerprintMd5);
@@ -159,11 +142,10 @@ public class BuildPreferencePage extends FieldEditorPreferencePage implements
     private Fingerprints getFingerprints(String keystorePath) {
         // attempt to load the debug key.
         try {
-            DebugKeyProvider keyProvider = new DebugKeyProvider(keystorePath,
-                    null /* storeType */, null /* key gen output */);
+            DebugKeyProvider keyProvider = new DebugKeyProvider(keystorePath, null /* storeType */,
+                    null /* key gen output */);
 
-            return new Fingerprints(
-                    FingerprintUtils.getFingerprint(keyProvider.getCertificate(), "MD5"),
+            return new Fingerprints(FingerprintUtils.getFingerprint(keyProvider.getCertificate(), "MD5"),
                     FingerprintUtils.getFingerprint(keyProvider.getCertificate(), "SHA1"));
         } catch (GeneralSecurityException e) {
             setErrorMessage(e.getMessage());
@@ -183,8 +165,7 @@ public class BuildPreferencePage extends FieldEditorPreferencePage implements
      * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
     @Override
-    public void init(IWorkbench workbench) {
-    }
+    public void init(IWorkbench workbench) {}
 
     /*
      * (non-Javadoc)
@@ -197,8 +178,7 @@ public class BuildPreferencePage extends FieldEditorPreferencePage implements
         super.performDefaults();
 
         // restore the default key store fingerprints
-        Fingerprints defaultFingerprints = getFingerprints(mPrefStore
-                .getString(AdtPrefs.PREFS_DEFAULT_DEBUG_KEYSTORE));
+        Fingerprints defaultFingerprints = getFingerprints(mPrefStore.getString(AdtPrefs.PREFS_DEFAULT_DEBUG_KEYSTORE));
         mDefaultFingerprintMd5.setStringValue(defaultFingerprints.md5);
         mDefaultFingerprintSha1.setStringValue(defaultFingerprints.sha1);
 
@@ -294,10 +274,10 @@ public class BuildPreferencePage extends FieldEditorPreferencePage implements
                 if (file.isFile()) {
                     // attempt to load the debug key.
                     try {
-                        DebugKeyProvider provider = new DebugKeyProvider(fileName,
-                                null /* storeType */, null /* key gen output */);
+                        DebugKeyProvider provider = new DebugKeyProvider(fileName, null /* storeType */,
+                                null /* key gen output */);
                         PrivateKey key = provider.getDebugKey();
-                        X509Certificate certificate = (X509Certificate)provider.getCertificate();
+                        X509Certificate certificate = (X509Certificate) provider.getCertificate();
 
                         if (key == null || certificate == null) {
                             showErrorMessage("Unable to find debug key in keystore!");
@@ -305,13 +285,11 @@ public class BuildPreferencePage extends FieldEditorPreferencePage implements
                         }
 
                         if (fingerprintMd5 != null) {
-                            fingerprintMd5.setStringValue(
-                                    FingerprintUtils.getFingerprint(certificate, "MD5"));
+                            fingerprintMd5.setStringValue(FingerprintUtils.getFingerprint(certificate, "MD5"));
                         }
 
                         if (fingerprintSha1 != null) {
-                            fingerprintSha1.setStringValue(
-                                    FingerprintUtils.getFingerprint(certificate, "SHA1"));
+                            fingerprintSha1.setStringValue(FingerprintUtils.getFingerprint(certificate, "SHA1"));
                         }
 
                         Date today = new Date();
@@ -342,11 +320,10 @@ public class BuildPreferencePage extends FieldEditorPreferencePage implements
                         return false;
                     }
 
-
                 } else {
                     // file does not exist.
                     showErrorMessage("Not a valid keystore path.");
-                    return false;  // Apply/OK must be disabled
+                    return false; // Apply/OK must be disabled
                 }
             }
 

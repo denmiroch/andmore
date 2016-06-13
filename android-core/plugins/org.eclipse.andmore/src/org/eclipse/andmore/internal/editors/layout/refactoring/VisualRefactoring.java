@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,10 +24,15 @@ import static com.android.SdkConstants.NEW_ID_PREFIX;
 import static com.android.SdkConstants.XMLNS;
 import static com.android.SdkConstants.XMLNS_PREFIX;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.xml.XmlFormatStyle;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -89,15 +91,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import com.android.annotations.NonNull;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.xml.XmlFormatStyle;
+import com.android.utils.Pair;
 
 /**
  * Parent class for the various visual refactoring operations; contains shared
@@ -105,10 +102,10 @@ import java.util.Set;
  */
 @SuppressWarnings("restriction") // XML model
 public abstract class VisualRefactoring extends Refactoring {
-    private static final String KEY_FILE = "file";                      //$NON-NLS-1$
-    private static final String KEY_PROJECT = "proj";                   //$NON-NLS-1$
-    private static final String KEY_SEL_START = "sel-start";            //$NON-NLS-1$
-    private static final String KEY_SEL_END = "sel-end";                //$NON-NLS-1$
+    private static final String KEY_FILE = "file"; //$NON-NLS-1$
+    private static final String KEY_PROJECT = "proj"; //$NON-NLS-1$
+    private static final String KEY_SEL_START = "sel-start"; //$NON-NLS-1$
+    private static final String KEY_SEL_END = "sel-end"; //$NON-NLS-1$
 
     protected final IFile mFile;
     protected final LayoutEditorDelegate mDelegate;
@@ -236,8 +233,8 @@ public abstract class VisualRefactoring extends Refactoring {
     protected abstract List<Change> computeChanges(IProgressMonitor monitor);
 
     @Override
-    public RefactoringStatus checkFinalConditions(IProgressMonitor monitor) throws CoreException,
-            OperationCanceledException {
+    public RefactoringStatus checkFinalConditions(IProgressMonitor monitor)
+            throws CoreException, OperationCanceledException {
         RefactoringStatus status = new RefactoringStatus();
         mChanges = new ArrayList<Change>();
         try {
@@ -259,14 +256,11 @@ public abstract class VisualRefactoring extends Refactoring {
     }
 
     @Override
-    public Change createChange(IProgressMonitor monitor) throws CoreException,
-            OperationCanceledException {
+    public Change createChange(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
         try {
             monitor.beginTask("Applying changes...", 1);
 
-            CompositeChange change = new CompositeChange(
-                    getName(),
-                    mChanges.toArray(new Change[mChanges.size()])) {
+            CompositeChange change = new CompositeChange(getName(), mChanges.toArray(new Change[mChanges.size()])) {
                 @Override
                 public ChangeDescriptor getDescriptor() {
                     VisualRefactoringDescriptor desc = createDescriptor();
@@ -300,7 +294,6 @@ public abstract class VisualRefactoring extends Refactoring {
 
     // ---- Shared functionality ----
 
-
     protected void openFile(IFile file) {
         GraphicalEditorPart graphicalEditor = mDelegate.getGraphicalEditor();
         IFile leavingFile = graphicalEditor.getEditedFile();
@@ -330,8 +323,7 @@ public abstract class VisualRefactoring extends Refactoring {
         */
 
         try {
-            IEditorPart part =
-                IDE.openEditor(mDelegate.getEditor().getEditorSite().getPage(), file);
+            IEditorPart part = IDE.openEditor(mDelegate.getEditor().getEditorSite().getPage(), file);
             if (part instanceof AndroidXmlEditor && AdtPrefs.getPrefs().getFormatGuiXml()) {
                 AndroidXmlEditor newEditor = (AndroidXmlEditor) part;
                 newEditor.reformatDocument();
@@ -341,11 +333,9 @@ public abstract class VisualRefactoring extends Refactoring {
         }
     }
 
-
     /** Produce a list of edits to replace references to the given id with the given new id */
-    protected static List<TextEdit> replaceIds(String androidNamePrefix,
-            IStructuredDocument doc, int skipStart, int skipEnd,
-            String rootId, String referenceId) {
+    protected static List<TextEdit> replaceIds(String androidNamePrefix, IStructuredDocument doc, int skipStart,
+            int skipEnd, String rootId, String referenceId) {
         if (rootId == null) {
             return Collections.emptyList();
         }
@@ -428,8 +418,7 @@ public abstract class VisualRefactoring extends Refactoring {
                     if (value.equals(ANDROID_URI)) {
                         mAndroidNamespacePrefix = name;
                         if (mAndroidNamespacePrefix.startsWith(XMLNS_PREFIX)) {
-                            mAndroidNamespacePrefix =
-                                mAndroidNamespacePrefix.substring(XMLNS_PREFIX.length());
+                            mAndroidNamespacePrefix = mAndroidNamespacePrefix.substring(XMLNS_PREFIX.length());
                         }
                     }
                 }
@@ -454,8 +443,7 @@ public abstract class VisualRefactoring extends Refactoring {
                 if (value.equals(ANDROID_URI)) {
                     nsPrefix = name;
                     if (nsPrefix.startsWith(XMLNS_PREFIX)) {
-                        nsPrefix =
-                            nsPrefix.substring(XMLNS_PREFIX.length());
+                        nsPrefix = nsPrefix.substring(XMLNS_PREFIX.length());
                     }
                 }
             }
@@ -504,8 +492,7 @@ public abstract class VisualRefactoring extends Refactoring {
             Node attributeNode = attributes.item(i);
 
             String name = attributeNode.getLocalName();
-            if (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)
-                    && ANDROID_URI.equals(attributeNode.getNamespaceURI())) {
+            if (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX) && ANDROID_URI.equals(attributeNode.getNamespaceURI())) {
                 result.add((Attr) attributeNode);
             }
         }
@@ -523,8 +510,7 @@ public abstract class VisualRefactoring extends Refactoring {
         } else {
             insertAt = elementEnd;
         }
-        xmlText = xmlText.substring(0, insertAt) + namespaceDeclarations
-                + xmlText.substring(insertAt);
+        xmlText = xmlText.substring(0, insertAt) + namespaceDeclarations + xmlText.substring(insertAt);
 
         return xmlText;
     }
@@ -539,8 +525,7 @@ public abstract class VisualRefactoring extends Refactoring {
             for (int i = 0, n = attributes.getLength(); i < n; i++) {
                 Node attr = attributes.item(i);
                 String name = attr.getLocalName();
-                if (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)
-                        && ANDROID_URI.equals(attr.getNamespaceURI())) {
+                if (name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX) && ANDROID_URI.equals(attr.getNamespaceURI())) {
                     if (name.equals(ATTR_LAYOUT_WIDTH) || name.equals(ATTR_LAYOUT_HEIGHT)) {
                         // These are special and are left in
                         continue;
@@ -658,8 +643,7 @@ public abstract class VisualRefactoring extends Refactoring {
     protected List<Element> initElements() {
         List<Element> nodes = new ArrayList<Element>();
 
-        assert mTreeSelection == null || mSelection == null :
-            "treeSel= " + mTreeSelection + ", sel=" + mSelection;
+        assert mTreeSelection == null || mSelection == null : "treeSel= " + mTreeSelection + ", sel=" + mSelection;
 
         // Initialize mSelectionStart and mSelectionEnd based on the selection context, which
         // is either a treeSelection (when invoked from the layout editor or the outline), or
@@ -697,8 +681,7 @@ public abstract class VisualRefactoring extends Refactoring {
 
             // Figure out the range of selected nodes from the document offsets
             IStructuredDocument doc = mDelegate.getEditor().getStructuredDocument();
-            Pair<Element, Element> range = DomUtilities.getElementRange(doc,
-                    mSelectionStart, mSelectionEnd);
+            Pair<Element, Element> range = DomUtilities.getElementRange(doc, mSelectionStart, mSelectionEnd);
             if (range != null) {
                 Element first = range.getFirst();
                 Element last = range.getSecond();
@@ -800,8 +783,7 @@ public abstract class VisualRefactoring extends Refactoring {
     protected boolean validateContiguous(List<CanvasViewInfo> infos, RefactoringStatus status) {
         if (infos.size() > 1) {
             // All elements must be siblings (e.g. same parent)
-            List<UiViewElementNode> nodes = new ArrayList<UiViewElementNode>(infos
-                    .size());
+            List<UiViewElementNode> nodes = new ArrayList<UiViewElementNode>(infos.size());
             for (CanvasViewInfo info : infos) {
                 UiViewElementNode node = info.getUiViewNode();
                 if (node != null) {
@@ -858,8 +840,7 @@ public abstract class VisualRefactoring extends Refactoring {
         }
         String oldTypeBase = oldType.substring(oldType.lastIndexOf('.') + 1);
         String id = getId(element);
-        if (id == null || id.length() == 0
-                || id.toLowerCase(Locale.US).contains(oldTypeBase.toLowerCase(Locale.US))) {
+        if (id == null || id.length() == 0 || id.toLowerCase(Locale.US).contains(oldTypeBase.toLowerCase(Locale.US))) {
             String newTypeBase = newType.substring(newType.lastIndexOf('.') + 1);
             return ensureHasId(rootEdit, element, newTypeBase);
         }
@@ -885,23 +866,20 @@ public abstract class VisualRefactoring extends Refactoring {
         return ensureHasId(rootEdit, element, prefix, true);
     }
 
-    protected String ensureHasId(MultiTextEdit rootEdit, Element element, String prefix,
-            boolean apply) {
+    protected String ensureHasId(MultiTextEdit rootEdit, Element element, String prefix, boolean apply) {
         String id = mGeneratedIdMap.get(element);
         if (id != null) {
             return NEW_ID_PREFIX + id;
         }
 
-        if (!element.hasAttributeNS(ANDROID_URI, ATTR_ID)
-                || (prefix != null && !getId(element).startsWith(prefix))) {
+        if (!element.hasAttributeNS(ANDROID_URI, ATTR_ID) || (prefix != null && !getId(element).startsWith(prefix))) {
             id = DomUtilities.getFreeWidgetId(element, mGeneratedIds, prefix);
             // Make sure we don't use this one again
             mGeneratedIds.add(id);
             mGeneratedIdMap.put(element, id);
             id = NEW_ID_PREFIX + id;
             if (apply) {
-                setAttribute(rootEdit, element,
-                        ANDROID_URI, getAndroidNamespacePrefix(), ATTR_ID, id);
+                setAttribute(rootEdit, element, ANDROID_URI, getAndroidNamespacePrefix(), ATTR_ID, id);
             }
             return id;
         }
@@ -960,23 +938,21 @@ public abstract class VisualRefactoring extends Refactoring {
         return fqcn;
     }
 
-    protected void setAttribute(MultiTextEdit rootEdit, Element element,
-            String attributeUri,
-            String attributePrefix, String attributeName, String attributeValue) {
+    protected void setAttribute(MultiTextEdit rootEdit, Element element, String attributeUri, String attributePrefix,
+            String attributeName, String attributeValue) {
         int offset = getFirstAttributeOffset(element);
         if (offset != -1) {
             if (element.hasAttributeNS(attributeUri, attributeName)) {
-                replaceAttributeDeclaration(rootEdit, offset, element, attributePrefix,
-                        attributeUri, attributeName, attributeValue);
-            } else {
-                addAttributeDeclaration(rootEdit, offset, attributePrefix, attributeName,
+                replaceAttributeDeclaration(rootEdit, offset, element, attributePrefix, attributeUri, attributeName,
                         attributeValue);
+            } else {
+                addAttributeDeclaration(rootEdit, offset, attributePrefix, attributeName, attributeValue);
             }
         }
     }
 
-    private void addAttributeDeclaration(MultiTextEdit rootEdit, int offset,
-            String attributePrefix, String attributeName, String attributeValue) {
+    private void addAttributeDeclaration(MultiTextEdit rootEdit, int offset, String attributePrefix,
+            String attributeName, String attributeValue) {
         StringBuilder sb = new StringBuilder();
         sb.append(' ');
 
@@ -991,9 +967,8 @@ public abstract class VisualRefactoring extends Refactoring {
     }
 
     /** Replaces the value declaration of the given attribute */
-    private void replaceAttributeDeclaration(MultiTextEdit rootEdit, int offset,
-            Element element, String attributePrefix, String attributeUri,
-            String attributeName, String attributeValue) {
+    private void replaceAttributeDeclaration(MultiTextEdit rootEdit, int offset, Element element,
+            String attributePrefix, String attributeUri, String attributeName, String attributeValue) {
         // Find attribute value and replace it
         IStructuredModel model = mDelegate.getEditor().getModelForRead();
         try {
@@ -1005,8 +980,7 @@ public abstract class VisualRefactoring extends Refactoring {
 
             int valueStart = -1;
             boolean useNextValue = false;
-            String targetName = attributePrefix != null
-                ? attributePrefix + ':' + attributeName : attributeName;
+            String targetName = attributePrefix != null ? attributePrefix + ':' + attributeName : attributeName;
 
             // Look at all attribute values and look for an id reference match
             for (int j = 0; j < region.getNumberOfRegions(); j++) {
@@ -1028,13 +1002,12 @@ public abstract class VisualRefactoring extends Refactoring {
             if (valueStart != -1) {
                 String oldValue = element.getAttributeNS(attributeUri, attributeName);
                 int start = valueStart + 1; // Skip opening "
-                ReplaceEdit setAttribute = new ReplaceEdit(start, oldValue.length(),
-                        attributeValue);
+                ReplaceEdit setAttribute = new ReplaceEdit(start, oldValue.length(), attributeValue);
                 try {
                     rootEdit.addChild(setAttribute);
                 } catch (MalformedTreeException mte) {
-                    AndmoreAndroidPlugin.log(mte, "Could not replace attribute %1$s with %2$s",
-                            attributeName, attributeValue);
+                    AndmoreAndroidPlugin.log(mte, "Could not replace attribute %1$s with %2$s", attributeName,
+                            attributeValue);
                     throw mte;
                 }
             }
@@ -1044,8 +1017,7 @@ public abstract class VisualRefactoring extends Refactoring {
     }
 
     /** Strips out the given attribute, if defined */
-    protected void removeAttribute(MultiTextEdit rootEdit, Element element, String uri,
-            String attributeName) {
+    protected void removeAttribute(MultiTextEdit rootEdit, Element element, String uri, String attributeName) {
         if (element.hasAttributeNS(uri, attributeName)) {
             Attr attribute = element.getAttributeNodeNS(uri, attributeName);
             removeAttribute(rootEdit, attribute);
@@ -1062,7 +1034,6 @@ public abstract class VisualRefactoring extends Refactoring {
             rootEdit.addChild(deletion);
         }
     }
-
 
     /**
      * Removes the given element's opening and closing tags (including all of its
@@ -1111,8 +1082,8 @@ public abstract class VisualRefactoring extends Refactoring {
 
                 // Find the close tag
                 // Look at all attribute values and look for an id reference match
-                region = doc.getRegionAtCharacterOffset(elementRegion.getEndOffset()
-                        - element.getTagName().length() - 1);
+                region = doc
+                        .getRegionAtCharacterOffset(elementRegion.getEndOffset() - element.getTagName().length() - 1);
                 list = region.getRegions();
                 regionStart = region.getStartOffset();
                 startOffset = -1;
@@ -1135,19 +1106,16 @@ public abstract class VisualRefactoring extends Refactoring {
 
             // Dedent the contents
             if (changeIndentation && startLineInclusive != -1 && endLineInclusive != -1) {
-                String indent = AndroidXmlEditor.getIndentAtOffset(doc, getRegion(element)
-                        .getStartOffset());
-                setIndentation(rootEdit, indent, doc, startLineInclusive, endLineInclusive,
-                        element, skip);
+                String indent = AndroidXmlEditor.getIndentAtOffset(doc, getRegion(element).getStartOffset());
+                setIndentation(rootEdit, indent, doc, startLineInclusive, endLineInclusive, element, skip);
             }
         } finally {
             model.releaseFromRead();
         }
     }
 
-    protected void removeIndentation(MultiTextEdit rootEdit, String removeIndent,
-            IStructuredDocument doc, int startLineInclusive, int endLineInclusive,
-            Element element, List<Element> skip) {
+    protected void removeIndentation(MultiTextEdit rootEdit, String removeIndent, IStructuredDocument doc,
+            int startLineInclusive, int endLineInclusive, Element element, List<Element> skip) {
         if (startLineInclusive > endLineInclusive) {
             return;
         }
@@ -1165,8 +1133,7 @@ public abstract class VisualRefactoring extends Refactoring {
                 if (overlaps(lineStart, lineEnd, element, skip)) {
                     continue;
                 }
-                String lineText = getText(lineStart,
-                        lineStart + Math.min(lineLength, indentLength));
+                String lineText = getText(lineStart, lineStart + Math.min(lineLength, indentLength));
                 if (lineText.startsWith(removeIndent)) {
                     rootEdit.addChild(new DeleteEdit(lineStart, indentLength));
                 }
@@ -1176,9 +1143,8 @@ public abstract class VisualRefactoring extends Refactoring {
         }
     }
 
-    protected void setIndentation(MultiTextEdit rootEdit, String indent,
-            IStructuredDocument doc, int startLineInclusive, int endLineInclusive,
-            Element element, List<Element> skip) {
+    protected void setIndentation(MultiTextEdit rootEdit, String indent, IStructuredDocument doc,
+            int startLineInclusive, int endLineInclusive, Element element, List<Element> skip) {
         if (startLineInclusive > endLineInclusive) {
             return;
         }
@@ -1216,8 +1182,7 @@ public abstract class VisualRefactoring extends Refactoring {
     }
 
     /** Returns true if the given line overlaps any of the given elements */
-    private static boolean overlaps(int startOffset, int endOffset,
-            Element element, List<Element> overlaps) {
+    private static boolean overlaps(int startOffset, int endOffset, Element element, List<Element> overlaps) {
         for (Element e : overlaps) {
             if (e == element) {
                 continue;
@@ -1261,7 +1226,6 @@ public abstract class VisualRefactoring extends Refactoring {
             AndmoreAndroidPlugin.log(e, null);
         }
 
-
         return new DeleteEdit(startOffset, endOffset - startOffset);
     }
 
@@ -1285,8 +1249,7 @@ public abstract class VisualRefactoring extends Refactoring {
      * @return a new {@link MultiTextEdit} which performs the same edits as the input edit
      *         but also reformats the text
      */
-    public static MultiTextEdit reformat(String oldContents, MultiTextEdit edit,
-            XmlFormatStyle style) {
+    public static MultiTextEdit reformat(String oldContents, MultiTextEdit edit, XmlFormatStyle style) {
         IDocument document = new org.eclipse.jface.text.Document();
         document.set(oldContents);
 
@@ -1313,9 +1276,7 @@ public abstract class VisualRefactoring extends Refactoring {
         //int length = end - start;
         //TextEdit format = AndroidXmlFormattingStrategy.format(model, start, length);
         EclipseXmlFormatPreferences formatPrefs = EclipseXmlFormatPreferences.create();
-        String formatted = EclipseXmlPrettyPrinter.prettyPrint(actual, formatPrefs, style,
-                null /*lineSeparator*/);
-
+        String formatted = EclipseXmlPrettyPrinter.prettyPrint(actual, formatPrefs, style, null /*lineSeparator*/);
 
         // Figure out how much of the before and after strings are identical and narrow
         // the replacement scope
@@ -1339,9 +1300,7 @@ public abstract class VisualRefactoring extends Refactoring {
         }
 
         lastDifference = firstDifference + 1;
-        for (int i = formatted.length() - 1, j = end - 1;
-                i > firstDifference && j > start;
-                i--, j--) {
+        for (int i = formatted.length() - 1, j = end - 1; i > firstDifference && j > start; i--, j--) {
             if (formatted.charAt(i) != oldContents.charAt(j)) {
                 lastDifference = i + 1;
                 break;
@@ -1353,8 +1312,7 @@ public abstract class VisualRefactoring extends Refactoring {
         end = Math.max(start, end);
         formatted = formatted.substring(firstDifference, lastDifference);
 
-        ReplaceEdit format = new ReplaceEdit(start, end - start,
-                formatted);
+        ReplaceEdit format = new ReplaceEdit(start, end - start, formatted);
 
         MultiTextEdit newEdit = new MultiTextEdit();
         newEdit.addChild(format);
@@ -1377,8 +1335,7 @@ public abstract class VisualRefactoring extends Refactoring {
     public abstract static class VisualRefactoringDescriptor extends RefactoringDescriptor {
         private final Map<String, String> mArguments;
 
-        public VisualRefactoringDescriptor(
-                String id, String project, String description, String comment,
+        public VisualRefactoringDescriptor(String id, String project, String description, String comment,
                 Map<String, String> arguments) {
             super(id, project, description, comment, STRUCTURAL_CHANGE | MULTI_CHANGE);
             mArguments = arguments;

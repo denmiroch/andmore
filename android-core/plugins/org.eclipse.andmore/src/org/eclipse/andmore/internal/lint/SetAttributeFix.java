@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +23,13 @@ import static com.android.SdkConstants.ATTR_TRANSLATABLE;
 import static com.android.SdkConstants.NEW_ID_PREFIX;
 import static com.android.SdkConstants.VALUE_FALSE;
 
+import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
+import org.eclipse.andmore.internal.editors.descriptors.DescriptorsUtils;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.ui.IEditorPart;
+import org.w3c.dom.Element;
+
 import com.android.tools.lint.checks.AccessibilityDetector;
 import com.android.tools.lint.checks.InefficientWeightDetector;
 import com.android.tools.lint.checks.ManifestDetector;
@@ -33,13 +37,6 @@ import com.android.tools.lint.checks.MissingIdDetector;
 import com.android.tools.lint.checks.SecurityDetector;
 import com.android.tools.lint.checks.TextFieldDetector;
 import com.android.tools.lint.checks.TranslationDetector;
-
-import org.eclipse.andmore.AdtUtils;
-import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
-import org.eclipse.andmore.internal.editors.descriptors.DescriptorsUtils;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.ui.IEditorPart;
-import org.w3c.dom.Element;
 
 /** Shared fix class for various builtin attributes */
 final class SetAttributeFix extends SetPropertyFix {
@@ -113,8 +110,7 @@ final class SetAttributeFix extends SetPropertyFix {
 
     @Override
     protected boolean invokeCodeCompletion() {
-        return mId.equals(SecurityDetector.EXPORTED_SERVICE.getId())
-                || mId.equals(TextFieldDetector.ISSUE.getId())
+        return mId.equals(SecurityDetector.EXPORTED_SERVICE.getId()) || mId.equals(TextFieldDetector.ISSUE.getId())
                 || mId.equals(ManifestDetector.ALLOW_BACKUP.getId());
     }
 
@@ -139,8 +135,7 @@ final class SetAttributeFix extends SetPropertyFix {
             IEditorPart editor = AdtUtils.getActiveEditor();
             if (editor instanceof AndroidXmlEditor) {
                 AndroidXmlEditor xmlEditor = (AndroidXmlEditor) editor;
-                return DescriptorsUtils.getFreeWidgetId(xmlEditor.getUiRootNode(),
-                        "fragment"); //$NON-NLS-1$
+                return DescriptorsUtils.getFreeWidgetId(xmlEditor.getUiRootNode(), "fragment"); //$NON-NLS-1$
             } else {
                 return NEW_ID_PREFIX;
             }

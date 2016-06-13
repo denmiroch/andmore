@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,12 +16,10 @@ import static com.android.SdkConstants.FD_RESOURCES;
 import static com.android.SdkConstants.FD_RES_ANIMATOR;
 import static org.eclipse.andmore.AndmoreAndroidConstants.WS_SEP;
 
-import com.android.ide.common.rendering.api.Capability;
-import com.android.ide.common.rendering.api.IAnimationListener;
-import com.android.ide.common.rendering.api.RenderSession;
-import com.android.ide.common.rendering.api.Result;
-import com.android.resources.ResourceType;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
@@ -42,10 +37,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import com.android.ide.common.rendering.api.Capability;
+import com.android.ide.common.rendering.api.IAnimationListener;
+import com.android.ide.common.rendering.api.RenderSession;
+import com.android.ide.common.rendering.api.Result;
+import com.android.resources.ResourceType;
+import com.android.utils.Pair;
 
 /**
  * "Play Animation" context menu which lists available animations in the project and in
@@ -96,8 +93,7 @@ public class PlayAnimationMenu extends SubmenuAction {
         GraphicalEditorPart graphicalEditor = mCanvas.getEditorDelegate().getGraphicalEditor();
         if (graphicalEditor.renderingSupports(Capability.PLAY_ANIMATION)) {
             // List of animations
-            Collection<String> animationNames = graphicalEditor.getResourceNames(mFramework,
-                    ResourceType.ANIMATOR);
+            Collection<String> animationNames = graphicalEditor.getResourceNames(mFramework, ResourceType.ANIMATOR);
             if (animationNames.size() > 0) {
                 // Sort alphabetically
                 List<String> sortedNames = new ArrayList<String>(animationNames);
@@ -124,8 +120,7 @@ public class PlayAnimationMenu extends SubmenuAction {
                 new ActionContributionItem(sub).fill(menu, -1);
             }
         } else {
-            addDisabledMessageItem(
-                    "Not supported for this SDK version; try changing the Render Target");
+            addDisabledMessageItem("Not supported for this SDK version; try changing the Render Target");
         }
     }
 
@@ -150,64 +145,62 @@ public class PlayAnimationMenu extends SubmenuAction {
             if (viewObject != null) {
                 ViewHierarchy viewHierarchy = mCanvas.getViewHierarchy();
                 RenderSession session = viewHierarchy.getSession();
-                Result r = session.animate(viewObject, mAnimationName, mIsFrameworkAnim,
-                        new IAnimationListener() {
-                            private boolean mPendingDrawing = false;
+                Result r = session.animate(viewObject, mAnimationName, mIsFrameworkAnim, new IAnimationListener() {
+                    private boolean mPendingDrawing = false;
 
-                            @Override
-                            public void onNewFrame(RenderSession s) {
-                                SelectionOverlay selectionOverlay = mCanvas.getSelectionOverlay();
-                                if (!selectionOverlay.isHiding()) {
-                                    selectionOverlay.setHiding(true);
-                                }
-                                HoverOverlay hoverOverlay = mCanvas.getHoverOverlay();
-                                if (!hoverOverlay.isHiding()) {
-                                    hoverOverlay.setHiding(true);
-                                }
+                    @Override
+                    public void onNewFrame(RenderSession s) {
+                        SelectionOverlay selectionOverlay = mCanvas.getSelectionOverlay();
+                        if (!selectionOverlay.isHiding()) {
+                            selectionOverlay.setHiding(true);
+                        }
+                        HoverOverlay hoverOverlay = mCanvas.getHoverOverlay();
+                        if (!hoverOverlay.isHiding()) {
+                            hoverOverlay.setHiding(true);
+                        }
 
-                                ImageOverlay imageOverlay = mCanvas.getImageOverlay();
-                                imageOverlay.setImage(s.getImage(), s.isAlphaChannelImage());
-                                synchronized (this) {
-                                    if (mPendingDrawing == false) {
-                                        mCanvas.getDisplay().asyncExec(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                synchronized (this) {
-                                                    mPendingDrawing = false;
-                                                }
-                                                mCanvas.redraw();
-                                            }
-                                        });
-                                        mPendingDrawing = true;
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public boolean isCanceled() {
-                                return false;
-                            }
-
-                            @Override
-                            public void done(Result result) {
-                                SelectionOverlay selectionOverlay = mCanvas.getSelectionOverlay();
-                                selectionOverlay.setHiding(false);
-                                HoverOverlay hoverOverlay = mCanvas.getHoverOverlay();
-                                hoverOverlay.setHiding(false);
-
-                                // Must refresh view hierarchy to force objects back to
-                                // their original positions in case animations have left
-                                // them elsewhere
+                        ImageOverlay imageOverlay = mCanvas.getImageOverlay();
+                        imageOverlay.setImage(s.getImage(), s.isAlphaChannelImage());
+                        synchronized (this) {
+                            if (mPendingDrawing == false) {
                                 mCanvas.getDisplay().asyncExec(new Runnable() {
                                     @Override
                                     public void run() {
-                                        GraphicalEditorPart graphicalEditor = mCanvas
-                                                .getEditorDelegate().getGraphicalEditor();
-                                        graphicalEditor.recomputeLayout();
+                                        synchronized (this) {
+                                            mPendingDrawing = false;
+                                        }
+                                        mCanvas.redraw();
                                     }
                                 });
+                                mPendingDrawing = true;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public boolean isCanceled() {
+                        return false;
+                    }
+
+                    @Override
+                    public void done(Result result) {
+                        SelectionOverlay selectionOverlay = mCanvas.getSelectionOverlay();
+                        selectionOverlay.setHiding(false);
+                        HoverOverlay hoverOverlay = mCanvas.getHoverOverlay();
+                        hoverOverlay.setHiding(false);
+
+                        // Must refresh view hierarchy to force objects back to
+                        // their original positions in case animations have left
+                        // them elsewhere
+                        mCanvas.getDisplay().asyncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                GraphicalEditorPart graphicalEditor = mCanvas.getEditorDelegate().getGraphicalEditor();
+                                graphicalEditor.recomputeLayout();
                             }
                         });
+                    }
+                });
 
                 if (!r.isSuccess()) {
                     if (r.getErrorMessage() != null) {
@@ -232,8 +225,7 @@ public class PlayAnimationMenu extends SubmenuAction {
             Shell parent = mCanvas.getShell();
             NewXmlFileWizard wizard = new NewXmlFileWizard();
             LayoutEditorDelegate editor = mCanvas.getEditorDelegate();
-            IWorkbenchWindow workbenchWindow =
-                editor.getEditor().getEditorSite().getWorkbenchWindow();
+            IWorkbenchWindow workbenchWindow = editor.getEditor().getEditorSite().getWorkbenchWindow();
             IWorkbench workbench = workbenchWindow.getWorkbench();
             String animationDir = FD_RESOURCES + WS_SEP + FD_RES_ANIMATOR;
             Pair<IProject, String> pair = Pair.of(editor.getEditor().getProject(), animationDir);

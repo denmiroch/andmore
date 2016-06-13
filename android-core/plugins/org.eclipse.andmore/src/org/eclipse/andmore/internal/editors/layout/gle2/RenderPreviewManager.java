@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -160,7 +157,7 @@ public class RenderPreviewManager {
     /** Zooms in (grows all previews) */
     public void zoomIn() {
         sScale = sScale * (1 / 0.9);
-        if (Math.abs(sScale-1.0) < 0.0001) {
+        if (Math.abs(sScale - 1.0) < 0.0001) {
             sScale = 1.0;
         }
 
@@ -170,7 +167,7 @@ public class RenderPreviewManager {
     /** Zooms out (shrinks all previews) */
     public void zoomOut() {
         sScale = sScale * (0.9 / 1);
-        if (Math.abs(sScale-1.0) < 0.0001) {
+        if (Math.abs(sScale - 1.0) < 0.0001) {
             sScale = 1.0;
         }
         updatedZoom();
@@ -312,11 +309,8 @@ public class RenderPreviewManager {
         int scaledImageHeight = mVScale.getScaledImgSize();
         Rectangle clientArea = mCanvas.getClientArea();
 
-        if (!refresh &&
-                (scaledImageWidth == mPrevImageWidth
-                && scaledImageHeight == mPrevImageHeight
-                && clientArea.width == mPrevCanvasWidth
-                && clientArea.height == mPrevCanvasHeight)) {
+        if (!refresh && (scaledImageWidth == mPrevImageWidth && scaledImageHeight == mPrevImageHeight
+                && clientArea.width == mPrevCanvasWidth && clientArea.height == mPrevCanvasHeight)) {
             // No change
             return;
         }
@@ -396,9 +390,8 @@ public class RenderPreviewManager {
                 x = rightHandSide;
                 int prevY = y;
                 y = nextY;
-                if ((prevY <= bottomBorder ||
-                        y <= bottomBorder)
-                            && Math.max(nextY, y + preview.getHeight()) > bottomBorder) {
+                if ((prevY <= bottomBorder || y <= bottomBorder)
+                        && Math.max(nextY, y + preview.getHeight()) > bottomBorder) {
                     // If there's really no visible room below, don't bother
                     // Similarly, don't wrap individually scaled views
                     if (bottomBorder < availableHeight - 40 && preview.getScale() < 1.2) {
@@ -415,8 +408,7 @@ public class RenderPreviewManager {
                     }
                 }
             }
-            if (x > 0 && y <= bottomBorder
-                    && Math.max(nextY, y + preview.getHeight()) > bottomBorder) {
+            if (x > 0 && y <= bottomBorder && Math.max(nextY, y + preview.getHeight()) > bottomBorder) {
                 if (clientArea.height - bottomBorder < preview.getHeight()) {
                     // No room below the device on the left; just continue on the
                     // bottom row
@@ -485,8 +477,8 @@ public class RenderPreviewManager {
 
         // First see if we can fit everything; if so, we can try to make the layouts
         // larger such that they fill up all the available space
-        long availableArea = rightHandSide * bottomBorder +
-                availableWidth * (Math.max(0, availableHeight - bottomBorder));
+        long availableArea = rightHandSide * bottomBorder
+                + availableWidth * (Math.max(0, availableHeight - bottomBorder));
 
         long requiredArea = 0;
         for (RenderPreview preview : mPreviews) {
@@ -522,12 +514,11 @@ public class RenderPreviewManager {
 
         // Add in gap on right and bottom since we'll add that requirement on the width and
         // height rectangles too (for spacing)
-        packer.addSpace(new Rect(rightHandSide, 0,
-                availableWidth - rightHandSide + PREVIEW_HGAP,
+        packer.addSpace(new Rect(rightHandSide, 0, availableWidth - rightHandSide + PREVIEW_HGAP,
                 availableHeight + PREVIEW_VGAP));
         if (maxVisibleY > bottomBorder) {
-            packer.addSpace(new Rect(0, bottomBorder + PREVIEW_VGAP,
-                    availableWidth + PREVIEW_HGAP, maxVisibleY - bottomBorder + PREVIEW_VGAP));
+            packer.addSpace(new Rect(0, bottomBorder + PREVIEW_VGAP, availableWidth + PREVIEW_HGAP,
+                    maxVisibleY - bottomBorder + PREVIEW_VGAP));
         }
 
         // TODO: Sort previews first before attempting to position them?
@@ -557,6 +548,7 @@ public class RenderPreviewManager {
 
         mLayoutHeight = availableHeight;
     }
+
     /**
      * Paints the configuration previews
      *
@@ -594,12 +586,10 @@ public class RenderPreviewManager {
                     // data from live (not varying) configured configuration
                     VaryingConfiguration cfg = (VaryingConfiguration) configuration;
                     int flags = cfg.getAlternateFlags() | cfg.getOverrideFlags();
-                    displayName = NestedConfiguration.computeDisplayName(flags,
-                            getChooser().getConfiguration());
+                    displayName = NestedConfiguration.computeDisplayName(flags, getChooser().getConfiguration());
                 } else if (configuration instanceof NestedConfiguration) {
                     int flags = ((NestedConfiguration) configuration).getOverrideFlags();
-                    displayName = NestedConfiguration.computeDisplayName(flags,
-                            getChooser().getConfiguration());
+                    displayName = NestedConfiguration.computeDisplayName(flags, getChooser().getConfiguration());
                 } else {
                     displayName = configuration.getDisplayName();
                 }
@@ -630,16 +620,15 @@ public class RenderPreviewManager {
                 gc.setAlpha(128);
                 int padding = 3;
                 int arc = 5;
-                gc.fillRoundRectangle(x - padding, y - padding,
-                        ZOOM_ICON_WIDTH + 2 * padding,
+                gc.fillRoundRectangle(x - padding, y - padding, ZOOM_ICON_WIDTH + 2 * padding,
                         4 * ZOOM_ICON_HEIGHT + 2 * padding, arc, arc);
 
                 gc.setAlpha(255);
                 IconFactory iconFactory = IconFactory.getInstance();
                 Image zoomOut = iconFactory.getIcon("zoomminus"); //$NON-NLS-1$);
-                Image zoomIn = iconFactory.getIcon("zoomplus");   //$NON-NLS-1$);
-                Image zoom100 = iconFactory.getIcon("zoom100");   //$NON-NLS-1$);
-                Image close = iconFactory.getIcon("close");       //$NON-NLS-1$);
+                Image zoomIn = iconFactory.getIcon("zoomplus"); //$NON-NLS-1$);
+                Image zoom100 = iconFactory.getIcon("zoom100"); //$NON-NLS-1$);
+                Image close = iconFactory.getIcon("close"); //$NON-NLS-1$);
 
                 gc.drawImage(zoomIn, x, y);
                 y += ZOOM_ICON_HEIGHT;
@@ -659,8 +648,7 @@ public class RenderPreviewManager {
             rootY += 20;
             gc.setFont(mCanvas.getFont());
             gc.setForeground(mCanvas.getDisplay().getSystemColor(SWT.COLOR_BLACK));
-            gc.drawText("Add previews with \"Add as Thumbnail\"\nin the configuration menu",
-                    rootX, rootY, true);
+            gc.drawText("Add previews with \"Add as Thumbnail\"\nin the configuration menu", rootX, rootY, true);
         }
 
         if (mAnimation != null) {
@@ -682,12 +670,8 @@ public class RenderPreviewManager {
         if (name == null || name.isEmpty()) {
             name = getUniqueName();
         }
-        InputDialog d = new InputDialog(
-                AndmoreAndroidPlugin.getShell(),
-                "Add as Thumbnail Preview",  // title
-                "Name of thumbnail:",
-                name,
-                null);
+        InputDialog d = new InputDialog(AndmoreAndroidPlugin.getShell(), "Add as Thumbnail Preview", // title
+                "Name of thumbnail:", name, null);
         if (d.open() == Window.OK) {
             selectMode(CUSTOM);
 
@@ -791,8 +775,7 @@ public class RenderPreviewManager {
         State currentState = parent.getDeviceState();
         State nextState = parent.getNextDeviceState(currentState);
         if (nextState != currentState) {
-            VaryingConfiguration configuration =
-                    VaryingConfiguration.create(chooser, parent);
+            VaryingConfiguration configuration = VaryingConfiguration.create(chooser, parent);
             configuration.setAlternateDeviceState(true);
             configuration.syncFolderConfig();
             addPreview(RenderPreview.create(this, configuration));
@@ -800,12 +783,11 @@ public class RenderPreviewManager {
     }
 
     private void createLocaleVariation(ConfigurationChooser chooser, Configuration parent) {
-    	LocaleQualifier currentLocale = parent.getLocale().locale;
+        LocaleQualifier currentLocale = parent.getLocale().locale;
         for (Locale locale : chooser.getLocaleList()) {
-        	String language = locale.locale.getLanguage();
-        	if (!language.equals(currentLocale.getLanguage())) {
-                VaryingConfiguration configuration =
-                        VaryingConfiguration.create(chooser, parent);
+            String language = locale.locale.getLanguage();
+            if (!language.equals(currentLocale.getLanguage())) {
+                VaryingConfiguration configuration = VaryingConfiguration.create(chooser, parent);
                 configuration.setAlternateLocale(true);
                 configuration.syncFolderConfig();
                 addPreview(RenderPreview.create(this, configuration));
@@ -852,10 +834,7 @@ public class RenderPreviewManager {
      */
     public boolean recomputePreviews(boolean force) {
         RenderPreviewMode newMode = AdtPrefs.getPrefs().getRenderPreviewMode();
-        if (newMode == mMode && !force
-                && (mRevision == sRevision
-                    || mMode == NONE
-                    || mMode == CUSTOM)) {
+        if (newMode == mMode && !force && (mRevision == sRevision || mMode == NONE || mMode == CUSTOM)) {
             return false;
         }
 
@@ -987,7 +966,7 @@ public class RenderPreviewManager {
                 state = device.getAllStates().get(0);
             }
 
-            if (device.getName().startsWith("Nexus ")         //$NON-NLS-1$
+            if (device.getName().startsWith("Nexus ") //$NON-NLS-1$
                     || device.getName().endsWith(" Nexus")) { //$NON-NLS-1$
                 // Not String#contains("Nexus") because that would also pick up all the generic
                 // entries ("3.7in WVGA (Nexus One)") so we'd have them duplicated
@@ -1020,8 +999,7 @@ public class RenderPreviewManager {
             }
 
             if (interesting) {
-                NestedConfiguration screenConfig = NestedConfiguration.create(chooser,
-                        configuration);
+                NestedConfiguration screenConfig = NestedConfiguration.create(chooser, configuration);
                 screenConfig.setOverrideDevice(true);
                 screenConfig.setDevice(device, true);
                 screenConfig.syncFolderConfig();
@@ -1055,8 +1033,7 @@ public class RenderPreviewManager {
 
         for (final Reference reference : includedBy) {
             String title = reference.getDisplayName();
-            Configuration config = Configuration.create(chooser.getConfiguration(),
-                    reference.getFile());
+            Configuration config = Configuration.create(chooser.getConfiguration(), reference.getFile());
             RenderPreview preview = RenderPreview.create(this, config);
             preview.setDisplayName(title);
             preview.setIncludedWithin(reference);
@@ -1152,7 +1129,6 @@ public class RenderPreviewManager {
         description.displayName = newName;
         saveList();
     }
-
 
     /**
      * Notifies that the main configuration has changed.
@@ -1266,14 +1242,13 @@ public class RenderPreviewManager {
                         ConfigurationChooser chooser = getChooser();
                         IFile editedFile = chooser.getEditedFile();
                         if (editedFile != null) {
-                            chooser.syncToVariations(CFG_DEVICE|CFG_DEVICE_STATE,
-                                    editedFile, configuration, false, false);
+                            chooser.syncToVariations(CFG_DEVICE | CFG_DEVICE_STATE, editedFile, configuration, false,
+                                    false);
                         }
                     }
                 }
 
-                IDE.openEditor(site.getWorkbenchWindow().getActivePage(), input,
-                        CommonXmlEditor.ID);
+                IDE.openEditor(site.getWorkbenchWindow().getActivePage(), input, CommonXmlEditor.ID);
             } catch (PartInitException e) {
                 AndmoreAndroidPlugin.log(e, null);
             }
@@ -1316,17 +1291,14 @@ public class RenderPreviewManager {
         // Update its configuration such that it is complementing or inheriting
         // from the new chosen configuration
         if (previewConfiguration instanceof VaryingConfiguration) {
-            VaryingConfiguration varying = VaryingConfiguration.create(
-                    (VaryingConfiguration) previewConfiguration,
+            VaryingConfiguration varying = VaryingConfiguration.create((VaryingConfiguration) previewConfiguration,
                     newConfiguration);
             varying.updateDisplayName();
             originalConfiguration = varying;
             newPreview.setConfiguration(originalConfiguration);
         } else if (previewConfiguration instanceof NestedConfiguration) {
-            NestedConfiguration nested = NestedConfiguration.create(
-                    (NestedConfiguration) previewConfiguration,
-                    originalConfiguration,
-                    newConfiguration);
+            NestedConfiguration nested = NestedConfiguration.create((NestedConfiguration) previewConfiguration,
+                    originalConfiguration, newConfiguration);
             nested.setDisplayName(nested.computeDisplayName());
             originalConfiguration = nested;
             newPreview.setConfiguration(originalConfiguration);
@@ -1492,8 +1464,7 @@ public class RenderPreviewManager {
 
         RenderPreview preview = getPreview(mousePos);
         if (preview != null) {
-            boolean handled = preview.click(mousePos.x - getX() - preview.getX(),
-                    mousePos.y - getY() - preview.getY());
+            boolean handled = preview.click(mousePos.x - getX() - preview.getX(), mousePos.y - getY() - preview.getY());
             if (handled) {
                 // In case layout was performed, there could be a new preview
                 // under this coordinate now, so make sure it's hover etc
@@ -1515,7 +1486,6 @@ public class RenderPreviewManager {
         return mPreviews != null && !mPreviews.isEmpty();
     }
 
-
     private void sortPreviewsByScreenSize() {
         if (mPreviews != null) {
             Collections.sort(mPreviews, new Comparator<RenderPreview>() {
@@ -1529,14 +1499,12 @@ public class RenderPreviewManager {
                         Screen screen1 = device1.getDefaultHardware().getScreen();
                         Screen screen2 = device2.getDefaultHardware().getScreen();
                         if (screen1 != null && screen2 != null) {
-                            double delta = screen1.getDiagonalLength()
-                                    - screen2.getDiagonalLength();
+                            double delta = screen1.getDiagonalLength() - screen2.getDiagonalLength();
                             if (delta != 0.0) {
                                 return (int) Math.signum(delta);
                             } else {
                                 if (screen1.getPixelDensity() != screen2.getPixelDensity()) {
-                                    return screen1.getPixelDensity().compareTo(
-                                            screen2.getPixelDensity());
+                                    return screen1.getPixelDensity().compareTo(screen2.getPixelDensity());
                                 }
                             }
                         }
@@ -1597,8 +1565,7 @@ public class RenderPreviewManager {
         }
 
         @Override
-        public void widgetDefaultSelected(SelectionEvent e) {
-        }
+        public void widgetDefaultSelected(SelectionEvent e) {}
     }
 
     /** Animation overlay shown briefly after swapping two previews */
@@ -1616,13 +1583,11 @@ public class RenderPreviewManager {
             begin = System.currentTimeMillis();
             end = begin + DURATION;
 
-            initialRect1 = new Rect(preview1.getX(), preview1.getY(),
-                    preview1.getWidth(), preview1.getHeight());
+            initialRect1 = new Rect(preview1.getX(), preview1.getY(), preview1.getWidth(), preview1.getHeight());
 
             CanvasTransform hi = mCanvas.getHorizontalTransform();
             CanvasTransform vi = mCanvas.getVerticalTransform();
-            initialRect2 = new Rect(hi.translate(0), vi.translate(0),
-                    hi.getScaledImgSize(), vi.getScaledImgSize());
+            initialRect2 = new Rect(hi.translate(0), vi.translate(0), hi.getScaledImgSize(), vi.getScaledImgSize());
             preview = preview2;
         }
 
@@ -1636,26 +1601,22 @@ public class RenderPreviewManager {
             CanvasTransform hi = mCanvas.getHorizontalTransform();
             CanvasTransform vi = mCanvas.getVerticalTransform();
             if (targetRect1 == null) {
-                targetRect1 = new Rect(hi.translate(0), vi.translate(0),
-                    hi.getScaledImgSize(), vi.getScaledImgSize());
+                targetRect1 = new Rect(hi.translate(0), vi.translate(0), hi.getScaledImgSize(), vi.getScaledImgSize());
             }
             double portion = (now - begin) / (double) DURATION;
-            Rect rect1 = new Rect(
-                    (int) (portion * (targetRect1.x - initialRect1.x) + initialRect1.x),
+            Rect rect1 = new Rect((int) (portion * (targetRect1.x - initialRect1.x) + initialRect1.x),
                     (int) (portion * (targetRect1.y - initialRect1.y) + initialRect1.y),
                     (int) (portion * (targetRect1.w - initialRect1.w) + initialRect1.w),
                     (int) (portion * (targetRect1.h - initialRect1.h) + initialRect1.h));
 
             if (targetRect2 == null) {
-                targetRect2 = new Rect(preview.getX(), preview.getY(),
-                        preview.getWidth(), preview.getHeight());
+                targetRect2 = new Rect(preview.getX(), preview.getY(), preview.getWidth(), preview.getHeight());
             }
             portion = (now - begin) / (double) DURATION;
-            Rect rect2 = new Rect(
-                (int) (portion * (targetRect2.x - initialRect2.x) + initialRect2.x),
-                (int) (portion * (targetRect2.y - initialRect2.y) + initialRect2.y),
-                (int) (portion * (targetRect2.w - initialRect2.w) + initialRect2.w),
-                (int) (portion * (targetRect2.h - initialRect2.h) + initialRect2.h));
+            Rect rect2 = new Rect((int) (portion * (targetRect2.x - initialRect2.x) + initialRect2.x),
+                    (int) (portion * (targetRect2.y - initialRect2.y) + initialRect2.y),
+                    (int) (portion * (targetRect2.w - initialRect2.w) + initialRect2.w),
+                    (int) (portion * (targetRect2.h - initialRect2.h) + initialRect2.h));
 
             gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_GRAY));
             gc.drawRectangle(rect1.x, rect1.y, rect1.w, rect1.h);
@@ -1678,9 +1639,7 @@ public class RenderPreviewManager {
      * @param oldConfiguration the previous configuration
      * @param newConfiguration the new configuration in the chooser
      */
-    public void updateChooserConfig(
-            @NonNull Configuration oldConfiguration,
-            @NonNull Configuration newConfiguration) {
+    public void updateChooserConfig(@NonNull Configuration oldConfiguration, @NonNull Configuration newConfiguration) {
         if (hasPreviews()) {
             for (RenderPreview preview : mPreviews) {
                 Configuration configuration = preview.getConfiguration();

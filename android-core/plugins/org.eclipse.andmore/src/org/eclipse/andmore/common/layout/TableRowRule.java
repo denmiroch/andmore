@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +14,8 @@ package org.eclipse.andmore.common.layout;
 
 import static com.android.SdkConstants.FQCN_TABLE_LAYOUT;
 
+import java.util.List;
+
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.ide.common.api.DropFeedback;
@@ -25,8 +24,6 @@ import com.android.ide.common.api.IViewRule;
 import com.android.ide.common.api.InsertType;
 import com.android.ide.common.api.RuleAction;
 import com.android.ide.common.api.SegmentType;
-
-import java.util.List;
 
 /**
  * An {@link IViewRule} for android.widget.TableRow.
@@ -43,17 +40,14 @@ public class TableRowRule extends LinearLayoutRule {
     }
 
     @Override
-    public void onChildInserted(@NonNull INode child, @NonNull INode parent,
-            @NonNull InsertType insertType) {
+    public void onChildInserted(@NonNull INode child, @NonNull INode parent, @NonNull InsertType insertType) {
         // Overridden to inhibit the setting of layout_width/layout_height since
         // the table row will enforce match_parent and wrap_content for width and height
         // respectively.
     }
 
     @Override
-    public void addLayoutActions(
-            @NonNull List<RuleAction> actions,
-            final @NonNull INode parentNode,
+    public void addLayoutActions(@NonNull List<RuleAction> actions, final @NonNull INode parentNode,
             final @NonNull List<? extends INode> children) {
         super.addLayoutActions(actions, parentNode, children);
 
@@ -63,16 +57,14 @@ public class TableRowRule extends LinearLayoutRule {
         if (children != null) {
             INode grandParent = parentNode.getParent();
             if (grandParent != null && grandParent.getFqcn().equals(FQCN_TABLE_LAYOUT)) {
-                TableLayoutRule.addTableLayoutActions(mRulesEngine, actions, grandParent,
-                        children);
+                TableLayoutRule.addTableLayoutActions(mRulesEngine, actions, grandParent, children);
             }
         }
     }
 
     @Override
-    public DropFeedback onResizeBegin(@NonNull INode child, @NonNull INode parent,
-            @Nullable SegmentType horizontalEdge, @Nullable SegmentType verticalEdge,
-            @Nullable Object childView, @Nullable Object parentView) {
+    public DropFeedback onResizeBegin(@NonNull INode child, @NonNull INode parent, @Nullable SegmentType horizontalEdge,
+            @Nullable SegmentType verticalEdge, @Nullable Object childView, @Nullable Object parentView) {
         // No resizing in TableRows; the width is *always* match_parent and the height is
         // *always* wrap_content.
         return null;

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,8 @@
  */
 
 package org.eclipse.andmore.internal.editors.ui;
+
+import java.lang.reflect.Method;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -37,8 +36,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
-
-import java.lang.reflect.Method;
 
 /**
  * Helper for the AndroidManifest form editor.
@@ -85,11 +82,9 @@ public final class SectionHelper {
          * @param extra_style Extra styles (on top of description and title bar).
          * @param use_description True if the Section.DESCRIPTION style should be added.
          */
-        public ManifestSectionPart(Composite body, FormToolkit toolkit,
-                int extra_style, boolean use_description) {
-            super(body, toolkit, extra_style |
-                    ExpandableComposite.TITLE_BAR |
-                    (use_description ? Section.DESCRIPTION : 0));
+        public ManifestSectionPart(Composite body, FormToolkit toolkit, int extra_style, boolean use_description) {
+            super(body, toolkit,
+                    extra_style | ExpandableComposite.TITLE_BAR | (use_description ? Section.DESCRIPTION : 0));
         }
 
         // Create non-static methods of helpers just for convenience
@@ -117,8 +112,7 @@ public final class SectionHelper {
          * @param tooltip An optional tooltip for the label and text. Can be null.
          * @return The new created label
          */
-        public Label createLabel(Composite parent, FormToolkit toolkit, String label,
-                String tooltip) {
+        public Label createLabel(Composite parent, FormToolkit toolkit, String label, String tooltip) {
             return SectionHelper.createLabel(parent, toolkit, label, tooltip);
         }
 
@@ -134,8 +128,8 @@ public final class SectionHelper {
          * @param tooltip An optional tooltip for the label and text. Can be null.
          * @return The new created Text field (the label is not returned)
          */
-        public Text createLabelAndText(Composite parent, FormToolkit toolkit, String label,
-                String value, String tooltip) {
+        public Text createLabelAndText(Composite parent, FormToolkit toolkit, String label, String value,
+                String tooltip) {
             return SectionHelper.createLabelAndText(parent, toolkit, label, value, tooltip);
         }
 
@@ -154,8 +148,8 @@ public final class SectionHelper {
          * huge, which we don't want.
          * @return The new created FormText.
          */
-        public FormText createFormText(Composite parent, FormToolkit toolkit, boolean isHtml,
-                String label, boolean setupLayoutData) {
+        public FormText createFormText(Composite parent, FormToolkit toolkit, boolean isHtml, String label,
+                boolean setupLayoutData) {
             return SectionHelper.createFormText(parent, toolkit, isHtml, label, setupLayoutData);
         }
 
@@ -171,7 +165,7 @@ public final class SectionHelper {
             // Since this is protected, some reflection is needed to invoke it.
             try {
                 Method reflow;
-                reflow = section.getClass().getDeclaredMethod("reflow", (Class<?>[])null);
+                reflow = section.getClass().getDeclaredMethod("reflow", (Class<?>[]) null);
                 reflow.setAccessible(true);
                 reflow.invoke(section);
             } catch (Exception e) {
@@ -192,8 +186,7 @@ public final class SectionHelper {
      * @param numColumns Desired number of columns.
      * @return The new composite.
      */
-    static public Composite createTableLayout(Composite composite, FormToolkit toolkit,
-            int numColumns) {
+    static public Composite createTableLayout(Composite composite, FormToolkit toolkit, int numColumns) {
         Composite table = toolkit.createComposite(composite);
         TableWrapLayout layout = new TableWrapLayout();
         layout.numColumns = numColumns;
@@ -215,8 +208,7 @@ public final class SectionHelper {
      * @param numColumns Desired number of columns.
      * @return The new composite.
      */
-    static public Composite createGridLayout(Composite composite, FormToolkit toolkit,
-            int numColumns) {
+    static public Composite createGridLayout(Composite composite, FormToolkit toolkit, int numColumns) {
         Composite grid = toolkit.createComposite(composite);
         GridLayout layout = new GridLayout();
         layout.numColumns = numColumns;
@@ -240,8 +232,8 @@ public final class SectionHelper {
      * @param tooltip An optional tooltip for the label and text. Can be null.
      * @return The new created Text field (the label is not returned)
      */
-    static public Text createLabelAndText(Composite parent, FormToolkit toolkit, String label_text,
-            String value, String tooltip) {
+    static public Text createLabelAndText(Composite parent, FormToolkit toolkit, String label_text, String value,
+            String tooltip) {
         Label label = toolkit.createLabel(parent, label_text);
         label.setLayoutData(new TableWrapData(TableWrapData.LEFT, TableWrapData.MIDDLE));
         Text text = toolkit.createText(parent, value);
@@ -261,8 +253,7 @@ public final class SectionHelper {
      * @param tooltip An optional tooltip for the label and text. Can be null.
      * @return The new created label
      */
-    static public Label createLabel(Composite parent, FormToolkit toolkit, String label_text,
-            String tooltip) {
+    static public Label createLabel(Composite parent, FormToolkit toolkit, String label_text, String tooltip) {
         Label label = toolkit.createLabel(parent, label_text);
 
         TableWrapData twd = new TableWrapData(TableWrapData.FILL_GRAB);
@@ -304,8 +295,7 @@ public final class SectionHelper {
 
         control.addMouseTrackListener(new MouseTrackListener() {
             @Override
-            public void mouseEnter(MouseEvent e) {
-            }
+            public void mouseEnter(MouseEvent e) {}
 
             @Override
             public void mouseExit(MouseEvent e) {
@@ -314,7 +304,7 @@ public final class SectionHelper {
 
             @Override
             public void mouseHover(MouseEvent e) {
-                ic.setLocation(control.toDisplay(10, 25));  // same offset as in PDETextHover
+                ic.setLocation(control.toDisplay(10, 25)); // same offset as in PDETextHover
                 ic.setVisible(true);
             }
         });
@@ -341,8 +331,8 @@ public final class SectionHelper {
      * huge, which we don't want.
      * @return The new created FormText.
      */
-    static public FormText createFormText(Composite parent, FormToolkit toolkit,
-            boolean isHtml, String label, boolean setupLayoutData) {
+    static public FormText createFormText(Composite parent, FormToolkit toolkit, boolean isHtml, String label,
+            boolean setupLayoutData) {
         FormText text = toolkit.createFormText(parent, true /* track focus */);
         if (setupLayoutData) {
             TableWrapData twd = new TableWrapData(TableWrapData.FILL_GRAB);
@@ -353,10 +343,10 @@ public final class SectionHelper {
             text.setLayoutData(twd);
         }
         text.setWhitespaceNormalized(true);
-        if (isHtml && !label.startsWith("<form>")) {          //$NON-NLS-1$
+        if (isHtml && !label.startsWith("<form>")) { //$NON-NLS-1$
             // This assertion is violated, for example by the Class attribute for an activity
             //assert label.startsWith("<form>") : "HTML for FormText must be wrapped in <form>...</form>"; //$NON-NLS-1$
-            label = "<form>" + label + "</form>";   //$NON-NLS-1$ //$NON-NLS-2$
+            label = "<form>" + label + "</form>"; //$NON-NLS-1$ //$NON-NLS-2$
         }
         text.setText(label, isHtml /* parseTags */, isHtml /* expandURLs */);
         return text;

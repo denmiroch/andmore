@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,15 +33,13 @@ public class AndroidJUnitLaunchShortcut extends JUnitLaunchShortcut {
      * first instrumentation found in the AndroidManifest.
      */
     @Override
-    protected ILaunchConfigurationWorkingCopy createLaunchConfiguration(IJavaElement element)
-            throws CoreException {
+    protected ILaunchConfigurationWorkingCopy createLaunchConfiguration(IJavaElement element) throws CoreException {
         ILaunchConfigurationWorkingCopy config = super.createLaunchConfiguration(element);
         // just get first valid instrumentation runner
-        String instrumentation = new InstrumentationRunnerValidator(element.getJavaProject()).
-                getValidInstrumentationTestRunner();
+        String instrumentation = new InstrumentationRunnerValidator(element.getJavaProject())
+                .getValidInstrumentationTestRunner();
         if (instrumentation != null) {
-            config.setAttribute(AndroidJUnitLaunchConfigDelegate.ATTR_INSTR_NAME, 
-                    instrumentation);
+            config.setAttribute(AndroidJUnitLaunchConfigDelegate.ATTR_INSTR_NAME, instrumentation);
         }
         // if a valid runner is not found, rely on launch delegate to log error.
         // This method is called without explicit user action to launch Android JUnit, so avoid

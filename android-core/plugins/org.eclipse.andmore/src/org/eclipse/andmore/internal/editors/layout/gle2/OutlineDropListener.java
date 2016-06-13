@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,10 @@
  */
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.InsertType;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.common.layout.BaseLayoutRule;
 import org.eclipse.andmore.internal.editors.descriptors.DescriptorsUtils;
@@ -29,10 +28,8 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TransferData;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.InsertType;
 
 /** Drop listener for the outline page */
 /*package*/ class OutlineDropListener extends ViewerDropAdapter {
@@ -158,8 +155,7 @@ import java.util.Set;
     }
 
     @Override
-    public boolean validateDrop(Object target, int operation,
-            TransferData transferType) {
+    public boolean validateDrop(Object target, int operation, TransferData transferType) {
         DropTargetEvent event = getCurrentEvent();
         if (event == null) {
             return false;
@@ -184,8 +180,7 @@ import java.util.Set;
         if (location == LOCATION_ON) {
             // Targeting the middle of an item means to add it as a new child
             // of the given element. This is only allowed on some types of nodes.
-            if (!DescriptorsUtils.canInsertChildren(parentNode.getDescriptor(),
-                    parent.getViewObject())) {
+            if (!DescriptorsUtils.canInsertChildren(parentNode.getDescriptor(), parent.getViewObject())) {
                 return false;
             }
         }

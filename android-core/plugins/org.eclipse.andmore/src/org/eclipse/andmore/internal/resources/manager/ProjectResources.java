@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -97,8 +94,8 @@ public class ProjectResources extends ResourceRepository {
             @NonNull FolderConfiguration referenceConfig) {
         ensureInitialized();
 
-        Map<ResourceType, Map<String, ResourceValue>> resultMap =
-                new EnumMap<ResourceType, Map<String, ResourceValue>>(ResourceType.class);
+        Map<ResourceType, Map<String, ResourceValue>> resultMap = new EnumMap<ResourceType, Map<String, ResourceValue>>(
+                ResourceType.class);
 
         // if the project contains libraries, we need to add the libraries resources here
         // so that they are accessible to the layout rendering.
@@ -113,20 +110,19 @@ public class ProjectResources extends ResourceRepository {
                 // one will have priority over the 2nd one. So it's better to loop in the inverse
                 // order and fill the map with resources that will be overwritten by higher
                 // priority resources
-                for (int i = libraries.size() - 1 ; i >= 0 ; i--) {
+                for (int i = libraries.size() - 1; i >= 0; i--) {
                     IProject library = libraries.get(i);
 
                     ProjectResources libRes = resMgr.getProjectResources(library);
                     if (libRes != null) {
                         // get the library resources, and only the library, not the dependencies
                         // so call doGetConfiguredResources() directly.
-                        Map<ResourceType, Map<String, ResourceValue>> libMap =
-                                libRes.doGetConfiguredResources(referenceConfig);
+                        Map<ResourceType, Map<String, ResourceValue>> libMap = libRes
+                                .doGetConfiguredResources(referenceConfig);
 
                         // we don't want to simply replace the whole map, but instead merge the
                         // content of any sub-map
-                        for (Entry<ResourceType, Map<String, ResourceValue>> libEntry :
-                            libMap.entrySet()) {
+                        for (Entry<ResourceType, Map<String, ResourceValue>> libEntry : libMap.entrySet()) {
 
                             // get the map currently in the result map for this resource type
                             Map<String, ResourceValue> tempMap = resultMap.get(libEntry.getKey());
@@ -147,8 +143,7 @@ public class ProjectResources extends ResourceRepository {
         }
 
         // now the project resources themselves.
-        Map<ResourceType, Map<String, ResourceValue>> thisProjectMap =
-                doGetConfiguredResources(referenceConfig);
+        Map<ResourceType, Map<String, ResourceValue>> thisProjectMap = doGetConfiguredResources(referenceConfig);
 
         // now merge the maps.
         for (Entry<ResourceType, Map<String, ResourceValue>> entry : thisProjectMap.entrySet()) {
@@ -261,8 +256,7 @@ public class ProjectResources extends ResourceRepository {
      *    The list is acquired by the {@link ProjectResources} object.
      */
     void setCompiledResources(Map<Integer, Pair<ResourceType, String>> resIdValueToNameMap,
-            Map<IntArrayWrapper, String> styleableValueMap,
-            Map<ResourceType, Map<String, Integer>> resourceValueMap) {
+            Map<IntArrayWrapper, String> styleableValueMap, Map<ResourceType, Map<String, Integer>> resourceValueMap) {
         mResourceValueMap = resourceValueMap;
         mResIdValueToNameMap = resIdValueToNameMap;
         mStyleableValueToNameMap = styleableValueMap;

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,8 +17,11 @@ import static com.android.SdkConstants.FN_BUILD_CONFIG_BASE;
 import static com.android.SdkConstants.FN_MANIFEST_BASE;
 import static com.android.SdkConstants.FN_RESOURCE_BASE;
 
-import com.android.SdkConstants;
-import com.android.xml.AndroidManifest;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -68,11 +68,8 @@ import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.ITextRegionList;
 import org.eclipse.wst.xml.core.internal.regions.DOMRegionContext;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import com.android.SdkConstants;
+import com.android.xml.AndroidManifest;
 
 /**
  *  Wrapper class defining the stages of the refactoring process
@@ -85,10 +82,7 @@ class ApplicationPackageNameRefactoring extends Refactoring {
 
     List<String> MAIN_COMPONENT_TYPES_LIST = Arrays.asList(MAIN_COMPONENT_TYPES);
 
-    ApplicationPackageNameRefactoring(
-            IProject project,
-            Name oldPackageName,
-            Name newPackageName) {
+    ApplicationPackageNameRefactoring(IProject project, Name oldPackageName, Name newPackageName) {
         mProject = project;
         mOldPackageName = oldPackageName;
         mNewPackageName = newPackageName;
@@ -100,27 +94,22 @@ class ApplicationPackageNameRefactoring extends Refactoring {
 
         // Accurate refactoring of the "shorthand" names in
         // AndroidManifest.xml depends on not having compilation errors.
-        if (mProject.findMaxProblemSeverity(
-                IMarker.PROBLEM,
-                true,
+        if (mProject.findMaxProblemSeverity(IMarker.PROBLEM, true,
                 IResource.DEPTH_INFINITE) == IMarker.SEVERITY_ERROR) {
-            return
-                RefactoringStatus.createFatalErrorStatus("Fix the errors in your project, first.");
+            return RefactoringStatus.createFatalErrorStatus("Fix the errors in your project, first.");
         }
 
         return new RefactoringStatus();
     }
 
     @Override
-    public RefactoringStatus checkFinalConditions(IProgressMonitor pm)
-            throws OperationCanceledException {
+    public RefactoringStatus checkFinalConditions(IProgressMonitor pm) throws OperationCanceledException {
 
         return new RefactoringStatus();
     }
 
     @Override
-    public Change createChange(IProgressMonitor pm) throws CoreException,
-    OperationCanceledException {
+    public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
 
         // Traverse all files in the project, building up a list of changes
         JavaFileVisitor fileVisitor = new JavaFileVisitor();
@@ -133,12 +122,8 @@ class ApplicationPackageNameRefactoring extends Refactoring {
         return "AndroidPackageNameRefactoring"; //$NON-NLS-1$
     }
 
-    public final static String[] MAIN_COMPONENT_TYPES = {
-        AndroidManifest.NODE_ACTIVITY, AndroidManifest.NODE_SERVICE,
-        AndroidManifest.NODE_RECEIVER, AndroidManifest.NODE_PROVIDER,
-        AndroidManifest.NODE_APPLICATION
-    };
-
+    public final static String[] MAIN_COMPONENT_TYPES = { AndroidManifest.NODE_ACTIVITY, AndroidManifest.NODE_SERVICE,
+            AndroidManifest.NODE_RECEIVER, AndroidManifest.NODE_PROVIDER, AndroidManifest.NODE_APPLICATION };
 
     TextEdit updateJavaFileImports(CompilationUnit cu) {
 
@@ -147,8 +132,8 @@ class ApplicationPackageNameRefactoring extends Refactoring {
         TextEdit rewrittenImports = importVisitor.getTextEdit();
 
         // If the import of R was potentially implicit, insert an import statement
-        if (rewrittenImports != null && cu.getPackage().getName().getFullyQualifiedName()
-                .equals(mOldPackageName.getFullyQualifiedName())) {
+        if (rewrittenImports != null
+                && cu.getPackage().getName().getFullyQualifiedName().equals(mOldPackageName.getFullyQualifiedName())) {
 
             UsageVisitor usageVisitor = new UsageVisitor();
             cu.accept(usageVisitor);
@@ -156,20 +141,17 @@ class ApplicationPackageNameRefactoring extends Refactoring {
             if (usageVisitor.seenAny()) {
                 ImportRewrite irw = ImportRewrite.create(cu, true);
                 if (usageVisitor.hasSeenR()) {
-                    irw.addImport(mNewPackageName.getFullyQualifiedName() + '.'
-                            + FN_RESOURCE_BASE);
+                    irw.addImport(mNewPackageName.getFullyQualifiedName() + '.' + FN_RESOURCE_BASE);
                 }
                 if (usageVisitor.hasSeenBuildConfig()) {
-                    irw.addImport(mNewPackageName.getFullyQualifiedName() + '.'
-                            + FN_BUILD_CONFIG_BASE);
+                    irw.addImport(mNewPackageName.getFullyQualifiedName() + '.' + FN_BUILD_CONFIG_BASE);
                 }
                 if (usageVisitor.hasSeenManifest()) {
-                    irw.addImport(mNewPackageName.getFullyQualifiedName() + '.'
-                            + FN_MANIFEST_BASE);
+                    irw.addImport(mNewPackageName.getFullyQualifiedName() + '.' + FN_MANIFEST_BASE);
                 }
 
                 try {
-                    rewrittenImports.addChild( irw.rewriteImports(null) );
+                    rewrittenImports.addChild(irw.rewriteImports(null));
                 } catch (MalformedTreeException e) {
                     Status s = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, e.getMessage(), e);
                     AndmoreAndroidPlugin.getDefault().getLog().log(s);
@@ -256,17 +238,14 @@ class ApplicationPackageNameRefactoring extends Refactoring {
                 } else if (DOMRegionContext.XML_TAG_ATTRIBUTE_VALUE.equals(type)) {
                     // Check this is the attribute and the original string
 
-                    if (lastAttrName != null &&
-                            lastAttrName.startsWith(SdkConstants.XMLNS_PREFIX)) {
+                    if (lastAttrName != null && lastAttrName.startsWith(SdkConstants.XMLNS_PREFIX)) {
 
                         String lastAttrValue = region.getText(subRegion);
                         if (oldAppNamespaceString.equals(stripQuotes(lastAttrValue))) {
 
                             // Found an occurrence. Create a change for it.
-                            TextEdit edit = new ReplaceEdit(
-                                    region.getStartOffset() + subRegion.getStart(),
-                                    subRegion.getTextLength(),
-                                    addQuotes(newAppNamespaceString));
+                            TextEdit edit = new ReplaceEdit(region.getStartOffset() + subRegion.getStart(),
+                                    subRegion.getTextLength(), addQuotes(newAppNamespaceString));
                             TextEditGroup editGroup = new TextEditGroup(
                                     "Replace package name in custom namespace prefix", edit);
 
@@ -351,40 +330,35 @@ class ApplicationPackageNameRefactoring extends Refactoring {
                 } else if (DOMRegionContext.XML_TAG_ATTRIBUTE_VALUE.equals(type)) {
 
                     String lastAttrValue = region.getText(subRegion);
-                    if (lastAttrName != null &&
-                            lastAttrName.startsWith(SdkConstants.XMLNS_PREFIX)) {
+                    if (lastAttrName != null && lastAttrName.startsWith(SdkConstants.XMLNS_PREFIX)) {
 
                         // Resolves the android namespace prefix for this file
                         if (SdkConstants.ANDROID_URI.equals(stripQuotes(lastAttrValue))) {
                             String android_namespace_prefix = lastAttrName
-                                .substring(SdkConstants.XMLNS_PREFIX.length());
-                            android_name_attribute = android_namespace_prefix + ':'
-                                + AndroidManifest.ATTRIBUTE_NAME;
+                                    .substring(SdkConstants.XMLNS_PREFIX.length());
+                            android_name_attribute = android_namespace_prefix + ':' + AndroidManifest.ATTRIBUTE_NAME;
                         }
                     } else if (AndroidManifest.NODE_MANIFEST.equals(lastTagName)
                             && AndroidManifest.ATTRIBUTE_PACKAGE.equals(lastAttrName)) {
 
                         // Found an occurrence. Create a change for it.
-                        TextEdit edit = new ReplaceEdit(region.getStartOffset()
-                                + subRegion.getStart(), subRegion.getTextLength(),
-                                addQuotes(mNewPackageName.getFullyQualifiedName()));
+                        TextEdit edit = new ReplaceEdit(region.getStartOffset() + subRegion.getStart(),
+                                subRegion.getTextLength(), addQuotes(mNewPackageName.getFullyQualifiedName()));
 
                         multiEdit.addChild(edit);
                         editGroups.add(new TextEditGroup("Change Android package name", edit));
 
-                    } else if (MAIN_COMPONENT_TYPES_LIST.contains(lastTagName)
-                            && lastAttrName != null
+                    } else if (MAIN_COMPONENT_TYPES_LIST.contains(lastTagName) && lastAttrName != null
                             && lastAttrName.equals(android_name_attribute)) {
 
                         String package_path = stripQuotes(lastAttrValue);
                         String old_package_name_string = mOldPackageName.getFullyQualifiedName();
 
-                        String absolute_path = AndroidManifest.combinePackageAndClassName(
-                                old_package_name_string, package_path);
+                        String absolute_path = AndroidManifest.combinePackageAndClassName(old_package_name_string,
+                                package_path);
 
-                        TextEdit edit = new ReplaceEdit(region.getStartOffset()
-                                + subRegion.getStart(), subRegion.getTextLength(),
-                                addQuotes(absolute_path));
+                        TextEdit edit = new ReplaceEdit(region.getStartOffset() + subRegion.getStart(),
+                                subRegion.getTextLength(), addQuotes(absolute_path));
 
                         multiEdit.addChild(edit);
 
@@ -404,7 +378,6 @@ class ApplicationPackageNameRefactoring extends Refactoring {
         }
         return null;
     }
-
 
     /*
      * Iterates through all project files, taking distinct actions based on
@@ -477,7 +450,6 @@ class ApplicationPackageNameRefactoring extends Refactoring {
                         if (path.segmentCount() == 4) {
                             if (path.segment(1).equalsIgnoreCase(SdkConstants.FD_RESOURCES)) {
 
-
                                 TextFileChange xmlChange = editXmlResourceFile(file);
                                 if (xmlChange != null) {
                                     mChanges.add(xmlChange);
@@ -525,9 +497,11 @@ class ApplicationPackageNameRefactoring extends Refactoring {
         public boolean hasSeenBuildConfig() {
             return mSeenBuildConfig;
         }
+
         public boolean hasSeenManifest() {
             return mSeenManifest;
         }
+
         public boolean hasSeenR() {
             return mSeenR;
         }
@@ -545,7 +519,7 @@ class ApplicationPackageNameRefactoring extends Refactoring {
 
         public TextEdit getTextEdit() {
             try {
-                return this.mRewriter.rewriteAST();
+                return mRewriter.rewriteAST();
             } catch (JavaModelException e) {
                 Status s = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, e.getMessage(), e);
                 AndmoreAndroidPlugin.getDefault().getLog().log(s);
@@ -565,19 +539,14 @@ class ApplicationPackageNameRefactoring extends Refactoring {
 
                 String identifier = qualifiedImportName.getName().getIdentifier();
                 if (identifier.equals(FN_RESOURCE_BASE)) {
-                    mRewriter.replace(qualifiedImportName.getQualifier(), mNewPackageName,
-                            null);
+                    mRewriter.replace(qualifiedImportName.getQualifier(), mNewPackageName, null);
                 } else if (identifier.equals(FN_BUILD_CONFIG_BASE)
-                        && mOldPackageName.toString().equals(
-                                qualifiedImportName.getQualifier().toString())) {
-                    mRewriter.replace(qualifiedImportName.getQualifier(), mNewPackageName,
-                            null);
+                        && mOldPackageName.toString().equals(qualifiedImportName.getQualifier().toString())) {
+                    mRewriter.replace(qualifiedImportName.getQualifier(), mNewPackageName, null);
 
                 } else if (identifier.equals(FN_MANIFEST_BASE)
-                        && mOldPackageName.toString().equals(
-                                qualifiedImportName.getQualifier().toString())) {
-                    mRewriter.replace(qualifiedImportName.getQualifier(), mNewPackageName,
-                            null);
+                        && mOldPackageName.toString().equals(qualifiedImportName.getQualifier().toString())) {
+                    mRewriter.replace(qualifiedImportName.getQualifier(), mNewPackageName, null);
                 }
             }
 

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,10 @@
  */
 
 package org.eclipse.andmore.internal.editors.uimodel;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.descriptors.DescriptorsUtils;
@@ -48,10 +49,6 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Represents an XML attribute that is defined by a set of flag values,
  * i.e. enum names separated by pipe (|) characters.
@@ -66,8 +63,7 @@ import java.util.Set;
  */
 public class UiFlagAttributeNode extends UiTextAttributeNode {
 
-    public UiFlagAttributeNode(FlagAttributeDescriptor attributeDescriptor,
-            UiElementNode uiParent) {
+    public UiFlagAttributeNode(FlagAttributeDescriptor attributeDescriptor, UiElementNode uiParent) {
         super(attributeDescriptor, uiParent);
     }
 
@@ -98,7 +94,7 @@ public class UiFlagAttributeNode extends UiTextAttributeNode {
 
         final Text text = toolkit.createText(composite, getCurrentValue());
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalIndent = 1;  // Needed by the fixed composite borders under GTK
+        gd.horizontalIndent = 1; // Needed by the fixed composite borders under GTK
         text.setLayoutData(gd);
         final Button selectButton = toolkit.createButton(composite, "Select...", SWT.PUSH);
 
@@ -133,8 +129,8 @@ public class UiFlagAttributeNode extends UiTextAttributeNode {
 
         String[] values = null;
 
-        if (getDescriptor() instanceof FlagAttributeDescriptor &&
-                ((FlagAttributeDescriptor) getDescriptor()).getNames() != null) {
+        if (getDescriptor() instanceof FlagAttributeDescriptor
+                && ((FlagAttributeDescriptor) getDescriptor()).getNames() != null) {
             // Get enum values from the descriptor
             values = ((FlagAttributeDescriptor) getDescriptor()).getNames();
         }
@@ -157,8 +153,7 @@ public class UiFlagAttributeNode extends UiTextAttributeNode {
      * containing the result.
      */
     public String showDialog(Shell shell, String currentValue) {
-        FlagSelectionDialog dlg = new FlagSelectionDialog(
-                shell, currentValue.trim().split("\\s*\\|\\s*")); //$NON-NLS-1$
+        FlagSelectionDialog dlg = new FlagSelectionDialog(shell, currentValue.trim().split("\\s*\\|\\s*")); //$NON-NLS-1$
         dlg.open();
         Object[] result = dlg.getResult();
         if (result != null) {
@@ -208,7 +203,7 @@ public class UiFlagAttributeNode extends UiTextAttributeNode {
 
                 for (TableItem item : mTable.getItems()) {
                     if (item.getChecked()) {
-                        results.add((String)item.getData());
+                        results.add((String) item.getData());
                     }
                 }
 
@@ -218,7 +213,7 @@ public class UiFlagAttributeNode extends UiTextAttributeNode {
 
         @Override
         protected Control createDialogArea(Composite parent) {
-            Composite composite= new Composite(parent, SWT.NONE);
+            Composite composite = new Composite(parent, SWT.NONE);
             composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             composite.setLayout(new GridLayout(1, true));
             composite.setFont(parent.getFont());

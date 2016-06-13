@@ -1,23 +1,19 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  *******************************************************************************/
 
 package org.eclipse.andmore.internal.sourcelookup;
 
-import com.android.sdklib.IAndroidTarget;
+import java.io.File;
 
 import org.eclipse.andmore.internal.sdk.ProjectState;
 import org.eclipse.andmore.internal.sdk.Sdk;
@@ -36,7 +32,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.launching.JavaSourceLookupDirector;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
-import java.io.File;
+import com.android.sdklib.IAndroidTarget;
 
 public class AdtSourceLookupDirector extends JavaSourceLookupDirector {
 
@@ -44,9 +40,7 @@ public class AdtSourceLookupDirector extends JavaSourceLookupDirector {
     public void initializeDefaults(ILaunchConfiguration configuration) throws CoreException {
         dispose();
         setLaunchConfiguration(configuration);
-        String projectName =
-            configuration.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
-                ""); //$NON-NLS-1$
+        String projectName = configuration.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, ""); //$NON-NLS-1$
         if (projectName != null && projectName.length() > 0) {
             IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
             if (project != null && project.isOpen()) {
@@ -85,18 +79,14 @@ public class AdtSourceLookupDirector extends JavaSourceLookupDirector {
                                 File srcFile = new File(androidSrc);
                                 ISourceContainer adtContainer = null;
                                 if (srcFile.isFile()) {
-                                    adtContainer = new ExternalArchiveSourceContainer(androidSrc,
-                                            true);
+                                    adtContainer = new ExternalArchiveSourceContainer(androidSrc, true);
                                 }
                                 if (srcFile.isDirectory()) {
                                     adtContainer = new DirectorySourceContainer(srcFile, false);
                                 }
                                 if (adtContainer != null) {
-                                    ISourceContainer defaultContainer =
-                                        new DefaultSourceContainer();
-                                    setSourceContainers(new ISourceContainer[] {
-                                            adtContainer, defaultContainer
-                                    });
+                                    ISourceContainer defaultContainer = new DefaultSourceContainer();
+                                    setSourceContainers(new ISourceContainer[] { adtContainer, defaultContainer });
                                     initializeParticipants();
                                     return;
                                 }
@@ -110,9 +100,7 @@ public class AdtSourceLookupDirector extends JavaSourceLookupDirector {
     }
 
     private void initDefaults() {
-        setSourceContainers(new ISourceContainer[] {
-            new DefaultSourceContainer()
-        });
+        setSourceContainers(new ISourceContainer[] { new DefaultSourceContainer() });
         initializeParticipants();
     }
 

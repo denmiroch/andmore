@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.editors.layout.configuration;
-
-import com.android.ide.common.resources.configuration.FolderConfiguration;
-import com.android.ide.common.resources.configuration.ResourceQualifier;
-import com.android.resources.ResourceFolderType;
-import com.android.sdkuilib.ui.GridDialog;
 
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.andmore.internal.ui.ConfigurationSelector;
@@ -33,6 +25,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+
+import com.android.ide.common.resources.configuration.FolderConfiguration;
+import com.android.ide.common.resources.configuration.ResourceQualifier;
+import com.android.resources.ResourceFolderType;
+import com.android.sdkuilib.ui.GridDialog;
 
 /**
  * Dialog to choose a non existing {@link FolderConfiguration}.
@@ -64,8 +61,8 @@ public final class LayoutCreatorDialog extends GridDialog {
 
     @Override
     public void createDialogContent(Composite parent) {
-        new Label(parent, SWT.NONE).setText(
-                String.format("Configuration for the alternate version of %1$s", mFileName));
+        new Label(parent, SWT.NONE)
+                .setText(String.format("Configuration for the alternate version of %1$s", mFileName));
 
         mSelector = new ConfigurationSelector(parent, SelectorMode.CONFIG_ONLY);
         mSelector.setConfiguration(mConfig);
@@ -97,15 +94,13 @@ public final class LayoutCreatorDialog extends GridDialog {
                         break;
                     case INVALID_CONFIG:
                         ResourceQualifier invalidQualifier = mSelector.getInvalidQualifier();
-                        mStatusLabel.setText(String.format(
-                                "Invalid Configuration: %1$s has no filter set.",
+                        mStatusLabel.setText(String.format("Invalid Configuration: %1$s has no filter set.",
                                 invalidQualifier.getName()));
                         mStatusImage.setImage(IconFactory.getInstance().getIcon("warning")); //$NON-NLS-1$
                         getButton(IDialogConstants.OK_ID).setEnabled(false);
                         break;
                     case REGION_WITHOUT_LANGUAGE:
-                        mStatusLabel.setText(
-                                "The Region qualifier requires the Language qualifier.");
+                        mStatusLabel.setText("The Region qualifier requires the Language qualifier.");
                         mStatusImage.setImage(IconFactory.getInstance().getIcon("warning")); //$NON-NLS-1$
                         getButton(IDialogConstants.OK_ID).setEnabled(false);
                         break;
@@ -141,8 +136,8 @@ public final class LayoutCreatorDialog extends GridDialog {
      * resets the status label to show the file that will be created.
      */
     private void resetStatus() {
-        String displayString = Dialog.shortenText(String.format("New File: res/%1$s/%2$s",
-                mConfig.getFolderName(ResourceFolderType.LAYOUT), mFileName),
+        String displayString = Dialog.shortenText(
+                String.format("New File: res/%1$s/%2$s", mConfig.getFolderName(ResourceFolderType.LAYOUT), mFileName),
                 mStatusLabel);
         mStatusLabel.setText(displayString);
     }

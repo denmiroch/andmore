@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,18 @@
  */
 
 package org.eclipse.andmore.internal.wizards.newproject;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.andmore.AndmoreAndroidConstants;
+import org.eclipse.andmore.internal.project.AndroidManifestHelper;
+import org.eclipse.andmore.internal.sdk.Sdk;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.ui.IWorkingSet;
 
 import com.android.SdkConstants;
 import com.android.annotations.Nullable;
@@ -25,18 +34,6 @@ import com.android.sdklib.internal.project.ProjectProperties;
 import com.android.sdklib.internal.project.ProjectProperties.PropertyType;
 import com.android.utils.Pair;
 import com.android.xml.AndroidManifest;
-
-import org.eclipse.andmore.AndmoreAndroidConstants;
-import org.eclipse.andmore.internal.project.AndroidManifestHelper;
-import org.eclipse.andmore.internal.sdk.Sdk;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.ui.IWorkingSet;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The {@link NewProjectWizardState} holds the state used by the various pages
@@ -232,8 +229,7 @@ public class NewProjectWizardState {
         }
 
         if (activity != null) {
-            newActivityName = AndroidManifest.extractActivityName(activity.getName(),
-                    newPackageName);
+            newActivityName = AndroidManifest.extractActivityName(activity.getName(), newPackageName);
         }
 
         if (newActivityName != null && newActivityName.length() > 0) {
@@ -248,13 +244,11 @@ public class NewProjectWizardState {
                 String[] ids = newActivityName.split(AndmoreAndroidConstants.RE_DOT);
                 newActivityName = ids[ids.length - 1];
             }
-            if (projectName == null || projectName.length() == 0 ||
-                    !projectNameModifiedByUser) {
+            if (projectName == null || projectName.length() == 0 || !projectNameModifiedByUser) {
                 projectName = newActivityName;
                 projectNameModifiedByUser = false;
             }
-            if (applicationName == null || applicationName.length() == 0 ||
-                    !applicationNameModifiedByUser) {
+            if (applicationName == null || applicationName.length() == 0 || !applicationNameModifiedByUser) {
                 applicationNameModifiedByUser = false;
                 applicationName = newActivityName;
             }
@@ -267,15 +261,13 @@ public class NewProjectWizardState {
                 // Package name is a java identifier, so it's most suitable for
                 // an application name.
 
-                if (applicationName == null || applicationName.length() == 0 ||
-                        !applicationNameModifiedByUser) {
+                if (applicationName == null || applicationName.length() == 0 || !applicationNameModifiedByUser) {
                     applicationName = newPackageName;
                 }
 
                 // For the project name, remove any dots
                 newPackageName = newPackageName.replace('.', '_');
-                if (projectName == null || projectName.length() == 0 ||
-                        !projectNameModifiedByUser) {
+                if (projectName == null || projectName.length() == 0 || !projectNameModifiedByUser) {
                     projectName = newPackageName;
                 }
 
@@ -333,8 +325,7 @@ public class NewProjectWizardState {
         // is tied to the current target, so changing it would invalidate the project we're
         // trying to load in the first place.
         if (!targetModifiedByUser) {
-            ProjectProperties p = ProjectProperties.load(projectPath,
-                    PropertyType.PROJECT);
+            ProjectProperties p = ProjectProperties.load(projectPath, PropertyType.PROJECT);
             if (p != null) {
                 String v = p.getProperty(ProjectProperties.PROPERTY_TARGET);
                 IAndroidTarget desiredTarget = Sdk.getCurrent().getTargetFromHashString(v);
@@ -342,8 +333,7 @@ public class NewProjectWizardState {
                 // - we found a new desired target
                 // - there is no current target
                 // - or the current target can't run the desired target
-                if (desiredTarget != null &&
-                        (currentTarget == null || !desiredTarget.canRunOn(currentTarget))) {
+                if (desiredTarget != null && (currentTarget == null || !desiredTarget.canRunOn(currentTarget))) {
                     foundTarget = desiredTarget;
                 }
             }
@@ -361,8 +351,7 @@ public class NewProjectWizardState {
                 // Otherwise try to match the requested min-sdk-version if we find an
                 // exact match, regardless of the currently selected target.
                 for (IAndroidTarget existingTarget : targets) {
-                    if (existingTarget != null &&
-                            existingTarget.getVersion().equals(minSdk)) {
+                    if (existingTarget != null && existingTarget.getVersion().equals(minSdk)) {
                         foundTarget = existingTarget;
                         break;
                     }
@@ -373,8 +362,7 @@ public class NewProjectWizardState {
                 // Or last attempt, try to match a sample project location and use it
                 // if we find an exact match, regardless of the currently selected target.
                 for (IAndroidTarget existingTarget : targets) {
-                    if (existingTarget != null &&
-                            projectPath.startsWith(existingTarget.getLocation())) {
+                    if (existingTarget != null && projectPath.startsWith(existingTarget.getLocation())) {
                         foundTarget = existingTarget;
                         break;
                     }

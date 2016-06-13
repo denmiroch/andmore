@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -105,15 +102,15 @@ import com.google.common.hash.Hashing;
  */
 public class BuildHelper {
 
-    private static final String CONSOLE_PREFIX_DX = "Dx";   //$NON-NLS-1$
-    private final static String TEMP_PREFIX = "android_";   //$NON-NLS-1$
+    private static final String CONSOLE_PREFIX_DX = "Dx"; //$NON-NLS-1$
+    private final static String TEMP_PREFIX = "android_"; //$NON-NLS-1$
 
-    private static final String COMMAND_CRUNCH = "crunch";  //$NON-NLS-1$
+    private static final String COMMAND_CRUNCH = "crunch"; //$NON-NLS-1$
     private static final String COMMAND_PACKAGE = "package"; //$NON-NLS-1$
 
     private static final String MULTIDEX_ENABLED_PROPERTY = "multidex.enabled";
     private static final String MULTIDEX_MAIN_DEX_LIST_PROPERTY = "multidex.main-dex-list";
-        
+
     @NonNull
     private final ProjectState mProjectState;
     @NonNull
@@ -137,7 +134,7 @@ public class BuildHelper {
 
     private final static int MILLION = 1000000;
     private String mProguardFile;
-   
+
     /**
      * An object able to put a marker on a resource.
      */
@@ -154,12 +151,10 @@ public class BuildHelper {
      * @param verbose
      * @throws CoreException
      */
-    public BuildHelper(@NonNull ProjectState projectState,
-            @NonNull BuildToolInfo buildToolInfo,
-            @NonNull AndroidPrintStream outStream,
-            @NonNull AndroidPrintStream errStream,
-            boolean forceJumbo, boolean disableDexMerger, boolean debugMode,
-            boolean verbose, ResourceMarker resMarker) throws CoreException {
+    public BuildHelper(@NonNull ProjectState projectState, @NonNull BuildToolInfo buildToolInfo,
+            @NonNull AndroidPrintStream outStream, @NonNull AndroidPrintStream errStream, boolean forceJumbo,
+            boolean disableDexMerger, boolean debugMode, boolean verbose, ResourceMarker resMarker)
+            throws CoreException {
         mProjectState = projectState;
         mProject = projectState.getProject();
         mBuildToolInfo = buildToolInfo;
@@ -200,7 +195,7 @@ public class BuildHelper {
         // Benchmarking end
         if (BENCHMARK_FLAG) {
             String msg = "BENCHMARK ADT: Ending Initial Package (.ap_). \nTime Elapsed: " //$NON-NLS-1$
-                            + ((System.nanoTime() - startCrunchTime)/MILLION) + "ms";     //$NON-NLS-1$
+                    + ((System.nanoTime() - startCrunchTime) / MILLION) + "ms"; //$NON-NLS-1$
             AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.ALWAYS, mProject, msg);
         }
     }
@@ -218,14 +213,13 @@ public class BuildHelper {
      * @throws AaptExecException
      * @throws AaptResultException
      */
-    public void packageResources(IFile manifestFile, List<IProject> libProjects, String resFilter,
-            int versionCode, String outputFolder, String outputFilename)
-            throws AaptExecException, AaptResultException {
+    public void packageResources(IFile manifestFile, List<IProject> libProjects, String resFilter, int versionCode,
+            String outputFolder, String outputFilename) throws AaptExecException, AaptResultException {
 
         // Benchmarking start
         long startPackageTime = 0;
         if (BENCHMARK_FLAG) {
-            String msg = "BENCHMARK ADT: Starting Initial Packaging (.ap_)";    //$NON-NLS-1$
+            String msg = "BENCHMARK ADT: Starting Initial Packaging (.ap_)"; //$NON-NLS-1$
             AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.ALWAYS, mProject, msg);
             startPackageTime = System.nanoTime();
         }
@@ -271,7 +265,8 @@ public class BuildHelper {
                     // png cache folder first
                     IFolder libBinFolder = BaseProjectHelper.getAndroidOutputFolder(lib);
 
-                    IFolder libCacheFolder = libBinFolder.getFolder(AndmoreAndroidConstants.WS_BIN_RELATIVE_CRUNCHCACHE);
+                    IFolder libCacheFolder = libBinFolder
+                            .getFolder(AndmoreAndroidConstants.WS_BIN_RELATIVE_CRUNCHCACHE);
                     addFolderToList(osResPaths, libCacheFolder);
 
                     IFolder libBcFolder = libBinFolder.getFolder(AndmoreAndroidConstants.WS_BIN_RELATIVE_BC);
@@ -292,14 +287,13 @@ public class BuildHelper {
 
             // build the default resource package
             executeAapt(COMMAND_PACKAGE, osManifestPath, osResPaths, osAssetsPath,
-                    outputFolder + File.separator + outputFilename, resFilter,
-                    versionCode);
+                    outputFolder + File.separator + outputFilename, resFilter, versionCode);
         }
 
         // Benchmarking end
         if (BENCHMARK_FLAG) {
             String msg = "BENCHMARK ADT: Ending Initial Package (.ap_). \nTime Elapsed: " //$NON-NLS-1$
-                            + ((System.nanoTime() - startPackageTime)/MILLION) + "ms";    //$NON-NLS-1$
+                    + ((System.nanoTime() - startPackageTime) / MILLION) + "ms"; //$NON-NLS-1$
             AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.ALWAYS, mProject, msg);
         }
     }
@@ -338,9 +332,8 @@ public class BuildHelper {
      * @throws DuplicateFileException
      */
     public void finalDebugPackage(String intermediateApk, List<File> dexFiles, String output,
-            List<IProject> libProjects, ResourceMarker resMarker)
-            throws ApkCreationException, KeytoolException, AndroidLocationException,
-            NativeLibInJarException, DuplicateFileException, CoreException {
+            List<IProject> libProjects, ResourceMarker resMarker) throws ApkCreationException, KeytoolException,
+            AndroidLocationException, NativeLibInJarException, DuplicateFileException, CoreException {
 
         AndmoreAndroidPlugin adt = AndmoreAndroidPlugin.getDefault();
         if (adt == null) {
@@ -362,8 +355,8 @@ public class BuildHelper {
         // from the keystore, get the signing info
         SigningInfo info = ApkBuilder.getDebugKey(keystoreOsPath, mVerbose ? mOutStream : null);
 
-        finalPackage(intermediateApk, dexFiles, output, libProjects,
-                info != null ? info.key : null, info != null ? info.certificate : null, resMarker);
+        finalPackage(intermediateApk, dexFiles, output, libProjects, info != null ? info.key : null,
+                info != null ? info.certificate : null, resMarker);
     }
 
     /**
@@ -372,23 +365,22 @@ public class BuildHelper {
      * @param javaProject
      * @return
      */
-    public List<File> listDexFiles(IJavaProject javaProject)
-    {    	
-    	IFolder binFolder = BaseProjectHelper.getAndroidOutputFolder(javaProject.getProject());
-    	File binFile = binFolder.getLocation().toFile();
-    	
-    	File[] dexFiles = binFile.listFiles(new FilenameFilter() {
-			
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(SdkConstants.DOT_DEX);
-			}
-		});
-    	
-    	// return a mutable list.
-    	return new ArrayList<File>(Arrays.asList(dexFiles));
+    public List<File> listDexFiles(IJavaProject javaProject) {
+        IFolder binFolder = BaseProjectHelper.getAndroidOutputFolder(javaProject.getProject());
+        File binFile = binFolder.getLocation().toFile();
+
+        File[] dexFiles = binFile.listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(SdkConstants.DOT_DEX);
+            }
+        });
+
+        // return a mutable list.
+        return new ArrayList<File>(Arrays.asList(dexFiles));
     }
-    
+
     /**
      * Makes the final package.
      *
@@ -410,29 +402,26 @@ public class BuildHelper {
      * @throws CoreException
      * @throws DuplicateFileException
      */
-    public void finalPackage(String intermediateApk, List<File> dexFiles, String output,
-            List<IProject> libProjects,
+    public void finalPackage(String intermediateApk, List<File> dexFiles, String output, List<IProject> libProjects,
             PrivateKey key, X509Certificate certificate, ResourceMarker resMarker)
-            throws NativeLibInJarException, ApkCreationException, DuplicateFileException,
-            CoreException {
+            throws NativeLibInJarException, ApkCreationException, DuplicateFileException, CoreException {
 
         try {
-        	if(dexFiles.size() < 1) {
-        		throw new ApkCreationException("No DEX file found.");
-        	}
-        	
-        	File mainDexFile = dexFiles.get(0);
-        	dexFiles.remove(0);
-        	
-            ApkBuilder apkBuilder = new ApkBuilder(output, intermediateApk, mainDexFile.getAbsolutePath(),
-                    key, certificate,
-                    mVerbose ? mOutStream: null);
-            apkBuilder.setDebugMode(mDebugMode);
-            
-            for (File dexFile : dexFiles) {
-            	apkBuilder.addFile(dexFile, dexFile.getName());
+            if (dexFiles.size() < 1) {
+                throw new ApkCreationException("No DEX file found.");
             }
-            
+
+            File mainDexFile = dexFiles.get(0);
+            dexFiles.remove(0);
+
+            ApkBuilder apkBuilder = new ApkBuilder(output, intermediateApk, mainDexFile.getAbsolutePath(), key,
+                    certificate, mVerbose ? mOutStream : null);
+            apkBuilder.setDebugMode(mDebugMode);
+
+            for (File dexFile : dexFiles) {
+                apkBuilder.addFile(dexFile, dexFile.getName());
+            }
+
             // either use the full compiled code paths or just the proguard file
             // if present
             Collection<String> pathsCollection = mCompiledCodePaths;
@@ -453,8 +442,7 @@ public class BuildHelper {
                         String libName = file.getName();
 
                         String msg = String.format(
-                                "Native libraries detected in '%1$s'. See console for more information.",
-                                libName);
+                                "Native libraries detected in '%1$s'. See console for more information.", libName);
 
                         ArrayList<String> consoleMsgs = new ArrayList<String>();
 
@@ -463,7 +451,8 @@ public class BuildHelper {
                                 libName));
 
                         if (jarStatus.hasNativeLibsConflicts()) {
-                            consoleMsgs.add("Additionally some of those libraries will interfer with the installation of the application because of their location in lib/");
+                            consoleMsgs.add(
+                                    "Additionally some of those libraries will interfer with the installation of the application because of their location in lib/");
                             consoleMsgs.add("lib/ is reserved for NDK libraries.");
                         }
 
@@ -477,8 +466,8 @@ public class BuildHelper {
 
                         // if there's a conflict or if the prefs force error on any native code in jar
                         // files, throw an exception
-                        if (jarStatus.hasNativeLibsConflicts() ||
-                                AdtPrefs.getPrefs().getBuildForceErrorOnNativeLibInJar()) {
+                        if (jarStatus.hasNativeLibsConflicts()
+                                || AdtPrefs.getPrefs().getBuildForceErrorOnNativeLibInJar()) {
                             throw new NativeLibInJarException(jarStatus, msg, libName, consoleStrings);
                         } else {
                             // otherwise, put a warning, and output to the console also.
@@ -502,8 +491,7 @@ public class BuildHelper {
             // now write the native libraries.
             // First look if the lib folder is there.
             IResource libFolder = mProject.findMember(SdkConstants.FD_NATIVE_LIBS);
-            if (libFolder != null && libFolder.exists() &&
-                    libFolder.getType() == IResource.FOLDER) {
+            if (libFolder != null && libFolder.exists() && libFolder.getType() == IResource.FOLDER) {
                 // get a File for the folder.
                 apkBuilder.addNativeLibraries(libFolder.getLocation().toFile());
             }
@@ -511,15 +499,14 @@ public class BuildHelper {
             // next the native libraries for the renderscript support mode.
             if (mProjectState.getRenderScriptSupportMode()) {
                 IFolder androidOutputFolder = BaseProjectHelper.getAndroidOutputFolder(mProject);
-                IResource rsLibFolder = androidOutputFolder.getFolder(
-                        AndmoreAndroidConstants.WS_BIN_RELATIVE_RS_LIBS);
+                IResource rsLibFolder = androidOutputFolder.getFolder(AndmoreAndroidConstants.WS_BIN_RELATIVE_RS_LIBS);
                 File rsLibFolderFile = rsLibFolder.getLocation().toFile();
                 if (rsLibFolderFile.isDirectory()) {
                     apkBuilder.addNativeLibraries(rsLibFolderFile);
                 }
 
-                File rsLibs = RenderScriptProcessor.getSupportNativeLibFolder(
-                        mBuildToolInfo.getLocation().getAbsolutePath());
+                File rsLibs = RenderScriptProcessor
+                        .getSupportNativeLibFolder(mBuildToolInfo.getLocation().getAbsolutePath());
                 if (rsLibs.isDirectory()) {
                     apkBuilder.addNativeLibraries(rsLibs);
                 }
@@ -529,8 +516,7 @@ public class BuildHelper {
             if (libProjects != null) {
                 for (IProject lib : libProjects) {
                     libFolder = lib.findMember(SdkConstants.FD_NATIVE_LIBS);
-                    if (libFolder != null && libFolder.exists() &&
-                            libFolder.getType() == IResource.FOLDER) {
+                    if (libFolder != null && libFolder.exists() && libFolder.getType() == IResource.FOLDER) {
                         apkBuilder.addNativeLibraries(libFolder.getLocation().toFile());
                     }
                 }
@@ -551,9 +537,8 @@ public class BuildHelper {
         return mCompiledCodePaths;
     }
 
-    public void runProguard(List<File> proguardConfigs, File inputJar, Collection<String> jarFiles,
-                            File obfuscatedJar, File logOutput)
-            throws ProguardResultException, ProguardExecException, IOException {
+    public void runProguard(List<File> proguardConfigs, File inputJar, Collection<String> jarFiles, File obfuscatedJar,
+            File logOutput) throws ProguardResultException, ProguardExecException, IOException {
         IAndroidTarget target = Sdk.getCurrent().getTarget(mProject);
 
         // prepare the command line for proguard
@@ -592,16 +577,16 @@ public class BuildHelper {
                 logOutput.mkdirs();
             }
 
-            command.add("-dump");                                              //$NON-NLS-1$
-            command.add(new File(logOutput, "dump.txt").getAbsolutePath());    //$NON-NLS-1$
+            command.add("-dump"); //$NON-NLS-1$
+            command.add(new File(logOutput, "dump.txt").getAbsolutePath()); //$NON-NLS-1$
 
-            command.add("-printseeds");                                        //$NON-NLS-1$
-            command.add(new File(logOutput, "seeds.txt").getAbsolutePath());   //$NON-NLS-1$
+            command.add("-printseeds"); //$NON-NLS-1$
+            command.add(new File(logOutput, "seeds.txt").getAbsolutePath()); //$NON-NLS-1$
 
-            command.add("-printusage");                                        //$NON-NLS-1$
-            command.add(new File(logOutput, "usage.txt").getAbsolutePath());   //$NON-NLS-1$
+            command.add("-printusage"); //$NON-NLS-1$
+            command.add(new File(logOutput, "usage.txt").getAbsolutePath()); //$NON-NLS-1$
 
-            command.add("-printmapping");                                      //$NON-NLS-1$
+            command.add("-printmapping"); //$NON-NLS-1$
             command.add(new File(logOutput, "mapping.txt").getAbsolutePath()); //$NON-NLS-1$
         }
 
@@ -620,16 +605,14 @@ public class BuildHelper {
         // The Mac/Linux proguard.sh can infer it correctly but not the proguard.bat one.
         String[] envp = null;
         Map<String, String> envMap = new TreeMap<String, String>(System.getenv());
-        if (!envMap.containsKey("PROGUARD_HOME")) {                                    //$NON-NLS-1$
-            envMap.put("PROGUARD_HOME", Sdk.getCurrent().getSdkOsLocation() +          //$NON-NLS-1$
-                                        SdkConstants.FD_TOOLS + File.separator +
-                                        SdkConstants.FD_PROGUARD);
+        if (!envMap.containsKey("PROGUARD_HOME")) { //$NON-NLS-1$
+            envMap.put("PROGUARD_HOME", Sdk.getCurrent().getSdkOsLocation() + //$NON-NLS-1$
+                    SdkConstants.FD_TOOLS + File.separator + SdkConstants.FD_PROGUARD);
             envp = new String[envMap.size()];
             int i = 0;
             for (Map.Entry<String, String> entry : envMap.entrySet()) {
-                envp[i++] = String.format("%1$s=%2$s",                                 //$NON-NLS-1$
-                                          entry.getKey(),
-                                          entry.getValue());
+                envp[i++] = String.format("%1$s=%2$s", //$NON-NLS-1$
+                        entry.getKey(), entry.getValue());
             }
         }
 
@@ -660,8 +643,7 @@ public class BuildHelper {
             }
 
             if (execError != 0) {
-                throw new ProguardResultException(execError,
-                        results.toArray(new String[results.size()]));
+                throw new ProguardResultException(execError, results.toArray(new String[results.size()]));
             }
 
         } catch (IOException e) {
@@ -689,7 +671,7 @@ public class BuildHelper {
 
         // Arg 0 is the proguard.bat path and arg 1 is the user config file
         String launcher = AndmoreAndroidPlugin.readFile(new File(command.get(0)));
-        if (launcher.contains("%*")) {                                      //$NON-NLS-1$
+        if (launcher.contains("%*")) { //$NON-NLS-1$
             // This is the launcher from Tools R12. Don't work around it.
             return null;
         }
@@ -705,7 +687,7 @@ public class BuildHelper {
         commandArray[1] = command.get(1);
 
         // Write all the other arguments to a config file
-        File argsFile = File.createTempFile(TEMP_PREFIX, ".pro");           //$NON-NLS-1$
+        File argsFile = File.createTempFile(TEMP_PREFIX, ".pro"); //$NON-NLS-1$
         // TODO FIXME this may leave a lot of temp files around on a long session.
         // Should have a better way to clean up e.g. before each build.
         argsFile.deleteOnExit();
@@ -715,12 +697,12 @@ public class BuildHelper {
         for (int i = 2; i < command.size(); i++) {
             String s = command.get(i);
             fw.write(s);
-            fw.write(s.startsWith("-") ? ' ' : '\n');                       //$NON-NLS-1$
+            fw.write(s.startsWith("-") ? ' ' : '\n'); //$NON-NLS-1$
         }
 
         fw.close();
 
-        commandArray[2] = "@" + argsFile.getAbsolutePath();                 //$NON-NLS-1$
+        commandArray[2] = "@" + argsFile.getAbsolutePath(); //$NON-NLS-1$
         return commandArray;
     }
 
@@ -751,13 +733,11 @@ public class BuildHelper {
      *   Or on Windows the original path surrounded by double quotes if it contains a quote.
      */
     private String quoteWinArg(String path) {
-        if (path.indexOf('\'') != -1 &&
-                SdkConstants.currentPlatform() == SdkConstants.PLATFORM_WINDOWS) {
+        if (path.indexOf('\'') != -1 && SdkConstants.currentPlatform() == SdkConstants.PLATFORM_WINDOWS) {
             path = '"' + path + '"';
         }
         return path;
     }
-
 
     /**
      * Execute the Dx tool for dalvik code conversion.
@@ -768,8 +748,7 @@ public class BuildHelper {
      * @throws CoreException
      * @throws DexException
      */
-    public void executeDx(IJavaProject javaProject, Collection<String> inputPaths,
-            String osOutFilePath)
+    public void executeDx(IJavaProject javaProject, Collection<String> inputPaths, String osOutFilePath)
             throws CoreException, DexException {
 
         // get the dex wrapper
@@ -795,25 +774,25 @@ public class BuildHelper {
 
             boolean multiDexEnabled = false;
             String mainDexListFileLocation = null;
-            
+
             if (mProjectState.getProperty(MULTIDEX_ENABLED_PROPERTY) != null) {
-            	multiDexEnabled = Boolean.parseBoolean(mProjectState.getProperty(MULTIDEX_ENABLED_PROPERTY));
-            	
-            	if(multiDexEnabled && mProjectState.getProperty(MULTIDEX_MAIN_DEX_LIST_PROPERTY) != null) {
-            		// inform the user
-            		mOutStream.println("Using --multi-dex");
-            		
-            		IFile mainDexListFile = mProject.getFile(
-	            			mProjectState.getProperty(MULTIDEX_MAIN_DEX_LIST_PROPERTY));
-	            	if(mainDexListFile != null) {
-	            		mainDexListFileLocation = mainDexListFile.getRawLocation().toOSString();
-	            		
-	            		// For multidex output to a folder
-	                	osOutFilePath = new File(osOutFilePath).getParent();
-	            	}
-            	}
+                multiDexEnabled = Boolean.parseBoolean(mProjectState.getProperty(MULTIDEX_ENABLED_PROPERTY));
+
+                if (multiDexEnabled && mProjectState.getProperty(MULTIDEX_MAIN_DEX_LIST_PROPERTY) != null) {
+                    // inform the user
+                    mOutStream.println("Using --multi-dex");
+
+                    IFile mainDexListFile = mProject
+                            .getFile(mProjectState.getProperty(MULTIDEX_MAIN_DEX_LIST_PROPERTY));
+                    if (mainDexListFile != null) {
+                        mainDexListFileLocation = mainDexListFile.getRawLocation().toOSString();
+
+                        // For multidex output to a folder
+                        osOutFilePath = new File(osOutFilePath).getParent();
+                    }
+                }
             }
-            
+
             // replace the libs by their dexed versions (dexing them if needed.)
             List<String> finalInputPaths = new ArrayList<String>(inputPaths.size());
             if (mDisableDexMerger || multiDexEnabled || inputPaths.size() == 1) {
@@ -832,20 +811,18 @@ public class BuildHelper {
                         File dexedLib = new File(dexedLibs, fileName);
                         String dexedLibPath = dexedLib.getAbsolutePath();
 
-                        if (dexedLib.isFile() == false ||
-                                dexedLib.lastModified() < inputFile.lastModified()) {
+                        if (dexedLib.isFile() == false || dexedLib.lastModified() < inputFile.lastModified()) {
 
                             if (mVerbose) {
-                                mOutStream.println(
-                                        String.format("Pre-Dexing %1$s -> %2$s", input, fileName));
+                                mOutStream.println(String.format("Pre-Dexing %1$s -> %2$s", input, fileName));
                             }
 
                             if (dexedLib.isFile()) {
                                 dexedLib.delete();
                             }
 
-                            int res = wrapper.run(dexedLibPath, Collections.singleton(input),
-                                    mForceJumbo, false, null, false, mVerbose, mOutStream, mErrStream);
+                            int res = wrapper.run(dexedLibPath, Collections.singleton(input), mForceJumbo, false, null,
+                                    false, mVerbose, mOutStream, mErrStream);
 
                             if (res != 0) {
                                 // output error message and mark the project.
@@ -854,9 +831,7 @@ public class BuildHelper {
                             }
                         } else {
                             if (mVerbose) {
-                                mOutStream.println(
-                                        String.format("Using Pre-Dexed %1$s <- %2$s",
-                                                fileName, input));
+                                mOutStream.println(String.format("Using Pre-Dexed %1$s <- %2$s", fileName, input));
                             }
                         }
 
@@ -870,15 +845,10 @@ public class BuildHelper {
                     mOutStream.println("Input: " + input);
                 }
             }
-            
-            int res = wrapper.run(osOutFilePath,
-                    finalInputPaths,
-                    mForceJumbo,
-                    multiDexEnabled,
-                    mainDexListFileLocation,
+
+            int res = wrapper.run(osOutFilePath, finalInputPaths, mForceJumbo, multiDexEnabled, mainDexListFileLocation,
                     true, // minimalMainDex is true, only used for multidex
-                    mVerbose,
-                    mOutStream, mErrStream);
+                    mVerbose, mOutStream, mErrStream);
 
             mOutStream.setPrefix(null);
             mErrStream.setPrefix(null);
@@ -933,9 +903,8 @@ public class BuildHelper {
      * @throws AaptExecException
      * @throws AaptResultException
      */
-    private void executeAapt(String aaptCommand, String osManifestPath,
-            List<String> osResPaths, String osAssetsPath, String osOutFilePath,
-            String configFilter, int versionCode) throws AaptExecException, AaptResultException {
+    private void executeAapt(String aaptCommand, String osManifestPath, List<String> osResPaths, String osAssetsPath,
+            String osOutFilePath, String configFilter, int versionCode) throws AaptExecException, AaptResultException {
         IAndroidTarget target = Sdk.getCurrent().getTarget(mProject);
 
         String aapt = mBuildToolInfo.getPath(BuildToolInfo.PathId.AAPT);
@@ -955,7 +924,7 @@ public class BuildHelper {
         }
 
         if (aaptCommand.equals(COMMAND_PACKAGE)) {
-            commandArray.add("-f");          //$NON-NLS-1$
+            commandArray.add("-f"); //$NON-NLS-1$
             commandArray.add("--no-crunch"); //$NON-NLS-1$
 
             // if more than one res, this means there's a library (or more) and we need
@@ -1000,8 +969,7 @@ public class BuildHelper {
             commandArray.add(osOutFilePath);
         }
 
-        String command[] = commandArray.toArray(
-                new String[commandArray.size()]);
+        String command[] = commandArray.toArray(new String[commandArray.size()]);
 
         if (AdtPrefs.getPrefs().getBuildVerbosity() == BuildVerbosity.VERBOSE) {
             StringBuilder sb = new StringBuilder();
@@ -1015,8 +983,8 @@ public class BuildHelper {
         // Benchmarking start
         long startAaptTime = 0;
         if (BENCHMARK_FLAG) {
-            String msg = "BENCHMARK ADT: Starting " + aaptCommand  //$NON-NLS-1$
-                         + " call to Aapt";                        //$NON-NLS-1$
+            String msg = "BENCHMARK ADT: Starting " + aaptCommand //$NON-NLS-1$
+                    + " call to Aapt"; //$NON-NLS-1$
             AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.ALWAYS, mProject, msg);
             startAaptTime = System.nanoTime();
         }
@@ -1038,8 +1006,7 @@ public class BuildHelper {
                 }
             }
             if (returnCode != 0) {
-                throw new AaptResultException(returnCode,
-                        stdErr.toArray(new String[stdErr.size()]));
+                throw new AaptResultException(returnCode, stdErr.toArray(new String[stdErr.size()]));
             }
         } catch (IOException e) {
             String msg = String.format(Messages.AAPT_Exec_Error_s, command[0]);
@@ -1051,9 +1018,9 @@ public class BuildHelper {
 
         // Benchmarking end
         if (BENCHMARK_FLAG) {
-            String msg = "BENCHMARK ADT: Ending " + aaptCommand                  //$NON-NLS-1$
-                         + " call to Aapt.\nBENCHMARK ADT: Time Elapsed: "       //$NON-NLS-1$
-                         + ((System.nanoTime() - startAaptTime)/MILLION) + "ms"; //$NON-NLS-1$
+            String msg = "BENCHMARK ADT: Ending " + aaptCommand //$NON-NLS-1$
+                    + " call to Aapt.\nBENCHMARK ADT: Time Elapsed: " //$NON-NLS-1$
+                    + ((System.nanoTime() - startAaptTime) / MILLION) + "ms"; //$NON-NLS-1$
             AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.ALWAYS, mProject, msg);
         }
     }
@@ -1064,13 +1031,11 @@ public class BuildHelper {
      * @param resMarker
      * @throws CoreException
      */
-    private void gatherPaths(ResourceMarker resMarker)
-            throws CoreException {
+    private void gatherPaths(ResourceMarker resMarker) throws CoreException {
         IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
 
         // get a java project for the project.
         IJavaProject javaProject = JavaCore.create(mProject);
-
 
         // get the output of the main project
         IPath path = javaProject.getOutputLocation();
@@ -1087,17 +1052,16 @@ public class BuildHelper {
                 // ignore non exported entries, unless they're in the DEPEDENCIES container,
                 // in which case we always want it (there may be some older projects that
                 // have it as non exported).
-                if (e.isExported() ||
-                        (e.getEntryKind() == IClasspathEntry.CPE_CONTAINER &&
-                         e.getPath().toString().equals(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES))) {
+                if (e.isExported() || (e.getEntryKind() == IClasspathEntry.CPE_CONTAINER
+                        && e.getPath().toString().equals(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES))) {
                     handleCPE(e, javaProject, wsRoot, resMarker);
                 }
             }
         }
     }
 
-    private void handleCPE(IClasspathEntry entry, IJavaProject javaProject,
-            IWorkspaceRoot wsRoot, ResourceMarker resMarker) {
+    private void handleCPE(IClasspathEntry entry, IJavaProject javaProject, IWorkspaceRoot wsRoot,
+            ResourceMarker resMarker) {
 
         // if this is a classpath variable reference, we resolve it.
         if (entry.getEntryKind() == IClasspathEntry.CPE_VARIABLE) {
@@ -1108,8 +1072,8 @@ public class BuildHelper {
             IProject refProject = wsRoot.getProject(entry.getPath().lastSegment());
             try {
                 // ignore if it's an Android project, or if it's not a Java Project
-                if (refProject.hasNature(JavaCore.NATURE_ID) &&
-                        refProject.hasNature(AndmoreAndroidConstants.NATURE_DEFAULT) == false) {
+                if (refProject.hasNature(JavaCore.NATURE_ID)
+                        && refProject.hasNature(AndmoreAndroidConstants.NATURE_DEFAULT) == false) {
                     IJavaProject refJavaProject = JavaCore.create(refProject);
 
                     // get the output folder
@@ -1128,8 +1092,7 @@ public class BuildHelper {
         } else if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
             // get the container
             try {
-                IClasspathContainer container = JavaCore.getClasspathContainer(
-                        entry.getPath(), javaProject);
+                IClasspathContainer container = JavaCore.getClasspathContainer(entry.getPath(), javaProject);
                 // ignore the system and default_system types as they represent
                 // libraries that are part of the runtime.
                 if (container != null && container.getKind() == IClasspathContainer.K_APPLICATION) {
@@ -1145,8 +1108,7 @@ public class BuildHelper {
         }
     }
 
-    private void handleClasspathLibrary(IClasspathEntry e, IWorkspaceRoot wsRoot,
-            ResourceMarker resMarker) {
+    private void handleClasspathLibrary(IClasspathEntry e, IWorkspaceRoot wsRoot, ResourceMarker resMarker) {
         // get the IPath
         IPath path = e.getPath();
 
@@ -1158,8 +1120,7 @@ public class BuildHelper {
 
         } else if (SdkConstants.EXT_JAR.equalsIgnoreCase(path.getFileExtension())) {
             // case of a jar file (which could be relative to the workspace or a full path)
-            if (resource != null && resource.exists() &&
-                    resource.getType() == IResource.FILE) {
+            if (resource != null && resource.exists() && resource.getType() == IResource.FILE) {
                 mCompiledCodePaths.add(resource.getLocation().toOSString());
             } else {
                 // if the jar path doesn't match a workspace resource,
@@ -1170,8 +1131,7 @@ public class BuildHelper {
                 if (f.isFile()) {
                     mCompiledCodePaths.add(osFullPath);
                 } else {
-                    String message = String.format( Messages.Couldnt_Locate_s_Error,
-                            path);
+                    String message = String.format(Messages.Couldnt_Locate_s_Error, path);
                     // always output to the console
                     mOutStream.println(message);
 
@@ -1183,8 +1143,7 @@ public class BuildHelper {
             }
         } else {
             // this can be the case for a class folder.
-            if (resource != null && resource.exists() &&
-                    resource.getType() == IResource.FOLDER) {
+            if (resource != null && resource.exists() && resource.getType() == IResource.FOLDER) {
                 mCompiledCodePaths.add(resource.getLocation().toOSString());
             } else {
                 // if the path doesn't match a workspace resource,
@@ -1247,15 +1206,10 @@ public class BuildHelper {
      * @return the process return code.
      * @throws InterruptedException
      */
-    public final static int grabProcessOutput(
-            final IProject project,
-            final Process process,
-            final ArrayList<String> stderr)
-            throws InterruptedException {
+    public final static int grabProcessOutput(final IProject project, final Process process,
+            final ArrayList<String> stderr) throws InterruptedException {
 
-        return GrabProcessOutput.grabProcessOutput(
-                process,
-                Wait.WAIT_FOR_READERS, // we really want to make sure we get all the output!
+        return GrabProcessOutput.grabProcessOutput(process, Wait.WAIT_FOR_READERS, // we really want to make sure we get all the output!
                 new IProcessOutput() {
 
                     @SuppressWarnings("unused")
@@ -1264,12 +1218,10 @@ public class BuildHelper {
                         if (line != null) {
                             // If benchmarking always print the lines that
                             // correspond to benchmarking info returned by ADT
-                            if (BENCHMARK_FLAG && line.startsWith("BENCHMARK:")) {    //$NON-NLS-1$
-                                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.ALWAYS,
-                                        project, line);
+                            if (BENCHMARK_FLAG && line.startsWith("BENCHMARK:")) { //$NON-NLS-1$
+                                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.ALWAYS, project, line);
                             } else {
-                                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE,
-                                        project, line);
+                                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project, line);
                             }
                         }
                     }

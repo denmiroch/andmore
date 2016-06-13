@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,9 +48,7 @@ public class NestedConfiguration extends Configuration {
      * @param chooser the associated chooser
      * @param configuration the configuration to inherit from
      */
-    protected NestedConfiguration(
-            @NonNull ConfigurationChooser chooser,
-            @NonNull Configuration configuration) {
+    protected NestedConfiguration(@NonNull ConfigurationChooser chooser, @NonNull Configuration configuration) {
         super(chooser);
         mParent = configuration;
 
@@ -85,12 +80,9 @@ public class NestedConfiguration extends Configuration {
      * @return a new configuration
      */
     @NonNull
-    public static NestedConfiguration create(
-            @NonNull NestedConfiguration other,
-            @NonNull Configuration values,
+    public static NestedConfiguration create(@NonNull NestedConfiguration other, @NonNull Configuration values,
             @NonNull Configuration parent) {
-        NestedConfiguration configuration =
-                new NestedConfiguration(other.mConfigChooser, parent);
+        NestedConfiguration configuration = new NestedConfiguration(other.mConfigChooser, parent);
         initFrom(configuration, other, values, true /*sync*/);
         return configuration;
     }
@@ -105,8 +97,8 @@ public class NestedConfiguration extends Configuration {
      * @param values the configuration to copy values from
      * @param sync if true, sync the folder configuration from
      */
-    protected static void initFrom(NestedConfiguration configuration,
-            NestedConfiguration other, Configuration values, boolean sync) {
+    protected static void initFrom(NestedConfiguration configuration, NestedConfiguration other, Configuration values,
+            boolean sync) {
         configuration.mOverride = other.mOverride;
         configuration.setDisplayName(values.getDisplayName());
         configuration.setActivity(values.getActivity());
@@ -153,8 +145,7 @@ public class NestedConfiguration extends Configuration {
      * @return a new configuration
      */
     @NonNull
-    public static NestedConfiguration create(@NonNull ConfigurationChooser chooser,
-            @NonNull Configuration parent) {
+    public static NestedConfiguration create(@NonNull ConfigurationChooser chooser, @NonNull Configuration parent) {
         return new NestedConfiguration(chooser, parent);
     }
 
@@ -461,8 +452,7 @@ public class NestedConfiguration extends Configuration {
     @Nullable
     public static String computeDisplayName(int flags, @NonNull Configuration configuration) {
         if ((flags & CFG_LOCALE) != 0) {
-            return ConfigurationChooser.getLocaleLabel(configuration.mConfigChooser,
-                    configuration.getLocale(), false);
+            return ConfigurationChooser.getLocaleLabel(configuration.mConfigChooser, configuration.getLocale(), false);
         }
 
         if ((flags & CFG_TARGET) != 0) {
@@ -493,14 +483,13 @@ public class NestedConfiguration extends Configuration {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this.getClass())
-                .add("parent", mParent.getDisplayName())          //$NON-NLS-1$
-                .add("display", getDisplayName())                 //$NON-NLS-1$
-                .add("overrideLocale", isOverridingLocale())           //$NON-NLS-1$
-                .add("overrideTarget", isOverridingTarget())           //$NON-NLS-1$
-                .add("overrideDevice", isOverridingDevice())           //$NON-NLS-1$
+        return Objects.toStringHelper(this.getClass()).add("parent", mParent.getDisplayName()) //$NON-NLS-1$
+                .add("display", getDisplayName()) //$NON-NLS-1$
+                .add("overrideLocale", isOverridingLocale()) //$NON-NLS-1$
+                .add("overrideTarget", isOverridingTarget()) //$NON-NLS-1$
+                .add("overrideDevice", isOverridingDevice()) //$NON-NLS-1$
                 .add("overrideDeviceState", isOverridingDeviceState()) //$NON-NLS-1$
-                .add("persistent", toPersistentString())          //$NON-NLS-1$
+                .add("persistent", toPersistentString()) //$NON-NLS-1$
                 .toString();
     }
 }

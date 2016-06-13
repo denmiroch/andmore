@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,9 @@
 
 package org.eclipse.andmore.internal.refactorings.extractstring;
 
-import com.android.SdkConstants;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.core.resources.IFile;
@@ -30,9 +29,7 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import com.android.SdkConstants;
 
 /**
  * An helper utility to get IDs out of an Android XML resource file.
@@ -45,11 +42,9 @@ class XmlStringFileHelper {
      *
      * Map type: map [String filename] => map [String id => String value].
      */
-    private HashMap<String, Map<String, String>> mResIdCache =
-        new HashMap<String, Map<String, String>>();
+    private HashMap<String, Map<String, String>> mResIdCache = new HashMap<String, Map<String, String>>();
 
-    public XmlStringFileHelper() {
-    }
+    public XmlStringFileHelper() {}
 
     /**
      * Utility method used by the wizard to retrieve the actual value definition of a given
@@ -121,10 +116,8 @@ class XmlStringFileHelper {
                     Node root = findChild(doc, null, SdkConstants.TAG_RESOURCES);
                     if (root != null) {
                         for (Node strNode = findChild(root, null,
-                                                      SdkConstants.TAG_STRING);
-                             strNode != null;
-                             strNode = findChild(null, strNode,
-                                                 SdkConstants.TAG_STRING)) {
+                                SdkConstants.TAG_STRING); strNode != null; strNode = findChild(null, strNode,
+                                        SdkConstants.TAG_STRING)) {
                             NamedNodeMap attrs = strNode.getAttributes();
                             Node nameAttr = attrs.getNamedItem(SdkConstants.ATTR_NAME);
                             if (nameAttr != null) {
@@ -132,10 +125,10 @@ class XmlStringFileHelper {
 
                                 // Find the TEXT node right after the element.
                                 // Whitespace matters so we don't try to normalize it.
-                                String text = "";                       //$NON-NLS-1$
-                                for (Node txtNode = strNode.getFirstChild();
-                                        txtNode != null && txtNode.getNodeType() == Node.TEXT_NODE;
-                                        txtNode = txtNode.getNextSibling()) {
+                                String text = ""; //$NON-NLS-1$
+                                for (Node txtNode = strNode.getFirstChild(); txtNode != null
+                                        && txtNode.getNodeType() == Node.TEXT_NODE; txtNode = txtNode
+                                                .getNextSibling()) {
                                     text += txtNode.getNodeValue();
                                 }
 
@@ -173,9 +166,8 @@ class XmlStringFileHelper {
             lastChild = lastChild.getNextSibling();
         }
 
-        for ( ; lastChild != null ; lastChild = lastChild.getNextSibling()) {
-            if (lastChild.getNodeType() == Node.ELEMENT_NODE &&
-                    lastChild.getNamespaceURI() == null &&  // resources don't have any NS URI
+        for (; lastChild != null; lastChild = lastChild.getNextSibling()) {
+            if (lastChild.getNodeType() == Node.ELEMENT_NODE && lastChild.getNamespaceURI() == null && // resources don't have any NS URI
                     elementName.equals(lastChild.getLocalName())) {
                 return lastChild;
             }

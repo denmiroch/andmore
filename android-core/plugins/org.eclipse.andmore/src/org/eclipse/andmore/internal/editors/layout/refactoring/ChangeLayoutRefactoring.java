@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,10 +35,11 @@ import static com.android.SdkConstants.VALUE_FALSE;
 import static com.android.SdkConstants.VALUE_VERTICAL;
 import static com.android.SdkConstants.VALUE_WRAP_CONTENT;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.xml.XmlFormatStyle;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.descriptors.AttributeDescriptor;
@@ -76,18 +74,17 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.xml.XmlFormatStyle;
 
 /**
  * Converts the selected layout into a layout of a different type.
  */
 @SuppressWarnings("restriction") // XML model
 public class ChangeLayoutRefactoring extends VisualRefactoring {
-    private static final String KEY_TYPE = "type";       //$NON-NLS-1$
+    private static final String KEY_TYPE = "type"; //$NON-NLS-1$
     private static final String KEY_FLATTEN = "flatten"; //$NON-NLS-1$
 
     private String mTypeFqcn;
@@ -106,22 +103,18 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
     }
 
     @VisibleForTesting
-	public
-    ChangeLayoutRefactoring(List<Element> selectedElements, LayoutEditorDelegate delegate) {
+    public ChangeLayoutRefactoring(List<Element> selectedElements, LayoutEditorDelegate delegate) {
         super(selectedElements, delegate);
     }
 
-    public ChangeLayoutRefactoring(
-            IFile file,
-            LayoutEditorDelegate delegate,
-            ITextSelection selection,
+    public ChangeLayoutRefactoring(IFile file, LayoutEditorDelegate delegate, ITextSelection selection,
             ITreeSelection treeSelection) {
         super(file, delegate, selection, treeSelection);
     }
 
     @Override
-    public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+    public RefactoringStatus checkInitialConditions(IProgressMonitor pm)
+            throws CoreException, OperationCanceledException {
         RefactoringStatus status = new RefactoringStatus();
 
         try {
@@ -148,8 +141,7 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
     @Override
     protected VisualRefactoringDescriptor createDescriptor() {
         String comment = getName();
-        return new Descriptor(
-                mProject.getName(), //project
+        return new Descriptor(mProject.getName(), //project
                 comment, //description
                 comment, //comment
                 createArgumentMap());
@@ -190,13 +182,11 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
         // overlay children are replaced by their first element children
         for (Element element : elements) {
             String tagName = element.getTagName();
-            if (tagName.equals(GESTURE_OVERLAY_VIEW)
-                    || tagName.equals(FQCN_GESTURE_OVERLAY_VIEW)) {
+            if (tagName.equals(GESTURE_OVERLAY_VIEW) || tagName.equals(FQCN_GESTURE_OVERLAY_VIEW)) {
                 List<Element> replacement = new ArrayList<Element>(elements.size());
                 for (Element e : elements) {
                     tagName = e.getTagName();
-                    if (tagName.equals(GESTURE_OVERLAY_VIEW)
-                            || tagName.equals(FQCN_GESTURE_OVERLAY_VIEW)) {
+                    if (tagName.equals(GESTURE_OVERLAY_VIEW) || tagName.equals(FQCN_GESTURE_OVERLAY_VIEW)) {
                         NodeList children = e.getChildNodes();
                         Element first = null;
                         for (int i = 0, n = children.getLength(); i < n; i++) {
@@ -221,7 +211,7 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
 
     @Override
     @NonNull
-	public List<Change> computeChanges(IProgressMonitor monitor) {
+    public List<Change> computeChanges(IProgressMonitor monitor) {
         String name = getViewClass(mTypeFqcn);
 
         IFile file = mDelegate.getEditor().getInputFile();
@@ -256,8 +246,7 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
             try {
                 IStructuredDocument doc = model.getStructuredDocument();
                 if (doc != null) {
-                    List<TextEdit> replaceIds = replaceIds(getAndroidNamespacePrefix(), doc,
-                            mSelectionStart,
+                    List<TextEdit> replaceIds = replaceIds(getAndroidNamespacePrefix(), doc, mSelectionStart,
                             mSelectionEnd, oldId, newId);
                     for (TextEdit edit : replaceIds) {
                         rootEdit.addChild(edit);
@@ -316,8 +305,7 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
                     namespaceUri = ANDROID_URI;
                     attribute = attribute.substring(SdkConstants.ANDROID_NS_NAME_PREFIX.length());
                 }
-                setAttribute(rootEdit, layout, namespaceUri,
-                        prefix, attribute, value);
+                setAttribute(rootEdit, layout, namespaceUri, prefix, attribute, value);
             }
         }
 
@@ -333,8 +321,8 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
     }
 
     /** Checks whether we need to add any missing attributes on the elements */
-    private void addMissingWrapContentAttributes(MultiTextEdit rootEdit, Element layout,
-            String oldType, String newType, Set<Element> skip) {
+    private void addMissingWrapContentAttributes(MultiTextEdit rootEdit, Element layout, String oldType, String newType,
+            Set<Element> skip) {
         if (oldType.equals(FQCN_GRID_LAYOUT) && !newType.equals(FQCN_GRID_LAYOUT)) {
             String namespace = getAndroidNamespacePrefix();
 
@@ -344,12 +332,10 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
                 }
 
                 if (!child.hasAttributeNS(ANDROID_URI, ATTR_LAYOUT_WIDTH)) {
-                    setAttribute(rootEdit, child, ANDROID_URI,
-                            namespace, ATTR_LAYOUT_WIDTH, VALUE_WRAP_CONTENT);
+                    setAttribute(rootEdit, child, ANDROID_URI, namespace, ATTR_LAYOUT_WIDTH, VALUE_WRAP_CONTENT);
                 }
                 if (!child.hasAttributeNS(ANDROID_URI, ATTR_LAYOUT_HEIGHT)) {
-                    setAttribute(rootEdit, child, ANDROID_URI,
-                            namespace, ATTR_LAYOUT_HEIGHT, VALUE_WRAP_CONTENT);
+                    setAttribute(rootEdit, child, ANDROID_URI, namespace, ATTR_LAYOUT_HEIGHT, VALUE_WRAP_CONTENT);
                 }
             }
         }
@@ -381,11 +367,9 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
 
                         if (open != -1 && close != -1) {
                             int oldLength = oldName.length();
-                            rootEdit.addChild(new ReplaceEdit(mSelectionStart + open, oldLength,
-                                    TABLE_ROW));
+                            rootEdit.addChild(new ReplaceEdit(mSelectionStart + open, oldLength, TABLE_ROW));
                             if (close != open) { // Gracefully handle <FooLayout/>
-                                rootEdit.addChild(new ReplaceEdit(mSelectionStart + close,
-                                        oldLength, TABLE_ROW));
+                                rootEdit.addChild(new ReplaceEdit(mSelectionStart + close, oldLength, TABLE_ROW));
                             }
                         }
                     } // else: WRAP in TableLayout!
@@ -394,13 +378,12 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
         }
     }
 
-     /** Hand coded conversion from a LinearLayout to a RelativeLayout */
+    /** Hand coded conversion from a LinearLayout to a RelativeLayout */
     private void convertLinearToRelative(MultiTextEdit rootEdit) {
         // This can be done accurately.
         Element layout = getPrimaryElement();
         // Horizontal is the default, so if no value is specified it is horizontal.
-        boolean isVertical = VALUE_VERTICAL.equals(layout.getAttributeNS(ANDROID_URI,
-                ATTR_ORIENTATION));
+        boolean isVertical = VALUE_VERTICAL.equals(layout.getAttributeNS(ANDROID_URI, ATTR_ORIENTATION));
 
         String attributePrefix = getAndroidNamespacePrefix();
 
@@ -418,8 +401,7 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
                     Element child = (Element) node;
                     String id = ensureHasId(rootEdit, child, null);
                     if (prevId != null) {
-                        setAttribute(rootEdit, child, ANDROID_URI, attributePrefix,
-                                ATTR_LAYOUT_BELOW, prevId);
+                        setAttribute(rootEdit, child, ANDROID_URI, attributePrefix, ATTR_LAYOUT_BELOW, prevId);
                     }
                     prevId = id;
                 }
@@ -427,8 +409,7 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
         } else {
             // Align each child to the left
             NodeList children = layout.getChildNodes();
-            boolean isBaselineAligned =
-                !VALUE_FALSE.equals(layout.getAttributeNS(ANDROID_URI, ATTR_BASELINE_ALIGNED));
+            boolean isBaselineAligned = !VALUE_FALSE.equals(layout.getAttributeNS(ANDROID_URI, ATTR_BASELINE_ALIGNED));
 
             String prevId = null;
             for (int i = 0, n = children.getLength(); i < n; i++) {
@@ -437,11 +418,10 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
                     Element child = (Element) node;
                     String id = ensureHasId(rootEdit, child, null);
                     if (prevId != null) {
-                        setAttribute(rootEdit, child, ANDROID_URI, attributePrefix,
-                                ATTR_LAYOUT_TO_RIGHT_OF, prevId);
+                        setAttribute(rootEdit, child, ANDROID_URI, attributePrefix, ATTR_LAYOUT_TO_RIGHT_OF, prevId);
                         if (isBaselineAligned) {
-                            setAttribute(rootEdit, child, ANDROID_URI, attributePrefix,
-                                    ATTR_LAYOUT_ALIGN_BASELINE, prevId);
+                            setAttribute(rootEdit, child, ANDROID_URI, attributePrefix, ATTR_LAYOUT_ALIGN_BASELINE,
+                                    prevId);
                         }
                     }
                     prevId = id;
@@ -494,8 +474,7 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
      *            to
      * @param layout the layout to be converted
      */
-    private void convertGeneric(MultiTextEdit rootEdit, String oldType, String newType,
-            Element layout) {
+    private void convertGeneric(MultiTextEdit rootEdit, String oldType, String newType, Element layout) {
         // TODO: Add hooks for 3rd party conversions getting registered through the
         // IViewRule interface.
 
@@ -514,8 +493,7 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
         removeUndefinedAttrs(rootEdit, layout, true /*removeLayoutAttrs*/);
     }
 
-    private void removeUndefinedAttrs(MultiTextEdit rootEdit, Element layout,
-            boolean removeLayoutAttrs) {
+    private void removeUndefinedAttrs(MultiTextEdit rootEdit, Element layout, boolean removeLayoutAttrs) {
         ViewElementDescriptor descriptor = getElementDescriptor(mTypeFqcn);
         if (descriptor == null) {
             return;
@@ -547,7 +525,7 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
                                 // operation abort
                                 AndmoreAndroidPlugin.log(IStatus.WARNING,
                                         "Could not remove unsupported attribute %1$s; " + //$NON-NLS-1$
-                                        "already modified during refactoring?", //$NON-NLS-1$
+                                                "already modified during refactoring?", //$NON-NLS-1$
                                         attribute.getLocalName());
                             }
                         }
@@ -570,8 +548,7 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
             Node attributeNode = attributeMap.item(i);
 
             String name = attributeNode.getLocalName();
-            if (!name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)
-                    && ANDROID_URI.equals(attributeNode.getNamespaceURI())) {
+            if (!name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX) && ANDROID_URI.equals(attributeNode.getNamespaceURI())) {
                 if (!defined.contains(name)) {
                     // Remove it
                     removeAttribute(rootEdit, layout, ANDROID_URI, name);
@@ -591,8 +568,8 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
             rootView = viewHierarchy.getRoot();
         }
 
-        RelativeLayoutConversionHelper helper =
-            new RelativeLayoutConversionHelper(this, layout, mFlatten, rootEdit, rootView);
+        RelativeLayoutConversionHelper helper = new RelativeLayoutConversionHelper(this, layout, mFlatten, rootEdit,
+                rootView);
         helper.convertToRelative();
         List<Element> deletedElements = helper.getDeletedElements();
         Set<Element> deleted = null;
@@ -613,14 +590,12 @@ public class ChangeLayoutRefactoring extends VisualRefactoring {
             rootView = viewHierarchy.getRoot();
         }
 
-        GridLayoutConverter converter = new GridLayoutConverter(this, layout, mFlatten,
-                rootEdit, rootView);
+        GridLayoutConverter converter = new GridLayoutConverter(this, layout, mFlatten, rootEdit, rootView);
         converter.convertToGridLayout();
     }
 
     public static class Descriptor extends VisualRefactoringDescriptor {
-        public Descriptor(String project, String description, String comment,
-                Map<String, String> arguments) {
+        public Descriptor(String project, String description, String comment, Map<String, String> arguments) {
             super("org.eclipse.andmore.refactoring.convert", //$NON-NLS-1$
                     project, description, comment, arguments);
         }

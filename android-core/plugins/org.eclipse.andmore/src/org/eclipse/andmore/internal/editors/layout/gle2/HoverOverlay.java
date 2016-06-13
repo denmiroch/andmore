@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,12 +16,12 @@ package org.eclipse.andmore.internal.editors.layout.gle2;
 import static org.eclipse.andmore.internal.editors.layout.gle2.SwtDrawingStyle.HOVER;
 import static org.eclipse.andmore.internal.editors.layout.gle2.SwtDrawingStyle.HOVER_SELECTION;
 
+import java.util.List;
+
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
-
-import java.util.List;
 
 /**
  * The {@link HoverOverlay} paints an optional hover on top of the layout,
@@ -83,12 +80,10 @@ public class HoverOverlay extends Overlay {
         }
 
         if (SwtDrawingStyle.HOVER_SELECTION.getStrokeColor() != null) {
-            mHoverSelectStrokeColor = new Color(device,
-                    SwtDrawingStyle.HOVER_SELECTION.getStrokeColor());
+            mHoverSelectStrokeColor = new Color(device, SwtDrawingStyle.HOVER_SELECTION.getStrokeColor());
         }
         if (SwtDrawingStyle.HOVER_SELECTION.getFillColor() != null) {
-            mHoverSelectFillColor = new Color(device,
-                    SwtDrawingStyle.HOVER_SELECTION.getFillColor());
+            mHoverSelectFillColor = new Color(device, SwtDrawingStyle.HOVER_SELECTION.getFillColor());
         }
     }
 
@@ -150,7 +145,6 @@ public class HoverOverlay extends Overlay {
             int w = mHScale.scale(mHoverRect.width);
             int h = mVScale.scale(mHoverRect.height);
 
-
             boolean hoverIsSelected = false;
             List<SelectionItem> selections = mCanvas.getSelectionManager().getSelections();
             for (SelectionItem item : selections) {
@@ -166,18 +160,15 @@ public class HoverOverlay extends Overlay {
             if (stroke != null) {
                 int oldAlpha = gc.getAlpha();
                 gc.setForeground(stroke);
-                gc.setLineStyle(hoverIsSelected ?
-                        HOVER_SELECTION.getLineStyle() : HOVER.getLineStyle());
-                gc.setAlpha(hoverIsSelected ?
-                        HOVER_SELECTION.getStrokeAlpha() : HOVER.getStrokeAlpha());
+                gc.setLineStyle(hoverIsSelected ? HOVER_SELECTION.getLineStyle() : HOVER.getLineStyle());
+                gc.setAlpha(hoverIsSelected ? HOVER_SELECTION.getStrokeAlpha() : HOVER.getStrokeAlpha());
                 gc.drawRectangle(x, y, w, h);
                 gc.setAlpha(oldAlpha);
             }
 
             if (fill != null) {
                 int oldAlpha = gc.getAlpha();
-                gc.setAlpha(hoverIsSelected ?
-                        HOVER_SELECTION.getFillAlpha() : HOVER.getFillAlpha());
+                gc.setAlpha(hoverIsSelected ? HOVER_SELECTION.getFillAlpha() : HOVER.getFillAlpha());
                 gc.setBackground(fill);
                 gc.fillRectangle(x, y, w, h);
                 gc.setAlpha(oldAlpha);

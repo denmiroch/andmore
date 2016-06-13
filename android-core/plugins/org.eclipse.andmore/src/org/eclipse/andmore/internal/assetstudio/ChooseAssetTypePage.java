@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.assetstudio;
-
-import com.android.resources.ResourceFolderType;
 
 import org.eclipse.andmore.internal.project.ProjectChooserHelper;
 import org.eclipse.andmore.internal.project.ProjectChooserHelper.ProjectCombo;
@@ -37,6 +32,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import com.android.resources.ResourceFolderType;
 
 /** Page for choosing the type of asset to create, as well as the target project */
 public class ChooseAssetTypePage extends WizardPage implements SelectionListener, ModifyListener {
@@ -87,8 +84,7 @@ public class ChooseAssetTypePage extends WizardPage implements SelectionListener
         projectLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         projectLabel.setText("Project:");
 
-        ProjectChooserHelper helper =
-                new ProjectChooserHelper(getShell(), null /* filter */);
+        ProjectChooserHelper helper = new ProjectChooserHelper(getShell(), null /* filter */);
         mProjectButton = new ProjectCombo(helper, container, mValues.project);
         mProjectButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
         mProjectButton.addSelectionListener(this);
@@ -163,9 +159,7 @@ public class ChooseAssetTypePage extends WizardPage implements SelectionListener
         } else if (source == mClipboardButton) {
             Clipboard clipboard = new Clipboard(getShell().getDisplay());
             TextTransfer textTransfer = TextTransfer.getInstance();
-            clipboard.setContents(
-                    new Object[] { mResourceName.getText() },
-                    new Transfer[] { textTransfer });
+            clipboard.setContents(new Object[] { mResourceName.getText() }, new Transfer[] { textTransfer });
             clipboard.dispose();
         } else if (source instanceof Button) {
             // User selected a different asset type to be created
@@ -179,8 +173,7 @@ public class ChooseAssetTypePage extends WizardPage implements SelectionListener
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 
     @Override
     public void modifyText(ModifyEvent e) {
@@ -208,8 +201,7 @@ public class ChooseAssetTypePage extends WizardPage implements SelectionListener
             if (outputName == null || outputName.length() == 0) {
                 error = "Please enter a name";
             } else {
-                ResourceNameValidator validator =
-                        ResourceNameValidator.create(true, ResourceFolderType.DRAWABLE);
+                ResourceNameValidator validator = ResourceNameValidator.create(true, ResourceFolderType.DRAWABLE);
                 error = validator.isValid(outputName);
             }
         }

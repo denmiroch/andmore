@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -75,16 +72,11 @@ public class ConfigurationMatcher {
     private final boolean mUpdateUi;
 
     ConfigurationMatcher(ConfigurationChooser chooser) {
-        this(chooser, chooser.getConfiguration(), chooser.getEditedFile(),
-                chooser.getResources(), true);
+        this(chooser, chooser.getConfiguration(), chooser.getEditedFile(), chooser.getResources(), true);
     }
 
-    ConfigurationMatcher(
-            @NonNull ConfigurationChooser chooser,
-            @NonNull Configuration configuration,
-            @Nullable IFile editedFile,
-            @Nullable ProjectResources resources,
-            boolean updateUi) {
+    ConfigurationMatcher(@NonNull ConfigurationChooser chooser, @NonNull Configuration configuration,
+            @Nullable IFile editedFile, @Nullable ProjectResources resources, boolean updateUi) {
         mConfigChooser = chooser;
         mConfiguration = configuration;
         mEditedFile = editedFile;
@@ -119,8 +111,8 @@ public class ConfigurationMatcher {
         final State state;
         final ConfigBundle bundle;
 
-        public ConfigMatch(@NonNull FolderConfiguration testConfig, @NonNull Device device,
-                @NonNull State state, @NonNull ConfigBundle bundle) {
+        public ConfigMatch(@NonNull FolderConfiguration testConfig, @NonNull Device device, @NonNull State state,
+                @NonNull ConfigBundle bundle) {
             this.testConfig = testConfig;
             this.device = device;
             this.state = state;
@@ -144,8 +136,7 @@ public class ConfigurationMatcher {
      * given config.
      */
     public boolean isCurrentFileBestMatchFor(FolderConfiguration config) {
-        ResourceFile match = mResources.getMatchingFile(mEditedFile.getName(),
-                ResourceType.LAYOUT, config);
+        ResourceFile match = mResources.getMatchingFile(mEditedFile.getName(), ResourceType.LAYOUT, config);
 
         if (match != null) {
             return match.getFile().equals(mEditedFile);
@@ -196,18 +187,18 @@ public class ConfigurationMatcher {
             int localeIndex = -1;
             Device device = mConfiguration.getDevice();
             if (device != null) {
-                mainloop: for (State state : device.getAllStates()) {
+                mainloop:
+                for (State state : device.getAllStates()) {
                     testConfig.set(DeviceConfigHelper.getFolderConfig(state));
 
                     // loop on the locales.
-                    for (int i = 0 ; i < localeList.size() ; i++) {
+                    for (int i = 0; i < localeList.size(); i++) {
                         Locale locale = localeList.get(i);
 
                         // update the test config with the locale qualifiers
                         testConfig.setLocaleQualifier(locale.locale);
 
-                        if (editedConfig.isMatchFor(testConfig) &&
-                                isCurrentFileBestMatchFor(testConfig)) {
+                        if (editedConfig.isMatchFor(testConfig) && isCurrentFileBestMatchFor(testConfig)) {
                             matchState = state;
                             localeIndex = i;
                             break mainloop;
@@ -281,7 +272,7 @@ public class ConfigurationMatcher {
             max = localeHostMatch + 1; // test is <
         }
 
-        for (int i = start ; i < max ; i++) {
+        for (int i = start; i < max; i++) {
             Locale l = localeList.get(i);
 
             ConfigBundle bundle = new ConfigBundle();
@@ -333,17 +324,14 @@ public class ConfigurationMatcher {
                 // quick check
                 if (!editedConfig.isMatchFor(currentConfig)) {
                     AndmoreAndroidPlugin.log(IStatus.ERROR,
-                        "favorCurrentConfig can only be true if the current config is compatible");
+                            "favorCurrentConfig can only be true if the current config is compatible");
                 }
 
                 // just display the warning
                 AndmoreAndroidPlugin.printErrorToConsole(mEditedFile.getProject(),
-                        String.format(
-                                "'%1$s' is not a best match for any device/locale combination.",
+                        String.format("'%1$s' is not a best match for any device/locale combination.",
                                 editedConfig.toDisplayString()),
-                        String.format(
-                                "Displaying it with '%1$s'",
-                                currentConfig.toDisplayString()));
+                        String.format("Displaying it with '%1$s'", currentConfig.toDisplayString()));
             } else if (anyMatches.size() > 0) {
                 // select the best device anyway.
                 ConfigMatch match = selectConfigMatch(anyMatches);
@@ -351,8 +339,7 @@ public class ConfigurationMatcher {
                 mConfiguration.setDeviceState(match.state, true);
                 mConfiguration.setLocale(localeList.get(match.bundle.localeIndex), true);
                 mConfiguration.setUiMode(UiMode.getByIndex(match.bundle.dockModeIndex), true);
-                mConfiguration.setNightMode(NightMode.getByIndex(match.bundle.nightModeIndex),
-                        true);
+                mConfiguration.setNightMode(NightMode.getByIndex(match.bundle.nightModeIndex), true);
 
                 if (mUpdateUi) {
                     mConfigChooser.selectDevice(mConfiguration.getDevice());
@@ -364,13 +351,10 @@ public class ConfigurationMatcher {
 
                 // TODO: display a better warning!
                 AndmoreAndroidPlugin.printErrorToConsole(mEditedFile.getProject(),
-                        String.format(
-                                "'%1$s' is not a best match for any device/locale combination.",
+                        String.format("'%1$s' is not a best match for any device/locale combination.",
                                 editedConfig.toDisplayString()),
-                        String.format(
-                                "Displaying it with '%1$s' which is compatible, but will " +
-                                "actually be displayed with another more specific version of " +
-                                "the layout.",
+                        String.format("Displaying it with '%1$s' which is compatible, but will "
+                                + "actually be displayed with another more specific version of " + "the layout.",
                                 currentConfig.toDisplayString()));
 
             } else {
@@ -403,8 +387,7 @@ public class ConfigurationMatcher {
             if (target != null) {
                 int apiLevel = target.getVersion().getApiLevel();
                 for (ConfigBundle bundle : configBundles) {
-                    bundle.config.setVersionQualifier(
-                            new VersionQualifier(apiLevel));
+                    bundle.config.setVersionQualifier(new VersionQualifier(apiLevel));
                 }
             }
         }
@@ -462,7 +445,8 @@ public class ConfigurationMatcher {
                 // contains FAKE_REGION_VALUE). If we don't find a perfect region match
                 // we take the fake region. Since it's last in the list, this makes the
                 // test easy.
-                if (localeQ.getLanguage().equals(currentLanguage) && (localeQ.getRegion().equals(currentRegion) || localeQ.hasRegion())) { 
+                if (localeQ.getLanguage().equals(currentLanguage)
+                        && (localeQ.getRegion().equals(currentRegion) || localeQ.hasRegion())) {
                     return l;
                 }
             }
@@ -544,8 +528,7 @@ public class ConfigurationMatcher {
                     return projectTarget;
                 }
 
-                if (projectTarget.getVersion().isPreview()
-                        && projectTarget.hasRenderingLibrary()) {
+                if (projectTarget.getVersion().isPreview() && projectTarget.hasRenderingLibrary()) {
                     // If the project target is a preview version, then just use it
                     return projectTarget;
                 }
@@ -602,8 +585,7 @@ public class ConfigurationMatcher {
      * (this can only happen if the states don't have a single qualifier that is the same).
      */
     @Nullable
-    static String getClosestMatch(@NonNull FolderConfiguration oldConfig,
-            @NonNull List<State> states) {
+    static String getClosestMatch(@NonNull FolderConfiguration oldConfig, @NonNull List<State> states) {
 
         // create 2 lists as we're going to go through one and put the
         // candidates in the other.
@@ -613,15 +595,14 @@ public class ConfigurationMatcher {
         list1.addAll(states);
 
         final int count = FolderConfiguration.getQualifierCount();
-        for (int i = 0 ; i < count ; i++) {
+        for (int i = 0; i < count; i++) {
             // compute the new candidate list by only taking states that have
             // the same i-th qualifier as the old state
             for (State s : list1) {
                 ResourceQualifier oldQualifier = oldConfig.getQualifier(i);
 
                 FolderConfiguration folderConfig = DeviceConfigHelper.getFolderConfig(s);
-                ResourceQualifier newQualifier =
-                        folderConfig != null ? folderConfig.getQualifier(i) : null;
+                ResourceQualifier newQualifier = folderConfig != null ? folderConfig.getQualifier(i) : null;
 
                 if (oldQualifier == null) {
                     if (newQualifier == null) {
@@ -720,14 +701,12 @@ public class ConfigurationMatcher {
 
             if (ss1 == ScreenSize.XLARGE) {
                 if (ss2 == ScreenSize.XLARGE) {
-                    ScreenOrientationQualifier orientation1 =
-                            config1.getScreenOrientationQualifier();
+                    ScreenOrientationQualifier orientation1 = config1.getScreenOrientationQualifier();
                     ScreenOrientation so1 = orientation1.getValue();
                     if (so1 == null) {
                         so1 = ScreenOrientation.PORTRAIT;
                     }
-                    ScreenOrientationQualifier orientation2 =
-                            config2.getScreenOrientationQualifier();
+                    ScreenOrientationQualifier orientation2 = config2.getScreenOrientationQualifier();
                     ScreenOrientation so2 = orientation2.getValue();
                     if (so2 == null) {
                         so2 = ScreenOrientation.PORTRAIT;
@@ -764,10 +743,10 @@ public class ConfigurationMatcher {
 
         public PhoneConfigComparator() {
             // put the sort order for the density.
-            mDensitySort.put(Density.HIGH.getDpiValue(),   1);
+            mDensitySort.put(Density.HIGH.getDpiValue(), 1);
             mDensitySort.put(Density.MEDIUM.getDpiValue(), 2);
-            mDensitySort.put(Density.XHIGH.getDpiValue(),  3);
-            mDensitySort.put(Density.LOW.getDpiValue(),    4);
+            mDensitySort.put(Density.XHIGH.getDpiValue(), 3);
+            mDensitySort.put(Density.LOW.getDpiValue(), 4);
         }
 
         @Override
@@ -804,8 +783,7 @@ public class ConfigurationMatcher {
             if (dpi1 == dpi2) {
                 // portrait is better
                 ScreenOrientation so1 = ScreenOrientation.PORTRAIT;
-                ScreenOrientationQualifier orientationQualifier1 =
-                        config1.getScreenOrientationQualifier();
+                ScreenOrientationQualifier orientationQualifier1 = config1.getScreenOrientationQualifier();
                 if (orientationQualifier1 != null) {
                     so1 = orientationQualifier1.getValue();
                     if (so1 == null) {
@@ -813,8 +791,7 @@ public class ConfigurationMatcher {
                     }
                 }
                 ScreenOrientation so2 = ScreenOrientation.PORTRAIT;
-                ScreenOrientationQualifier orientationQualifier2 =
-                        config2.getScreenOrientationQualifier();
+                ScreenOrientationQualifier orientationQualifier2 = config2.getScreenOrientationQualifier();
                 if (orientationQualifier2 != null) {
                     so2 = orientationQualifier2.getValue();
                     if (so2 == null) {

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +13,9 @@
 
 package org.eclipse.andmore.internal.editors;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.internal.editors.formatting.AndroidXmlFormatter;
 import org.eclipse.andmore.internal.editors.formatting.AndroidXmlFormattingStrategy;
@@ -36,14 +36,10 @@ import org.eclipse.wst.xml.core.text.IXMLPartitions;
 import org.eclipse.wst.xml.ui.StructuredTextViewerConfigurationXML;
 import org.eclipse.wst.xml.ui.internal.contentassist.XMLContentAssistProcessor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Base Source Viewer Configuration for Android resources.
  */
-@SuppressWarnings({"restriction", "deprecation"}) // XMLContentAssistProcessor etc
+@SuppressWarnings({ "restriction", "deprecation" }) // XMLContentAssistProcessor etc
 public abstract class AndroidSourceViewerConfig extends StructuredTextViewerConfigurationXML {
 
     public AndroidSourceViewerConfig() {
@@ -62,8 +58,7 @@ public abstract class AndroidSourceViewerConfig extends StructuredTextViewerConf
      *
      * @return An {@link IContentAssistProcessor} or null.
      */
-    public abstract IContentAssistProcessor getAndroidContentAssistProcessor(
-            ISourceViewer sourceViewer,
+    public abstract IContentAssistProcessor getAndroidContentAssistProcessor(ISourceViewer sourceViewer,
             String partitionType);
 
     /**
@@ -77,23 +72,20 @@ public abstract class AndroidSourceViewerConfig extends StructuredTextViewerConf
      * @return IContentAssistProcessors or null if should not be supported
      */
     @Override
-    protected IContentAssistProcessor[] getContentAssistProcessors(
-            ISourceViewer sourceViewer, String partitionType) {
+    protected IContentAssistProcessor[] getContentAssistProcessors(ISourceViewer sourceViewer, String partitionType) {
         ArrayList<IContentAssistProcessor> processors = new ArrayList<IContentAssistProcessor>();
-        if (partitionType == IStructuredPartitions.UNKNOWN_PARTITION ||
-            partitionType == IStructuredPartitions.DEFAULT_PARTITION ||
-            partitionType == IXMLPartitions.XML_DEFAULT) {
+        if (partitionType == IStructuredPartitions.UNKNOWN_PARTITION
+                || partitionType == IStructuredPartitions.DEFAULT_PARTITION
+                || partitionType == IXMLPartitions.XML_DEFAULT) {
 
-            IContentAssistProcessor processor =
-                getAndroidContentAssistProcessor(sourceViewer, partitionType);
+            IContentAssistProcessor processor = getAndroidContentAssistProcessor(sourceViewer, partitionType);
 
             if (processor != null) {
                 processors.add(processor);
             }
         }
 
-        IContentAssistProcessor[] others = super.getContentAssistProcessors(sourceViewer,
-                partitionType);
+        IContentAssistProcessor[] others = super.getContentAssistProcessors(sourceViewer, partitionType);
         if (others != null && others.length > 0) {
             for (IContentAssistProcessor p : others) {
                 // Builtin Eclipse WTP code completion assistant? If so,
@@ -103,8 +95,7 @@ public abstract class AndroidSourceViewerConfig extends StructuredTextViewerConf
                         // and instead org.eclipse.wst.xml.ui.internal.contentassist.
                         // XMLStructuredContentAssistProcessor is used - which isn't available
                         // at compile time in 3.5.
-                        || p.getClass().getSimpleName().equals(
-                            "XMLStructuredContentAssistProcessor")) { //$NON-NLS-1$
+                        || p.getClass().getSimpleName().equals("XMLStructuredContentAssistProcessor")) { //$NON-NLS-1$
                     processors.add(new FilteringContentAssistProcessor(p));
                 } else {
                     processors.add(p);
@@ -126,8 +117,7 @@ public abstract class AndroidSourceViewerConfig extends StructuredTextViewerConf
     }
 
     @Override
-    public IAutoEditStrategy[] getAutoEditStrategies(
-            ISourceViewer sourceViewer, String contentType) {
+    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
         IAutoEditStrategy[] strategies = super.getAutoEditStrategies(sourceViewer, contentType);
         List<IAutoEditStrategy> s = new ArrayList<IAutoEditStrategy>(strategies.length + 1);
         s.add(new AndroidXmlAutoEditStrategy());
@@ -149,8 +139,7 @@ public abstract class AndroidSourceViewerConfig extends StructuredTextViewerConf
         IContentFormatter formatter = super.getContentFormatter(sourceViewer);
 
         if (formatter instanceof MultiPassContentFormatter) {
-            ((MultiPassContentFormatter) formatter).setMasterStrategy(
-                    new AndroidXmlFormattingStrategy());
+            ((MultiPassContentFormatter) formatter).setMasterStrategy(new AndroidXmlFormattingStrategy());
             return formatter;
         } else {
             return new AndroidXmlFormatter();
@@ -186,20 +175,18 @@ public abstract class AndroidSourceViewerConfig extends StructuredTextViewerConf
                 return null;
             }
 
-            List<ICompletionProposal> proposals =
-                new ArrayList<ICompletionProposal>(result.length);
+            List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(result.length);
             for (ICompletionProposal proposal : result) {
                 String replacement = proposal.getDisplayString();
-                if (replacement.charAt(0) == '"' &&
-                        replacement.charAt(replacement.length() - 1) == '"') {
+                if (replacement.charAt(0) == '"' && replacement.charAt(replacement.length() - 1) == '"') {
                     // Filter out attribute values. In Android XML files (where there is no DTD
                     // etc) the default Eclipse XML code completion simply provides the
                     // existing value as a completion. This is often misleading, since if you
                     // for example have a typo, completion will show your current (wrong)
                     // value as a valid completion.
-                } else if (replacement.contains("Namespace")  //$NON-NLS-1$
-                        || replacement.startsWith("XSL ")  //$NON-NLS-1$
-                        || replacement.contains("Schema")) {  //$NON-NLS-1$
+                } else if (replacement.contains("Namespace") //$NON-NLS-1$
+                        || replacement.startsWith("XSL ") //$NON-NLS-1$
+                        || replacement.contains("Schema")) { //$NON-NLS-1$
                     // Eclipse adds in a number of namespace and schema related completions which
                     // are not usually applicable in our files.
                 } else {

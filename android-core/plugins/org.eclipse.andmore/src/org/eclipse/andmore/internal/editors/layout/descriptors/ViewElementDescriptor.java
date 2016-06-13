@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +19,9 @@ import static com.android.SdkConstants.ANDROID_WIDGET_PREFIX;
 import static com.android.SdkConstants.VIEW;
 import static com.android.SdkConstants.VIEW_TAG;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.common.resources.platform.AttributeInfo;
 import org.eclipse.andmore.internal.editors.IconFactory;
@@ -30,9 +30,6 @@ import org.eclipse.andmore.internal.editors.descriptors.ElementDescriptor;
 import org.eclipse.andmore.internal.editors.layout.uimodel.UiViewElementNode;
 import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
 import org.eclipse.swt.graphics.Image;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * {@link ViewElementDescriptor} describes the properties expected for a given XML element node
@@ -89,11 +86,9 @@ public class ViewElementDescriptor extends ElementDescriptor {
      *  UI node MUST have an XML node attached and it will cease to exist when the XML node
      *  ceases to exist.
      */
-    public ViewElementDescriptor(String xml_name, String ui_name,
-            String fullClassName,
-            String tooltip, String sdk_url,
-            AttributeDescriptor[] attributes, AttributeDescriptor[] layoutAttributes,
-            ElementDescriptor[] children, boolean mandatory) {
+    public ViewElementDescriptor(String xml_name, String ui_name, String fullClassName, String tooltip, String sdk_url,
+            AttributeDescriptor[] attributes, AttributeDescriptor[] layoutAttributes, ElementDescriptor[] children,
+            boolean mandatory) {
         super(xml_name, ui_name, tooltip, sdk_url, attributes, children, mandatory);
         mFullClassName = fullClassName;
         mLayoutAttributes = layoutAttributes != null ? layoutAttributes : new AttributeDescriptor[0];
@@ -217,7 +212,7 @@ public class ViewElementDescriptor extends ElementDescriptor {
      * @return a non null list of attribute sources for this view
      */
     public List<String> getAttributeSources() {
-        return mAttributeSources != null ? mAttributeSources : Collections.<String>emptyList();
+        return mAttributeSources != null ? mAttributeSources : Collections.<String> emptyList();
     }
 
     /**
@@ -241,8 +236,7 @@ public class ViewElementDescriptor extends ElementDescriptor {
      *         tag
      */
     public static boolean viewNeedsPackage(String fqcn) {
-        return !(fqcn.startsWith(ANDROID_WIDGET_PREFIX)
-              || fqcn.startsWith(ANDROID_VIEW_PKG)
-              || fqcn.startsWith(ANDROID_WEBKIT_PKG));
+        return !(fqcn.startsWith(ANDROID_WIDGET_PREFIX) || fqcn.startsWith(ANDROID_VIEW_PKG)
+                || fqcn.startsWith(ANDROID_WEBKIT_PKG));
     }
 }

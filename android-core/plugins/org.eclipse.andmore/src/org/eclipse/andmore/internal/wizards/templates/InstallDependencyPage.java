@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +12,9 @@
  */
 package org.eclipse.andmore.internal.wizards.templates;
 
-import com.android.utils.Pair;
+import java.io.File;
+import java.net.URL;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.actions.AddSupportJarAction;
@@ -39,9 +38,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 
-import java.io.File;
-import java.net.URL;
-import java.util.List;
+import com.android.utils.Pair;
 
 class InstallDependencyPage extends WizardPage implements SelectionListener {
     /**
@@ -53,8 +50,7 @@ class InstallDependencyPage extends WizardPage implements SelectionListener {
     static final String SUPPORT_LIBRARY_NAME = "android-support-v4"; //$NON-NLS-1$
 
     /** URL containing more info */
-    private static final String URL =
-            "http://developer.android.com/tools/extras/support-library.html"; //$NON-NLS-1$
+    private static final String URL = "http://developer.android.com/tools/extras/support-library.html"; //$NON-NLS-1$
 
     private Button mCheckButton;
     private Button mInstallButton;
@@ -96,9 +92,9 @@ class InstallDependencyPage extends WizardPage implements SelectionListener {
         GridData gd_dependLabel = new GridData(SWT.LEFT, SWT.TOP, true, false, 2, 1);
         gd_dependLabel.widthHint = NewTemplatePage.WIZARD_PAGE_WIDTH - 50;
         dependLabel.setLayoutData(gd_dependLabel);
-        dependLabel.setText("This template depends on the Android Support library, which is " +
-                "either not installed, or the template depends on a more recent version than " +
-                "the one you have installed.");
+        dependLabel.setText("This template depends on the Android Support library, which is "
+                + "either not installed, or the template depends on a more recent version than "
+                + "the one you have installed.");
 
         mLink = new Link(container, SWT.NONE);
         mLink.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 2, 1));
@@ -127,10 +123,9 @@ class InstallDependencyPage extends WizardPage implements SelectionListener {
         GridData gd_descLabel = new GridData(SWT.LEFT, SWT.TOP, true, false, 2, 1);
         gd_descLabel.widthHint = 550;
         descLabel.setLayoutData(gd_descLabel);
-        descLabel.setText(
-                "You can install or upgrade it by clicking the Install button below, or " +
-                "alternatively, you can install it outside of Eclipse with the SDK Manager, " +
-                "then click on \"Check Again\" to proceed.");
+        descLabel.setText("You can install or upgrade it by clicking the Install button below, or "
+                + "alternatively, you can install it outside of Eclipse with the SDK Manager, "
+                + "then click on \"Check Again\" to proceed.");
 
         mInstallButton = new Button(container, SWT.NONE);
         mInstallButton.setText("Install/Upgrade");
@@ -238,8 +233,8 @@ class InstallDependencyPage extends WizardPage implements SelectionListener {
         IStatus status = null;
 
         List<Pair<String, Integer>> dependencies = mTemplate.getDependencies();
-        if (dependencies.size() > 1 || dependencies.size() == 1
-                && !dependencies.get(0).getFirst().equals(SUPPORT_LIBRARY_NAME)) {
+        if (dependencies.size() > 1
+                || dependencies.size() == 1 && !dependencies.get(0).getFirst().equals(SUPPORT_LIBRARY_NAME)) {
             status = new Status(IStatus.WARNING, AndmoreAndroidPlugin.PLUGIN_ID,
                     "Unsupported template dependency: Upgrade your Android Eclipse plugin");
         }
@@ -247,8 +242,7 @@ class InstallDependencyPage extends WizardPage implements SelectionListener {
         setPageComplete(status == null || status.getSeverity() != IStatus.ERROR);
         if (status != null) {
             setMessage(status.getMessage(),
-                    status.getSeverity() == IStatus.ERROR
-                        ? IMessageProvider.ERROR : IMessageProvider.WARNING);
+                    status.getSeverity() == IStatus.ERROR ? IMessageProvider.ERROR : IMessageProvider.WARNING);
         } else {
             setErrorMessage(null);
             setMessage(null);
@@ -285,14 +279,12 @@ class InstallDependencyPage extends WizardPage implements SelectionListener {
                 IWebBrowser browser = workbench.getBrowserSupport().getExternalBrowser();
                 browser.openURL(new URL(URL));
             } catch (Exception ex) {
-                String message = String.format("Could not open browser. Vist\n%1$s\ninstead.",
-                        URL);
+                String message = String.format("Could not open browser. Vist\n%1$s\ninstead.", URL);
                 MessageDialog.openError(getShell(), "Browser Error", message);
             }
         }
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 }

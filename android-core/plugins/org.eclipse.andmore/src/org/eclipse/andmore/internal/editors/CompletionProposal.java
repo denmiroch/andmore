@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +14,8 @@ package org.eclipse.andmore.internal.editors;
 
 import static com.android.SdkConstants.XMLNS;
 
-import com.android.ide.common.api.IAttributeInfo;
-import com.android.utils.XmlUtils;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.descriptors.AttributeDescriptor;
@@ -44,8 +41,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.ide.common.api.IAttributeInfo;
+import com.android.utils.XmlUtils;
 
 /**
  * Just like {@link org.eclipse.jface.text.contentassist.CompletionProposal},
@@ -62,8 +59,7 @@ import java.util.regex.Pattern;
  * basically keep around the maps computed by the attrs.xml parser.
  */
 class CompletionProposal implements ICompletionProposal {
-    private static final Pattern ATTRIBUTE_PATTERN =
-            Pattern.compile("[@?]android:attr/(.*)"); //$NON-NLS-1$
+    private static final Pattern ATTRIBUTE_PATTERN = Pattern.compile("[@?]android:attr/(.*)"); //$NON-NLS-1$
 
     private final AndroidContentAssist mAssist;
     private final Object mChoice;
@@ -78,11 +74,9 @@ class CompletionProposal implements ICompletionProposal {
     private final String mNsUri;
     private String mAdditionalProposalInfo;
 
-    CompletionProposal(AndroidContentAssist assist,
-            Object choice, String replacementString, int replacementOffset,
+    CompletionProposal(AndroidContentAssist assist, Object choice, String replacementString, int replacementOffset,
             int replacementLength, int cursorPosition, Image image, String displayString,
-            IContextInformation contextInformation, String additionalProposalInfo,
-            String nsPrefix, String nsUri) {
+            IContextInformation contextInformation, String additionalProposalInfo, String nsPrefix, String nsUri) {
         assert replacementString != null;
         assert replacementOffset >= 0;
         assert replacementLength >= 0;
@@ -129,7 +123,7 @@ class CompletionProposal implements ICompletionProposal {
     public String getAdditionalProposalInfo() {
         if (mAdditionalProposalInfo == null) {
             if (mChoice instanceof ElementDescriptor) {
-                String tooltip = ((ElementDescriptor)mChoice).getTooltip();
+                String tooltip = ((ElementDescriptor) mChoice).getTooltip();
                 mAdditionalProposalInfo = DescriptorsUtils.formatTooltip(tooltip);
             } else if (mChoice instanceof TextAttributeDescriptor) {
                 mAdditionalProposalInfo = ((TextAttributeDescriptor) mChoice).getTooltip();
@@ -141,11 +135,10 @@ class CompletionProposal implements ICompletionProposal {
                     String attrName = matcher.group(1);
                     AndroidTargetData data = mAssist.getEditor().getTargetData();
                     if (data != null) {
-                        IDescriptorProvider descriptorProvider =
-                            data.getDescriptorProvider(mAssist.getRootDescriptorId());
+                        IDescriptorProvider descriptorProvider = data
+                                .getDescriptorProvider(mAssist.getRootDescriptorId());
                         if (descriptorProvider != null) {
-                            ElementDescriptor[] rootElementDescriptors =
-                                descriptorProvider.getRootElementDescriptors();
+                            ElementDescriptor[] rootElementDescriptors = descriptorProvider.getRootElementDescriptors();
                             for (ElementDescriptor elementDesc : rootElementDescriptors) {
                                 for (AttributeDescriptor desc : elementDesc.getAttributes()) {
                                     String name = desc.getXmlLocalName();

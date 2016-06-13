@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,10 +19,8 @@ import static com.android.SdkConstants.ATTR_NAME;
 import static com.android.SdkConstants.LAYOUT_RESOURCE_PREFIX;
 import static org.eclipse.andmore.internal.editors.layout.gle2.LayoutMetadata.KEY_FRAGMENT_LAYOUT;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.resources.ResourceType;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
@@ -47,8 +42,10 @@ import org.eclipse.swt.widgets.Menu;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.resources.ResourceType;
+import com.android.utils.Pair;
 
 /**
  * Fragment context menu allowing a layout to be chosen for previewing in the fragment frame.
@@ -160,8 +157,7 @@ public class FragmentMenu extends SubmenuAction {
                 if (layouts.size() > 0) {
                     new Separator().fill(menu, -1);
                     for (Pair<String, String> layout : layouts) {
-                        action = new SetFragmentLayoutAction(layout.getFirst(),
-                                layout.getSecond(), selected);
+                        action = new SetFragmentLayoutAction(layout.getFirst(), layout.getSecond(), selected);
                         new ActionContributionItem(action).fill(menu, -1);
                     }
                 }
@@ -203,8 +199,7 @@ public class FragmentMenu extends SubmenuAction {
      */
     @Nullable
     public static String getFragmentLayout(@NonNull Node node) {
-        String layout = LayoutMetadata.getProperty(
-                node, LayoutMetadata.KEY_FRAGMENT_LAYOUT);
+        String layout = LayoutMetadata.getProperty(node, LayoutMetadata.KEY_FRAGMENT_LAYOUT);
         if (layout != null) {
             return layout;
         }
@@ -242,8 +237,7 @@ public class FragmentMenu extends SubmenuAction {
             UiViewElementNode node = item.getViewInfo().getUiViewNode();
             if (node != null) {
                 Node xmlNode = node.getXmlNode();
-                LayoutMetadata.setProperty(delegate.getEditor(), xmlNode, KEY_FRAGMENT_LAYOUT,
-                        layout);
+                LayoutMetadata.setProperty(delegate.getEditor(), xmlNode, KEY_FRAGMENT_LAYOUT, layout);
             }
         }
 
@@ -289,9 +283,8 @@ public class FragmentMenu extends SubmenuAction {
             IFile file = delegate.getEditor().getInputFile();
             GraphicalEditorPart editor = delegate.getGraphicalEditor();
             ResourceChooser dlg = ResourceChooser.create(editor, ResourceType.LAYOUT)
-                .setInputValidator(CyclicDependencyValidator.create(file))
-                .setInitialSize(85, 10)
-                .setCurrentResource(getSelectedLayout());
+                    .setInputValidator(CyclicDependencyValidator.create(file)).setInitialSize(85, 10)
+                    .setCurrentResource(getSelectedLayout());
             int result = dlg.open();
             if (result == ResourceChooser.CLEAR_RETURN_CODE) {
                 setNewLayout(null);

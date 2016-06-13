@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,9 @@
 
 package org.eclipse.andmore.internal.editors.values;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.resources.ResourceFolderType;
-import com.android.xml.AndroidXPathFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -32,9 +28,10 @@ import org.eclipse.ui.PartInitException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.resources.ResourceFolderType;
+import com.android.xml.AndroidXPathFactory;
 
 /**
  * Multi-page form editor for /res/values XML files.
@@ -44,8 +41,7 @@ public class ValuesEditorDelegate extends CommonXmlDelegate {
     public static class Creator implements IDelegateCreator {
         @Override
         @SuppressWarnings("unchecked")
-        public ValuesEditorDelegate createForFile(
-                @NonNull CommonXmlEditor delegator,
+        public ValuesEditorDelegate createForFile(@NonNull CommonXmlEditor delegator,
                 @Nullable ResourceFolderType type) {
             if (ResourceFolderType.VALUES == type) {
                 return new ValuesEditorDelegate(delegator);
@@ -59,9 +55,8 @@ public class ValuesEditorDelegate extends CommonXmlDelegate {
      * Old standalone-editor ID.
      * Use {@link CommonXmlEditor#ID} instead.
      */
-    public static final String LEGACY_EDITOR_ID =
-        AndmoreAndroidConstants.EDITORS_NAMESPACE + ".resources.ResourcesEditor"; //$NON-NLS-1$
-
+    public static final String LEGACY_EDITOR_ID = AndmoreAndroidConstants.EDITORS_NAMESPACE
+            + ".resources.ResourcesEditor"; //$NON-NLS-1$
 
     /**
      * Creates the form editor for resources XML files.
@@ -84,7 +79,7 @@ public class ValuesEditorDelegate extends CommonXmlDelegate {
             AndmoreAndroidPlugin.log(IStatus.ERROR, "Error creating nested page"); //$NON-NLS-1$
             AndmoreAndroidPlugin.getDefault().getLog().log(e.getStatus());
         }
-     }
+    }
 
     /**
      * Processes the new XML Model, which XML root node is given.
@@ -98,13 +93,11 @@ public class ValuesEditorDelegate extends CommonXmlDelegate {
 
         getUiRootNode().setXmlDocument(xml_doc);
         if (xml_doc != null) {
-            ElementDescriptor resources_desc =
-                    ValuesDescriptors.getInstance().getElementDescriptor();
+            ElementDescriptor resources_desc = ValuesDescriptors.getInstance().getElementDescriptor();
             try {
                 XPath xpath = AndroidXPathFactory.newXPath();
-                Node node = (Node) xpath.evaluate("/" + resources_desc.getXmlName(),  //$NON-NLS-1$
-                        xml_doc,
-                        XPathConstants.NODE);
+                Node node = (Node) xpath.evaluate("/" + resources_desc.getXmlName(), //$NON-NLS-1$
+                        xml_doc, XPathConstants.NODE);
                 // Node can be null _or_ it must be the element we searched for.
                 assert node == null || node.getNodeName().equals(resources_desc.getXmlName());
 
@@ -125,8 +118,7 @@ public class ValuesEditorDelegate extends CommonXmlDelegate {
     public void delegateInitUiRootNode(boolean force) {
         // The manifest UI node is always created, even if there's no corresponding XML node.
         if (getUiRootNode() == null || force) {
-            ElementDescriptor resources_desc =
-                    ValuesDescriptors.getInstance().getElementDescriptor();
+            ElementDescriptor resources_desc = ValuesDescriptors.getInstance().getElementDescriptor();
             setUiRootNode(resources_desc.createUiNode());
             getUiRootNode().setEditor(getEditor());
 
@@ -141,4 +133,3 @@ public class ValuesEditorDelegate extends CommonXmlDelegate {
         // FIXME Update when the descriptors are not static
     }
 }
-

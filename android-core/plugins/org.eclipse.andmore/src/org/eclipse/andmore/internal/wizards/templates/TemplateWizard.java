@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +14,10 @@ package org.eclipse.andmore.internal.wizards.templates;
 
 import static org.eclipse.core.resources.IResource.DEPTH_INFINITE;
 
-import com.android.annotations.NonNull;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.assetstudio.ConfigureAssetSetPage;
 import org.eclipse.andmore.internal.assetstudio.CreateAssetSetWizardState;
@@ -36,9 +36,8 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.android.annotations.NonNull;
 
 abstract class TemplateWizard extends Wizard implements INewWizard {
     private static final String PROJECT_LOGO_LARGE = "android-64"; //$NON-NLS-1$
@@ -48,8 +47,7 @@ abstract class TemplateWizard extends Wizard implements INewWizard {
     private TemplatePreviewPage mPreviewPage;
     protected ConfigureAssetSetPage mIconPage;
 
-    protected TemplateWizard() {
-    }
+    protected TemplateWizard() {}
 
     /** Should this wizard add an icon page? */
     protected boolean shouldAddIconPage() {
@@ -163,8 +161,7 @@ abstract class TemplateWizard extends Wizard implements INewWizard {
         if (!changes.isEmpty()) {
             monitor.beginTask("Creating template...", changes.size());
             try {
-                CompositeChange composite = new CompositeChange("",
-                        changes.toArray(new Change[changes.size()]));
+                CompositeChange composite = new CompositeChange("", changes.toArray(new Change[changes.size()]));
                 composite.perform(monitor);
             } catch (CoreException e) {
                 AndmoreAndroidPlugin.log(e, null);
@@ -189,8 +186,7 @@ abstract class TemplateWizard extends Wizard implements INewWizard {
         try {
             getContainer().run(true, false, new IRunnableWithProgress() {
                 @Override
-                public void run(IProgressMonitor monitor) throws InvocationTargetException,
-                InterruptedException {
+                public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     boolean ok = performFinish(monitor);
                     success.set(ok);
                 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.project;
-
-import com.android.ide.common.xml.AndroidManifestParser.ManifestErrorHandler;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.core.resources.IFile;
@@ -27,6 +22,8 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.android.ide.common.xml.AndroidManifestParser.ManifestErrorHandler;
 
 /**
  * XML error handler used by the parser to report errors/warnings.
@@ -97,11 +94,8 @@ public class XmlErrorHandler extends DefaultHandler implements ManifestErrorHand
     @Override
     public void warning(SAXParseException exception) throws SAXException {
         if (mFile != null) {
-            BaseProjectHelper.markResource(mFile,
-                    AndmoreAndroidConstants.MARKER_XML,
-                    exception.getMessage(),
-                    exception.getLineNumber(),
-                    IMarker.SEVERITY_WARNING);
+            BaseProjectHelper.markResource(mFile, AndmoreAndroidConstants.MARKER_XML, exception.getMessage(),
+                    exception.getLineNumber(), IMarker.SEVERITY_WARNING);
         }
     }
 
@@ -126,10 +120,7 @@ public class XmlErrorHandler extends DefaultHandler implements ManifestErrorHand
         }
 
         if (mFile != null) {
-            BaseProjectHelper.markResource(mFile,
-                    AndmoreAndroidConstants.MARKER_XML,
-                    message,
-                    lineNumber,
+            BaseProjectHelper.markResource(mFile, AndmoreAndroidConstants.MARKER_XML, message, lineNumber,
                     IMarker.SEVERITY_ERROR);
         }
     }
@@ -145,21 +136,19 @@ public class XmlErrorHandler extends DefaultHandler implements ManifestErrorHand
      * the class or of its constructors.
      */
     @Override
-    public void checkClass(Locator locator, String className, String superClassName,
-            boolean testVisibility) {
+    public void checkClass(Locator locator, String className, String superClassName, boolean testVisibility) {
         if (mJavaProject == null) {
             return;
         }
         // we need to check the validity of the activity.
-        String result = BaseProjectHelper.testClassForManifest(mJavaProject,
-                className, superClassName, testVisibility);
+        String result = BaseProjectHelper.testClassForManifest(mJavaProject, className, superClassName, testVisibility);
         if (result != BaseProjectHelper.TEST_CLASS_OK) {
             // get the line number
             int line = locator.getLineNumber();
 
             // mark the file
-            IMarker marker = BaseProjectHelper.markResource(getFile(),
-                    AndmoreAndroidConstants.MARKER_ANDROID, result, line, IMarker.SEVERITY_ERROR);
+            IMarker marker = BaseProjectHelper.markResource(getFile(), AndmoreAndroidConstants.MARKER_ANDROID, result,
+                    line, IMarker.SEVERITY_ERROR);
 
             // add custom attributes to be used by the manifest editor.
             if (marker != null) {
@@ -167,8 +156,7 @@ public class XmlErrorHandler extends DefaultHandler implements ManifestErrorHand
                     marker.setAttribute(AndmoreAndroidConstants.MARKER_ATTR_TYPE,
                             AndmoreAndroidConstants.MARKER_ATTR_TYPE_ACTIVITY);
                     marker.setAttribute(AndmoreAndroidConstants.MARKER_ATTR_CLASS, className);
-                } catch (CoreException e) {
-                }
+                } catch (CoreException e) {}
             }
         }
     }

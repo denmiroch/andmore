@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,10 +19,9 @@ import static com.android.SdkConstants.NEW_ID_PREFIX;
 import static com.android.SdkConstants.PREFIX_RESOURCE_REF;
 import static com.android.SdkConstants.PREFIX_THEME_REF;
 
-import com.android.ide.common.resources.ResourceItem;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.resources.ResourceType;
-import com.android.utils.SdkUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.common.CommonXmlEditor;
@@ -38,9 +34,10 @@ import org.eclipse.jface.fieldassist.ContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.resources.ResourceType;
+import com.android.utils.SdkUtils;
 
 /**
  * Resource value completion for the given property
@@ -62,11 +59,10 @@ class ResourceValueCompleter implements IContentProposalProvider {
     @Override
     public IContentProposal[] getProposals(String contents, int position) {
         if (contents.startsWith(PREFIX_RESOURCE_REF)) {
-            CommonXmlEditor editor = this.xmlProperty.getXmlEditor();
+            CommonXmlEditor editor = xmlProperty.getXmlEditor();
             if (editor != null) {
-                String[] matches = computeResourceStringMatches(
-                        editor,
-                        this.xmlProperty.mDescriptor, contents.substring(0, position));
+                String[] matches = computeResourceStringMatches(editor, xmlProperty.mDescriptor,
+                        contents.substring(0, position));
                 List<IContentProposal> proposals = null;
                 if (matches != null && matches.length > 0) {
                     proposals = new ArrayList<IContentProposal>(matches.length);
@@ -86,8 +82,8 @@ class ResourceValueCompleter implements IContentProposalProvider {
      * but computes complete results up front rather than dividing it up into
      * smaller chunks like @{code @android:}, {@code string/}, and {@code ok}.
      */
-    static String[] computeResourceStringMatches(AndroidXmlEditor editor,
-            AttributeDescriptor attributeDescriptor, String prefix) {
+    static String[] computeResourceStringMatches(AndroidXmlEditor editor, AttributeDescriptor attributeDescriptor,
+            String prefix) {
         List<String> results = new ArrayList<String>(200);
 
         // System matches: only do this if the value already matches at least @a,
@@ -109,7 +105,6 @@ class ResourceValueCompleter implements IContentProposalProvider {
                 addMatches(repository, prefix, true /* isSystem */, results);
             }
         }
-
 
         // When completing project resources skip framework resources unless
         // the prefix possibly completes both, such as "@an" which can match
@@ -140,8 +135,7 @@ class ResourceValueCompleter implements IContentProposalProvider {
 
     private static void addMatches(ResourceRepository repository, String prefix, boolean isSystem,
             List<String> results) {
-        int typeStart = isSystem
-                ? ANDROID_PREFIX.length() : PREFIX_RESOURCE_REF.length();
+        int typeStart = isSystem ? ANDROID_PREFIX.length() : PREFIX_RESOURCE_REF.length();
 
         for (ResourceType type : repository.getAvailableResourceTypes()) {
             if (prefix.regionMatches(typeStart, type.getName(), 0,
@@ -168,8 +162,7 @@ class ResourceValueCompleter implements IContentProposalProvider {
                 String base = sb.toString();
 
                 int nameStart = typeStart + type.getName().length() + 1; // +1: add "/" divider
-                String namePrefix =
-                        prefix.length() <= nameStart ? "" : prefix.substring(nameStart);
+                String namePrefix = prefix.length() <= nameStart ? "" : prefix.substring(nameStart);
                 for (ResourceItem item : repository.getResourceItemsOfType(type)) {
                     String name = item.getName();
                     if (SdkUtils.startsWithIgnoreCase(name, namePrefix)) {

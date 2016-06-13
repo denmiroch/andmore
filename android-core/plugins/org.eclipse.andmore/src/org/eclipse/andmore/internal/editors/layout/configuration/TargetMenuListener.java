@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,8 @@
 
 package org.eclipse.andmore.internal.editors.layout.configuration;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.sdklib.AndroidVersion;
-import com.android.sdklib.IAndroidTarget;
+import java.util.List;
+import java.util.RandomAccess;
 
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
 import org.eclipse.swt.SWT;
@@ -31,8 +26,10 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolItem;
 
-import java.util.List;
-import java.util.RandomAccess;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.sdklib.AndroidVersion;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * The {@linkplain TargetMenuListener} class is responsible for
@@ -43,10 +40,7 @@ class TargetMenuListener extends SelectionAdapter {
     private final IAndroidTarget mTarget;
     private final boolean mPickBest;
 
-    TargetMenuListener(
-            @NonNull ConfigurationChooser configChooser,
-            @Nullable IAndroidTarget target,
-            boolean pickBest) {
+    TargetMenuListener(@NonNull ConfigurationChooser configChooser, @Nullable IAndroidTarget target, boolean pickBest) {
         mConfigChooser = configChooser;
         mTarget = target;
         mPickBest = pickBest;

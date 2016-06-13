@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,7 @@
  */
 package org.eclipse.andmore.internal.wizards.templates;
 
+import java.io.File;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.wizards.newproject.WorkingSetGroup;
@@ -45,13 +43,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkingSet;
 
-import java.io.File;
-
 /**
  * Second wizard page in the "New Project From Template" wizard
  */
-public class ProjectContentsPage extends WizardPage
-        implements ModifyListener, SelectionListener, FocusListener {
+public class ProjectContentsPage extends WizardPage implements ModifyListener, SelectionListener, FocusListener {
 
     private final NewProjectWizardState mValues;
 
@@ -93,14 +88,12 @@ public class ProjectContentsPage extends WizardPage
         mCustomIconToggle.addSelectionListener(this);
 
         mCreateActivityToggle = new Button(container, SWT.CHECK);
-        mCreateActivityToggle.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false,
-                4, 1));
+        mCreateActivityToggle.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
         mCreateActivityToggle.setText("Create activity");
         mCreateActivityToggle.setSelection(mValues.createActivity);
         mCreateActivityToggle.addSelectionListener(this);
 
-        new Label(container, SWT.NONE).setLayoutData(
-                new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        new Label(container, SWT.NONE).setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 
         mLibraryToggle = new Button(container, SWT.CHECK);
         mLibraryToggle.setSelection(true);
@@ -110,12 +103,10 @@ public class ProjectContentsPage extends WizardPage
         mLibraryToggle.addSelectionListener(this);
 
         // Blank line
-        new Label(container, SWT.NONE).setLayoutData(
-                new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        new Label(container, SWT.NONE).setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 
         mUseDefaultLocationToggle = new Button(container, SWT.CHECK);
-        mUseDefaultLocationToggle.setLayoutData(
-                new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        mUseDefaultLocationToggle.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
         mUseDefaultLocationToggle.setText("Create Project in Workspace");
         mUseDefaultLocationToggle.addSelectionListener(this);
 
@@ -133,8 +124,7 @@ public class ProjectContentsPage extends WizardPage
         mChooseLocationButton.setEnabled(false);
         setUseCustomLocation(!mValues.useDefaultLocation);
 
-        new Label(container, SWT.NONE).setLayoutData(
-                new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        new Label(container, SWT.NONE).setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 
         Composite group = mWorkingSetGroup.createControl(container);
         group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
@@ -217,7 +207,6 @@ public class ProjectContentsPage extends WizardPage
         validatePage();
     }
 
-
     /** If the project should be created in the workspace, then update the project location
      * based on the project name. */
     private void updateProjectLocation(String projectName) {
@@ -284,18 +273,15 @@ public class ProjectContentsPage extends WizardPage
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 
     // ---- Implements FocusListener ----
 
     @Override
-    public void focusGained(FocusEvent e) {
-    }
+    public void focusGained(FocusEvent e) {}
 
     @Override
-    public void focusLost(FocusEvent e) {
-    }
+    public void focusLost(FocusEvent e) {}
 
     // Validation
 
@@ -305,8 +291,7 @@ public class ProjectContentsPage extends WizardPage
         setPageComplete(status == null || status.getSeverity() != IStatus.ERROR);
         if (status != null) {
             setMessage(status.getMessage(),
-                    status.getSeverity() == IStatus.ERROR
-                        ? IMessageProvider.ERROR : IMessageProvider.WARNING);
+                    status.getSeverity() == IStatus.ERROR ? IMessageProvider.ERROR : IMessageProvider.WARNING);
         } else {
             setErrorMessage(null);
             setMessage(null);
@@ -322,9 +307,9 @@ public class ProjectContentsPage extends WizardPage
         if (values.projectName != null) {
             File dest = Platform.getLocation().append(values.projectName).toFile();
             if (dest.exists()) {
-                return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, String.format(
-                   "There is already a file or directory named \"%1$s\" in the selected location.",
-                        values.projectName));
+                return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
+                        String.format("There is already a file or directory named \"%1$s\" in the selected location.",
+                                values.projectName));
             }
         }
 

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,8 @@
  */
 
 package org.eclipse.andmore.internal.wizards.export;
+
+import java.util.List;
 
 import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.andmore.internal.wizards.export.ExportWizard.ExportWizardPage;
@@ -30,8 +29,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-
-import java.util.List;
 
 /**
  * Key creation page.
@@ -52,7 +49,6 @@ final class KeyCreationPage extends ExportWizardPage {
     private String mDName;
     private int mValidity = 0;
     private List<String> mExistingAliases;
-
 
     protected KeyCreationPage(ExportWizard wizard, String pageName) {
         super(pageName);
@@ -92,7 +88,7 @@ final class KeyCreationPage extends ExportWizardPage {
             @Override
             public void verifyText(VerifyEvent e) {
                 // check for digit only.
-                for (int i = 0 ; i < e.text.length(); i++) {
+                for (int i = 0; i < e.text.length(); i++) {
                     char letter = e.text.charAt(i);
                     if (letter < '0' || letter > '9') {
                         e.doit = false;
@@ -102,8 +98,7 @@ final class KeyCreationPage extends ExportWizardPage {
             }
         });
 
-        new Label(composite, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(
-                gd = new GridData(GridData.FILL_HORIZONTAL));
+        new Label(composite, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(gd = new GridData(GridData.FILL_HORIZONTAL));
         gd.horizontalSpan = 2;
 
         new Label(composite, SWT.NONE).setText("First and Last Name:");

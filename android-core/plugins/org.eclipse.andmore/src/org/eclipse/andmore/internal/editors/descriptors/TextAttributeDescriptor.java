@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,11 +13,8 @@
 
 package org.eclipse.andmore.internal.editors.descriptors;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.IAttributeInfo;
-import com.android.ide.common.api.IAttributeInfo.Format;
+import java.util.EnumSet;
+import java.util.Locale;
 
 import org.eclipse.andmore.internal.editors.ui.TextValueCellEditor;
 import org.eclipse.andmore.internal.editors.uimodel.UiAttributeNode;
@@ -32,9 +26,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 
-import java.util.EnumSet;
-import java.util.Locale;
-
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.IAttributeInfo;
+import com.android.ide.common.api.IAttributeInfo.Format;
 
 /**
  * Describes a textual XML attribute.
@@ -59,10 +55,7 @@ public class TextAttributeDescriptor extends AttributeDescriptor implements IPro
      *              See {@link SdkConstants#NS_RESOURCES} for a common value.
      * @param attrInfo The {@link IAttributeInfo} of this attribute. Can't be null.
      */
-    public TextAttributeDescriptor(
-            String xmlLocalName,
-            String nsUri,
-            IAttributeInfo attrInfo) {
+    public TextAttributeDescriptor(String xmlLocalName, String nsUri, IAttributeInfo attrInfo) {
         super(xmlLocalName, nsUri, attrInfo);
     }
 
@@ -85,7 +78,6 @@ public class TextAttributeDescriptor extends AttributeDescriptor implements IPro
 
         return mUiName;
     }
-
 
     /**
      * Sets the UI name to be associated with this descriptor. This is usually
@@ -170,10 +162,10 @@ public class TextAttributeDescriptor extends AttributeDescriptor implements IPro
                 }
                 rawTooltip += "* Deprecated";
                 if (deprecated.length() != 0) {
-                    rawTooltip += ": " + deprecated;                            //$NON-NLS-1$
+                    rawTooltip += ": " + deprecated; //$NON-NLS-1$
                 }
-                if (deprecated.length() == 0 || !deprecated.endsWith(".")) {    //$NON-NLS-1$
-                    rawTooltip += ".";                                          //$NON-NLS-1$
+                if (deprecated.length() == 0 || !deprecated.endsWith(".")) { //$NON-NLS-1$
+                    rawTooltip += "."; //$NON-NLS-1$
                 }
             }
 
@@ -184,12 +176,12 @@ public class TextAttributeDescriptor extends AttributeDescriptor implements IPro
                 StringBuilder sb = new StringBuilder();
                 if (rawTooltip != null && rawTooltip.length() > 0) {
                     sb.append(rawTooltip);
-                    sb.append(" ");     //$NON-NLS-1$
+                    sb.append(" "); //$NON-NLS-1$
                 }
                 if (sb.length() > 0) {
-                    sb.append("@@");    //$NON-NLS-1$  @@ inserts a break before the types
+                    sb.append("@@"); //$NON-NLS-1$  @@ inserts a break before the types
                 }
-                sb.append("[");         //$NON-NLS-1$
+                sb.append("["); //$NON-NLS-1$
                 boolean isFirst = true;
                 for (Format f : formats_list) {
                     if (isFirst) {
@@ -204,7 +196,7 @@ public class TextAttributeDescriptor extends AttributeDescriptor implements IPro
 
                 if (mRequired) {
                     // Note: this string is split in 2 to make it translatable.
-                    sb.append(".@@");          //$NON-NLS-1$ @@ inserts a break and is not translatable
+                    sb.append(".@@"); //$NON-NLS-1$ @@ inserts a break and is not translatable
                     sb.append("* Required.");
                 }
 

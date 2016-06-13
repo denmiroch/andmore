@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,28 +13,18 @@
 
 package org.eclipse.andmore.internal.launch;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ddmlib.AdbCommandRejectedException;
-import com.android.ddmlib.AndroidDebugBridge;
-import com.android.ddmlib.AndroidDebugBridge.IClientChangeListener;
-import com.android.ddmlib.AndroidDebugBridge.IDebugBridgeChangeListener;
-import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
-import com.android.ddmlib.CanceledException;
-import com.android.ddmlib.Client;
-import com.android.ddmlib.ClientData;
-import com.android.ddmlib.ClientData.DebuggerStatus;
-import com.android.ddmlib.IDevice;
-import com.android.ddmlib.InstallException;
-import com.android.ddmlib.Log;
-import com.android.ddmlib.TimeoutException;
-import com.android.ide.common.xml.ManifestData;
-import com.android.prefs.AndroidLocation.AndroidLocationException;
-import com.android.sdklib.AndroidVersion;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.internal.avd.AvdInfo;
-import com.android.sdklib.internal.avd.AvdManager;
-import com.android.utils.NullLogger;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.ddms.DdmsPlugin;
@@ -70,33 +57,42 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IVMConnector;
 import org.eclipse.jdt.launching.JavaRuntime;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ddmlib.AdbCommandRejectedException;
+import com.android.ddmlib.AndroidDebugBridge;
+import com.android.ddmlib.AndroidDebugBridge.IClientChangeListener;
+import com.android.ddmlib.AndroidDebugBridge.IDebugBridgeChangeListener;
+import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
+import com.android.ddmlib.CanceledException;
+import com.android.ddmlib.Client;
+import com.android.ddmlib.ClientData;
+import com.android.ddmlib.ClientData.DebuggerStatus;
+import com.android.ddmlib.IDevice;
+import com.android.ddmlib.InstallException;
+import com.android.ddmlib.Log;
+import com.android.ddmlib.TimeoutException;
+import com.android.ide.common.xml.ManifestData;
+import com.android.prefs.AndroidLocation.AndroidLocationException;
+import com.android.sdklib.AndroidVersion;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.internal.avd.AvdInfo;
+import com.android.sdklib.internal.avd.AvdManager;
+import com.android.utils.NullLogger;
 
 /**
  * Controls the launch of Android application either on a device or on the
  * emulator. If an emulator is already running, this class will attempt to reuse
  * it.
  */
-public final class AndroidLaunchController implements IDebugBridgeChangeListener,
-        IDeviceChangeListener, IClientChangeListener, ILaunchController {
+public final class AndroidLaunchController
+        implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListener, ILaunchController {
 
     private static final String FLAG_AVD = "-avd"; //$NON-NLS-1$
     private static final String FLAG_NETDELAY = "-netdelay"; //$NON-NLS-1$
@@ -109,8 +105,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * to running application. The integer is the port on which to connect.
      * <b>ALL ACCESS MUST BE INSIDE A <code>synchronized (sListLock)</code> block!</b>
      */
-    private static final HashMap<ILaunchConfiguration, Integer> sRunningAppMap =
-        new HashMap<ILaunchConfiguration, Integer>();
+    private static final HashMap<ILaunchConfiguration, Integer> sRunningAppMap = new HashMap<ILaunchConfiguration, Integer>();
 
     private static final Object sListLock = sRunningAppMap;
 
@@ -121,22 +116,19 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * {@link AndroidLaunchController#mWaitingForReadyEmulatorList}.
      * <b>ALL ACCESS MUST BE INSIDE A <code>synchronized (sListLock)</code> block!</b>
      */
-    private final ArrayList<DelayedLaunchInfo> mWaitingForEmulatorLaunches =
-        new ArrayList<DelayedLaunchInfo>();
+    private final ArrayList<DelayedLaunchInfo> mWaitingForEmulatorLaunches = new ArrayList<DelayedLaunchInfo>();
 
     /**
      * List of application waiting to be launched on a device/emulator.<br>
      * <b>ALL ACCESS MUST BE INSIDE A <code>synchronized (sListLock)</code> block!</b>
      * */
-    private final ArrayList<DelayedLaunchInfo> mWaitingForReadyEmulatorList =
-        new ArrayList<DelayedLaunchInfo>();
+    private final ArrayList<DelayedLaunchInfo> mWaitingForReadyEmulatorList = new ArrayList<DelayedLaunchInfo>();
 
     /**
      * Application waiting to show up as waiting for debugger.
      * <b>ALL ACCESS MUST BE INSIDE A <code>synchronized (sListLock)</code> block!</b>
      */
-    private final ArrayList<DelayedLaunchInfo> mWaitingForDebuggerApplications =
-        new ArrayList<DelayedLaunchInfo>();
+    private final ArrayList<DelayedLaunchInfo> mWaitingForDebuggerApplications = new ArrayList<DelayedLaunchInfo>();
 
     /**
      * List of clients that have appeared as waiting for debugger before their name was available.
@@ -160,7 +152,6 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
     public static AndroidLaunchController getInstance() {
         return sThis;
     }
-
 
     /**
      * Launches a remote java debugging session on an already running application
@@ -207,15 +198,13 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
 
             try {
                 // make the working copy object
-                wc = configType.newInstance(null,
-                        manager.generateLaunchConfigurationName(name));
+                wc = configType.newInstance(null, manager.generateLaunchConfigurationName(name));
 
                 // set the project name
                 wc.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, name);
 
                 // set the launch mode to default.
-                wc.setAttribute(LaunchConfigDelegate.ATTR_LAUNCH_ACTION,
-                        LaunchConfigDelegate.DEFAULT_LAUNCH_ACTION);
+                wc.setAttribute(LaunchConfigDelegate.ATTR_LAUNCH_ACTION, LaunchConfigDelegate.DEFAULT_LAUNCH_ACTION);
 
                 // set default target mode
                 wc.setAttribute(LaunchConfigDelegate.ATTR_TARGET_MODE,
@@ -225,20 +214,16 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                 wc.setAttribute(LaunchConfigDelegate.ATTR_AVD_NAME, (String) null);
 
                 // set the default network speed
-                wc.setAttribute(LaunchConfigDelegate.ATTR_SPEED,
-                        LaunchConfigDelegate.DEFAULT_SPEED);
+                wc.setAttribute(LaunchConfigDelegate.ATTR_SPEED, LaunchConfigDelegate.DEFAULT_SPEED);
 
                 // and delay
-                wc.setAttribute(LaunchConfigDelegate.ATTR_DELAY,
-                        LaunchConfigDelegate.DEFAULT_DELAY);
+                wc.setAttribute(LaunchConfigDelegate.ATTR_DELAY, LaunchConfigDelegate.DEFAULT_DELAY);
 
                 // default wipe data mode
-                wc.setAttribute(LaunchConfigDelegate.ATTR_WIPE_DATA,
-                        LaunchConfigDelegate.DEFAULT_WIPE_DATA);
+                wc.setAttribute(LaunchConfigDelegate.ATTR_WIPE_DATA, LaunchConfigDelegate.DEFAULT_WIPE_DATA);
 
                 // default disable boot animation option
-                wc.setAttribute(LaunchConfigDelegate.ATTR_NO_BOOT_ANIM,
-                        LaunchConfigDelegate.DEFAULT_NO_BOOT_ANIM);
+                wc.setAttribute(LaunchConfigDelegate.ATTR_NO_BOOT_ANIM, LaunchConfigDelegate.DEFAULT_NO_BOOT_ANIM);
 
                 // set default emulator options
                 IPreferenceStore store = AndmoreAndroidPlugin.getDefault().getPreferenceStore();
@@ -252,8 +237,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                 return wc.doSave();
 
             } catch (CoreException e) {
-                String msg = String.format(
-                        "Failed to create a Launch config for project '%1$s': %2$s",
+                String msg = String.format("Failed to create a Launch config for project '%1$s': %2$s",
                         project.getName(), e.getMessage());
                 AndmoreAndroidPlugin.printErrorToConsole(project, msg);
 
@@ -297,19 +281,16 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * @param config the launch configuration
      * @param launch the launch object
      */
-    public void launch(final IProject project, String mode, IFile apk,
-            String packageName, String debugPackageName, Boolean debuggable,
-            String requiredApiVersionNumber, final IAndroidLaunchAction launchAction,
-            final AndroidLaunchConfiguration config, final AndroidLaunch launch,
-            IProgressMonitor monitor) {
+    public void launch(final IProject project, String mode, IFile apk, String packageName, String debugPackageName,
+            Boolean debuggable, String requiredApiVersionNumber, final IAndroidLaunchAction launchAction,
+            final AndroidLaunchConfiguration config, final AndroidLaunch launch, IProgressMonitor monitor) {
 
         String message = String.format("Performing %1$s", launchAction.getLaunchDescription());
         AndmoreAndroidPlugin.printToConsole(project, message);
 
         // create the launch info
-        final DelayedLaunchInfo launchInfo = new DelayedLaunchInfo(project, packageName,
-                debugPackageName, launchAction, apk, debuggable, requiredApiVersionNumber, launch,
-                monitor);
+        final DelayedLaunchInfo launchInfo = new DelayedLaunchInfo(project, packageName, debugPackageName, launchAction,
+                apk, debuggable, requiredApiVersionNumber, launch, monitor);
 
         // set the debug mode
         launchInfo.setDebugMode(mode.equals(ILaunchManager.DEBUG_MODE));
@@ -366,8 +347,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
         IDevice[] devices = AndroidDebugBridge.getBridge().getDevices();
         if (config.mReuseLastUsedDevice) {
             // check to see if the last used device is still online
-            IDevice lastUsedDevice = getDeviceIfOnline(config.mLastUsedDevice,
-                    devices);
+            IDevice lastUsedDevice = getDeviceIfOnline(config.mLastUsedDevice, devices);
             if (lastUsedDevice != null) {
                 response.setDeviceToUse(lastUsedDevice);
                 continueLaunch(response, project, launch, launchInfo, config);
@@ -387,15 +367,13 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
 
             if (preferredAvd != null) {
                 IAndroidTarget preferredAvdTarget = preferredAvd.getTarget();
-                if (preferredAvdTarget != null
-                        && !preferredAvdTarget.getVersion().canRun(minApiVersion)) {
+                if (preferredAvdTarget != null && !preferredAvdTarget.getVersion().canRun(minApiVersion)) {
                     preferredAvd = null;
 
-                    AndmoreAndroidPlugin.printErrorToConsole(project, String.format(
-                            "Preferred AVD '%1$s' (API Level: %2$d) cannot run application with minApi %3$s. Looking for a compatible AVD...",
-                            config.mAvdName,
-                            preferredAvdTarget.getVersion().getApiLevel(),
-                            minApiVersion));
+                    AndmoreAndroidPlugin.printErrorToConsole(project,
+                            String.format(
+                                    "Preferred AVD '%1$s' (API Level: %2$d) cannot run application with minApi %3$s. Looking for a compatible AVD...",
+                                    config.mAvdName, preferredAvdTarget.getVersion().getApiLevel(), minApiVersion));
                 }
             }
 
@@ -408,9 +386,10 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                     if (deviceAvd != null && deviceAvd.equals(config.mAvdName)) {
                         response.setDeviceToUse(d);
 
-                        AndmoreAndroidPlugin.printToConsole(project, String.format(
-                                "Automatic Target Mode: Preferred AVD '%1$s' is available on emulator '%2$s'",
-                                config.mAvdName, d));
+                        AndmoreAndroidPlugin.printToConsole(project,
+                                String.format(
+                                        "Automatic Target Mode: Preferred AVD '%1$s' is available on emulator '%2$s'",
+                                        config.mAvdName, d));
 
                         continueLaunch(response, project, launch, launchInfo, config);
                         return;
@@ -421,9 +400,10 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                 // We need to start it.
                 response.setAvdToLaunch(preferredAvd);
 
-                AndmoreAndroidPlugin.printToConsole(project, String.format(
-                        "Automatic Target Mode: Preferred AVD '%1$s' is not available. Launching new emulator.",
-                        config.mAvdName));
+                AndmoreAndroidPlugin.printToConsole(project,
+                        String.format(
+                                "Automatic Target Mode: Preferred AVD '%1$s' is not available. Launching new emulator.",
+                                config.mAvdName));
 
                 continueLaunch(response, project, launch, launchInfo, config);
                 return;
@@ -473,18 +453,17 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                 String deviceAvd = d.getAvdName();
                 if (deviceAvd != null) { // physical devices return null.
                     AvdInfo info = avdManager.getAvd(deviceAvd, true /*validAvdOnly*/);
-                    if (AvdCompatibility.canRun(info, projectTarget, minApiVersion)
-                            == AvdCompatibility.Compatibility.YES) {
+                    if (AvdCompatibility.canRun(info, projectTarget,
+                            minApiVersion) == AvdCompatibility.Compatibility.YES) {
                         compatibleRunningAvds.put(d, info);
                     }
                 } else {
                     if (projectTarget.isPlatform()) { // means this can run on any device as long
-                                                      // as api level is high enough
+                                                          // as api level is high enough
                         AndroidVersion deviceVersion = Sdk.getDeviceVersion(d);
                         // the deviceVersion may be null if it wasn't yet queried (device just
                         // plugged in or emulator just booting up.
-                        if (deviceVersion != null &&
-                                deviceVersion.canRun(projectTarget.getVersion())) {
+                        if (deviceVersion != null && deviceVersion.canRun(projectTarget.getVersion())) {
                             // device is compatible with project
                             compatibleRunningAvds.put(d, null);
                             continue;
@@ -511,16 +490,15 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                 if (defaultAvd != null) {
                     response.setAvdToLaunch(defaultAvd);
 
-                    AndmoreAndroidPlugin.printToConsole(project, String.format(
-                            "Automatic Target Mode: launching new emulator with compatible AVD '%1$s'",
-                            defaultAvd.getName()));
+                    AndmoreAndroidPlugin.printToConsole(project,
+                            String.format("Automatic Target Mode: launching new emulator with compatible AVD '%1$s'",
+                                    defaultAvd.getName()));
 
                     continueLaunch(response, project, launch, launchInfo, config);
                     return;
                 } else {
-                    AndmoreAndroidPlugin.printToConsole(project, String.format(
-                            "Failed to find an AVD compatible with target '%1$s'.",
-                            projectTarget.getName()));
+                    AndmoreAndroidPlugin.printToConsole(project, String
+                            .format("Failed to find an AVD compatible with target '%1$s'.", projectTarget.getName()));
 
                     final Display display = AndmoreAndroidPlugin.getDisplay();
                     final boolean[] searchAgain = new boolean[] { false };
@@ -542,16 +520,15 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                         defaultAvd = findMatchingAvd(avdManager, projectTarget, minApiVersion);
 
                         if (defaultAvd == null) {
-                            AndmoreAndroidPlugin.printErrorToConsole(project, String.format(
-                                    "Still no compatible AVDs with target '%1$s': Aborting launch.",
-                                    projectTarget.getName()));
+                            AndmoreAndroidPlugin.printErrorToConsole(project,
+                                    String.format("Still no compatible AVDs with target '%1$s': Aborting launch.",
+                                            projectTarget.getName()));
                             stopLaunch(launchInfo);
                         } else {
                             response.setAvdToLaunch(defaultAvd);
 
-                            AndmoreAndroidPlugin.printToConsole(project, String.format(
-                                    "Launching new emulator with compatible AVD '%1$s'",
-                                    defaultAvd.getName()));
+                            AndmoreAndroidPlugin.printToConsole(project, String
+                                    .format("Launching new emulator with compatible AVD '%1$s'", defaultAvd.getName()));
 
                             continueLaunch(response, project, launch, launchInfo, config);
                             return;
@@ -565,11 +542,11 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                 // get the AvdInfo, if null, the device is a physical device.
                 AvdInfo avdInfo = e.getValue();
                 if (avdInfo != null) {
-                    message = String.format("Automatic Target Mode: using existing emulator '%1$s' running compatible AVD '%2$s'",
+                    message = String.format(
+                            "Automatic Target Mode: using existing emulator '%1$s' running compatible AVD '%2$s'",
                             response.getDeviceToUse(), e.getValue().getName());
                 } else {
-                    message = String.format("Automatic Target Mode: using device '%1$s'",
-                            response.getDeviceToUse());
+                    message = String.format("Automatic Target Mode: using device '%1$s'", response.getDeviceToUse());
                 }
                 AndmoreAndroidPlugin.printToConsole(project, message);
 
@@ -586,18 +563,16 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
 
             AndmoreAndroidPlugin.printToConsole(project, message);
         } else if ((config.mTargetMode == TargetMode.ALL_DEVICES_AND_EMULATORS
-                || config.mTargetMode == TargetMode.ALL_DEVICES
-                || config.mTargetMode == TargetMode.ALL_EMULATORS)
+                || config.mTargetMode == TargetMode.ALL_DEVICES || config.mTargetMode == TargetMode.ALL_EMULATORS)
                 && ILaunchManager.RUN_MODE.equals(mode)) {
             // if running on multiple devices, identify all compatible devices
             boolean includeDevices = config.mTargetMode != TargetMode.ALL_EMULATORS;
             boolean includeAvds = config.mTargetMode != TargetMode.ALL_DEVICES;
-            Collection<IDevice> compatibleDevices = findCompatibleDevices(devices,
-                    minApiVersion, includeDevices, includeAvds);
+            Collection<IDevice> compatibleDevices = findCompatibleDevices(devices, minApiVersion, includeDevices,
+                    includeAvds);
             if (compatibleDevices.size() == 0) {
-                AndmoreAndroidPlugin.printErrorToConsole(project,
-                      "No active compatible AVD's or devices found. "
-                    + "Relaunch this configuration after connecting a device or starting an AVD.");
+                AndmoreAndroidPlugin.printErrorToConsole(project, "No active compatible AVD's or devices found. "
+                        + "Relaunch this configuration after connecting a device or starting an AVD.");
                 stopLaunch(launchInfo);
             } else {
                 multiLaunch(launchInfo, compatibleDevices);
@@ -614,14 +589,11 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                 try {
                     // open the chooser dialog. It'll fill 'response' with the device to use
                     // or the AVD to launch.
-                    DeviceChooserDialog dialog = new DeviceChooserDialog(
-                            AndmoreAndroidPlugin.getShell(),
-                            response, launchInfo.getPackageName(),
-                            desiredProjectTarget, minApiVersion,
+                    DeviceChooserDialog dialog = new DeviceChooserDialog(AndmoreAndroidPlugin.getShell(), response,
+                            launchInfo.getPackageName(), desiredProjectTarget, minApiVersion,
                             config.mReuseLastUsedDevice);
                     if (dialog.open() == Window.OK) {
-                        updateLaunchConfigWithLastUsedDevice(launch.getLaunchConfiguration(),
-                                response);
+                        updateLaunchConfigWithLastUsedDevice(launch.getLaunchConfiguration(), response);
                         continueLaunch.set(true);
                     } else {
                         AndmoreAndroidPlugin.printErrorToConsole(project, "Launch canceled!");
@@ -637,8 +609,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                     if (msg == null) {
                         msg = e.getClass().getCanonicalName();
                     }
-                    AndmoreAndroidPlugin.printErrorToConsole(project,
-                            String.format("Error during launch: %s", msg));
+                    AndmoreAndroidPlugin.printErrorToConsole(project, String.format("Error during launch: %s", msg));
                     stopLaunch(launchInfo);
                 }
             }
@@ -657,11 +628,11 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * @param includeAvds include emulators in the filtered list
      * @return set of compatible devices, may be an empty set
      */
-    private Collection<IDevice> findCompatibleDevices(IDevice[] devices,
-            AndroidVersion requiredVersion, boolean includeDevices, boolean includeAvds) {
+    private Collection<IDevice> findCompatibleDevices(IDevice[] devices, AndroidVersion requiredVersion,
+            boolean includeDevices, boolean includeAvds) {
         Set<IDevice> compatibleDevices = new HashSet<IDevice>(devices.length);
         AvdManager avdManager = Sdk.getCurrent().getAvdManager();
-        for (IDevice d: devices) {
+        for (IDevice d : devices) {
             boolean isEmulator = d.isEmulator();
             boolean canRun = false;
 
@@ -702,13 +673,11 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
         AvdInfo[] avds = avdManager.getValidAvds();
         AvdInfo bestAvd = null;
         for (AvdInfo avd : avds) {
-            if (AvdCompatibility.canRun(avd, projectTarget, minApiVersion)
-                    == AvdCompatibility.Compatibility.YES) {
+            if (AvdCompatibility.canRun(avd, projectTarget, minApiVersion) == AvdCompatibility.Compatibility.YES) {
                 // at this point we can ignore the code name issue since
                 // AvdCompatibility.canRun() will already have filtered out the non compatible AVDs.
-                if (bestAvd == null ||
-                        avd.getTarget().getVersion().getApiLevel() <
-                            bestAvd.getTarget().getVersion().getApiLevel()) {
+                if (bestAvd == null || avd.getTarget().getVersion().getApiLevel() < bestAvd.getTarget().getVersion()
+                        .getApiLevel()) {
                     bestAvd = avd;
                 }
             }
@@ -725,16 +694,14 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * @param config The config needed to start a new emulator.
      */
     private void continueLaunch(final DeviceChooserResponse response, final IProject project,
-            final AndroidLaunch launch, final DelayedLaunchInfo launchInfo,
-            final AndroidLaunchConfiguration config) {
+            final AndroidLaunch launch, final DelayedLaunchInfo launchInfo, final AndroidLaunchConfiguration config) {
         if (response.getAvdToLaunch() != null) {
             // there was no selected device, we start a new emulator.
             synchronized (sListLock) {
                 AvdInfo info = response.getAvdToLaunch();
                 mWaitingForEmulatorLaunches.add(launchInfo);
-                AndmoreAndroidPlugin.printToConsole(project, String.format(
-                        "Launching a new emulator with Virtual Device '%1$s'",
-                        info.getName()));
+                AndmoreAndroidPlugin.printToConsole(project,
+                        String.format("Launching a new emulator with Virtual Device '%1$s'", info.getName()));
                 boolean status = launchEmulator(config, info);
 
                 if (status == false) {
@@ -786,8 +753,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * @param launchConfig the {@link ILaunchConfiguration} object.
      * @param port The debugger port to connect to.
      */
-    private static void setPortLaunchConfigAssociation(ILaunchConfiguration launchConfig,
-            int port) {
+    private static void setPortLaunchConfigAssociation(ILaunchConfiguration launchConfig, int port) {
         synchronized (sListLock) {
             sRunningAppMap.put(launchConfig, port);
         }
@@ -832,9 +798,8 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                     // this means the manifest uses a codename for minSdkVersion
                     // check that the device is using the same codename
                     if (requiredApiString.equals(deviceCodeName) == false) {
-                        AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), String.format(
-                            "ERROR: Application requires a device running '%1$s'!",
-                            requiredApiString));
+                        AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), String
+                                .format("ERROR: Application requires a device running '%1$s'!", requiredApiString));
                         return false;
                     }
                 } else {
@@ -862,9 +827,8 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                     AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
                             "WARNING: Unknown device API version!");
                 } else {
-                    AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), String.format(
-                            "Device API version is %1$d (Android %2$s)", deviceApiLevel,
-                            deviceVersion));
+                    AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
+                            String.format("Device API version is %1$d (Android %2$s)", deviceApiLevel, deviceVersion));
                 }
             }
 
@@ -878,7 +842,8 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                     // debuggable=true. The only case to look for is if false is manually set
                     // in the manifest.
                     if (launchInfo.getDebuggable() == Boolean.FALSE) {
-                        String message = String.format("Application '%1$s' has its 'debuggable' attribute set to FALSE and cannot be debugged.",
+                        String message = String.format(
+                                "Application '%1$s' has its 'debuggable' attribute set to FALSE and cannot be debugged.",
                                 launchInfo.getPackageName());
                         AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), message);
 
@@ -931,7 +896,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
     }
 
     private void multiLaunch(DelayedLaunchInfo launchInfo, Collection<IDevice> devices) {
-        for (IDevice d: devices) {
+        for (IDevice d : devices) {
             boolean success = doPreLaunchActions(launchInfo, d);
             if (!success) {
                 String deviceName = d.isEmulator() ? d.getAvdName() : d.getSerialNumber();
@@ -956,12 +921,12 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * @return true if the install succeeded.
      */
     private boolean syncApp(DelayedLaunchInfo launchInfo, IDevice device) {
-        boolean alreadyInstalled = ApkInstallManager.getInstance().isApplicationInstalled(
-                launchInfo.getProject(), launchInfo.getPackageName(), device);
+        boolean alreadyInstalled = ApkInstallManager.getInstance().isApplicationInstalled(launchInfo.getProject(),
+                launchInfo.getPackageName(), device);
 
         if (alreadyInstalled) {
             AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(),
-            "Application already deployed. No need to reinstall.");
+                    "Application already deployed. No need to reinstall.");
         } else {
             if (doSyncApp(launchInfo, device) == false) {
                 return false;
@@ -992,8 +957,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
         IPath path = launchInfo.getPackageFile().getLocation();
         String fileName = path.lastSegment();
         try {
-            String message = String.format("Uploading %1$s onto device '%2$s'",
-                    fileName, device.getSerialNumber());
+            String message = String.format("Uploading %1$s onto device '%2$s'", fileName, device.getSerialNumber());
             AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(), message);
 
             String remotePackagePath = device.syncPackageToDevice(path.toOSString());
@@ -1002,12 +966,11 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
 
             // if the installation succeeded, we register it.
             if (installResult) {
-               ApkInstallManager.getInstance().registerInstallation(
-                       launchInfo.getProject(), launchInfo.getPackageName(), device);
+                ApkInstallManager.getInstance().registerInstallation(launchInfo.getProject(),
+                        launchInfo.getPackageName(), device);
             }
             return installResult;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             String msg = String.format("Failed to install %1$s on device '%2$s': %3$s", fileName,
                     device.getSerialNumber(), e.getMessage());
             AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), msg, e);
@@ -1017,16 +980,16 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
             AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), msg);
         } catch (AdbCommandRejectedException e) {
             String msg = String.format(
-                    "Failed to install %1$s on device '%2$s': adb rejected install command with: %3$s",
-                    fileName, device.getSerialNumber(), e.getMessage());
+                    "Failed to install %1$s on device '%2$s': adb rejected install command with: %3$s", fileName,
+                    device.getSerialNumber(), e.getMessage());
             AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), msg, e);
         } catch (CanceledException e) {
             if (e.wasCanceled()) {
                 AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(),
                         String.format("Install of %1$s canceled", fileName));
             } else {
-                String msg = String.format("Failed to install %1$s on device '%2$s': %3$s",
-                        fileName, device.getSerialNumber(), e.getMessage());
+                String msg = String.format("Failed to install %1$s on device '%2$s': %3$s", fileName,
+                        device.getSerialNumber(), e.getMessage());
                 AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), msg, e);
             }
         }
@@ -1069,8 +1032,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
         for (IJavaProject androidProject : androidProjectList) {
             // Parse the Manifest to get various required information
             // copied from LaunchConfigDelegate
-            ManifestData manifestData = AndroidManifestHelper.parseForData(
-                    androidProject.getProject());
+            ManifestData manifestData = AndroidManifestHelper.parseForData(androidProject.getProject());
 
             if (manifestData == null) {
                 continue;
@@ -1084,15 +1046,9 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
             }
 
             // Create new launchInfo as an hybrid between parent and dependency information
-            DelayedLaunchInfo delayedLaunchInfo = new DelayedLaunchInfo(
-                    androidProject.getProject(),
-                    manifestData.getPackage(),
-                    manifestData.getPackage(),
-                    launchInfo.getLaunchAction(),
-                    apk,
-                    manifestData.getDebuggable(),
-                    manifestData.getMinSdkVersionString(),
-                    launchInfo.getLaunch(),
+            DelayedLaunchInfo delayedLaunchInfo = new DelayedLaunchInfo(androidProject.getProject(),
+                    manifestData.getPackage(), manifestData.getPackage(), launchInfo.getLaunchAction(), apk,
+                    manifestData.getDebuggable(), manifestData.getMinSdkVersionString(), launchInfo.getLaunch(),
                     launchInfo.getMonitor());
 
             // Add to the list
@@ -1108,8 +1064,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * @param remotePath The remote path of the package.
      * @param device The device on which the launch is done.
      */
-    private boolean installPackage(DelayedLaunchInfo launchInfo, final String remotePath,
-            final IDevice device) {
+    private boolean installPackage(DelayedLaunchInfo launchInfo, final String remotePath, final IDevice device) {
         String message = String.format("Installing %1$s...", launchInfo.getPackageFile().getName());
         AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(), message);
         try {
@@ -1120,12 +1075,10 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
              * other way around it: adb install does not want to update a package w/o uninstalling
              * the old one first!
              */
-            return checkInstallResult(result, device, launchInfo, remotePath,
-                    InstallRetryMode.ALWAYS);
+            return checkInstallResult(result, device, launchInfo, remotePath, InstallRetryMode.ALWAYS);
         } catch (Exception e) {
-            String msg = String.format(
-                    "Failed to install %1$s on device '%2$s!",
-                    launchInfo.getPackageFile().getName(), device.getSerialNumber());
+            String msg = String.format("Failed to install %1$s on device '%2$s!", launchInfo.getPackageFile().getName(),
+                    device.getSerialNumber());
             AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), msg, e.getMessage());
         }
 
@@ -1142,13 +1095,12 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * @return <code>true<code> if success, <code>false</code> otherwise.
      * @throws InstallException
      */
-    private boolean checkInstallResult(String result, IDevice device, DelayedLaunchInfo launchInfo,
-            String remotePath, InstallRetryMode retryMode) throws InstallException {
+    private boolean checkInstallResult(String result, IDevice device, DelayedLaunchInfo launchInfo, String remotePath,
+            InstallRetryMode retryMode) throws InstallException {
         if (result == null) {
             AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(), "Success!");
             return true;
-        }
-        else if (result.equals("INSTALL_FAILED_ALREADY_EXISTS")) { //$NON-NLS-1$
+        } else if (result.equals("INSTALL_FAILED_ALREADY_EXISTS")) { //$NON-NLS-1$
             // this should never happen, since reinstall mode is used on the first attempt
             if (retryMode == InstallRetryMode.PROMPT) {
                 boolean prompt = AndmoreAndroidPlugin.displayPrompt("Application Install",
@@ -1157,7 +1109,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                     retryMode = InstallRetryMode.ALWAYS;
                 } else {
                     AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
-                        "Installation error! The package already exists.");
+                            "Installation error! The package already exists.");
                     return false;
                 }
             }
@@ -1184,33 +1136,30 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                 AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(),
                         "Application already exists. Attempting to re-install instead...");
                 String res = doInstall(launchInfo, remotePath, device, true /* reinstall */ );
-                return checkInstallResult(res, device, launchInfo, remotePath,
-                        InstallRetryMode.NEVER);
+                return checkInstallResult(res, device, launchInfo, remotePath, InstallRetryMode.NEVER);
             }
             AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
                     "Installation error! The package already exists.");
         } else if (result.equals("INSTALL_FAILED_INVALID_APK")) { //$NON-NLS-1$
             AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
-                "Installation failed due to invalid APK file!",
-                "Please check logcat output for more details.");
+                    "Installation failed due to invalid APK file!", "Please check logcat output for more details.");
         } else if (result.equals("INSTALL_FAILED_INVALID_URI")) { //$NON-NLS-1$
-            AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
-                "Installation failed due to invalid URI!",
-                "Please check logcat output for more details.");
+            AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), "Installation failed due to invalid URI!",
+                    "Please check logcat output for more details.");
         } else if (result.equals("INSTALL_FAILED_COULDNT_COPY")) { //$NON-NLS-1$
-            AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
-                String.format("Installation failed: Could not copy %1$s to its final location!",
-                        launchInfo.getPackageFile().getName()),
-                "Please check logcat output for more details.");
+            AndmoreAndroidPlugin
+                    .printErrorToConsole(launchInfo.getProject(),
+                            String.format("Installation failed: Could not copy %1$s to its final location!",
+                                    launchInfo.getPackageFile().getName()),
+                            "Please check logcat output for more details.");
         } else if (result.equals("INSTALL_PARSE_FAILED_INCONSISTENT_CERTIFICATES")) { //$NON-NLS-1$
             if (retryMode != InstallRetryMode.NEVER) {
                 boolean prompt = AndmoreAndroidPlugin.displayPrompt("Application Install",
-                                "Re-installation failed due to different application signatures. You must perform a full uninstall of the application. WARNING: This will remove the application data!\nDo you want to uninstall?");
+                        "Re-installation failed due to different application signatures. You must perform a full uninstall of the application. WARNING: This will remove the application data!\nDo you want to uninstall?");
                 if (prompt) {
                     doUninstall(device, launchInfo);
                     String res = doInstall(launchInfo, remotePath, device, false);
-                    return checkInstallResult(res, device, launchInfo, remotePath,
-                            InstallRetryMode.NEVER);
+                    return checkInstallResult(res, device, launchInfo, remotePath, InstallRetryMode.NEVER);
                 }
             }
             AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
@@ -1219,8 +1168,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                     String.format("Please execute 'adb uninstall %1$s' in a shell.", launchInfo.getPackageName()));
         } else {
             AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
-                String.format("Installation error: %1$s", result),
-                "Please check logcat output for more details.");
+                    String.format("Installation error: %1$s", result), "Please check logcat output for more details.");
         }
 
         return false;
@@ -1233,13 +1181,11 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * @return a {@link String} with an error code, or <code>null</code> if success.
      * @throws InstallException if the installation failed.
      */
-    private String doUninstall(IDevice device, DelayedLaunchInfo launchInfo)
-            throws InstallException {
+    private String doUninstall(IDevice device, DelayedLaunchInfo launchInfo) throws InstallException {
         try {
             return device.uninstallPackage(launchInfo.getPackageName());
         } catch (InstallException e) {
-            String msg = String.format(
-                    "Failed to uninstall %1$s: %2$s", launchInfo.getPackageName(), e.getMessage());
+            String msg = String.format("Failed to uninstall %1$s: %2$s", launchInfo.getPackageName(), e.getMessage());
             AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), msg);
             throw e;
         }
@@ -1255,8 +1201,8 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * @return a {@link String} with an error code, or <code>null</code> if success.
      * @throws InstallException if the uninstallation failed.
      */
-    private String doInstall(DelayedLaunchInfo launchInfo, final String remotePath,
-            final IDevice device, boolean reinstall) throws InstallException {
+    private String doInstall(DelayedLaunchInfo launchInfo, final String remotePath, final IDevice device,
+            boolean reinstall) throws InstallException {
         return device.installRemotePackage(remotePath, reinstall);
     }
 
@@ -1327,7 +1273,8 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
 
         boolean needsWipeData = config.mWipeData && !hasWipeData;
         if (needsWipeData) {
-            if (!AndmoreAndroidPlugin.displayPrompt("Android Launch", "Are you sure you want to wipe all user data when starting this emulator?")) {
+            if (!AndmoreAndroidPlugin.displayPrompt("Android Launch",
+                    "Are you sure you want to wipe all user data when starting this emulator?")) {
                 needsWipeData = false;
             }
         }
@@ -1385,26 +1332,23 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * @return an existing <code>ILaunchConfiguration</code> object matching the project, or
      *      <code>null</code>.
      */
-    private static ILaunchConfiguration findConfig(ILaunchManager manager,
-            ILaunchConfigurationType type, String projectName) {
+    private static ILaunchConfiguration findConfig(ILaunchManager manager, ILaunchConfigurationType type,
+            String projectName) {
         try {
             ILaunchConfiguration[] configs = manager.getLaunchConfigurations(type);
 
             for (ILaunchConfiguration config : configs) {
-                if (config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
-                        "").equals(projectName)) {  //$NON-NLS-1$
+                if (config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, "").equals(projectName)) { //$NON-NLS-1$
                     return config;
                 }
             }
         } catch (CoreException e) {
-            MessageDialog.openError(AndmoreAndroidPlugin.getShell(),
-                    "Launch Error", e.getStatus().getMessage());
+            MessageDialog.openError(AndmoreAndroidPlugin.getShell(), "Launch Error", e.getStatus().getMessage());
         }
 
         // didn't find anything that matches. Return null
         return null;
     }
-
 
     /**
      * Connects a remote debugger on the specified port.
@@ -1415,15 +1359,14 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
      * @throws CoreException
      */
     @SuppressWarnings("deprecation")
-    public static boolean connectRemoteDebugger(int debugPort,
-            AndroidLaunch launch, IProgressMonitor monitor)
-                throws CoreException {
+    public static boolean connectRemoteDebugger(int debugPort, AndroidLaunch launch, IProgressMonitor monitor)
+            throws CoreException {
         // get some default parameters.
         int connectTimeout = JavaRuntime.getPreferences().getInt(JavaRuntime.PREF_CONNECT_TIMEOUT);
 
         HashMap<String, String> newMap = new HashMap<String, String>();
 
-        newMap.put("hostname", "localhost");  //$NON-NLS-1$ //$NON-NLS-2$
+        newMap.put("hostname", "localhost"); //$NON-NLS-1$ //$NON-NLS-2$
 
         newMap.put("port", Integer.toString(debugPort)); //$NON-NLS-1$
 
@@ -1486,13 +1429,12 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
         synchronized (sListLock) {
             for (DelayedLaunchInfo launchInfo : mWaitingForReadyEmulatorList) {
                 AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
-                    String.format(message, launchInfo.getLaunchAction().getLaunchDescription()));
+                        String.format(message, launchInfo.getLaunchAction().getLaunchDescription()));
                 stopLaunch(launchInfo);
             }
             for (DelayedLaunchInfo launchInfo : mWaitingForDebuggerApplications) {
                 AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
-                        String.format(message,
-                                launchInfo.getLaunchAction().getLaunchDescription()));
+                        String.format(message, launchInfo.getLaunchAction().getLaunchDescription()));
                 stopLaunch(launchInfo);
             }
 
@@ -1528,10 +1470,9 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                 // and tell the user about it
                 AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(),
                         String.format("New emulator found: %1$s", device.getSerialNumber()));
-                AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(),
-                        String.format("Waiting for HOME ('%1$s') to be launched...",
-                            AndmoreAndroidPlugin.getDefault().getPreferenceStore().getString(
-                                    AdtPrefs.PREFS_HOME_PACKAGE)));
+                AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(), String.format(
+                        "Waiting for HOME ('%1$s') to be launched...",
+                        AndmoreAndroidPlugin.getDefault().getPreferenceStore().getString(AdtPrefs.PREFS_HOME_PACKAGE)));
             }
         }
     }
@@ -1549,22 +1490,19 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
         // any pending launch on this device must be canceled.
         String message = "%1$s disconnected! Cancelling '%2$s'!";
         synchronized (sListLock) {
-            ArrayList<DelayedLaunchInfo> copyList =
-                (ArrayList<DelayedLaunchInfo>) mWaitingForReadyEmulatorList.clone();
+            ArrayList<DelayedLaunchInfo> copyList = (ArrayList<DelayedLaunchInfo>) mWaitingForReadyEmulatorList.clone();
             for (DelayedLaunchInfo launchInfo : copyList) {
                 if (launchInfo.getDevice() == device) {
-                    AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
-                            String.format(message, device.getSerialNumber(),
-                                    launchInfo.getLaunchAction().getLaunchDescription()));
+                    AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), String.format(message,
+                            device.getSerialNumber(), launchInfo.getLaunchAction().getLaunchDescription()));
                     stopLaunch(launchInfo);
                 }
             }
             copyList = (ArrayList<DelayedLaunchInfo>) mWaitingForDebuggerApplications.clone();
             for (DelayedLaunchInfo launchInfo : copyList) {
                 if (launchInfo.getDevice() == device) {
-                    AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
-                            String.format(message, device.getSerialNumber(),
-                                    launchInfo.getLaunchAction().getLaunchDescription()));
+                    AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), String.format(message,
+                            device.getSerialNumber(), launchInfo.getLaunchAction().getLaunchDescription()));
                     stopLaunch(launchInfo);
                 }
             }
@@ -1615,7 +1553,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
 
                     // look for application waiting for home
                     synchronized (sListLock) {
-                        for (int i = 0; i < mWaitingForReadyEmulatorList.size(); ) {
+                        for (int i = 0; i < mWaitingForReadyEmulatorList.size();) {
                             DelayedLaunchInfo launchInfo = mWaitingForReadyEmulatorList.get(i);
                             if (launchInfo.getDevice() == device) {
                                 // it's match, remove from the list
@@ -1634,8 +1572,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                                 }
 
                                 AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(),
-                                        String.format("HOME is up on device '%1$s'",
-                                                device.getSerialNumber()));
+                                        String.format("HOME is up on device '%1$s'", device.getSerialNumber()));
 
                                 // attempt to sync the new package onto the device.
                                 if (syncApp(launchInfo, device)) {
@@ -1644,7 +1581,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                                 } else {
                                     // failure! Cancel and return
                                     AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
-                                    "Launch canceled!");
+                                            "Launch canceled!");
                                     stopLaunch(launchInfo);
                                 }
 
@@ -1697,16 +1634,15 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
             String applicationName = client.getClientData().getClientDescription();
             Log.d("adt", "App Name: " + applicationName);
             synchronized (sListLock) {
-                for (int i = 0; i < mWaitingForDebuggerApplications.size(); ) {
+                for (int i = 0; i < mWaitingForDebuggerApplications.size();) {
                     final DelayedLaunchInfo launchInfo = mWaitingForDebuggerApplications.get(i);
-                    if (client.getDevice() == launchInfo.getDevice() &&
-                            applicationName.equals(launchInfo.getDebugPackageName())) {
+                    if (client.getDevice() == launchInfo.getDevice()
+                            && applicationName.equals(launchInfo.getDebugPackageName())) {
                         // this is a match. We remove the launch info from the list
                         mWaitingForDebuggerApplications.remove(i);
 
                         // and connect the debugger.
-                        String msg = String.format(
-                                "Attempting to connect debugger to '%1$s' on port %2$d",
+                        String msg = String.format("Attempting to connect debugger to '%1$s' on port %2$d",
                                 launchInfo.getDebugPackageName(), client.getDebuggerListenPort());
                         AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(), msg);
 
@@ -1714,9 +1650,7 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
                             @Override
                             public void run() {
                                 try {
-                                    if (connectRemoteDebugger(
-                                            client.getDebuggerListenPort(),
-                                            launchInfo.getLaunch(),
+                                    if (connectRemoteDebugger(client.getDebuggerListenPort(), launchInfo.getLaunch(),
                                             launchInfo.getMonitor()) == false) {
                                         return;
                                     }
@@ -1813,14 +1747,12 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
         }
     }
 
-    public static void updateLaunchConfigWithLastUsedDevice(
-            ILaunchConfiguration launchConfiguration, DeviceChooserResponse response) {
+    public static void updateLaunchConfigWithLastUsedDevice(ILaunchConfiguration launchConfiguration,
+            DeviceChooserResponse response) {
         try {
             boolean configModified = false;
-            boolean reuse = launchConfiguration.getAttribute(
-                    LaunchConfigDelegate.ATTR_REUSE_LAST_USED_DEVICE, false);
-            String serial = launchConfiguration.getAttribute(
-                    LaunchConfigDelegate.ATTR_LAST_USED_DEVICE, (String)null);
+            boolean reuse = launchConfiguration.getAttribute(LaunchConfigDelegate.ATTR_REUSE_LAST_USED_DEVICE, false);
+            String serial = launchConfiguration.getAttribute(LaunchConfigDelegate.ATTR_LAST_USED_DEVICE, (String) null);
 
             ILaunchConfigurationWorkingCopy wc = launchConfiguration.getWorkingCopy();
             if (reuse != response.useDeviceForFutureLaunches()) {
@@ -1852,15 +1784,13 @@ public final class AndroidLaunchController implements IDebugBridgeChangeListener
     }
 
     @Nullable
-    public static IDevice getDeviceIfOnline(@Nullable String serial,
-            @NonNull IDevice[] onlineDevices) {
+    public static IDevice getDeviceIfOnline(@Nullable String serial, @NonNull IDevice[] onlineDevices) {
         if (serial == null) {
             return null;
         }
 
         for (IDevice device : onlineDevices) {
-            if (serial.equals(device.getAvdName()) ||
-                    serial.equals(device.getSerialNumber())) {
+            if (serial.equals(device.getAvdName()) || serial.equals(device.getSerialNumber())) {
                 return device;
             }
         }

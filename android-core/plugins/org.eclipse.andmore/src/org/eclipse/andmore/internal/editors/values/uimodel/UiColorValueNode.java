@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,8 @@
  */
 
 package org.eclipse.andmore.internal.editors.values.uimodel;
+
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.internal.editors.descriptors.TextValueDescriptor;
 import org.eclipse.andmore.internal.editors.uimodel.UiAttributeNode;
@@ -27,8 +26,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Text;
 
-import java.util.regex.Pattern;
-
 /**
  * Displays and edits a color XML element value with a custom validator.
  * <p/>
@@ -37,8 +34,7 @@ import java.util.regex.Pattern;
 public class UiColorValueNode extends UiTextValueNode {
 
     /** Accepted RGBA formats are one of #RGB, #ARGB, #RRGGBB or #AARRGGBB. */
-    private static final Pattern RGBA_REGEXP = Pattern.compile(
-            "#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})"); //$NON-NLS-1$
+    private static final Pattern RGBA_REGEXP = Pattern.compile("#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})"); //$NON-NLS-1$
 
     public UiColorValueNode(TextValueDescriptor attributeDescriptor, UiElementNode uiParent) {
         super(attributeDescriptor, uiParent);
@@ -59,8 +55,8 @@ public class UiColorValueNode extends UiTextValueNode {
                     getManagedForm().getMessageManager().removeMessage(text, text);
                 } else {
                     getManagedForm().getMessageManager().addMessage(text,
-                            "Accepted color formats are one of #RGB, #ARGB, #RRGGBB or #AARRGGBB.",
-                            null /* data */, IMessageProvider.ERROR, text);
+                            "Accepted color formats are one of #RGB, #ARGB, #RRGGBB or #AARRGGBB.", null /* data */,
+                            IMessageProvider.ERROR, text);
                 }
             }
         };

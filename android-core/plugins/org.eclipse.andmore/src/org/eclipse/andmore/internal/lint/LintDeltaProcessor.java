@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,24 +16,24 @@ import static com.android.SdkConstants.DOT_CLASS;
 import static com.android.SdkConstants.DOT_JAVA;
 import static com.android.SdkConstants.EXT_JAVA;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor;
-import org.eclipse.andmore.internal.resources.manager.ResourceManager;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IFileListener;
+import org.eclipse.andmore.internal.resources.manager.ResourceManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.swt.widgets.Display;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 
 /**
  * Delta processor for Java files, which runs single-file lints if it finds that
@@ -74,7 +71,7 @@ public class LintDeltaProcessor implements Runnable {
      *
      * @param delta the delta describing recently changed files
      */
-    public void process(@NonNull IResourceDelta delta)  {
+    public void process(@NonNull IResourceDelta delta) {
         if (mActiveFile == null || !mActiveFile.getName().endsWith(DOT_JAVA)) {
             return;
         }
@@ -83,8 +80,7 @@ public class LintDeltaProcessor implements Runnable {
         gatherFiles(delta);
 
         if (!mFiles.isEmpty()) {
-            EclipseLintRunner.startLint(mFiles, mActiveFile, null,
-                    false /*fatalOnly*/, false /*show*/);
+            EclipseLintRunner.startLint(mFiles, mActiveFile, null, false /*fatalOnly*/, false /*show*/);
         }
     }
 
@@ -94,15 +90,14 @@ public class LintDeltaProcessor implements Runnable {
      *
      * @param file the file that was changed
      */
-    public void process(@NonNull IFile file)  {
+    public void process(@NonNull IFile file) {
         if (mActiveFile == null || !mActiveFile.getName().endsWith(DOT_JAVA)) {
             return;
         }
 
         if (file.equals(mActiveFile)) {
-            mFiles = Collections.<IResource>singletonList(file);
-            EclipseLintRunner.startLint(mFiles, mActiveFile, null,
-                    false /*fatalOnly*/, false /*show*/);
+            mFiles = Collections.<IResource> singletonList(file);
+            EclipseLintRunner.startLint(mFiles, mActiveFile, null, false /*fatalOnly*/, false /*show*/);
         }
     }
 
@@ -165,9 +160,8 @@ public class LintDeltaProcessor implements Runnable {
         assert sListener == null; // Should only be called once on plugin activation
         sListener = new IFileListener() {
             @Override
-            public void fileChanged(@NonNull IFile file,
-                    @NonNull IMarkerDelta[] markerDeltas,
-                    int kind, @Nullable String extension, int flags, boolean isAndroidProject) {
+            public void fileChanged(@NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas, int kind,
+                    @Nullable String extension, int flags, boolean isAndroidProject) {
                 if (!isAndroidProject || flags == IResourceDelta.MARKERS) {
                     // If not an Android project or ONLY the markers changed.
                     // Ignore these since they happen
@@ -176,8 +170,7 @@ public class LintDeltaProcessor implements Runnable {
                     // again.
                     return;
                 }
-                if (EXT_JAVA.equals(extension)
-                        && !ResourceManager.isAutoBuilding()
+                if (EXT_JAVA.equals(extension) && !ResourceManager.isAutoBuilding()
                         && AdtPrefs.getPrefs().isLintOnSave()) {
                     LintDeltaProcessor.create().process(file);
                 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,6 +22,10 @@ import static org.eclipse.andmore.common.layout.BaseViewRule.stripIdPrefix;
 import static org.eclipse.andmore.common.layout.relative.ConstraintType.LAYOUT_CENTER_HORIZONTAL;
 import static org.eclipse.andmore.common.layout.relative.ConstraintType.LAYOUT_CENTER_VERTICAL;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
@@ -32,10 +33,6 @@ import com.android.ide.common.api.INode;
 import com.android.ide.common.api.INode.IAttribute;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Handles deletions in a relative layout, transferring constraints across
@@ -61,8 +58,7 @@ public class DeletionHandler {
      * @param moved nodes that were moved (e.g. deleted, but also inserted elsewhere)
      * @param layout the parent layout of the deleted nodes
      */
-    public DeletionHandler(@NonNull List<INode> deleted, @NonNull List<INode> moved,
-            @NonNull INode layout) {
+    public DeletionHandler(@NonNull List<INode> deleted, @NonNull List<INode> moved, @NonNull INode layout) {
         mDeleted = deleted;
         mMoved = moved;
         mLayout = layout;
@@ -96,8 +92,7 @@ public class DeletionHandler {
 
     @Nullable
     private static String getId(@NonNull IAttribute attribute) {
-        if (attribute.getName().startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)
-                && ANDROID_URI.equals(attribute.getUri())
+        if (attribute.getName().startsWith(ATTR_LAYOUT_RESOURCE_PREFIX) && ANDROID_URI.equals(attribute.getUri())
                 && !attribute.getName().startsWith(ATTR_LAYOUT_MARGIN)) {
             String id = attribute.getValue();
             // It might not be an id reference, so check manually rather than just
@@ -204,8 +199,8 @@ public class DeletionHandler {
      * in parent, then the constraint is turned into center horizontal.
      */
     @Nullable
-    private static ConstraintType getCompatibleConstraint(
-            @NonNull ConstraintType first, @NonNull ConstraintType second) {
+    private static ConstraintType getCompatibleConstraint(@NonNull ConstraintType first,
+            @NonNull ConstraintType second) {
         if (first == second) {
             return first;
         }

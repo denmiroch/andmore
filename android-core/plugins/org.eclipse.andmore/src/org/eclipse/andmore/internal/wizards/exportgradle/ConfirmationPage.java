@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,9 @@
 
 package org.eclipse.andmore.internal.wizards.exportgradle;
 
-import com.google.common.collect.Lists;
+import java.io.File;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.dialogs.Dialog;
@@ -40,9 +39,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * Confirmation page to review the actual project export
@@ -79,8 +76,7 @@ public class ConfirmationPage extends WizardPage {
         setControl(workArea);
 
         workArea.setLayout(new GridLayout());
-        workArea.setLayoutData(new GridData(GridData.FILL_BOTH
-                | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
+        workArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
         Label title = new Label(workArea, SWT.NONE);
         title.setText("Please review the export options.");
@@ -125,12 +121,10 @@ public class ConfirmationPage extends WizardPage {
             }
 
             @Override
-            public void dispose() {
-            }
+            public void dispose() {}
 
             @Override
-            public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-            }
+            public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
         });
         mTableViewer.setLabelProvider(new WorkbenchLabelProvider() {
@@ -176,8 +170,7 @@ public class ConfirmationPage extends WizardPage {
                     mModuleDescription2.setText("Path: " + module.getPath());
 
                     if (mOverrideProjects.contains(module.getJavaProject())) {
-                        mModuleDescription3.setText(
-                                "WARNING: build.gradle already exists for this project");
+                        mModuleDescription3.setText("WARNING: build.gradle already exists for this project");
                     } else {
                         mModuleDescription3.setText("");
                     }
@@ -219,8 +212,7 @@ public class ConfirmationPage extends WizardPage {
     private void computeOverride(String commonRoot) {
         mOverrideProjects = Lists.newArrayList();
         for (GradleModule module : mBuilder.getModules()) {
-            if (new File(module.getProject().getLocation().toFile(),
-                    BuildFileCreator.BUILD_FILE).exists()) {
+            if (new File(module.getProject().getLocation().toFile(), BuildFileCreator.BUILD_FILE).exists()) {
                 mOverrideProjects.add(module.getJavaProject());
             }
         }
@@ -229,11 +221,9 @@ public class ConfirmationPage extends WizardPage {
         boolean settingsFile = new File(commonRoot, BuildFileCreator.SETTINGS_FILE).exists();
         boolean buildFile = new File(commonRoot, BuildFileCreator.BUILD_FILE).exists();
         if (settingsFile && buildFile) {
-             mProjectRootWarning.setText(
-                     "WARNING: build.gradle/settings.gradle already exists at this location.");
+            mProjectRootWarning.setText("WARNING: build.gradle/settings.gradle already exists at this location.");
         } else if (settingsFile) {
-            mProjectRootWarning.setText(
-                    "WARNING: settings.gradle already exists at this location.");
+            mProjectRootWarning.setText("WARNING: settings.gradle already exists at this location.");
         } else if (buildFile) {
             mProjectRootWarning.setText("WARNING: build.gradle already exists at this location.");
         }

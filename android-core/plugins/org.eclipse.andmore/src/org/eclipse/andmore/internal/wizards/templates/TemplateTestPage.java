@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +11,8 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.wizards.templates;
+
+import java.io.File;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
@@ -30,11 +29,8 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import java.io.File;
-
 /** For template developers: Test local template directory */
-public class TemplateTestPage extends WizardPage
-        implements SelectionListener, ModifyListener {
+public class TemplateTestPage extends WizardPage implements SelectionListener, ModifyListener {
     private Text mLocation;
     private Button mButton;
     private static String sLocation; // Persist between repeated invocations
@@ -101,8 +97,7 @@ public class TemplateTestPage extends WizardPage
 
                 if (mTemplate.isDirectory()) {
                     if (!new File(mTemplate, TemplateHandler.TEMPLATE_XML).exists()) {
-                        error = String.format("Not a template: missing template.xml file in %1$s ",
-                                path);
+                        error = String.format("Not a template: missing template.xml file in %1$s ", path);
                     }
                 } else {
                     if (mTemplate.getName().equals(TemplateHandler.TEMPLATE_XML)) {
@@ -156,6 +151,5 @@ public class TemplateTestPage extends WizardPage
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 }

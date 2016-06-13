@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,17 +19,16 @@ import static com.android.SdkConstants.AUTO_URI;
 import static com.android.SdkConstants.CLASS_VIEWGROUP;
 import static com.android.SdkConstants.URI_PREFIX;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.resources.ResourceFile;
-import com.android.ide.common.resources.ResourceItem;
-import com.android.resources.ResourceType;
-import com.android.sdklib.IAndroidTarget;
-import com.google.common.collect.Maps;
-import com.google.common.collect.ObjectArrays;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.common.resources.platform.AttributeInfo;
 import org.eclipse.andmore.common.resources.platform.AttrsXmlParser;
 import org.eclipse.andmore.common.resources.platform.ViewClassInfo;
@@ -62,13 +58,14 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.graphics.Image;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.resources.ResourceFile;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.resources.ResourceType;
+import com.android.sdklib.IAndroidTarget;
+import com.google.common.collect.Maps;
+import com.google.common.collect.ObjectArrays;
 
 /**
  * Service responsible for creating/managing {@link ViewElementDescriptor} objects for custom
@@ -94,8 +91,7 @@ public final class CustomViewDescriptorService {
      * where the keys are the fully qualified class name, and the values are their associated
      * {@link ViewElementDescriptor}.
      */
-    private HashMap<IProject, HashMap<String, ViewElementDescriptor>> mCustomDescriptorMap =
-        new HashMap<IProject, HashMap<String, ViewElementDescriptor>>();
+    private HashMap<IProject, HashMap<String, ViewElementDescriptor>> mCustomDescriptorMap = new HashMap<IProject, HashMap<String, ViewElementDescriptor>>();
 
     /**
      * TODO will be used to update the ViewElementDescriptor of the custom view when it
@@ -117,9 +113,7 @@ public final class CustomViewDescriptorService {
          * @param className the fully qualified class name.
          * @param descriptor the updated ElementDescriptor.
          */
-        public void updatedClassInfo(IProject project,
-                                     String className,
-                                     ViewElementDescriptor descriptor);
+        public void updatedClassInfo(IProject project, String className, ViewElementDescriptor descriptor);
     }
 
     /**
@@ -185,35 +179,28 @@ public final class CustomViewDescriptorService {
                     // the type exists. Let's get the parent class and its ViewClassInfo.
 
                     // get the type hierarchy
-                    ITypeHierarchy hierarchy = type.newSupertypeHierarchy(
-                            new NullProgressMonitor());
+                    ITypeHierarchy hierarchy = type.newSupertypeHierarchy(new NullProgressMonitor());
 
-                    ViewElementDescriptor parentDescriptor = createViewDescriptor(
-                            hierarchy.getSuperclass(type), project, hierarchy);
+                    ViewElementDescriptor parentDescriptor = createViewDescriptor(hierarchy.getSuperclass(type),
+                            project, hierarchy);
 
                     if (parentDescriptor != null) {
                         // we have a valid parent, lets create a new ViewElementDescriptor.
                         List<AttributeDescriptor> attrList = new ArrayList<AttributeDescriptor>();
                         List<AttributeDescriptor> paramList = new ArrayList<AttributeDescriptor>();
-                        Map<ResourceFile, Long> files = findCustomDescriptors(project, type,
-                                attrList, paramList);
+                        Map<ResourceFile, Long> files = findCustomDescriptors(project, type, attrList, paramList);
 
-                        AttributeDescriptor[] attributes =
-                                getAttributeDescriptor(type, parentDescriptor);
+                        AttributeDescriptor[] attributes = getAttributeDescriptor(type, parentDescriptor);
                         if (!attrList.isEmpty()) {
                             attributes = join(attrList, attributes);
                         }
-                        AttributeDescriptor[] layoutAttributes =
-                                getLayoutAttributeDescriptors(type, parentDescriptor);
+                        AttributeDescriptor[] layoutAttributes = getLayoutAttributeDescriptors(type, parentDescriptor);
                         if (!paramList.isEmpty()) {
                             layoutAttributes = join(paramList, layoutAttributes);
                         }
                         String name = DescriptorsUtils.getBasename(fqcn);
-                        ViewElementDescriptor descriptor = new CustomViewDescriptor(name, fqcn,
-                                attributes,
-                                layoutAttributes,
-                                parentDescriptor.getChildren(),
-                                project, files);
+                        ViewElementDescriptor descriptor = new CustomViewDescriptor(name, fqcn, attributes,
+                                layoutAttributes, parentDescriptor.getChildren(), project, files);
                         descriptor.setSuperClass(parentDescriptor);
 
                         synchronized (mCustomDescriptorMap) {
@@ -239,13 +226,10 @@ public final class CustomViewDescriptorService {
         return null;
     }
 
-    private static AttributeDescriptor[] join(
-            @NonNull List<AttributeDescriptor> attributeList,
+    private static AttributeDescriptor[] join(@NonNull List<AttributeDescriptor> attributeList,
             @NonNull AttributeDescriptor[] attributes) {
         if (!attributeList.isEmpty()) {
-            return ObjectArrays.concat(
-                    attributeList.toArray(new AttributeDescriptor[attributeList.size()]),
-                    attributes,
+            return ObjectArrays.concat(attributeList.toArray(new AttributeDescriptor[attributeList.size()]), attributes,
                     AttributeDescriptor.class);
         } else {
             return attributes;
@@ -263,9 +247,7 @@ public final class CustomViewDescriptorService {
 
         AttrsXmlParser parser = mParserCache.get(file);
         if (parser == null) {
-            parser = new AttrsXmlParser(
-                    file.getFile().getOsLocation(),
-                    AndmoreAndroidPlugin.getDefault(), 20);
+            parser = new AttrsXmlParser(file.getFile().getOsLocation(), AndmoreAndroidPlugin.getDefault(), 20);
             parser.preload();
             mParserCache.put(file, parser);
         }
@@ -274,11 +256,8 @@ public final class CustomViewDescriptorService {
     }
 
     /** Compute/find the styleable resources for the given type, if possible */
-    private Map<ResourceFile, Long> findCustomDescriptors(
-            IProject project,
-            IType type,
-            List<AttributeDescriptor> customAttributes,
-            List<AttributeDescriptor> customLayoutAttributes) {
+    private Map<ResourceFile, Long> findCustomDescriptors(IProject project, IType type,
+            List<AttributeDescriptor> customAttributes, List<AttributeDescriptor> customLayoutAttributes) {
         // Look up the project where the type is declared (could be a library project;
         // we cannot use type.getJavaProject().getProject())
         IProject library = getProjectDeclaringType(type);
@@ -290,8 +269,7 @@ public final class CustomViewDescriptorService {
         Set<ResourceFile> resourceFiles = findAttrsFiles(library, className);
         if (resourceFiles != null && resourceFiles.size() > 0) {
             String appUri = getAppResUri(project);
-            Map<ResourceFile, Long> timestamps =
-                    Maps.newHashMapWithExpectedSize(resourceFiles.size());
+            Map<ResourceFile, Long> timestamps = Maps.newHashMapWithExpectedSize(resourceFiles.size());
             for (ResourceFile file : resourceFiles) {
                 AttrsXmlParser attrsXmlParser = getParser(file);
                 String fqcn = type.getFullyQualifiedName();
@@ -302,8 +280,8 @@ public final class CustomViewDescriptorService {
                 appendAttributes(customAttributes, classInfo.getAttributes(), appUri);
 
                 // Layout params
-                LayoutParamsInfo layoutInfo = new ViewClassInfo.LayoutParamsInfo(
-                        classInfo, "Layout", null /*superClassInfo*/); //$NON-NLS-1$
+                LayoutParamsInfo layoutInfo = new ViewClassInfo.LayoutParamsInfo(classInfo, "Layout", //$NON-NLS-1$
+                        null /*superClassInfo*/);
                 attrsXmlParser.loadLayoutParamsAttributes(layoutInfo);
                 appendAttributes(customLayoutAttributes, layoutInfo.getAttributes(), appUri);
 
@@ -326,13 +304,11 @@ public final class CustomViewDescriptorService {
         ResourceManager manager = ResourceManager.getInstance();
         ProjectResources resources = manager.getProjectResources(library);
         if (resources != null) {
-            Collection<ResourceItem> items =
-                resources.getResourceItemsOfType(ResourceType.DECLARE_STYLEABLE);
+            Collection<ResourceItem> items = resources.getResourceItemsOfType(ResourceType.DECLARE_STYLEABLE);
             for (ResourceItem item : items) {
                 String viewName = item.getName();
                 if (viewName.equals(className)
-                        || (viewName.startsWith(className)
-                            && viewName.equals(className + "_Layout"))) { //$NON-NLS-1$
+                        || (viewName.startsWith(className) && viewName.equals(className + "_Layout"))) { //$NON-NLS-1$
                     if (resourceFiles == null) {
                         resourceFiles = new HashSet<ResourceFile>();
                     }
@@ -382,7 +358,6 @@ public final class CustomViewDescriptorService {
         return appResource;
     }
 
-
     /** Append the {@link AttributeInfo} objects converted {@link AttributeDescriptor}
      * objects into the given attribute list.
      * <p>
@@ -391,8 +366,8 @@ public final class CustomViewDescriptorService {
      * but it handles namespace declarations in the attrs.xml file where the android:
      * namespace is included in the names.
      */
-    private static void appendAttributes(List<AttributeDescriptor> attributes,
-            AttributeInfo[] attributeInfos, String appResource) {
+    private static void appendAttributes(List<AttributeDescriptor> attributes, AttributeInfo[] attributeInfos,
+            String appResource) {
         // Custom attributes
         for (AttributeInfo info : attributeInfos) {
             String nsUri;
@@ -403,8 +378,7 @@ public final class CustomViewDescriptorService {
                 nsUri = appResource;
             }
 
-            DescriptorsUtils.appendAttribute(attributes,
-                    null /*elementXmlName*/, nsUri, info, false /*required*/,
+            DescriptorsUtils.appendAttribute(attributes, null /*elementXmlName*/, nsUri, info, false /*required*/,
                     null /*overrides*/);
         }
     }
@@ -414,8 +388,7 @@ public final class CustomViewDescriptorService {
      *
      * @return A {@link ViewElementDescriptor} or null if type or typeHierarchy is null.
      */
-    private ViewElementDescriptor createViewDescriptor(IType type, IProject project,
-            ITypeHierarchy typeHierarchy) {
+    private ViewElementDescriptor createViewDescriptor(IType type, IProject project, ITypeHierarchy typeHierarchy) {
         // check if the type is a built-in View class.
         List<ViewElementDescriptor> builtInList = null;
 
@@ -450,8 +423,7 @@ public final class CustomViewDescriptorService {
 
         IType parentType = typeHierarchy.getSuperclass(type);
         if (parentType != null) {
-            ViewElementDescriptor parentDescriptor = createViewDescriptor(parentType, project,
-                    typeHierarchy);
+            ViewElementDescriptor parentDescriptor = createViewDescriptor(parentType, project, typeHierarchy);
 
             if (parentDescriptor != null) {
                 // parent class is a valid View class with a descriptor, so we create one
@@ -470,8 +442,7 @@ public final class CustomViewDescriptorService {
                 }
                 ViewElementDescriptor descriptor = new CustomViewDescriptor(name, fqcn,
                         getAttributeDescriptor(type, parentDescriptor),
-                        getLayoutAttributeDescriptors(type, parentDescriptor),
-                        children, project, null);
+                        getLayoutAttributeDescriptors(type, parentDescriptor), children, project, null);
                 descriptor.setSuperClass(parentDescriptor);
 
                 // add it to the map
@@ -505,8 +476,7 @@ public final class CustomViewDescriptorService {
      * @param type the type for which the {@link AttributeDescriptor} are returned.
      * @param parentDescriptor the {@link ViewElementDescriptor} of the direct superclass.
      */
-    private static AttributeDescriptor[] getAttributeDescriptor(IType type,
-            ViewElementDescriptor parentDescriptor) {
+    private static AttributeDescriptor[] getAttributeDescriptor(IType type, ViewElementDescriptor parentDescriptor) {
         // TODO add the class attribute descriptors to the parent descriptors.
         return parentDescriptor.getAttributes();
     }
@@ -521,19 +491,14 @@ public final class CustomViewDescriptorService {
         private IProject mProject;
 
         public CustomViewDescriptor(String name, String fqcn, AttributeDescriptor[] attributes,
-                AttributeDescriptor[] layoutAttributes,
-                ElementDescriptor[] children, IProject project,
+                AttributeDescriptor[] layoutAttributes, ElementDescriptor[] children, IProject project,
                 Map<ResourceFile, Long> timestamps) {
-            super(
-                    fqcn, // xml name
+            super(fqcn, // xml name
                     name, // ui name
                     fqcn, // full class name
                     fqcn, // tooltip
                     null, // sdk_url
-                    attributes,
-                    layoutAttributes,
-                    children,
-                    false // mandatory
+                    attributes, layoutAttributes, children, false // mandatory
             );
             mTimeStamps = timestamps;
             mProject = project;
@@ -545,8 +510,7 @@ public final class CustomViewDescriptorService {
 
             int index = mXmlName.lastIndexOf('.');
             if (index != -1) {
-                return iconFactory.getIcon(mXmlName.substring(index + 1),
-                        "customView"); //$NON-NLS-1$
+                return iconFactory.getIcon(mXmlName.substring(index + 1), "customView"); //$NON-NLS-1$
             }
 
             return iconFactory.getIcon("customView"); //$NON-NLS-1$
@@ -599,8 +563,7 @@ public final class CustomViewDescriptorService {
                         mTimeStamps = findCustomDescriptors(mProject, type, attrList, paramList);
 
                         ViewElementDescriptor parentDescriptor = getSuperClassDesc();
-                        AttributeDescriptor[] attributes =
-                                getAttributeDescriptor(type, parentDescriptor);
+                        AttributeDescriptor[] attributes = getAttributeDescriptor(type, parentDescriptor);
                         if (!attrList.isEmpty()) {
                             attributes = join(attrList, attributes);
                         }

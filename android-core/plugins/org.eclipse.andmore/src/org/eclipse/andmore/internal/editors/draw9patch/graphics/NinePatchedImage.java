@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,15 +16,15 @@ package org.eclipse.andmore.internal.editors.draw9patch.graphics;
 import static com.android.SdkConstants.DOT_9PNG;
 import static com.android.SdkConstants.DOT_PNG;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Rectangle;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * The model of 9-patched image.
@@ -75,7 +72,6 @@ public class NinePatchedImage {
 
     private final List<Tick> mHorizontalContents = new ArrayList<Tick>();
     private final List<Tick> mVerticalContents = new ArrayList<Tick>();
-
 
     private static final int CHUNK_BIN_SIZE = 100;
     private final List<Chunk> mChunkBin = new ArrayList<Chunk>(CHUNK_BIN_SIZE);
@@ -273,7 +269,7 @@ public class NinePatchedImage {
                 isValid = false;
             }
             // right column
-            if (!ensureVerticalPixel(width -1, y, mVerticalContentPixels)) {
+            if (!ensureVerticalPixel(width - 1, y, mVerticalContentPixels)) {
                 isValid = false;
             }
         }
@@ -312,8 +308,7 @@ public class NinePatchedImage {
     }
 
     public boolean isValid(int x, int y) {
-        return (x == 0) ^ (y == 0)
-                ^ (x == mBaseImageData.width - 1) ^ (y == mBaseImageData.height - 1);
+        return (x == 0) ^ (y == 0) ^ (x == mBaseImageData.width - 1) ^ (y == mBaseImageData.height - 1);
     }
 
     /**
@@ -608,15 +603,13 @@ public class NinePatchedImage {
                 t.rect.y = yTick.start;
                 t.rect.height = yTick.getLength();
 
-                if (mRedTickOnlyInHorizontalFlag
-                        || xTick.color == BLACK_TICK || lenX == 1) {
+                if (mRedTickOnlyInHorizontalFlag || xTick.color == BLACK_TICK || lenX == 1) {
                     t.type += Chunk.TYPE_HORIZONTAL;
                     if (y == 0) {
                         horizontalPatchSum += t.rect.width;
                     }
                 }
-                if (mRedTickOnlyInVerticalFlag
-                        || yTick.color == BLACK_TICK || lenY == 1) {
+                if (mRedTickOnlyInVerticalFlag || yTick.color == BLACK_TICK || lenY == 1) {
                     t.type += Chunk.TYPE_VERTICAL;
                     if (x == 0) {
                         verticalPatchSum += t.rect.height;
@@ -661,12 +654,10 @@ public class NinePatchedImage {
                 for (int xPos = 0; xPos < xLen; xPos++) {
                     Chunk c = chunks[yPos][xPos];
                     Rectangle r = c.rect;
-                    if ((c.type & Chunk.TYPE_HORIZONTAL) != 0
-                            && isHorizontalCorrupted(mBaseImageData, r)) {
+                    if ((c.type & Chunk.TYPE_HORIZONTAL) != 0 && isHorizontalCorrupted(mBaseImageData, r)) {
                         c.type |= Chunk.TYPE_CORRUPT;
                     }
-                    if ((c.type & Chunk.TYPE_VERTICAL) != 0
-                            && isVerticalCorrupted(mBaseImageData, r)) {
+                    if ((c.type & Chunk.TYPE_VERTICAL) != 0 && isVerticalCorrupted(mBaseImageData, r)) {
                         c.type |= Chunk.TYPE_CORRUPT;
                     }
                 }
@@ -746,8 +737,7 @@ public class NinePatchedImage {
         streatchableHeight = streatchableHeight > 0 ? streatchableHeight : 1;
 
         if (DEBUG) {
-            System.out.println(String.format("streatchable %d %d", streatchableWidth,
-                    streatchableHeight));
+            System.out.println(String.format("streatchable %d %d", streatchableWidth, streatchableHeight));
         }
 
         for (int yPos = 0; yPos < lenY; yPos++) {
@@ -757,8 +747,7 @@ public class NinePatchedImage {
                 Chunk chunk = mPatchChunks[yPos][xPos];
 
                 if (DEBUG) {
-                    System.out.println(String.format("Tile[%d, %d] = %s",
-                            yPos, xPos, chunk.toString()));
+                    System.out.println(String.format("Tile[%d, %d] = %s", yPos, xPos, chunk.toString()));
                 }
 
                 p = getProjection();
@@ -799,8 +788,7 @@ public class NinePatchedImage {
 
         @Override
         public String toString() {
-            return String.format("src[%d, %d, %d, %d] => dest[%d, %d, %d, %d]",
-                    src.x, src.y, src.width, src.height,
+            return String.format("src[%d, %d, %d, %d] => dest[%d, %d, %d, %d]", src.x, src.y, src.width, src.height,
                     dest.x, dest.y, dest.width, dest.height);
         }
     }
@@ -845,8 +833,7 @@ public class NinePatchedImage {
 
         @Override
         public String toString() {
-            return String.format("%s %f/%f %s", typeToString(), horizontalWeight, verticalWeight,
-                    rect.toString());
+            return String.format("%s %f/%f %s", typeToString(), horizontalWeight, verticalWeight, rect.toString());
         }
     }
 

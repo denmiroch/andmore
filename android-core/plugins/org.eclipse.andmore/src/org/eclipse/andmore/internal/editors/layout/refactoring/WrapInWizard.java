@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,9 +20,10 @@ import static com.android.SdkConstants.GESTURE_OVERLAY_VIEW;
 import static com.android.SdkConstants.RADIO_GROUP;
 import static com.android.SdkConstants.VIEW_INCLUDE;
 
-import com.android.resources.ResourceType;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.descriptors.ViewElementDescriptor;
@@ -44,14 +42,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import com.android.resources.ResourceType;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
 
 public class WrapInWizard extends VisualRefactoringWizard {
-    private static final String SEPARATOR_LABEL =
-        "----------------------------------------"; //$NON-NLS-1$
+    private static final String SEPARATOR_LABEL = "----------------------------------------"; //$NON-NLS-1$
 
     public WrapInWizard(WrapInRefactoring ref, LayoutEditorDelegate editor) {
         super(ref, editor);
@@ -74,7 +70,7 @@ public class WrapInWizard extends VisualRefactoringWizard {
         private List<Pair<String, ViewElementDescriptor>> mClassNames;
 
         public InputPage(IProject project, String oldType) {
-            super("WrapInInputPage");  //$NON-NLS-1$
+            super("WrapInInputPage"); //$NON-NLS-1$
             mProject = project;
             mOldType = oldType;
         }
@@ -121,8 +117,7 @@ public class WrapInWizard extends VisualRefactoringWizard {
                 ok = false;
             } else {
                 // ...but if you do, it has to be valid!
-                ResourceNameValidator validator = ResourceNameValidator.create(false, mProject,
-                        ResourceType.ID);
+                ResourceNameValidator validator = ResourceNameValidator.create(false, mProject, ResourceType.ID);
                 String message = validator.isValid(id);
                 if (message != null) {
                     setErrorMessage(message);
@@ -141,15 +136,13 @@ public class WrapInWizard extends VisualRefactoringWizard {
                 setErrorMessage(null);
 
                 // Record state
-                WrapInRefactoring refactoring =
-                    (WrapInRefactoring) getRefactoring();
+                WrapInRefactoring refactoring = (WrapInRefactoring) getRefactoring();
                 refactoring.setId(id);
                 refactoring.setType(type);
 
                 ViewElementDescriptor descriptor = mClassNames.get(selectionIndex).getSecond();
                 if (descriptor instanceof PaletteMetadataDescriptor) {
-                    PaletteMetadataDescriptor paletteDescriptor =
-                        (PaletteMetadataDescriptor) descriptor;
+                    PaletteMetadataDescriptor paletteDescriptor = (PaletteMetadataDescriptor) descriptor;
                     String initializedAttributes = paletteDescriptor.getInitializedAttributes();
                     refactoring.setInitializedAttributes(initializedAttributes);
                 } else {
@@ -162,11 +155,9 @@ public class WrapInWizard extends VisualRefactoringWizard {
         }
     }
 
-    static List<Pair<String, ViewElementDescriptor>> addLayouts(IProject project,
-            String oldType, Combo combo,
+    static List<Pair<String, ViewElementDescriptor>> addLayouts(IProject project, String oldType, Combo combo,
             Set<String> exclude, boolean addGestureOverlay) {
-        List<Pair<String, ViewElementDescriptor>> classNames =
-            new ArrayList<Pair<String, ViewElementDescriptor>>();
+        List<Pair<String, ViewElementDescriptor>> classNames = new ArrayList<Pair<String, ViewElementDescriptor>>();
 
         if (oldType != null && oldType.equals(FQCN_RADIO_BUTTON)) {
             combo.add(RADIO_GROUP);
@@ -174,10 +165,10 @@ public class WrapInWizard extends VisualRefactoringWizard {
             classNames.add(Pair.of(RADIO_GROUP, (ViewElementDescriptor) null));
 
             combo.add(SEPARATOR_LABEL);
-            classNames.add(Pair.<String,ViewElementDescriptor>of(null, null));
+            classNames.add(Pair.<String, ViewElementDescriptor> of(null, null));
         }
 
-        Pair<List<String>,List<String>> result = CustomViewFinder.findViews(project, true);
+        Pair<List<String>, List<String>> result = CustomViewFinder.findViews(project, true);
         List<String> customViews = result.getFirst();
         List<String> thirdPartyViews = result.getSecond();
         if (customViews.size() > 0) {
@@ -186,7 +177,7 @@ public class WrapInWizard extends VisualRefactoringWizard {
                 classNames.add(Pair.of(view, (ViewElementDescriptor) null));
             }
             combo.add(SEPARATOR_LABEL);
-            classNames.add(Pair.<String,ViewElementDescriptor>of(null, null));
+            classNames.add(Pair.<String, ViewElementDescriptor> of(null, null));
         }
 
         // Populate type combo
@@ -197,12 +188,13 @@ public class WrapInWizard extends VisualRefactoringWizard {
                 AndroidTargetData targetData = currentSdk.getTargetData(target);
                 if (targetData != null) {
                     ViewMetadataRepository repository = ViewMetadataRepository.get();
-                    List<Pair<String,List<ViewElementDescriptor>>> entries =
-                        repository.getPaletteEntries(targetData, false, true);
+                    List<Pair<String, List<ViewElementDescriptor>>> entries = repository.getPaletteEntries(targetData,
+                            false, true);
                     // Find the layout category - it contains LinearLayout
                     List<ViewElementDescriptor> layoutDescriptors = null;
 
-                    search: for (Pair<String,List<ViewElementDescriptor>> pair : entries) {
+                    search:
+                    for (Pair<String, List<ViewElementDescriptor>> pair : entries) {
                         List<ViewElementDescriptor> list = pair.getSecond();
                         for (ViewElementDescriptor d : list) {
                             if (d.getFullClassName().equals(FQCN_LINEAR_LAYOUT)) {
@@ -236,18 +228,16 @@ public class WrapInWizard extends VisualRefactoringWizard {
 
                         if (addGestureOverlay) {
                             combo.add(GESTURE_OVERLAY_VIEW);
-                            classNames.add(Pair.<String, ViewElementDescriptor> of(
-                                    FQCN_GESTURE_OVERLAY_VIEW, null));
+                            classNames.add(Pair.<String, ViewElementDescriptor> of(FQCN_GESTURE_OVERLAY_VIEW, null));
 
                             combo.add(SEPARATOR_LABEL);
-                            classNames.add(Pair.<String,ViewElementDescriptor>of(null, null));
+                            classNames.add(Pair.<String, ViewElementDescriptor> of(null, null));
                         }
                     }
 
                     // Now add ALL known layout descriptors in case the user has
                     // a special case
-                    layoutDescriptors =
-                        targetData.getLayoutDescriptors().getLayoutDescriptors();
+                    layoutDescriptors = targetData.getLayoutDescriptors().getLayoutDescriptors();
 
                     for (ViewElementDescriptor d : layoutDescriptors) {
                         String className = d.getFullClassName();
@@ -260,7 +250,7 @@ public class WrapInWizard extends VisualRefactoringWizard {
             }
         } else {
             combo.add("SDK not initialized");
-            classNames.add(Pair.<String,ViewElementDescriptor>of(null, null));
+            classNames.add(Pair.<String, ViewElementDescriptor> of(null, null));
         }
 
         return classNames;

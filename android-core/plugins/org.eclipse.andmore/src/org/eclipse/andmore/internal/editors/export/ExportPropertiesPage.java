@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +23,6 @@ import org.eclipse.ui.forms.widgets.ColumnLayoutData;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
-
 /**
  * Page for export properties, used by {@link ExportEditor}.
  * It displays a part to edit the properties and another part
@@ -45,7 +41,7 @@ public final class ExportPropertiesPage extends FormPage {
     private ExportLinksPart mLinksPart;
 
     public ExportPropertiesPage(ExportEditor editor) {
-        super(editor, PAGE_ID, "Export Properties");  // tab's label, user visible, keep it short
+        super(editor, PAGE_ID, "Export Properties"); // tab's label, user visible, keep it short
         mEditor = editor;
     }
 

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -81,8 +78,7 @@ final class OverviewExportPart extends ManifestSectionPart {
             buf.append(" and sign it manually");
             buf.append("</li></form>"); //$NON-NLS-1$
 
-            FormText text = createFormText(table, toolkit, true, buf.toString(),
-                    false /* setupLayoutData */);
+            FormText text = createFormText(table, toolkit, true, buf.toString(), false /* setupLayoutData */);
             text.addHyperlinkListener(new HyperlinkAdapter() {
                 @Override
                 public void linkActivated(HyperlinkEvent e) {
@@ -113,7 +109,7 @@ final class OverviewExportPart extends ManifestSectionPart {
     private IProject getProject() {
         IEditorInput input = mOverviewPage.mEditor.getEditorInput();
         if (input instanceof FileEditorInput) {
-            FileEditorInput fileInput = (FileEditorInput)input;
+            FileEditorInput fileInput = (FileEditorInput) input;
             IFile file = fileInput.getFile();
             return file.getProject();
         }

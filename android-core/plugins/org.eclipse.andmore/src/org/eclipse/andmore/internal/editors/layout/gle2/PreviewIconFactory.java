@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,18 +19,19 @@ import static com.android.SdkConstants.FQCN_EXPANDABLE_LIST_VIEW;
 import static com.android.SdkConstants.FQCN_LIST_VIEW;
 import static com.android.SdkConstants.FQCN_TIME_PICKER;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.rendering.LayoutLibrary;
-import com.android.ide.common.rendering.api.Capability;
-import com.android.ide.common.rendering.api.RenderSession;
-import com.android.ide.common.rendering.api.ResourceValue;
-import com.android.ide.common.rendering.api.SessionParams.RenderingMode;
-import com.android.ide.common.rendering.api.StyleResourceValue;
-import com.android.ide.common.rendering.api.ViewInfo;
-import com.android.ide.common.resources.ResourceResolver;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+
+import javax.imageio.ImageIO;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.descriptors.DocumentDescriptor;
@@ -55,19 +53,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-
-import javax.imageio.ImageIO;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.rendering.LayoutLibrary;
+import com.android.ide.common.rendering.api.Capability;
+import com.android.ide.common.rendering.api.RenderSession;
+import com.android.ide.common.rendering.api.ResourceValue;
+import com.android.ide.common.rendering.api.SessionParams.RenderingMode;
+import com.android.ide.common.rendering.api.StyleResourceValue;
+import com.android.ide.common.rendering.api.ViewInfo;
+import com.android.ide.common.resources.ResourceResolver;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
 
 /**
  * Factory which can provide preview icons for android views of a particular SDK and
@@ -263,14 +260,9 @@ public class PreviewIconFactory {
                 int width = 200;
                 int height = childNodes.getLength() == 1 ? 400 : 1600;
 
-                session = RenderService.create(editor)
-                    .setModel(model)
-                    .setOverrideRenderSize(width, height)
-                    .setRenderingMode(RenderingMode.FULL_EXPAND)
-                    .setLog(editor.createRenderLogger("palette"))
-                    .setOverrideBgColor(overrideBgColor)
-                    .setDecorations(false)
-                    .createRenderSession();
+                session = RenderService.create(editor).setModel(model).setOverrideRenderSize(width, height)
+                        .setRenderingMode(RenderingMode.FULL_EXPAND).setLog(editor.createRenderLogger("palette"))
+                        .setOverrideBgColor(overrideBgColor).setDecorations(false).createRenderSession();
             } catch (Throwable t) {
                 // If there are internal errors previewing the components just revert to plain
                 // icons and labels
@@ -350,8 +342,7 @@ public class PreviewIconFactory {
                             sb.append(fqn);
                         }
                     }
-                    AndmoreAndroidPlugin.log(IStatus.WARNING, "Failed to render set of icons for %1$s",
-                            sb.toString());
+                    AndmoreAndroidPlugin.log(IStatus.WARNING, "Failed to render set of icons for %1$s", sb.toString());
 
                     if (session.getResult().getException() != null) {
                         AndmoreAndroidPlugin.log(session.getResult().getException(),
@@ -439,9 +430,8 @@ public class PreviewIconFactory {
         GraphicalEditorPart editor = mPalette.getEditor();
         ResourceResolver resources = editor.getResourceResolver();
         ResourceValue resourceValue = resources.findItemInTheme(themeItemName);
-        BufferedImage image = RenderService.create(editor)
-            .setOverrideRenderSize(100, 100)
-            .renderDrawable(resourceValue);
+        BufferedImage image = RenderService.create(editor).setOverrideRenderSize(100, 100)
+                .renderDrawable(resourceValue);
         if (image != null) {
             // Use the middle pixel as the color since that works better for gradients;
             // solid colors work too.
@@ -530,8 +520,7 @@ public class PreviewIconFactory {
             targetName = cleanup(targetName);
             themeName = cleanup(themeName);
             String deviceName = cleanup(mPalette.getCurrentDevice());
-            String dirName = String.format("palette-preview-r16b-%s-%s-%s", targetName,
-                    themeName, deviceName);
+            String dirName = String.format("palette-preview-r16b-%s-%s-%s", targetName, themeName, deviceName);
             IPath dirPath = pluginState.append(dirName);
 
             mImageDir = new File(dirPath.toOSString());
@@ -544,8 +533,7 @@ public class PreviewIconFactory {
         return mImageDir;
     }
 
-    private void savePreview(File output, BufferedImage image,
-            int left, int top, int right, int bottom) {
+    private void savePreview(File output, BufferedImage image, int left, int top, int right, int bottom) {
         try {
             BufferedImage im = ImageUtils.subImage(image, left, top, right, bottom);
             ImageIO.write(im, "PNG", output); //$NON-NLS-1$
@@ -558,10 +546,8 @@ public class PreviewIconFactory {
         mBackground = bg;
         mForeground = fg;
         File file = new File(imageDir, PREVIEW_INFO_FILE);
-        String colors = String.format(
-                "background=#%02x%02x%02x\nforeground=#%02x%02x%02x\n", //$NON-NLS-1$
-                bg.red, bg.green, bg.blue,
-                fg.red, fg.green, fg.blue);
+        String colors = String.format("background=#%02x%02x%02x\nforeground=#%02x%02x%02x\n", //$NON-NLS-1$
+                bg.red, bg.green, bg.blue, fg.red, fg.green, fg.blue);
         AndmoreAndroidPlugin.writeFile(file, colors);
     }
 

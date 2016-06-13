@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,22 +51,19 @@ public class FixProjectAction implements IObjectActionDelegate {
      * @see IObjectActionDelegate#setActivePart(IAction, IWorkbenchPart)
      */
     @Override
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-    }
+    public void setActivePart(IAction action, IWorkbenchPart targetPart) {}
 
     @Override
     public void run(IAction action) {
         if (mSelection instanceof IStructuredSelection) {
 
-            for (Iterator<?> it = ((IStructuredSelection) mSelection).iterator();
-                    it.hasNext();) {
+            for (Iterator<?> it = ((IStructuredSelection) mSelection).iterator(); it.hasNext();) {
                 Object element = it.next();
                 IProject project = null;
                 if (element instanceof IProject) {
                     project = (IProject) element;
                 } else if (element instanceof IAdaptable) {
-                    project = ((IAdaptable) element)
-                            .getAdapter(IProject.class);
+                    project = ((IAdaptable) element).getAdapter(IProject.class);
                 }
                 if (project != null) {
                     fixProject(project);

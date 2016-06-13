@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,20 +43,17 @@ public class AndroidLaunchConfiguration {
         ALL_DEVICES_AND_EMULATORS;
 
         public static TargetMode getMode(String s) {
-            for (TargetMode m: values()) {
+            for (TargetMode m : values()) {
                 if (m.toString().equals(s)) {
                     return m;
                 }
             }
 
-            throw new IllegalArgumentException(String.format(
-                    "Invalid representation (%s) for TargetMode", s));
+            throw new IllegalArgumentException(String.format("Invalid representation (%s) for TargetMode", s));
         }
 
         public boolean isMultiDevice() {
-            return this == ALL_DEVICES
-                    || this == ALL_EMULATORS
-                    || this == ALL_DEVICES_AND_EMULATORS;
+            return this == ALL_DEVICES || this == ALL_EMULATORS || this == ALL_DEVICES_AND_EMULATORS;
         }
     }
 
@@ -84,10 +78,8 @@ public class AndroidLaunchConfiguration {
      */
     public String mAvdName = null;
 
-    public String mNetworkSpeed = EmulatorConfigTab.getSpeed(
-            LaunchConfigDelegate.DEFAULT_SPEED);
-    public String mNetworkDelay = EmulatorConfigTab.getDelay(
-            LaunchConfigDelegate.DEFAULT_DELAY);
+    public String mNetworkSpeed = EmulatorConfigTab.getSpeed(LaunchConfigDelegate.DEFAULT_SPEED);
+    public String mNetworkDelay = EmulatorConfigTab.getDelay(LaunchConfigDelegate.DEFAULT_DELAY);
 
     /**
      * Optional custom command line parameter to launch the emulator
@@ -106,8 +98,7 @@ public class AndroidLaunchConfiguration {
      */
     public void set(ILaunchConfiguration config) {
         try {
-            mLaunchAction = config.getAttribute(LaunchConfigDelegate.ATTR_LAUNCH_ACTION,
-                    mLaunchAction);
+            mLaunchAction = config.getAttribute(LaunchConfigDelegate.ATTR_LAUNCH_ACTION, mLaunchAction);
         } catch (CoreException e1) {
             // nothing to be done here, we'll use the default value
         }
@@ -115,12 +106,10 @@ public class AndroidLaunchConfiguration {
         mTargetMode = parseTargetMode(config, mTargetMode);
 
         try {
-            mReuseLastUsedDevice = config.getAttribute(
-                    LaunchConfigDelegate.ATTR_REUSE_LAST_USED_DEVICE, false);
-            mLastUsedDevice = config.getAttribute(
-                    LaunchConfigDelegate.ATTR_LAST_USED_DEVICE, (String)null);
+            mReuseLastUsedDevice = config.getAttribute(LaunchConfigDelegate.ATTR_REUSE_LAST_USED_DEVICE, false);
+            mLastUsedDevice = config.getAttribute(LaunchConfigDelegate.ATTR_LAST_USED_DEVICE, (String) null);
         } catch (CoreException e) {
-         // nothing to be done here, we'll use the default value
+            // nothing to be done here, we'll use the default value
         }
 
         try {
@@ -146,8 +135,7 @@ public class AndroidLaunchConfiguration {
         mNetworkDelay = EmulatorConfigTab.getDelay(index);
 
         try {
-            mEmulatorCommandLine = config.getAttribute(
-                    LaunchConfigDelegate.ATTR_COMMANDLINE, ""); //$NON-NLS-1$
+            mEmulatorCommandLine = config.getAttribute(LaunchConfigDelegate.ATTR_COMMANDLINE, ""); //$NON-NLS-1$
         } catch (CoreException e) {
             // lets not do anything here, we'll use the default value
         }
@@ -159,8 +147,7 @@ public class AndroidLaunchConfiguration {
         }
 
         try {
-            mNoBootAnim = config.getAttribute(LaunchConfigDelegate.ATTR_NO_BOOT_ANIM,
-                                              mNoBootAnim);
+            mNoBootAnim = config.getAttribute(LaunchConfigDelegate.ATTR_NO_BOOT_ANIM, mNoBootAnim);
         } catch (CoreException e) {
             // nothing to be done here, we'll use the default value
         }
@@ -172,8 +159,7 @@ public class AndroidLaunchConfiguration {
      */
     public static TargetMode parseTargetMode(ILaunchConfiguration config, TargetMode defaultMode) {
         try {
-            String value = config.getAttribute(LaunchConfigDelegate.ATTR_TARGET_MODE,
-                    defaultMode.toString());
+            String value = config.getAttribute(LaunchConfigDelegate.ATTR_TARGET_MODE, defaultMode.toString());
             return TargetMode.getMode(value);
         } catch (CoreException e) {
             // ADT R20 changes the attribute type of ATTR_TARGET_MODE to be a string from a bool.
@@ -189,4 +175,3 @@ public class AndroidLaunchConfiguration {
         }
     }
 }
-

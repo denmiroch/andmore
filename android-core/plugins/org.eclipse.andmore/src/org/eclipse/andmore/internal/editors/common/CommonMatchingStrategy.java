@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,9 +14,6 @@
 package org.eclipse.andmore.internal.editors.common;
 
 import static com.android.SdkConstants.FD_RES_LAYOUT;
-
-import com.android.ide.common.resources.ResourceFolder;
-import com.android.resources.ResourceFolderType;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorMatchingStrategy;
@@ -32,6 +26,9 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.FileEditorInput;
 
+import com.android.ide.common.resources.ResourceFolder;
+import com.android.resources.ResourceFolderType;
+
 /**
  * Matching strategy for the editors.
  * This finds the right MatchingStrategy and delegates to it.
@@ -41,7 +38,7 @@ public class CommonMatchingStrategy implements IEditorMatchingStrategy {
     @Override
     public boolean matches(IEditorReference editorRef, IEditorInput input) {
         if (input instanceof FileEditorInput) {
-            FileEditorInput fileInput = (FileEditorInput)input;
+            FileEditorInput fileInput = (FileEditorInput) input;
 
             // get the IFile object and check it's in one of the layout folders.
             IFile file = fileInput.getFile();
@@ -56,8 +53,8 @@ public class CommonMatchingStrategy implements IEditorMatchingStrategy {
                         // layout files we can't just use editorRef.getName(), since
                         // the name sometimes includes the parent folder name (when the
                         // files are in layout- folders.
-                        if (!(editorRef.getName().endsWith(file.getName()) &&
-                                editorRef.getId().equals(CommonXmlEditor.ID))) {
+                        if (!(editorRef.getName().endsWith(file.getName())
+                                && editorRef.getId().equals(CommonXmlEditor.ID))) {
                             return false;
                         }
                     }
@@ -66,8 +63,7 @@ public class CommonMatchingStrategy implements IEditorMatchingStrategy {
                 // Per the IEditorMatchingStrategy documentation, editorRef.getEditorInput()
                 // is expensive so try exclude files that definitely don't match, such
                 // as those with the wrong extension or wrong file name
-                if (!(file.getName().equals(editorRef.getName()) &&
-                        editorRef.getId().equals(CommonXmlEditor.ID))) {
+                if (!(file.getName().equals(editorRef.getName()) && editorRef.getId().equals(CommonXmlEditor.ID))) {
                     return false;
                 }
             }

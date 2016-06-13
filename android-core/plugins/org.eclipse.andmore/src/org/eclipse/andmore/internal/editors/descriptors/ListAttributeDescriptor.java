@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,14 +13,14 @@
 
 package org.eclipse.andmore.internal.editors.descriptors;
 
-import com.android.ide.common.api.IAttributeInfo;
-
 import org.eclipse.andmore.internal.editors.ui.ListValueCellEditor;
 import org.eclipse.andmore.internal.editors.uimodel.UiAttributeNode;
 import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
 import org.eclipse.andmore.internal.editors.uimodel.UiListAttributeNode;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.widgets.Composite;
+
+import com.android.ide.common.api.IAttributeInfo;
 
 /**
  * Describes a text attribute that can contains some predefined values.
@@ -38,8 +35,7 @@ public class ListAttributeDescriptor extends TextAttributeDescriptor {
      */
     public static final ITextAttributeCreator CREATOR = new ITextAttributeCreator() {
         @Override
-        public TextAttributeDescriptor create(String xmlLocalName,
-                String nsUri, IAttributeInfo attrInfo) {
+        public TextAttributeDescriptor create(String xmlLocalName, String nsUri, IAttributeInfo attrInfo) {
             return new ListAttributeDescriptor(xmlLocalName, nsUri, attrInfo);
         }
     };
@@ -58,12 +54,11 @@ public class ListAttributeDescriptor extends TextAttributeDescriptor {
         }
     }
 
-     /**
-     * Creates a new {@link ListAttributeDescriptor} which uses the provided values
-     * and does not lookup the content of <code>attrInfo</code>.
-     */
-    public ListAttributeDescriptor(String xmlLocalName, String nsUri, IAttributeInfo attrInfo,
-            String[] values) {
+    /**
+    * Creates a new {@link ListAttributeDescriptor} which uses the provided values
+    * and does not lookup the content of <code>attrInfo</code>.
+    */
+    public ListAttributeDescriptor(String xmlLocalName, String nsUri, IAttributeInfo attrInfo, String[] values) {
         super(xmlLocalName, nsUri, attrInfo);
         mValues = values;
     }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,24 +51,23 @@ import com.google.common.base.Splitter;
 
 /** A description of a configuration, used for persistence */
 public class ConfigurationDescription {
-    private static final String TAG_PREVIEWS = "previews";    //$NON-NLS-1$
-    private static final String TAG_PREVIEW = "preview";      //$NON-NLS-1$
-    private static final String ATTR_TARGET = "target";       //$NON-NLS-1$
-    private static final String ATTR_CONFIG = "config";       //$NON-NLS-1$
-    private static final String ATTR_LOCALE = "locale";       //$NON-NLS-1$
-    private static final String ATTR_ACTIVITY = "activity";   //$NON-NLS-1$
-    private static final String ATTR_DEVICE = "device";       //$NON-NLS-1$
-    private static final String ATTR_STATE = "devicestate";   //$NON-NLS-1$
-    private static final String ATTR_UIMODE = "ui";           //$NON-NLS-1$
-    private static final String ATTR_NIGHTMODE = "night";     //$NON-NLS-1$
-    private final static String SEP_LOCALE = "-";             //$NON-NLS-1$
+    private static final String TAG_PREVIEWS = "previews"; //$NON-NLS-1$
+    private static final String TAG_PREVIEW = "preview"; //$NON-NLS-1$
+    private static final String ATTR_TARGET = "target"; //$NON-NLS-1$
+    private static final String ATTR_CONFIG = "config"; //$NON-NLS-1$
+    private static final String ATTR_LOCALE = "locale"; //$NON-NLS-1$
+    private static final String ATTR_ACTIVITY = "activity"; //$NON-NLS-1$
+    private static final String ATTR_DEVICE = "device"; //$NON-NLS-1$
+    private static final String ATTR_STATE = "devicestate"; //$NON-NLS-1$
+    private static final String ATTR_UIMODE = "ui"; //$NON-NLS-1$
+    private static final String ATTR_NIGHTMODE = "night"; //$NON-NLS-1$
+    private final static String SEP_LOCALE = "-"; //$NON-NLS-1$
 
     /**
      * Settings name for file-specific configuration preferences, such as which theme or
      * device to render the current layout with
      */
-    public final static QualifiedName NAME_CONFIG_STATE =
-        new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "state");//$NON-NLS-1$
+    public final static QualifiedName NAME_CONFIG_STATE = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "state");//$NON-NLS-1$
 
     /** The project corresponding to this configuration's description */
     public final IProject project;
@@ -140,8 +136,7 @@ public class ConfigurationDescription {
      * @param configuration the configuration to describe
      * @return a new configuration
      */
-    public static ConfigurationDescription fromConfiguration(
-            @Nullable IProject project,
+    public static ConfigurationDescription fromConfiguration(@Nullable IProject project,
             @NonNull Configuration configuration) {
         ConfigurationDescription description = new ConfigurationDescription(project);
         description.displayName = configuration.getDisplayName();
@@ -166,9 +161,7 @@ public class ConfigurationDescription {
      * @return true if the configuration was initialized
      */
     @Nullable
-    public static ConfigurationDescription fromXml(
-            @Nullable IProject project,
-            @NonNull Element element,
+    public static ConfigurationDescription fromXml(@Nullable IProject project, @NonNull Element element,
             @NonNull Collection<Device> deviceList) {
         ConfigurationDescription description = new ConfigurationDescription(project);
 
@@ -200,10 +193,10 @@ public class ConfigurationDescription {
         if (!localeString.isEmpty()) {
             // Load locale. Note that this can get overwritten by the
             // project-wide settings read below.
-        	LocaleQualifier locale = null;
-        			
-        	String language = null;
-        	String region = null;
+            LocaleQualifier locale = null;
+
+            String language = null;
+            String region = null;
             String locales[] = localeString.split(SEP_LOCALE);
             if (locales[0].length() > 0) {
                 language = locales[0];
@@ -212,10 +205,9 @@ public class ConfigurationDescription {
                 region = locales[1];
             }
             if (language == null) {
-            	locale = Locale.ANY_LOCALE;
-            }
-            else {
-            	locale = new LocaleQualifier(null, language, region, null);
+                locale = Locale.ANY_LOCALE;
+            } else {
+                locale = new LocaleQualifier(null, language, region, null);
             }
             description.locale = Locale.create(locale);
         }
@@ -256,7 +248,6 @@ public class ConfigurationDescription {
                 description.nightMode = NightMode.NOTNIGHT;
             }
         }
-
 
         // Should I really be storing the FULL configuration? Might be trouble if
         // you bring a different device
@@ -379,8 +370,7 @@ public class ConfigurationDescription {
 
                     if (data != null) {
                         ResourceRepository resources = data.getFrameworkResources();
-                        if (resources != null
-                            && resources.hasResourceItem(ANDROID_STYLE_RESOURCE_PREFIX + theme)) {
+                        if (resources != null && resources.hasResourceItem(ANDROID_STYLE_RESOURCE_PREFIX + theme)) {
                             theme = ANDROID_STYLE_RESOURCE_PREFIX + theme;
                             return;
                         }

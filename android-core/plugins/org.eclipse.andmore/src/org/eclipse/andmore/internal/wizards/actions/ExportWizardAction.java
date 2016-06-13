@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,7 +44,7 @@ public class ExportWizardAction implements IObjectActionDelegate {
     @Override
     public void run(IAction action) {
         if (mSelection instanceof IStructuredSelection) {
-            IStructuredSelection selection = (IStructuredSelection)mSelection;
+            IStructuredSelection selection = (IStructuredSelection) mSelection;
 
             // get the unique selected item.
             if (selection.size() == 1) {
@@ -58,27 +55,24 @@ public class ExportWizardAction implements IObjectActionDelegate {
                 if (element instanceof IProject) {
                     project = (IProject) element;
                 } else if (element instanceof IAdaptable) {
-                    project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+                    project = ((IAdaptable) element).getAdapter(IProject.class);
                 }
 
                 // and finally do the action
                 if (project != null) {
-                    if (!EclipseLintRunner.runLintOnExport(
-                            mWorkbench.getActiveWorkbenchWindow().getShell(), project)) {
+                    if (!EclipseLintRunner.runLintOnExport(mWorkbench.getActiveWorkbenchWindow().getShell(), project)) {
                         return;
                     }
 
                     ProjectState state = Sdk.getProjectState(project);
                     if (state.isLibrary()) {
-                        MessageDialog.openError(mWorkbench.getDisplay().getActiveShell(),
-                                "Android Export",
+                        MessageDialog.openError(mWorkbench.getDisplay().getActiveShell(), "Android Export",
                                 "Android library projects cannot be exported.");
                     } else {
                         // call the export wizard on the current selection.
                         ExportWizard wizard = new ExportWizard();
                         wizard.init(mWorkbench, selection);
-                        WizardDialog dialog = new WizardDialog(
-                                mWorkbench.getDisplay().getActiveShell(), wizard);
+                        WizardDialog dialog = new WizardDialog(mWorkbench.getDisplay().getActiveShell(), wizard);
                         dialog.open();
                     }
                 }

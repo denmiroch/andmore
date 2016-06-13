@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,8 +30,7 @@ public abstract class DropGesture extends Gesture {
      * @param event The {@link DropTargetEvent} for this drag and drop event
      * @see DropTargetListener#dragEnter(DropTargetEvent)
      */
-    public void dragEnter(DropTargetEvent event) {
-    }
+    public void dragEnter(DropTargetEvent event) {}
 
     /**
      * The cursor is moving over the drop target.
@@ -42,8 +38,7 @@ public abstract class DropGesture extends Gesture {
      * @param event The {@link DropTargetEvent} for this drag and drop event
      * @see DropTargetListener#dragOver(DropTargetEvent)
      */
-    public void dragOver(DropTargetEvent event) {
-    }
+    public void dragOver(DropTargetEvent event) {}
 
     /**
      * The operation being performed has changed (usually due to the user
@@ -52,8 +47,7 @@ public abstract class DropGesture extends Gesture {
      * @param event The {@link DropTargetEvent} for this drag and drop event
      * @see DropTargetListener#dragOperationChanged(DropTargetEvent)
      */
-    public void dragOperationChanged(DropTargetEvent event) {
-    }
+    public void dragOperationChanged(DropTargetEvent event) {}
 
     /**
      * The cursor has left the drop target boundaries OR the drop has been
@@ -62,8 +56,7 @@ public abstract class DropGesture extends Gesture {
      * @param event The {@link DropTargetEvent} for this drag and drop event
      * @see DropTargetListener#dragLeave(DropTargetEvent)
      */
-    public void dragLeave(DropTargetEvent event) {
-    }
+    public void dragLeave(DropTargetEvent event) {}
 
     /**
      * The drop is about to be performed. The drop target is given a last chance
@@ -72,8 +65,7 @@ public abstract class DropGesture extends Gesture {
      * @param event The {@link DropTargetEvent} for this drag and drop event
      * @see DropTargetListener#dropAccept(DropTargetEvent)
      */
-    public void dropAccept(DropTargetEvent event) {
-    }
+    public void dropAccept(DropTargetEvent event) {}
 
     /**
      * The data is being dropped. The data field contains java format of the
@@ -82,6 +74,5 @@ public abstract class DropGesture extends Gesture {
      * @param event The {@link DropTargetEvent} for this drag and drop event
      * @see DropTargetListener#drop(DropTargetEvent)
      */
-    public void drop(final DropTargetEvent event) {
-    }
+    public void drop(final DropTargetEvent event) {}
 }

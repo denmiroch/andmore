@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,18 +26,16 @@ import org.w3c.dom.Node;
  * <p/>
  * See {@link UiAttributeNode} for more information.
  */
-public abstract class UiAbstractTextAttributeNode extends UiAttributeNode
-    implements IUiSettableAttributeNode {
+public abstract class UiAbstractTextAttributeNode extends UiAttributeNode implements IUiSettableAttributeNode {
 
-    protected static final String DEFAULT_VALUE = "";  //$NON-NLS-1$
+    protected static final String DEFAULT_VALUE = ""; //$NON-NLS-1$
 
     /** Prevent internal listener from firing when internally modifying the text */
     private boolean mInternalTextModification;
     /** Last value read from the XML model. Cannot be null. */
     private String mCurrentValue = DEFAULT_VALUE;
 
-    public UiAbstractTextAttributeNode(AttributeDescriptor attributeDescriptor,
-            UiElementNode uiParent) {
+    public UiAbstractTextAttributeNode(AttributeDescriptor attributeDescriptor, UiElementNode uiParent) {
         super(attributeDescriptor, uiParent);
     }
 
@@ -64,7 +59,6 @@ public abstract class UiAbstractTextAttributeNode extends UiAttributeNode
 
     /** Sets the text value to be displayed in the UI. */
     public abstract void setTextWidgetValue(String value);
-
 
     /**
      * Updates the current text field's value when the XML has changed.

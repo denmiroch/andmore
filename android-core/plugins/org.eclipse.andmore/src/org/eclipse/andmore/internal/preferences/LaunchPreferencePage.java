@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +22,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 /**
  * Settings page for launch related preferences.
  */
-public class LaunchPreferencePage extends FieldEditorPreferencePage implements
-        IWorkbenchPreferencePage {
+public class LaunchPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     public LaunchPreferencePage() {
         super(GRID);
@@ -36,11 +32,11 @@ public class LaunchPreferencePage extends FieldEditorPreferencePage implements
 
     @Override
     protected void createFieldEditors() {
-        addField(new StringFieldEditor(AdtPrefs.PREFS_EMU_OPTIONS,
-                Messages.LaunchPreferencePage_Default_Emu_Options, getFieldEditorParent()));
+        addField(new StringFieldEditor(AdtPrefs.PREFS_EMU_OPTIONS, Messages.LaunchPreferencePage_Default_Emu_Options,
+                getFieldEditorParent()));
 
-        addField(new StringFieldEditor(AdtPrefs.PREFS_HOME_PACKAGE,
-                Messages.LaunchPreferencePage_Default_HOME_Package, getFieldEditorParent()));
+        addField(new StringFieldEditor(AdtPrefs.PREFS_HOME_PACKAGE, Messages.LaunchPreferencePage_Default_HOME_Package,
+                getFieldEditorParent()));
     }
 
     @Override

@@ -1,44 +1,31 @@
 /*
  * Copyright (C) 2011 - 2015 The Android Open Source Project
- * 
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
  * Contributors:
  * David Carver - bug 462184 - remove usage tracker
- * 
  */
 
 package org.eclipse.andmore.internal.welcome;
 
-import com.android.SdkConstants;
-import com.android.annotations.Nullable;
-import com.android.utils.GrabProcessOutput;
-import com.android.utils.GrabProcessOutput.IProcessOutput;
-import com.android.utils.GrabProcessOutput.Wait;
-import com.android.sdkstats.DdmsPreferenceStore;
-import com.android.sdkstats.SdkStatsService;
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AndmoreAndroidPlugin.CheckSdkErrorHandler;
-import org.eclipse.andmore.base.InstallDetails;
 import org.eclipse.andmore.internal.editors.layout.gle2.LayoutWindowCoordinator;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.ui.IStartup;
@@ -46,14 +33,13 @@ import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Version;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.SdkConstants;
+import com.android.annotations.Nullable;
+import com.android.sdkstats.DdmsPreferenceStore;
+import com.android.utils.GrabProcessOutput;
+import com.android.utils.GrabProcessOutput.IProcessOutput;
+import com.android.utils.GrabProcessOutput.Wait;
 
 /**
  * Andmore startup tasks (other than those performed in {@link AndmoreAndroidPlugin#start(org.osgi.framework.BundleContext)}
@@ -107,9 +93,8 @@ public class AdtStartup implements IStartup, IWindowListener {
             File toolsFolder = new File(install.getURL().getFile()).getParentFile();
             if (toolsFolder != null) {
                 File sdkFolder = new File(toolsFolder, "sdk");
-                if (sdkFolder.exists() && AndmoreAndroidPlugin.getDefault().checkSdkLocationAndId(
-                        sdkFolder.getAbsolutePath(),
-                        new SdkValidator())) {
+                if (sdkFolder.exists() && AndmoreAndroidPlugin.getDefault()
+                        .checkSdkLocationAndId(sdkFolder.getAbsolutePath(), new SdkValidator())) {
                     return sdkFolder;
                 }
             }
@@ -141,8 +126,7 @@ public class AdtStartup implements IStartup, IWindowListener {
 
                 if (ok) {
                     // Verify that the SDK is valid
-                    ok = AndmoreAndroidPlugin.getDefault().checkSdkLocationAndId(
-                            osSdkPath, new SdkValidator());
+                    ok = AndmoreAndroidPlugin.getDefault().checkSdkLocationAndId(osSdkPath, new SdkValidator());
                     if (ok) {
                         // Yes, we've seen an SDK location before and we can use it again,
                         // no need to pester the user with the welcome wizard.
@@ -161,16 +145,12 @@ public class AdtStartup implements IStartup, IWindowListener {
 
     private static class SdkValidator extends AndmoreAndroidPlugin.CheckSdkErrorHandler {
         @Override
-        public boolean handleError(
-                CheckSdkErrorHandler.Solution solution,
-                String message) {
+        public boolean handleError(CheckSdkErrorHandler.Solution solution, String message) {
             return false;
         }
 
         @Override
-        public boolean handleWarning(
-                CheckSdkErrorHandler.Solution  solution,
-                String message) {
+        public boolean handleWarning(CheckSdkErrorHandler.Solution solution, String message) {
             return true;
         }
     }
@@ -180,45 +160,37 @@ public class AdtStartup implements IStartup, IWindowListener {
             return null;
         }
 
-        final String valueName = "Path";                                               //$NON-NLS-1$
+        final String valueName = "Path"; //$NON-NLS-1$
         final AtomicReference<String> result = new AtomicReference<String>();
-        final Pattern regexp =
-            Pattern.compile("^\\s+" + valueName + "\\s+REG_SZ\\s+(.*)$");//$NON-NLS-1$ //$NON-NLS-2$
+        final Pattern regexp = Pattern.compile("^\\s+" + valueName + "\\s+REG_SZ\\s+(.*)$");//$NON-NLS-1$ //$NON-NLS-2$
 
-        for (String key : new String[] {
-                "HKLM\\Software\\Android SDK Tools",                                   //$NON-NLS-1$
-                "HKLM\\Software\\Wow6432Node\\Android SDK Tools" }) {                  //$NON-NLS-1$
+        for (String key : new String[] { "HKLM\\Software\\Android SDK Tools", //$NON-NLS-1$
+                "HKLM\\Software\\Wow6432Node\\Android SDK Tools" }) { //$NON-NLS-1$
 
-            String[] command = new String[] {
-                "reg", "query", key, "/v", valueName       //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            String[] command = new String[] { "reg", "query", key, "/v", valueName //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             };
 
             Process process;
             try {
                 process = Runtime.getRuntime().exec(command);
 
-                GrabProcessOutput.grabProcessOutput(
-                        process,
-                        Wait.WAIT_FOR_READERS,
-                        new IProcessOutput() {
-                            @Override
-                            public void out(@Nullable String line) {
-                                if (line != null) {
-                                    Matcher m = regexp.matcher(line);
-                                    if (m.matches()) {
-                                        result.set(m.group(1));
-                                    }
-                                }
+                GrabProcessOutput.grabProcessOutput(process, Wait.WAIT_FOR_READERS, new IProcessOutput() {
+                    @Override
+                    public void out(@Nullable String line) {
+                        if (line != null) {
+                            Matcher m = regexp.matcher(line);
+                            if (m.matches()) {
+                                result.set(m.group(1));
                             }
+                        }
+                    }
 
-                            @Override
-                            public void err(@Nullable String line) {
-                                // ignore stderr
-                            }
-                        });
-            } catch (IOException ignore) {
-            } catch (InterruptedException ignore) {
-            }
+                    @Override
+                    public void err(@Nullable String line) {
+                        // ignore stderr
+                    }
+                });
+            } catch (IOException ignore) {} catch (InterruptedException ignore) {}
 
             String str = result.get();
             if (str != null) {
@@ -266,12 +238,10 @@ public class AdtStartup implements IStartup, IWindowListener {
     // ---- Implements IWindowListener ----
 
     @Override
-    public void windowActivated(IWorkbenchWindow window) {
-    }
+    public void windowActivated(IWorkbenchWindow window) {}
 
     @Override
-    public void windowDeactivated(IWorkbenchWindow window) {
-    }
+    public void windowDeactivated(IWorkbenchWindow window) {}
 
     @Override
     public void windowClosed(IWorkbenchWindow window) {

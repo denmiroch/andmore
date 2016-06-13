@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,7 @@
 
 package org.eclipse.andmore.internal.editors.binaryxml;
 
-import com.android.SdkConstants;
+import java.io.File;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.core.resources.IStorage;
@@ -27,7 +24,7 @@ import org.eclipse.jdt.internal.ui.javaeditor.JarEntryEditorInput;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.wst.xml.ui.internal.tabletree.XMLMultiPageEditorPart;
 
-import java.io.File;
+import com.android.SdkConstants;
 
 /**
  * The XML editor is an editor that open Android xml files from the android.jar file
@@ -62,16 +59,15 @@ public class BinaryXMLMultiPageEditorPart extends XMLMultiPageEditorPart {
                     return;
                 }
                 path = path.removeLastSegments(1);
-                IPath filePath = path.append(SdkConstants.FD_DATA).append(
-                        jarEntryFile.getFullPath().toPortableString());
+                IPath filePath = path.append(SdkConstants.FD_DATA)
+                        .append(jarEntryFile.getFullPath().toPortableString());
                 File file = new File(filePath.toOSString());
                 if (!(file.isFile())) {
                     super.setInput(input);
                     return;
                 }
                 try {
-                    XmlStorageEditorInput newInput = new XmlStorageEditorInput(
-                            new FileStorage(file));
+                    XmlStorageEditorInput newInput = new XmlStorageEditorInput(new FileStorage(file));
                     super.setInput(newInput);
                     return;
                 } catch (Exception e) {

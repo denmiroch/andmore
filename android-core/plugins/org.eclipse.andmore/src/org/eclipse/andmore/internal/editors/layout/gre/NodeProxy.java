@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +13,11 @@
 
 package org.eclipse.andmore.internal.editors.layout.gre;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.IAttributeInfo;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.INodeHandler;
-import com.android.ide.common.api.Margins;
-import com.android.ide.common.api.Rect;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.common.resources.platform.AttributeInfo;
@@ -46,11 +41,13 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.IAttributeInfo;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.INodeHandler;
+import com.android.ide.common.api.Margins;
+import com.android.ide.common.api.Rect;
 
 /**
  *
@@ -107,7 +104,6 @@ public class NodeProxy implements INode {
         return NO_MARGINS;
     }
 
-
     @Override
     public int getBaseline() {
         ViewHierarchy viewHierarchy = mFactory.getCanvas().getViewHierarchy();
@@ -150,9 +146,7 @@ public class NodeProxy implements INode {
         return "";
     }
 
-
     // ---- Hierarchy handling ----
-
 
     @Override
     public INode getRoot() {
@@ -212,7 +206,6 @@ public class NodeProxy implements INode {
         return new INode[0];
     }
 
-
     // ---- XML Editing ---
 
     @Override
@@ -221,19 +214,17 @@ public class NodeProxy implements INode {
 
         if (editor != null) {
             // Create an undo edit XML wrapper, which takes a runnable
-            editor.wrapUndoEditXmlModel(
-                    undoName,
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            // Here editor.isEditXmlModelPending returns true and it
-                            // is safe to edit the model using any method from INode.
+            editor.wrapUndoEditXmlModel(undoName, new Runnable() {
+                @Override
+                public void run() {
+                    // Here editor.isEditXmlModelPending returns true and it
+                    // is safe to edit the model using any method from INode.
 
-                            // Finally execute the closure that will act on the XML
-                            c.handle(NodeProxy.this);
-                            applyPendingChanges();
-                        }
-                    });
+                    // Finally execute the closure that will act on the XML
+                    c.handle(NodeProxy.this);
+                    applyPendingChanges();
+                }
+            });
         }
     }
 
@@ -330,10 +321,7 @@ public class NodeProxy implements INode {
     }
 
     @Override
-    public boolean setAttribute(
-            @Nullable String uri,
-            @NonNull String name,
-            @Nullable String value) {
+    public boolean setAttribute(@Nullable String uri, @NonNull String name, @Nullable String value) {
         checkEditOK();
         UiAttributeNode attr = mNode.setAttributeValue(name, uri, value, true /* override */);
 
@@ -486,11 +474,9 @@ public class NodeProxy implements INode {
         return null;
     }
 
-    private void warnPrintf(String msg, Object...params) {
-        AndmoreAndroidPlugin.printToConsole(
-                mNode == null ? "" : mNode.getDescriptor().getXmlLocalName(),
-                String.format(msg, params)
-                );
+    private void warnPrintf(String msg, Object... params) {
+        AndmoreAndroidPlugin.printToConsole(mNode == null ? "" : mNode.getDescriptor().getXmlLocalName(),
+                String.format(msg, params));
     }
 
     /**

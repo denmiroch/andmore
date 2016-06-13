@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +13,12 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.utils.Pair;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.swt.events.KeyEvent;
 
-import java.util.Collections;
-import java.util.List;
+import com.android.utils.Pair;
 
 /**
  * A gesture is a mouse or keyboard driven user operation, such as a
@@ -106,8 +103,7 @@ public abstract class Gesture {
      * @param pos The most recent mouse coordinate applicable to this
      *            gesture, relative to the canvas control.
      */
-    public void update(ControlPoint pos) {
-    }
+    public void update(ControlPoint pos) {}
 
     /**
      * Handles termination of the gesture. This method is called when the
@@ -118,8 +114,7 @@ public abstract class Gesture {
      *            gesture, relative to the canvas control.
      * @param canceled True if the gesture was canceled, and false otherwise.
      */
-    public void end(ControlPoint pos, boolean canceled) {
-    }
+    public void end(ControlPoint pos, boolean canceled) {}
 
     /**
      * Handles a key press during the gesture. May be called repeatedly when the

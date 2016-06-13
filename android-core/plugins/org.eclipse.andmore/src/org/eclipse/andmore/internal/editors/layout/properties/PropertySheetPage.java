@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +11,12 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.editors.layout.properties;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.IconFactory;
@@ -51,17 +54,10 @@ import org.eclipse.wb.internal.core.model.property.Property;
 import org.eclipse.wb.internal.core.model.property.table.IPropertyExceptionHandler;
 import org.eclipse.wb.internal.core.model.property.table.PropertyTable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * Property sheet page used when the graphical layout editor is chosen
  */
-public class PropertySheetPage extends Page
-        implements IPropertySheetPage, IUiUpdateListener, IPage {
+public class PropertySheetPage extends Page implements IPropertySheetPage, IUiUpdateListener, IPage {
     private PropertyTable mPropertyTable;
     private final GraphicalEditorPart mEditor;
     private Property mActiveProperty;
@@ -72,11 +68,11 @@ public class PropertySheetPage extends Page
     private Action mExpandAll;
     private List<CanvasViewInfo> mSelection;
 
-    private static final String EXPAND_DISABLED_ICON = "expandall-disabled";          //$NON-NLS-1$
-    private static final String EXPAND_ICON = "expandall";                            //$NON-NLS-1$
-    private static final String DEFAULT_ICON = "properties_default";                  //$NON-NLS-1$
-    private static final String ADVANCED_ICON = "filter_advanced_properties";         //$NON-NLS-1$
-    private static final String ALPHA_ICON = "sort_alpha";                            //$NON-NLS-1$
+    private static final String EXPAND_DISABLED_ICON = "expandall-disabled"; //$NON-NLS-1$
+    private static final String EXPAND_ICON = "expandall"; //$NON-NLS-1$
+    private static final String DEFAULT_ICON = "properties_default"; //$NON-NLS-1$
+    private static final String ADVANCED_ICON = "filter_advanced_properties"; //$NON-NLS-1$
+    private static final String ALPHA_ICON = "sort_alpha"; //$NON-NLS-1$
     // TODO: goto-definition.png
 
     /**
@@ -103,10 +99,8 @@ public class PropertySheetPage extends Page
                 AndmoreAndroidPlugin.log(e, null);
             }
         });
-        mPropertyTable.setDefaultCollapsedNames(Arrays.asList(
-                "Deprecated",
-                "Layout Parameters",
-                "Layout Parameters|Margins"));
+        mPropertyTable.setDefaultCollapsedNames(
+                Arrays.asList("Deprecated", "Layout Parameters", "Layout Parameters|Margins"));
 
         createActions();
         setPropertyTableContextMenu();
@@ -114,8 +108,7 @@ public class PropertySheetPage extends Page
 
     @Override
     public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-        if (selection instanceof TreeSelection
-                && mPropertyTable != null && !mPropertyTable.isDisposed()) {
+        if (selection instanceof TreeSelection && mPropertyTable != null && !mPropertyTable.isDisposed()) {
             TreeSelection treeSelection = (TreeSelection) selection;
 
             // We get a lot of repeated selection requests for the same selection
@@ -220,8 +213,8 @@ public class PropertySheetPage extends Page
     }
 
     @Override
-    public void makeContributions(IMenuManager menuManager,
-            IToolBarManager toolBarManager, IStatusLineManager statusLineManager) {
+    public void makeContributions(IMenuManager menuManager, IToolBarManager toolBarManager,
+            IStatusLineManager statusLineManager) {
         toolBarManager.add(mShowAdvancedPropertiesAction);
         toolBarManager.add(new Separator());
         toolBarManager.add(mSortAlphaAction);
@@ -237,40 +230,21 @@ public class PropertySheetPage extends Page
         ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
         IconFactory iconFactory = IconFactory.getInstance();
 
-        mExpandAll = new PropertySheetAction(
-                IAction.AS_PUSH_BUTTON,
-                "Expand All",
-                ACTION_EXPAND,
-                iconFactory.getImageDescriptor(EXPAND_ICON),
-                iconFactory.getImageDescriptor(EXPAND_DISABLED_ICON));
+        mExpandAll = new PropertySheetAction(IAction.AS_PUSH_BUTTON, "Expand All", ACTION_EXPAND,
+                iconFactory.getImageDescriptor(EXPAND_ICON), iconFactory.getImageDescriptor(EXPAND_DISABLED_ICON));
 
-        mCollapseAll = new PropertySheetAction(
-                IAction.AS_PUSH_BUTTON,
-                "Collapse All",
-                ACTION_COLLAPSE,
+        mCollapseAll = new PropertySheetAction(IAction.AS_PUSH_BUTTON, "Collapse All", ACTION_COLLAPSE,
                 sharedImages.getImageDescriptor(ISharedImages.IMG_ELCL_COLLAPSEALL),
                 sharedImages.getImageDescriptor(ISharedImages.IMG_ELCL_COLLAPSEALL_DISABLED));
 
-        mShowAdvancedPropertiesAction = new PropertySheetAction(
-                IAction.AS_CHECK_BOX,
-                "Show Advanced Properties",
-                ACTION_SHOW_ADVANCED,
-                iconFactory.getImageDescriptor(ADVANCED_ICON),
-                null);
+        mShowAdvancedPropertiesAction = new PropertySheetAction(IAction.AS_CHECK_BOX, "Show Advanced Properties",
+                ACTION_SHOW_ADVANCED, iconFactory.getImageDescriptor(ADVANCED_ICON), null);
 
-        mSortAlphaAction = new PropertySheetAction(
-                IAction.AS_CHECK_BOX,
-                "Sort Alphabetically",
-                ACTION_SORT_ALPHA,
-                iconFactory.getImageDescriptor(ALPHA_ICON),
-                null);
+        mSortAlphaAction = new PropertySheetAction(IAction.AS_CHECK_BOX, "Sort Alphabetically", ACTION_SORT_ALPHA,
+                iconFactory.getImageDescriptor(ALPHA_ICON), null);
 
-        mDefaultValueAction = new PropertySheetAction(
-                IAction.AS_PUSH_BUTTON,
-                "Restore Default Value",
-                ACTION_DEFAULT_VALUE,
-                iconFactory.getImageDescriptor(DEFAULT_ICON),
-                null);
+        mDefaultValueAction = new PropertySheetAction(IAction.AS_PUSH_BUTTON, "Restore Default Value",
+                ACTION_DEFAULT_VALUE, iconFactory.getImageDescriptor(DEFAULT_ICON), null);
 
         // Listen on the selection in the property sheet so we can update the
         // Restore Default Value action
@@ -347,8 +321,8 @@ public class PropertySheetPage extends Page
     private class PropertySheetAction extends Action {
         private final int mAction;
 
-        private PropertySheetAction(int style, String label, int action,
-                ImageDescriptor imageDesc, ImageDescriptor disabledImageDesc) {
+        private PropertySheetAction(int style, String label, int action, ImageDescriptor imageDesc,
+                ImageDescriptor disabledImageDesc) {
             super(label, style);
             mAction = action;
             setImageDescriptor(imageDesc);
@@ -376,8 +350,8 @@ public class PropertySheetPage extends Page
                 }
                 case ACTION_SORT_ALPHA: {
                     boolean isAlphabetical = mSortAlphaAction.isChecked();
-                    getPropertyFactory().setSortingMode(
-                        isAlphabetical ? SortingMode.ALPHABETICAL : PropertyFactory.DEFAULT_MODE);
+                    getPropertyFactory()
+                            .setSortingMode(isAlphabetical ? SortingMode.ALPHABETICAL : PropertyFactory.DEFAULT_MODE);
                     refreshProperties();
                     break;
                 }

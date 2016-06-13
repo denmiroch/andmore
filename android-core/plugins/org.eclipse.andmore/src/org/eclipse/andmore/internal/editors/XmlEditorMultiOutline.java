@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,9 @@
  */
 
 package org.eclipse.andmore.internal.editors;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.jface.action.IMenuManager;
@@ -34,9 +34,6 @@ import org.eclipse.ui.part.Page;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Outline used for XML editors that have multiple pages with separate outlines:
  * switches between them
@@ -45,8 +42,7 @@ import java.util.List;
  * <p>
  * Modeled after .org.eclipse.pde.internal.ui.editor.PDEMultiPageContentOutline
  */
-public class XmlEditorMultiOutline extends Page implements IContentOutlinePage,
-        ISelectionChangedListener {
+public class XmlEditorMultiOutline extends Page implements IContentOutlinePage, ISelectionChangedListener {
     private boolean mDisposed;
     private PageBook mPageBook;
     private IContentOutlinePage mCurrentPage;
@@ -55,8 +51,7 @@ public class XmlEditorMultiOutline extends Page implements IContentOutlinePage,
     private List<ISelectionChangedListener> mListeners;
     private ISelection mSelection;
 
-    public XmlEditorMultiOutline() {
-    }
+    public XmlEditorMultiOutline() {}
 
     @Override
     public Control getControl() {
@@ -88,8 +83,7 @@ public class XmlEditorMultiOutline extends Page implements IContentOutlinePage,
 
     @Override
     public void makeContributions(IMenuManager menuManager, IToolBarManager toolBarManager,
-            IStatusLineManager statusLineManager) {
-    }
+            IStatusLineManager statusLineManager) {}
 
     @Override
     public void setActionBars(IActionBars actionBars) {
@@ -175,8 +169,7 @@ public class XmlEditorMultiOutline extends Page implements IContentOutlinePage,
     private static class EmptyPage implements IContentOutlinePage {
         private Composite mControl;
 
-        private EmptyPage() {
-        }
+        private EmptyPage() {}
 
         @Override
         public void createControl(Composite parent) {
@@ -184,8 +177,7 @@ public class XmlEditorMultiOutline extends Page implements IContentOutlinePage,
         }
 
         @Override
-        public void dispose() {
-        }
+        public void dispose() {}
 
         @Override
         public Control getControl() {
@@ -193,16 +185,13 @@ public class XmlEditorMultiOutline extends Page implements IContentOutlinePage,
         }
 
         @Override
-        public void setActionBars(IActionBars actionBars) {
-        }
+        public void setActionBars(IActionBars actionBars) {}
 
         @Override
-        public void setFocus() {
-        }
+        public void setFocus() {}
 
         @Override
-        public void addSelectionChangedListener(ISelectionChangedListener listener) {
-        }
+        public void addSelectionChangedListener(ISelectionChangedListener listener) {}
 
         @Override
         public ISelection getSelection() {
@@ -210,11 +199,9 @@ public class XmlEditorMultiOutline extends Page implements IContentOutlinePage,
         }
 
         @Override
-        public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-        }
+        public void removeSelectionChangedListener(ISelectionChangedListener listener) {}
 
         @Override
-        public void setSelection(ISelection selection) {
-        }
+        public void setSelection(ISelection selection) {}
     }
 }

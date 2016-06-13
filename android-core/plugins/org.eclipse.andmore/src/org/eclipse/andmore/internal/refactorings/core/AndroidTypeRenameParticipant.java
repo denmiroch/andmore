@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,12 +26,10 @@ import static com.android.SdkConstants.TOOLS_URI;
 import static com.android.SdkConstants.VIEW_FRAGMENT;
 import static com.android.SdkConstants.VIEW_TAG;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.ide.common.xml.ManifestData;
-import com.android.resources.ResourceFolderType;
-import com.android.resources.ResourceType;
-import com.android.utils.SdkUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -81,10 +76,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.ide.common.xml.ManifestData;
+import com.android.resources.ResourceFolderType;
+import com.android.resources.ResourceType;
+import com.android.utils.SdkUtils;
 
 /**
  * A participant to participate in refactorings that rename a type in an Android project.
@@ -137,15 +134,12 @@ public class AndroidTypeRenameParticipant extends RenameParticipant {
             IType type = (IType) element;
             IJavaProject javaProject = (IJavaProject) type.getAncestor(IJavaElement.JAVA_PROJECT);
             mProject = javaProject.getProject();
-            IResource manifestResource = mProject.findMember(AndmoreAndroidConstants.WS_SEP
-                    + SdkConstants.FN_ANDROID_MANIFEST_XML);
+            IResource manifestResource = mProject
+                    .findMember(AndmoreAndroidConstants.WS_SEP + SdkConstants.FN_ANDROID_MANIFEST_XML);
 
-            if (manifestResource == null || !manifestResource.exists()
-                    || !(manifestResource instanceof IFile)) {
-                RefactoringUtil.logInfo(
-                        String.format("Invalid or missing file %1$s in project %2$s",
-                                SdkConstants.FN_ANDROID_MANIFEST_XML,
-                                mProject.getName()));
+            if (manifestResource == null || !manifestResource.exists() || !(manifestResource instanceof IFile)) {
+                RefactoringUtil.logInfo(String.format("Invalid or missing file %1$s in project %2$s",
+                        SdkConstants.FN_ANDROID_MANIFEST_XML, mProject.getName()));
                 return false;
             }
 
@@ -190,8 +184,7 @@ public class AndroidTypeRenameParticipant extends RenameParticipant {
     }
 
     @Override
-    public Change createChange(IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+    public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
         if (pm.isCanceled()) {
             return null;
         }
@@ -203,8 +196,7 @@ public class AndroidTypeRenameParticipant extends RenameParticipant {
 
         RefactoringProcessor p = getProcessor();
         if (p instanceof RenameCompilationUnitProcessor) {
-            RenameTypeProcessor rtp =
-                    ((RenameCompilationUnitProcessor) p).getRenameTypeProcessor();
+            RenameTypeProcessor rtp = ((RenameCompilationUnitProcessor) p).getRenameTypeProcessor();
             if (rtp != null) {
                 String pattern = rtp.getFilePatterns();
                 boolean updQualf = rtp.getUpdateQualifiedNames();
@@ -234,10 +226,9 @@ public class AndroidTypeRenameParticipant extends RenameParticipant {
             Collection<ProjectState> parentProjects = projectState.getFullParentProjects();
             for (ProjectState parentProject : parentProjects) {
                 IProject project = parentProject.getProject();
-                IResource manifestResource = project.findMember(AndmoreAndroidConstants.WS_SEP
-                        + SdkConstants.FN_ANDROID_MANIFEST_XML);
-                if (manifestResource != null && manifestResource.exists()
-                        && manifestResource instanceof IFile) {
+                IResource manifestResource = project
+                        .findMember(AndmoreAndroidConstants.WS_SEP + SdkConstants.FN_ANDROID_MANIFEST_XML);
+                if (manifestResource != null && manifestResource.exists() && manifestResource instanceof IFile) {
                     addManifestFileChanges((IFile) manifestResource, result);
                 }
                 addLayoutFileChanges(project, result);
@@ -271,14 +262,12 @@ public class AndroidTypeRenameParticipant extends RenameParticipant {
                 for (IField field : fields) {
                     String name = field.getElementName();
                     if (name.equals(mOldSimpleName) || name.startsWith(mOldSimpleName)
-                            && name.length() > mOldSimpleName.length()
-                            && name.charAt(mOldSimpleName.length()) == '_') {
+                            && name.length() > mOldSimpleName.length() && name.charAt(mOldSimpleName.length()) == '_') {
                         // Rename styleable fields
-                        String newName = name.equals(mOldSimpleName) ? mNewSimpleName :
-                            mNewSimpleName + name.substring(mOldSimpleName.length());
-                        RenameRefactoring refactoring =
-                                RenameResourceParticipant.createFieldRefactoring(field,
-                                        newName, true);
+                        String newName = name.equals(mOldSimpleName) ? mNewSimpleName
+                                : mNewSimpleName + name.substring(mOldSimpleName.length());
+                        RenameRefactoring refactoring = RenameResourceParticipant.createFieldRefactoring(field, newName,
+                                true);
 
                         try {
                             sIgnore = true;
@@ -287,8 +276,7 @@ public class AndroidTypeRenameParticipant extends RenameParticipant {
                                 Change fieldChange = refactoring.createChange(monitor);
                                 if (fieldChange != null) {
                                     if (fieldChanges == null) {
-                                        fieldChanges = new CompositeChange(
-                                                "Update custom view styleable fields");
+                                        fieldChanges = new CompositeChange("Update custom view styleable fields");
                                         // Disable these changes. They sometimes end up
                                         // editing the wrong offsets. It looks like Eclipse
                                         // doesn't ensure that after applying each change it
@@ -332,8 +320,7 @@ public class AndroidTypeRenameParticipant extends RenameParticipant {
             for (IResource folder : folders) {
                 String folderName = folder.getName();
                 ResourceFolderType folderType = ResourceFolderType.getFolderType(folderName);
-                if (folderType != ResourceFolderType.LAYOUT &&
-                        folderType != ResourceFolderType.VALUES) {
+                if (folderType != ResourceFolderType.LAYOUT && folderType != ResourceFolderType.VALUES) {
                     continue;
                 }
                 if (!(folder instanceof IFolder)) {
@@ -357,8 +344,7 @@ public class AndroidTypeRenameParticipant extends RenameParticipant {
         }
     }
 
-    private boolean addXmlFileChanges(IFile file, CompositeChange changes,
-            ResourceFolderType folderType) {
+    private boolean addXmlFileChanges(IFile file, CompositeChange changes, ResourceFolderType folderType) {
         IModelManager modelManager = StructuredModelManager.getModelManager();
         IStructuredModel model = null;
         try {
@@ -410,9 +396,7 @@ public class AndroidTypeRenameParticipant extends RenameParticipant {
         return false;
     }
 
-    private void addLayoutReplacements(
-            @NonNull List<TextEdit> edits,
-            @NonNull Element element,
+    private void addLayoutReplacements(@NonNull List<TextEdit> edits, @NonNull Element element,
             @NonNull IStructuredDocument document) {
         String tag = element.getTagName();
         if (tag.equals(mOldFqcn)) {
@@ -469,9 +453,7 @@ public class AndroidTypeRenameParticipant extends RenameParticipant {
         }
     }
 
-    private void addValueReplacements(
-            @NonNull List<TextEdit> edits,
-            @NonNull Element root,
+    private void addValueReplacements(@NonNull List<TextEdit> edits, @NonNull Element root,
             @NonNull IStructuredDocument document) {
         // Look for styleable renames for custom views
         String declareStyleable = ResourceType.DECLARE_STYLEABLE.getName();
@@ -491,9 +473,7 @@ public class AndroidTypeRenameParticipant extends RenameParticipant {
         }
     }
 
-    private void addManifestReplacements(
-            @NonNull List<TextEdit> edits,
-            @NonNull Element element,
+    private void addManifestReplacements(@NonNull List<TextEdit> edits, @NonNull Element element,
             @NonNull IStructuredDocument document) {
         NamedNodeMap attributes = element.getAttributes();
         for (int i = 0, n = attributes.getLength(); i < n; i++) {

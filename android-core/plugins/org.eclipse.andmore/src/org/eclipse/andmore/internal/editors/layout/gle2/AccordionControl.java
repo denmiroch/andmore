@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,11 @@
  */
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.jface.resource.JFaceResources;
@@ -38,11 +40,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ScrollBar;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * The accordion control allows a series of labels with associated content that can be
@@ -194,8 +191,8 @@ public abstract class AccordionControl extends Composite {
      *            with wrapping
      * @param expand Set of headers to expand initially
      */
-    public AccordionControl(Composite parent, int style, List<?> headers,
-            boolean greedy, boolean wrapChildren, Set<String> expand) {
+    public AccordionControl(Composite parent, int style, List<?> headers, boolean greedy, boolean wrapChildren,
+            Set<String> expand) {
         super(parent, style);
         mWrap = wrapChildren;
 
@@ -208,7 +205,7 @@ public abstract class AccordionControl extends Composite {
 
         Font labelFont = null;
 
-        mOpen = IconFactory.getInstance().getIcon("open-folder");     //$NON-NLS-1$
+        mOpen = IconFactory.getInstance().getIcon("open-folder"); //$NON-NLS-1$
         mClosed = IconFactory.getInstance().getIcon("closed-folder"); //$NON-NLS-1$
         List<CLabel> expandLabels = new ArrayList<CLabel>();
 
@@ -242,8 +239,7 @@ public abstract class AccordionControl extends Composite {
                 }
 
                 @Override
-                public void mouseHover(MouseEvent e) {
-                }
+                public void mouseHover(MouseEvent e) {}
             });
 
             // Turn off border?
@@ -258,8 +254,7 @@ public abstract class AccordionControl extends Composite {
             setContentArea(label, scrolledComposite);
             scrolledComposite.setExpandHorizontal(true);
             scrolledComposite.setExpandVertical(true);
-            GridData scrollGridData = new GridData(SWT.FILL,
-                    greedy ? SWT.FILL : SWT.TOP, false, greedy, 1, 1);
+            GridData scrollGridData = new GridData(SWT.FILL, greedy ? SWT.FILL : SWT.TOP, false, greedy, 1, 1);
             scrollGridData.exclude = true;
             scrollGridData.grabExcessHorizontalSpace = wrapChildren;
             scrolledComposite.setLayoutData(scrollGridData);
@@ -277,7 +272,7 @@ public abstract class AccordionControl extends Composite {
                             vBar.setPageIncrement(r.height);
                         }
                     }
-                  });
+                });
             }
 
             updateIcon(label);
@@ -298,13 +293,11 @@ public abstract class AccordionControl extends Composite {
     /** Updates the background gradient of the given header label */
     private void updateBackground(CLabel label, boolean mouseOver) {
         Display display = label.getDisplay();
-        label.setBackground(new Color[] {
-                display.getSystemColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW),
-                display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND),
-                display.getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW)
-        }, new int[] {
-                mouseOver ? 60 : 40, 100
-        }, true);
+        label.setBackground(
+                new Color[] { display.getSystemColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW),
+                        display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND),
+                        display.getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW) },
+                new int[] { mouseOver ? 60 : 40, 100 }, true);
     }
 
     /**

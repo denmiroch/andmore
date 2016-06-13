@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,8 +28,7 @@ public class GraphicsUtilities {
         if (image == null) {
             return null;
         }
-        ImageData result = new ImageData(image.width + 2, image.height + 2, image.depth,
-                image.palette);
+        ImageData result = new ImageData(image.width + 2, image.height + 2, image.depth, image.palette);
 
         final int[] colors = new int[image.width];
         final byte[] alpha = new byte[image.width];
@@ -76,8 +72,7 @@ public class GraphicsUtilities {
         if (image == null) {
             return null;
         }
-        ImageData result = new ImageData(image.width, image.height, image.depth,
-                image.palette);
+        ImageData result = new ImageData(image.width, image.height, image.depth, image.palette);
 
         final int[] colors = new int[image.width];
         final byte[] alpha = new byte[image.width];

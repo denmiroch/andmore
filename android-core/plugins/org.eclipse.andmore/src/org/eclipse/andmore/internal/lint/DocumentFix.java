@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,14 +29,12 @@ abstract class DocumentFix extends LintFix {
         super(id, marker);
     }
 
-    protected abstract void apply(IDocument document, IStructuredModel model, Node node,
-            int start, int end);
+    protected abstract void apply(IDocument document, IStructuredModel model, Node node, int start, int end);
 
     @Override
     public void apply(IDocument document) {
         if (!(document instanceof IStructuredDocument)) {
-            AndmoreAndroidPlugin.log(null, "Unexpected document type: %1$s. Can't fix.",
-                    document.getClass().getName());
+            AndmoreAndroidPlugin.log(null, "Unexpected document type: %1$s. Can't fix.", document.getClass().getName());
             return;
         }
         int start = mMarker.getAttribute(IMarker.CHAR_START, -1);

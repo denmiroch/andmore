@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -161,8 +158,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
     private final ArrayList<IJavaProject> mPostLoadProjectsToCheck = new ArrayList<IJavaProject>();
 
     private GlobalProjectMonitor mResourceMonitor;
-    private ArrayList<ITargetChangeListener> mTargetChangeListeners =
-            new ArrayList<ITargetChangeListener>();
+    private ArrayList<ITargetChangeListener> mTargetChangeListeners = new ArrayList<ITargetChangeListener>();
 
     /**
      * This variable indicates that the job inside parseSdkContent() is currently
@@ -179,10 +175,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
     public static abstract class CheckSdkErrorHandler {
 
         public enum Solution {
-            NONE,
-            OPEN_SDK_MANAGER,
-            OPEN_ANDROID_PREFS,
-            OPEN_P2_UPDATE
+            NONE, OPEN_SDK_MANAGER, OPEN_ANDROID_PREFS, OPEN_P2_UPDATE
         }
 
         /**
@@ -215,8 +208,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
 
         // set the default android console.
         mAndroidConsole = new MessageConsole("Android", null); //$NON-NLS-1$
-        ConsolePlugin.getDefault().getConsoleManager().addConsoles(
-                new IConsole[] { mAndroidConsole });
+        ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { mAndroidConsole });
 
         // get the stream to write in the android console.
         mAndroidConsoleStream = mAndroidConsole.newMessageStream();
@@ -237,8 +229,8 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                 if (AdtPrefs.PREFS_SDK_DIR.equals(event.getProperty())) {
 
                     // finally restart adb, in case it's a different version
-                    DdmsPlugin.setToolsLocation(getOsAbsoluteAdb(), true /* startAdb */,
-                            getOsAbsoluteHprofConv(), getOsAbsoluteTraceview());
+                    DdmsPlugin.setToolsLocation(getOsAbsoluteAdb(), true /* startAdb */, getOsAbsoluteHprofConv(),
+                            getOsAbsoluteTraceview());
 
                     // get the SDK location and build id.
                     if (checkSdkLocationAndId()) {
@@ -254,12 +246,8 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
         AdtPrefs.getPrefs().loadValues(null /*event*/);
 
         // initialize property-sheet library
-        DesignerPlugin.initialize(
-                this,
-                PLUGIN_ID,
-                CURRENT_PLATFORM == PLATFORM_WINDOWS,
-                CURRENT_PLATFORM == PLATFORM_DARWIN,
-                CURRENT_PLATFORM == PLATFORM_LINUX);
+        DesignerPlugin.initialize(this, PLUGIN_ID, CURRENT_PLATFORM == PLATFORM_WINDOWS,
+                CURRENT_PLATFORM == PLATFORM_DARWIN, CURRENT_PLATFORM == PLATFORM_LINUX);
 
         // initialize editors
         startEditors();
@@ -298,7 +286,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
         // This is deferred in separate jobs to avoid blocking the bundle start.
         final boolean isSdkLocationValid = checkSdkLocationAndId();
         if (isSdkLocationValid) {
-        	System.out.println("Parsing sdk content.");
+            System.out.println("Parsing sdk content.");
             // parse the SDK resources.
             // Wait 2 seconds before starting the job. This leaves some time to the
             // other bundles to initialize.
@@ -396,8 +384,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
 
     /** Returns the absolute traceview path */
     public static String getOsAbsoluteTraceview() {
-        return getOsSdkFolder() + SdkConstants.OS_SDK_TOOLS_FOLDER +
-                AndmoreAndroidConstants.FN_TRACEVIEW;
+        return getOsSdkFolder() + SdkConstants.OS_SDK_TOOLS_FOLDER + AndmoreAndroidConstants.FN_TRACEVIEW;
     }
 
     /** Returns the absolute emulator path */
@@ -406,8 +393,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
     }
 
     public static String getOsAbsoluteHprofConv() {
-        return getOsSdkFolder() + SdkConstants.OS_SDK_PLATFORM_TOOLS_FOLDER +
-                AndmoreAndroidConstants.FN_HPROF_CONV;
+        return getOsSdkFolder() + SdkConstants.OS_SDK_PLATFORM_TOOLS_FOLDER + AndmoreAndroidConstants.FN_HPROF_CONV;
     }
 
     /** Returns the absolute proguard path */
@@ -419,8 +405,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * Returns a Url file path to the javaDoc folder.
      */
     public static String getUrlDoc() {
-        return ProjectHelper.getJavaDocPath(
-                getOsSdkFolder() + AndmoreAndroidConstants.WS_JAVADOC_FOLDER_LEAF);
+        return ProjectHelper.getJavaDocPath(getOsSdkFolder() + AndmoreAndroidConstants.WS_JAVADOC_FOLDER_LEAF);
     }
 
     /**
@@ -477,11 +462,10 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
             // which is handled by this IOException catch.
 
         } finally {
-        	try {
-				Closeables.close(reader, true);
-				Closeables.close(contents, true);
-			} catch (IOException e) {
-			}
+            try {
+                Closeables.close(reader, true);
+                Closeables.close(contents, true);
+            } catch (IOException e) {}
         }
 
         return null;
@@ -595,10 +579,10 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                         c = reader.read();
                         if (c == -1) {
                             return false;
-                        } else if (string.charAt(i) != (char)c) {
+                        } else if (string.charAt(i) != (char) c) {
                             matches = false;
                             // Back up the characters that did not match
-                            reader.backup(i-1);
+                            reader.backup(i - 1);
                             break;
                         }
                     }
@@ -737,7 +721,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                 if (c == -1) {
                     return sb.toString();
                 } else {
-                    sb.append((char)c);
+                    sb.append((char) c);
                 }
             }
         } catch (IOException e) {
@@ -762,7 +746,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * @return null if the file could not be read
      */
     public static String readEmbeddedTextFile(String filepath) {
-    	InputStream is = null;
+        InputStream is = null;
         try {
             is = readEmbeddedFileAsStream(filepath);
             if (is != null) {
@@ -781,14 +765,13 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                 }
             }
         } catch (IOException e) {
-            AndmoreAndroidPlugin.log(e, "Failed to read text file '%s'", filepath);  //$NON-NLS-1$
+            AndmoreAndroidPlugin.log(e, "Failed to read text file '%s'", filepath); //$NON-NLS-1$
         } finally {
-        	if (is != null) {
-        		try {
-					is.close();
-				} catch (IOException e) {
-				}
-        	}
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {}
+            }
         }
 
         return null;
@@ -801,7 +784,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * @return null if the file could not be read
      */
     public static byte[] readEmbeddedFile(String filepath) {
-    	InputStream is = null;
+        InputStream is = null;
         try {
             is = readEmbeddedFileAsStream(filepath);
             if (is != null) {
@@ -823,14 +806,13 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
             }
         } catch (IOException e) {
             // we'll just return null;.
-            AndmoreAndroidPlugin.log(e, "Failed to read binary file '%s'", filepath);  //$NON-NLS-1$
+            AndmoreAndroidPlugin.log(e, "Failed to read binary file '%s'", filepath); //$NON-NLS-1$
         } finally {
-        	if (is != null) {
-        		try {
-					is.close();
-				} catch (IOException e) {
-				}
-        	}
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {}
+            }
         }
 
         return null;
@@ -851,10 +833,10 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
             }
         } catch (MalformedURLException e) {
             // we'll just return null.
-            AndmoreAndroidPlugin.log(e, "Failed to read stream '%s'", filepath);  //$NON-NLS-1$
+            AndmoreAndroidPlugin.log(e, "Failed to read stream '%s'", filepath); //$NON-NLS-1$
         } catch (IOException e) {
             // we'll just return null;.
-            AndmoreAndroidPlugin.log(e, "Failed to read stream '%s'", filepath);  //$NON-NLS-1$
+            AndmoreAndroidPlugin.log(e, "Failed to read stream '%s'", filepath); //$NON-NLS-1$
         }
 
         return null;
@@ -871,7 +853,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
             if (sPlugin != null) {
                 bundle = sPlugin.getBundle();
             } else {
-                AndmoreAndroidPlugin.log(IStatus.WARNING, "ADT Plugin is missing");    //$NON-NLS-1$
+                AndmoreAndroidPlugin.log(IStatus.WARNING, "ADT Plugin is missing"); //$NON-NLS-1$
                 return null;
             }
         }
@@ -964,7 +946,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * @param args The arguments for the format string, like for
      * {@link String#format(String, Object...)}.
      */
-    public static void log(int severity, String format, Object ... args) {
+    public static void log(int severity, String format, Object... args) {
         if (format == null) {
             return;
         }
@@ -991,7 +973,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * @param args The arguments for the format string, like for
      * {@link String#format(String, Object...)}.
      */
-    public static void log(Throwable exception, String format, Object ... args) {
+    public static void log(Throwable exception, String format, Object... args) {
         String message = null;
         if (format != null) {
             message = String.format(format, args);
@@ -1020,8 +1002,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * @param args The arguments for the format string, like for
      * {@link String#format(String, Object...)}.
      */
-    public static synchronized void logAndPrintError(Throwable exception, String tag,
-            String format, Object ... args) {
+    public static synchronized void logAndPrintError(Throwable exception, String tag, String format, Object... args) {
         if (sPlugin != null) {
             String message = String.format(format, args);
             Status status = new Status(IStatus.ERROR, PLUGIN_ID, message, exception);
@@ -1049,7 +1030,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * @param objects the objects to print through their <code>toString</code> method.
      */
     public static void printErrorToConsole(Object... objects) {
-        printErrorToConsole((String)null, objects);
+        printErrorToConsole((String) null, objects);
     }
 
     /**
@@ -1071,8 +1052,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * @see BuildVerbosity#NORMAL
      * @see BuildVerbosity#VERBOSE
      */
-    public static synchronized void printBuildToConsole(BuildVerbosity level, IProject project,
-            Object... objects) {
+    public static synchronized void printBuildToConsole(BuildVerbosity level, IProject project, Object... objects) {
         if (sPlugin != null) {
             if (level.getLevel() <= AdtPrefs.getPrefs().getBuildVerbosity().getLevel()) {
                 String tag = project != null ? project.getName() : null;
@@ -1108,8 +1088,8 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
         EclipseUiHelper.showView(IConsoleConstants.ID_CONSOLE_VIEW, true);
 
         // now make sure it's not docked.
-        ConsolePlugin.getDefault().getConsoleManager().showConsoleView(
-                AndmoreAndroidPlugin.getDefault().getAndroidConsole());
+        ConsolePlugin.getDefault().getConsoleManager()
+                .showConsoleView(AndmoreAndroidPlugin.getDefault().getAndroidConsole());
     }
 
     /**
@@ -1180,10 +1160,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                 return true;
             }
 
-            private void displayMessage(
-                    final Solution solution,
-                    final String message,
-                    final int dialogImageType) {
+            private void displayMessage(final Solution solution, final String message, final int dialogImageType) {
                 final Display disp = getDisplay();
                 disp.asyncExec(new Runnable() {
                     @Override
@@ -1197,47 +1174,42 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                         }
 
                         String customLabel = null;
-                        switch(solution) {
-                        case OPEN_ANDROID_PREFS:
-                            customLabel = "Open Preferences";
-                            break;
-                        case OPEN_P2_UPDATE:
-                            customLabel = "Check for Updates";
-                            break;
-                        case OPEN_SDK_MANAGER:
-                            customLabel = "Open SDK Manager";
-                            break;
-						default:
-							break;
+                        switch (solution) {
+                            case OPEN_ANDROID_PREFS:
+                                customLabel = "Open Preferences";
+                                break;
+                            case OPEN_P2_UPDATE:
+                                customLabel = "Check for Updates";
+                                break;
+                            case OPEN_SDK_MANAGER:
+                                customLabel = "Open SDK Manager";
+                                break;
+                            default:
+                                break;
                         }
 
                         String btnLabels[] = new String[customLabel == null ? 1 : 2];
                         btnLabels[0] = customLabel;
                         btnLabels[btnLabels.length - 1] = IDialogConstants.CLOSE_LABEL;
 
-                        MessageDialog dialog = new MessageDialog(
-                                shell, // parent
-                                mTitle,
-                                null, // dialogTitleImage
-                                message,
-                                dialogImageType,
-                                btnLabels,
-                                btnLabels.length - 1);
+                        MessageDialog dialog = new MessageDialog(shell, // parent
+                                mTitle, null, // dialogTitleImage
+                                message, dialogImageType, btnLabels, btnLabels.length - 1);
                         int index = dialog.open();
 
                         if (customLabel != null && index == 0) {
-                            switch(solution) {
-                            case OPEN_ANDROID_PREFS:
-                                openAndroidPrefs();
-                                break;
-                            case OPEN_P2_UPDATE:
-                                openP2Update();
-                                break;
-                            case OPEN_SDK_MANAGER:
-                                openSdkManager();
-                                break;
-							default:
-								break;
+                            switch (solution) {
+                                case OPEN_ANDROID_PREFS:
+                                    openAndroidPrefs();
+                                    break;
+                                case OPEN_P2_UPDATE:
+                                    openP2Update();
+                                    break;
+                                case OPEN_SDK_MANAGER:
+                                    openSdkManager();
+                                    break;
+                                default:
+                                    break;
                             }
                         }
                     }
@@ -1264,11 +1236,11 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
 
             private void openP2Update() {
                 Display disp = getDisplay();
-                
+
                 disp.asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        String cmdId = "org.eclipse.equinox.p2.ui.sdk.update";  //$NON-NLS-1$
+                        String cmdId = "org.eclipse.equinox.p2.ui.sdk.update"; //$NON-NLS-1$
                         IWorkbench wb = PlatformUI.getWorkbench();
                         if (wb == null) {
                             return;
@@ -1293,10 +1265,9 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
             }
 
             private void openAndroidPrefs() {
-                PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(
-                        getDisplay().getActiveShell(),
+                PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(getDisplay().getActiveShell(),
                         "org.eclipse.andmore.preferences.main", //$NON-NLS-1$ preferencePageId
-                        null,  // displayedIds
+                        null, // displayedIds
                         null); // data
                 dialog.open();
             }
@@ -1314,11 +1285,9 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * @param errorHandler An checkSdkErrorHandler that can display a warning or an error.
      * @return False if there was an error or the result from the errorHandler invocation.
      */
-    public boolean checkSdkLocationAndId(@Nullable String osSdkLocation,
-                                         @NonNull CheckSdkErrorHandler errorHandler) {
+    public boolean checkSdkLocationAndId(@Nullable String osSdkLocation, @NonNull CheckSdkErrorHandler errorHandler) {
         if (osSdkLocation == null || osSdkLocation.trim().length() == 0) {
-            return errorHandler.handleError(
-                    Solution.OPEN_ANDROID_PREFS,
+            return errorHandler.handleError(Solution.OPEN_ANDROID_PREFS,
                     "Location of the Android SDK has not been setup in the preferences.");
         }
 
@@ -1328,18 +1297,15 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
 
         File osSdkFolder = new File(osSdkLocation);
         if (osSdkFolder.isDirectory() == false) {
-            return errorHandler.handleError(
-                    Solution.OPEN_ANDROID_PREFS,
+            return errorHandler.handleError(Solution.OPEN_ANDROID_PREFS,
                     String.format(Messages.Could_Not_Find_Folder, osSdkLocation));
         }
 
         String osTools = osSdkLocation + SdkConstants.OS_SDK_TOOLS_FOLDER;
         File toolsFolder = new File(osTools);
         if (toolsFolder.isDirectory() == false) {
-            return errorHandler.handleError(
-                    Solution.OPEN_ANDROID_PREFS,
-                    String.format(Messages.Could_Not_Find_Folder_In_SDK,
-                            SdkConstants.FD_TOOLS, osSdkLocation));
+            return errorHandler.handleError(Solution.OPEN_ANDROID_PREFS,
+                    String.format(Messages.Could_Not_Find_Folder_In_SDK, SdkConstants.FD_TOOLS, osSdkLocation));
         }
 
         // first check the min plug-in requirement as its error message is easier to figure
@@ -1351,30 +1317,23 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
         // check that we have both the tools component and the platform-tools component.
         String platformTools = osSdkLocation + SdkConstants.OS_SDK_PLATFORM_TOOLS_FOLDER;
         if (checkFolder(platformTools) == false) {
-            return errorHandler.handleWarning(
-                    Solution.OPEN_SDK_MANAGER,
-                    "SDK Platform Tools component is missing!\n" +
-                    "Please use the SDK Manager to install it.");
+            return errorHandler.handleWarning(Solution.OPEN_SDK_MANAGER,
+                    "SDK Platform Tools component is missing!\n" + "Please use the SDK Manager to install it.");
         }
 
         String tools = osSdkLocation + SdkConstants.OS_SDK_TOOLS_FOLDER;
         if (checkFolder(tools) == false) {
-            return errorHandler.handleError(
-                    Solution.OPEN_SDK_MANAGER,
-                    "SDK Tools component is missing!\n" +
-                    "Please use the SDK Manager to install it.");
+            return errorHandler.handleError(Solution.OPEN_SDK_MANAGER,
+                    "SDK Tools component is missing!\n" + "Please use the SDK Manager to install it.");
         }
 
         // check the path to various tools we use to make sure nothing is missing. This is
         // not meant to be exhaustive.
-        String[] filesToCheck = new String[] {
-                osSdkLocation + getOsRelativeAdb(),
-                osSdkLocation + getOsRelativeEmulator()
-        };
+        String[] filesToCheck = new String[] { osSdkLocation + getOsRelativeAdb(),
+                osSdkLocation + getOsRelativeEmulator() };
         for (String file : filesToCheck) {
             if (checkFile(file) == false) {
-                return errorHandler.handleError(
-                        Solution.OPEN_ANDROID_PREFS,
+                return errorHandler.handleError(Solution.OPEN_ANDROID_PREFS,
                         String.format(Messages.Could_Not_Find, file));
             }
         }
@@ -1429,8 +1388,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
 
                     mParseSdkContentIsRunning = true;
 
-                    SubMonitor progress = SubMonitor.convert(monitor,
-                            "Initialize SDK Manager", 100);
+                    SubMonitor progress = SubMonitor.convert(monitor, "Initialize SDK Manager", 100);
 
                     Sdk sdk = Sdk.loadSdk(AdtPrefs.getPrefs().getOsSdkFolder());
 
@@ -1459,15 +1417,13 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                         // check the projects that need checking.
                         // The method modifies the list (it removes the project that
                         // do not need to be resolved again).
-                        AndroidClasspathContainerInitializer.checkProjectsCache(
-                                mPostLoadProjectsToCheck);
+                        AndroidClasspathContainerInitializer.checkProjectsCache(mPostLoadProjectsToCheck);
 
                         list.addAll(mPostLoadProjectsToCheck);
 
                         // update the project that needs recompiling.
                         if (list.size() > 0) {
-                            IJavaProject[] array = list.toArray(
-                                    new IJavaProject[list.size()]);
+                            IJavaProject[] array = list.toArray(new IJavaProject[list.size()]);
                             ProjectHelper.updateProjects(array);
                         }
 
@@ -1486,8 +1442,8 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
 
                     // Clone the list before iterating, to avoid ConcurrentModification
                     // exceptions
-                    final List<ITargetChangeListener> listeners =
-                        (List<ITargetChangeListener>)mTargetChangeListeners.clone();
+                    final List<ITargetChangeListener> listeners = (List<ITargetChangeListener>) mTargetChangeListeners
+                            .clone();
                     final SubMonitor progress2 = progress;
                     AndmoreAndroidPlugin.getDisplay().asyncExec(new Runnable() {
                         @Override
@@ -1504,9 +1460,8 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                         }
                     });
                 } catch (Throwable t) {
-                    log(t, "Unknown exception in parseSdkContent.");    //$NON-NLS-1$
-                    return new Status(IStatus.ERROR, PLUGIN_ID,
-                            "parseSdkContent failed", t);               //$NON-NLS-1$
+                    log(t, "Unknown exception in parseSdkContent."); //$NON-NLS-1$
+                    return new Status(IStatus.ERROR, PLUGIN_ID, "parseSdkContent failed", t); //$NON-NLS-1$
 
                 } finally {
                     mParseSdkContentIsRunning = false;
@@ -1535,8 +1490,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
     // ----- Methods for Editors -------
 
     public void startEditors() {
-        sAndroidLogoDesc = imageDescriptorFromPlugin(AndmoreAndroidPlugin.PLUGIN_ID,
-                "/icons/android.png"); //$NON-NLS-1$
+        sAndroidLogoDesc = imageDescriptorFromPlugin(AndmoreAndroidPlugin.PLUGIN_ID, "/icons/android.png"); //$NON-NLS-1$
         sAndroidLogo = sAndroidLogoDesc.createImage();
 
         // Add a resource listener to handle compiled resources.
@@ -1625,8 +1579,8 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
     public void setupEditors(GlobalProjectMonitor monitor) {
         monitor.addFileListener(new IFileListener() {
             @Override
-            public void fileChanged(@NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas,
-                    int kind, @Nullable String extension, int flags, boolean isAndroidProject) {
+            public void fileChanged(@NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas, int kind,
+                    @Nullable String extension, int flags, boolean isAndroidProject) {
                 if (!isAndroidProject) {
                     return;
                 }
@@ -1649,12 +1603,10 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                     if (segment.equalsIgnoreCase(SdkConstants.FD_RESOURCES)) {
                         // we are inside a res/ folder, get the ResourceFolderType of the
                         // parent folder.
-                        String[] folderSegments = file.getParent().getName().split(
-                                SdkConstants.RES_QUALIFIER_SEP);
+                        String[] folderSegments = file.getParent().getName().split(SdkConstants.RES_QUALIFIER_SEP);
 
                         // get the enum for the resource type.
-                        ResourceFolderType type = ResourceFolderType.getTypeByName(
-                                folderSegments[0]);
+                        ResourceFolderType type = ResourceFolderType.getTypeByName(folderSegments[0]);
 
                         if (type != null) {
                             if (kind == IResourceDelta.ADDED) {
@@ -1692,20 +1644,16 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
             }
 
             @Override
-            public void projectOpenedWithWorkspace(IProject project) {
-            }
+            public void projectOpenedWithWorkspace(IProject project) {}
 
             @Override
-            public void allProjectsOpenedWithWorkspace() {
-            }
+            public void allProjectsOpenedWithWorkspace() {}
 
             @Override
-            public void projectOpened(IProject project) {
-            }
+            public void projectOpened(IProject project) {}
 
             @Override
-            public void projectRenamed(IProject project, IPath from) {
-            }
+            public void projectRenamed(IProject project, IPath from) {}
         });
     }
 
@@ -1731,8 +1679,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      */
     @SuppressWarnings("unchecked")
     public void updateTargetListeners(final IProject project) {
-        final List<ITargetChangeListener> listeners =
-            (List<ITargetChangeListener>)mTargetChangeListeners.clone();
+        final List<ITargetChangeListener> listeners = (List<ITargetChangeListener>) mTargetChangeListeners.clone();
 
         AndmoreAndroidPlugin.getDisplay().asyncExec(new Runnable() {
             @Override
@@ -1741,7 +1688,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                     try {
                         listener.onProjectTargetChange(project);
                     } catch (Exception e) {
-                        AndmoreAndroidPlugin.log(e, "Failed to update a TargetChangeListener.");  //$NON-NLS-1$
+                        AndmoreAndroidPlugin.log(e, "Failed to update a TargetChangeListener."); //$NON-NLS-1$
                     }
                 }
             }
@@ -1754,8 +1701,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      */
     @SuppressWarnings("unchecked")
     public void updateTargetListeners(final IAndroidTarget target) {
-        final List<ITargetChangeListener> listeners =
-            (List<ITargetChangeListener>)mTargetChangeListeners.clone();
+        final List<ITargetChangeListener> listeners = (List<ITargetChangeListener>) mTargetChangeListeners.clone();
 
         Display display = AndmoreAndroidPlugin.getDisplay();
         if (display == null || display.isDisposed()) {
@@ -1768,7 +1714,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                     try {
                         listener.onTargetLoaded(target);
                     } catch (Exception e) {
-                        AndmoreAndroidPlugin.log(e, "Failed to update a TargetChangeListener.");  //$NON-NLS-1$
+                        AndmoreAndroidPlugin.log(e, "Failed to update a TargetChangeListener."); //$NON-NLS-1$
                     }
                 }
             }
@@ -1850,7 +1796,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
                         // Basic file path comparison indicates they are not the same.
                         // Let's dig a bit deeper.
                         try {
-                            location     = location.getCanonicalFile();
+                            location = location.getCanonicalFile();
                             prefLocation = prefLocation.getCanonicalFile();
                             changed = !location.equals(prefLocation);
                         } catch (IOException ignore) {
@@ -1907,17 +1853,16 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * @param objects The objects to print through their toString() method (or directly for
      * {@link String} objects.
      */
-    public static synchronized void printToStream(MessageConsoleStream stream, String tag,
-            Object... objects) {
+    public static synchronized void printToStream(MessageConsoleStream stream, String tag, Object... objects) {
         String dateTag = AndroidPrintStream.getMessageTag(tag);
 
         for (Object obj : objects) {
             stream.print(dateTag);
             stream.print(" "); //$NON-NLS-1$
             if (obj instanceof String) {
-                stream.println((String)obj);
+                stream.println((String) obj);
             } else if (obj == null) {
-                stream.println("(null)");  //$NON-NLS-1$
+                stream.println("(null)"); //$NON-NLS-1$
             } else {
                 stream.println(obj.toString());
             }
@@ -2008,8 +1953,8 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * @param lineNumber the line number or -1
      * @return true if the target location could be opened, false otherwise
      */
-    public static boolean openStackTraceLine(@Nullable String fqcn,
-            @Nullable String method, @Nullable String fileName, int lineNumber) {
+    public static boolean openStackTraceLine(@Nullable String fqcn, @Nullable String method, @Nullable String fileName,
+            int lineNumber) {
         return new SourceRevealer().revealMethod(fqcn + '.' + method, fileName, lineNumber, null);
     }
 
@@ -2038,8 +1983,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
      * @return the editor that was opened, or null if no editor was opened
      * @throws PartInitException if something goes wrong
      */
-    public static IEditorPart openFile(IFile file, IRegion region, boolean showEditorTab)
-            throws PartInitException {
+    public static IEditorPart openFile(IFile file, IRegion region, boolean showEditorTab) throws PartInitException {
         IWorkbenchPage page = AdtUtils.getActiveWorkbenchPage();
         if (page == null) {
             return null;
@@ -2055,8 +1999,7 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
         } else if (targetEditor instanceof AbstractTextEditor) {
             AbstractTextEditor editor = (AbstractTextEditor) targetEditor;
             if (region != null) {
-                editor.setHighlightRange(region.getOffset(), region.getLength(),
-                        true /* moveCursor*/);
+                editor.setHighlightRange(region.getOffset(), region.getLength(), true /* moveCursor*/);
             }
         }
 

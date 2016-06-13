@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +13,13 @@
 
 package org.eclipse.andmore.internal.build;
 
-import com.android.annotations.NonNull;
-import com.android.sdklib.build.RenderScriptProcessor.CommandLineLauncher;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -32,13 +34,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.annotations.NonNull;
+import com.android.sdklib.build.RenderScriptProcessor.CommandLineLauncher;
 
 /**
  * A {@link SourceProcessor} for RenderScript files.
@@ -60,12 +57,8 @@ public class RenderScriptLauncher implements CommandLineLauncher {
     private final IProgressMonitor mMonitor;
     private final boolean mVerbose;
 
-    public RenderScriptLauncher(
-            @NonNull IProject project,
-            @NonNull IFolder sourceOutFolder,
-            @NonNull IFolder resOutFolder,
-            @NonNull IProgressMonitor monitor,
-            boolean verbose) {
+    public RenderScriptLauncher(@NonNull IProject project, @NonNull IFolder sourceOutFolder,
+            @NonNull IFolder resOutFolder, @NonNull IProgressMonitor monitor, boolean verbose) {
         mProject = project;
         mSourceOutFolder = sourceOutFolder;
         mResOutFolder = resOutFolder;
@@ -119,8 +112,7 @@ public class RenderScriptLauncher implements CommandLineLauncher {
                             AndmoreAndroidPlugin.printErrorToConsole(mProject, stdErr.toArray());
 
                             // mark the project
-                            BaseProjectHelper.markResource(mProject,
-                                    AndmoreAndroidConstants.MARKER_RENDERSCRIPT,
+                            BaseProjectHelper.markResource(mProject, AndmoreAndroidConstants.MARKER_RENDERSCRIPT,
                                     "Unparsed Renderscript error! Check the console for output.",
                                     IMarker.SEVERITY_ERROR);
                         } else {
@@ -131,18 +123,16 @@ public class RenderScriptLauncher implements CommandLineLauncher {
                 }
             } else if (returnCode != 0) {
                 // no stderr output but exec failed.
-                String msg = String.format("Error executing Renderscript: Return code %1$d",
-                        returnCode);
+                String msg = String.format("Error executing Renderscript: Return code %1$d", returnCode);
 
-                BaseProjectHelper.markResource(mProject, AndmoreAndroidConstants.MARKER_AIDL,
-                       msg, IMarker.SEVERITY_ERROR);
+                BaseProjectHelper.markResource(mProject, AndmoreAndroidConstants.MARKER_AIDL, msg,
+                        IMarker.SEVERITY_ERROR);
 
                 return;
             }
         } catch (IOException e) {
             // mark the project and exit
-            String msg = String.format(
-                    "Error executing Renderscript. Please check %1$s is present at %2$s",
+            String msg = String.format("Error executing Renderscript. Please check %1$s is present at %2$s",
                     executable.getName(), executable.getAbsolutePath());
             AndmoreAndroidPlugin.log(IStatus.ERROR, msg);
             BaseProjectHelper.markResource(mProject, AndmoreAndroidConstants.MARKER_RENDERSCRIPT, msg,
@@ -150,8 +140,7 @@ public class RenderScriptLauncher implements CommandLineLauncher {
             throw e;
         } catch (InterruptedException e) {
             // mark the project and exit
-            String msg = String.format(
-                    "Error executing Renderscript. Please check %1$s is present at %2$s",
+            String msg = String.format("Error executing Renderscript. Please check %1$s is present at %2$s",
                     executable.getName(), executable.getAbsolutePath());
             AndmoreAndroidPlugin.log(IStatus.ERROR, msg);
             BaseProjectHelper.markResource(mProject, AndmoreAndroidConstants.MARKER_RENDERSCRIPT, msg,

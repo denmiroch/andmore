@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +13,12 @@
 
 package org.eclipse.andmore.internal.editors.ui.tree;
 
+import java.util.ArrayList;
+
 import org.eclipse.andmore.internal.editors.descriptors.ElementDescriptor;
 import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-
-import java.util.ArrayList;
 
 /**
  * UiModelTreeContentProvider is a trivial implementation of {@link ITreeContentProvider}
@@ -35,8 +32,7 @@ class UiModelTreeContentProvider implements ITreeContentProvider {
     /** The uiRootNode of the model. */
     private final UiElementNode mUiRootNode;
 
-    public UiModelTreeContentProvider(UiElementNode uiRootNode,
-            ElementDescriptor[] descriptorFilters) {
+    public UiModelTreeContentProvider(UiElementNode uiRootNode, ElementDescriptor[] descriptorFilters) {
         mUiRootNode = uiRootNode;
         mDescriptorFilters = descriptorFilters;
     }
@@ -116,4 +112,3 @@ class UiModelTreeContentProvider implements ITreeContentProvider {
         // pass
     }
 }
-

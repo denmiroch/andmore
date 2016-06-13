@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.editors.layout.refactoring;
-
-import com.android.resources.ResourceType;
 
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.resources.ResourceNameValidator;
@@ -29,6 +24,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import com.android.resources.ResourceType;
 
 class ExtractIncludeWizard extends VisualRefactoringWizard {
     public ExtractIncludeWizard(ExtractIncludeRefactoring ref, LayoutEditorDelegate editor) {
@@ -73,10 +70,8 @@ class ExtractIncludeWizard extends VisualRefactoringWizard {
             mNameText.addModifyListener(mModifyValidateListener);
 
             mReplaceAllOccurrences = new Button(composite, SWT.CHECK);
-            mReplaceAllOccurrences.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER,
-                    false, false, 2, 1));
-            mReplaceAllOccurrences.setText(
-                    "Replace occurrences in all layouts with include to new layout");
+            mReplaceAllOccurrences.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+            mReplaceAllOccurrences.setText("Replace occurrences in all layouts with include to new layout");
             mReplaceAllOccurrences.setEnabled(true);
             mReplaceAllOccurrences.setSelection(true);
             mReplaceAllOccurrences.addSelectionListener(mSelectionValidateListener);
@@ -100,8 +95,7 @@ class ExtractIncludeWizard extends VisualRefactoringWizard {
                 setErrorMessage("Provide a name for the new layout");
                 ok = false;
             } else {
-                ResourceNameValidator validator = ResourceNameValidator.create(false, mProject,
-                        ResourceType.LAYOUT);
+                ResourceNameValidator validator = ResourceNameValidator.create(false, mProject, ResourceType.LAYOUT);
                 String message = validator.isValid(text);
                 if (message != null) {
                     setErrorMessage(message);
@@ -113,8 +107,7 @@ class ExtractIncludeWizard extends VisualRefactoringWizard {
                 setErrorMessage(null);
 
                 // Record state
-                ExtractIncludeRefactoring refactoring =
-                    (ExtractIncludeRefactoring) getRefactoring();
+                ExtractIncludeRefactoring refactoring = (ExtractIncludeRefactoring) getRefactoring();
                 refactoring.setLayoutName(text);
                 refactoring.setReplaceOccurrences(mReplaceAllOccurrences.getSelection());
             }

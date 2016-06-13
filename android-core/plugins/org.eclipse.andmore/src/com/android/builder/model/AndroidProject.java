@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,11 +13,11 @@
 
 package com.android.builder.model;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-
 import java.io.File;
 import java.util.Collection;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 
 /**
  * Entry point for the model of the Android Projects. This models a single module, whether
@@ -29,12 +26,12 @@ import java.util.Collection;
 public interface AndroidProject {
     //  Injectable properties to use with -P
     // Sent by Studio 1.0 ONLY
-    String PROPERTY_BUILD_MODEL_ONLY =  "android.injected.build.model.only";
+    String PROPERTY_BUILD_MODEL_ONLY = "android.injected.build.model.only";
     // Sent by Studio 1.1+
-    String PROPERTY_BUILD_MODEL_ONLY_ADVANCED =  "android.injected.build.model.only.advanced";
+    String PROPERTY_BUILD_MODEL_ONLY_ADVANCED = "android.injected.build.model.only.advanced";
     // Sent by Studio 2.2+. The value of the prop is a monotonically increasing integer.
     // see MODEL_LEVEL_* constants
-    String PROPERTY_BUILD_MODEL_ONLY_VERSIONED =  "android.injected.build.model.only.versioned";
+    String PROPERTY_BUILD_MODEL_ONLY_VERSIONED = "android.injected.build.model.only.versioned";
 
     // Sent in when external native projects models requires a refresh.
     String PROPERTY_REFRESH_EXTERNAL_NATIVE_MODEL = "android.injected.refresh.external.native.model";
@@ -79,7 +76,7 @@ public interface AndroidProject {
     int GENERATION_ORIGINAL = 1;
     int GENERATION_COMPONENT = 2;
 
-    int MODEL_LEVEL_0_ORIGNAL = 0 ; // studio 1.0, no support for SyncIssue
+    int MODEL_LEVEL_0_ORIGNAL = 0; // studio 1.0, no support for SyncIssue
     int MODEL_LEVEL_1_SYNC_ISSUE = 1; // studio 1.1+, with SyncIssue
     int MODEL_LEVEL_2_DEP_GRAPH = 2; // studio 2.2+, with full dep graph
     int MODEL_LEVEL_LATEST = MODEL_LEVEL_2_DEP_GRAPH;

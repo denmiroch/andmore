@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,8 +20,11 @@ import static com.android.SdkConstants.EXT_XML;
 import static com.android.SdkConstants.VIEW_FRAGMENT;
 import static com.android.SdkConstants.VIEW_INCLUDE;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.VisibleForTesting;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.internal.editors.descriptors.AttributeDescriptor;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
@@ -52,11 +52,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.annotations.NonNull;
+import com.android.annotations.VisibleForTesting;
 
 /**
  * Changes the type of the given widgets to the given target type
@@ -77,23 +74,19 @@ public class ChangeViewRefactoring extends VisualRefactoring {
         mTypeFqcn = arguments.get(KEY_TYPE);
     }
 
-    public ChangeViewRefactoring(
-            IFile file,
-            LayoutEditorDelegate delegate,
-            ITextSelection selection,
+    public ChangeViewRefactoring(IFile file, LayoutEditorDelegate delegate, ITextSelection selection,
             ITreeSelection treeSelection) {
         super(file, delegate, selection, treeSelection);
     }
 
     @VisibleForTesting
-	public
-    ChangeViewRefactoring(List<Element> selectedElements, LayoutEditorDelegate editor) {
+    public ChangeViewRefactoring(List<Element> selectedElements, LayoutEditorDelegate editor) {
         super(selectedElements, editor);
     }
 
     @Override
-    public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+    public RefactoringStatus checkInitialConditions(IProgressMonitor pm)
+            throws CoreException, OperationCanceledException {
         RefactoringStatus status = new RefactoringStatus();
 
         try {
@@ -129,8 +122,7 @@ public class ChangeViewRefactoring extends VisualRefactoring {
     @Override
     protected VisualRefactoringDescriptor createDescriptor() {
         String comment = getName();
-        return new Descriptor(
-                mProject.getName(), //project
+        return new Descriptor(mProject.getName(), //project
                 comment, //description
                 comment, //comment
                 createArgumentMap());
@@ -155,7 +147,7 @@ public class ChangeViewRefactoring extends VisualRefactoring {
 
     @Override
     @NonNull
-	public List<Change> computeChanges(IProgressMonitor monitor) {
+    public List<Change> computeChanges(IProgressMonitor monitor) {
         String name = getViewClass(mTypeFqcn);
 
         IFile file = mDelegate.getEditor().getInputFile();
@@ -181,13 +173,11 @@ public class ChangeViewRefactoring extends VisualRefactoring {
 
             if (open != -1) {
                 int oldLength = oldName.length();
-                rootEdit.addChild(new ReplaceEdit(region.getStartOffset() + open,
-                        oldLength, name));
+                rootEdit.addChild(new ReplaceEdit(region.getStartOffset() + open, oldLength, name));
             }
             if (close != -1 && close != open) {
                 int oldLength = oldName.length();
-                rootEdit.addChild(new ReplaceEdit(region.getStartOffset() + close, oldLength,
-                        name));
+                rootEdit.addChild(new ReplaceEdit(region.getStartOffset() + close, oldLength, name));
             }
 
             // Change tag type
@@ -202,8 +192,7 @@ public class ChangeViewRefactoring extends VisualRefactoring {
                         IndexedRegion range = getRegion(element);
                         int skipStart = range.getStartOffset();
                         int skipEnd = range.getEndOffset();
-                        List<TextEdit> replaceIds = replaceIds(getAndroidNamespacePrefix(), doc,
-                                skipStart, skipEnd,
+                        List<TextEdit> replaceIds = replaceIds(getAndroidNamespacePrefix(), doc, skipStart, skipEnd,
                                 oldId, newId);
                         for (TextEdit edit : replaceIds) {
                             rootEdit.addChild(edit);
@@ -245,8 +234,8 @@ public class ChangeViewRefactoring extends VisualRefactoring {
 
         // Set text attribute if it's defined
         if (defined.contains(ATTR_TEXT) && !element.hasAttributeNS(ANDROID_URI, ATTR_TEXT)) {
-            setAttribute(rootEdit, element, ANDROID_URI, getAndroidNamespacePrefix(),
-                    ATTR_TEXT, descriptor.getUiName());
+            setAttribute(rootEdit, element, ANDROID_URI, getAndroidNamespacePrefix(), ATTR_TEXT,
+                    descriptor.getUiName());
         }
     }
 
@@ -257,8 +246,7 @@ public class ChangeViewRefactoring extends VisualRefactoring {
             Node attributeNode = attributes.item(i);
 
             String name = attributeNode.getLocalName();
-            if (!name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX)
-                    && ANDROID_URI.equals(attributeNode.getNamespaceURI())) {
+            if (!name.startsWith(ATTR_LAYOUT_RESOURCE_PREFIX) && ANDROID_URI.equals(attributeNode.getNamespaceURI())) {
                 result.add((Attr) attributeNode);
             }
         }
@@ -270,8 +258,7 @@ public class ChangeViewRefactoring extends VisualRefactoring {
         List<String> types = new ArrayList<String>();
         for (Element primary : getElements()) {
             String oldType = primary.getTagName();
-            if (oldType.indexOf('.') == -1
-                    && !oldType.equals(VIEW_INCLUDE) && !oldType.equals(VIEW_FRAGMENT)) {
+            if (oldType.indexOf('.') == -1 && !oldType.equals(VIEW_INCLUDE) && !oldType.equals(VIEW_FRAGMENT)) {
                 oldType = ANDROID_WIDGET_PREFIX + oldType;
             }
             types.add(oldType);
@@ -286,8 +273,7 @@ public class ChangeViewRefactoring extends VisualRefactoring {
     }
 
     public static class Descriptor extends VisualRefactoringDescriptor {
-        public Descriptor(String project, String description, String comment,
-                Map<String, String> arguments) {
+        public Descriptor(String project, String description, String comment, Map<String, String> arguments) {
             super("org.eclipse.andmore.refactoring.changeview", //$NON-NLS-1$
                     project, description, comment, arguments);
         }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,14 +12,6 @@
  */
 package org.eclipse.andmore.common.layout.relative;
 
-import static com.android.ide.common.api.SegmentType.BASELINE;
-import static com.android.ide.common.api.SegmentType.BOTTOM;
-import static com.android.ide.common.api.SegmentType.CENTER_HORIZONTAL;
-import static com.android.ide.common.api.SegmentType.CENTER_VERTICAL;
-import static com.android.ide.common.api.SegmentType.LEFT;
-import static com.android.ide.common.api.SegmentType.RIGHT;
-import static com.android.ide.common.api.SegmentType.TOP;
-import static com.android.ide.common.api.SegmentType.UNKNOWN;
 import static com.android.SdkConstants.ATTR_LAYOUT_ABOVE;
 import static com.android.SdkConstants.ATTR_LAYOUT_ALIGN_BASELINE;
 import static com.android.SdkConstants.ATTR_LAYOUT_ALIGN_BOTTOM;
@@ -39,51 +28,81 @@ import static com.android.SdkConstants.ATTR_LAYOUT_CENTER_IN_PARENT;
 import static com.android.SdkConstants.ATTR_LAYOUT_CENTER_VERTICAL;
 import static com.android.SdkConstants.ATTR_LAYOUT_TO_LEFT_OF;
 import static com.android.SdkConstants.ATTR_LAYOUT_TO_RIGHT_OF;
+import static com.android.ide.common.api.SegmentType.BASELINE;
+import static com.android.ide.common.api.SegmentType.BOTTOM;
+import static com.android.ide.common.api.SegmentType.CENTER_HORIZONTAL;
+import static com.android.ide.common.api.SegmentType.CENTER_VERTICAL;
+import static com.android.ide.common.api.SegmentType.LEFT;
+import static com.android.ide.common.api.SegmentType.RIGHT;
+import static com.android.ide.common.api.SegmentType.TOP;
+import static com.android.ide.common.api.SegmentType.UNKNOWN;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.ide.common.api.SegmentType;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Each constraint type corresponds to a type of constraint available for the
  * RelativeLayout; for example, {@link #LAYOUT_ABOVE} corresponds to the layout_above constraint.
  */
 enum ConstraintType {
-    LAYOUT_ABOVE(ATTR_LAYOUT_ABOVE,
-            null /* sourceX */, BOTTOM, null /* targetX */, TOP,
-            false /* targetParent */, true /* horizontalEdge */, false /* verticalEdge */,
-            true /* relativeToMargin */),
+    LAYOUT_ABOVE(ATTR_LAYOUT_ABOVE, null /* sourceX */, BOTTOM, null /* targetX */, TOP, false /* targetParent */,
+            true /* horizontalEdge */, false /* verticalEdge */, true /* relativeToMargin */),
 
-    LAYOUT_BELOW(ATTR_LAYOUT_BELOW, null, TOP, null, BOTTOM, false, true, false, true),
-    ALIGN_TOP(ATTR_LAYOUT_ALIGN_TOP, null, TOP, null, TOP, false, true, false, false),
-    ALIGN_BOTTOM(ATTR_LAYOUT_ALIGN_BOTTOM, null, BOTTOM, null, BOTTOM, false, true, false, false),
-    ALIGN_LEFT(ATTR_LAYOUT_ALIGN_LEFT, LEFT, null, LEFT, null, false, false, true, false),
-    ALIGN_RIGHT(ATTR_LAYOUT_ALIGN_RIGHT, RIGHT, null, RIGHT, null, false, false, true, false),
-    LAYOUT_LEFT_OF(ATTR_LAYOUT_TO_LEFT_OF, RIGHT, null, LEFT, null, false, false, true, true),
-    LAYOUT_RIGHT_OF(ATTR_LAYOUT_TO_RIGHT_OF, LEFT, null, RIGHT, null, false, false, true, true),
-    ALIGN_PARENT_TOP(ATTR_LAYOUT_ALIGN_PARENT_TOP, null, TOP, null, TOP, true, true, false, false),
-    ALIGN_BASELINE(ATTR_LAYOUT_ALIGN_BASELINE, null, BASELINE, null, BASELINE, false, true, false,
-            false),
-    ALIGN_PARENT_LEFT(ATTR_LAYOUT_ALIGN_PARENT_LEFT, LEFT, null, LEFT, null, true, false, true,
-            false),
-    ALIGN_PARENT_RIGHT(ATTR_LAYOUT_ALIGN_PARENT_RIGHT, RIGHT, null, RIGHT, null, true, false, true,
-            false),
-    ALIGN_PARENT_BOTTOM(ATTR_LAYOUT_ALIGN_PARENT_BOTTOM, null, BOTTOM, null, BOTTOM, true, true,
-            false, false),
-    LAYOUT_CENTER_HORIZONTAL(ATTR_LAYOUT_CENTER_HORIZONTAL, CENTER_VERTICAL, null, CENTER_VERTICAL,
-            null, true, true, false, false),
-    LAYOUT_CENTER_VERTICAL(ATTR_LAYOUT_CENTER_VERTICAL, null, CENTER_HORIZONTAL, null,
-            CENTER_HORIZONTAL, true, false, true, false),
-    LAYOUT_CENTER_IN_PARENT(ATTR_LAYOUT_CENTER_IN_PARENT, CENTER_VERTICAL, CENTER_HORIZONTAL,
-            CENTER_VERTICAL, CENTER_HORIZONTAL, true, true, true, false);
+    LAYOUT_BELOW(ATTR_LAYOUT_BELOW, null, TOP, null, BOTTOM, false, true, false, true), ALIGN_TOP(ATTR_LAYOUT_ALIGN_TOP,
+            null, TOP, null, TOP, false, true, false, false), ALIGN_BOTTOM(ATTR_LAYOUT_ALIGN_BOTTOM, null, BOTTOM, null,
+                    BOTTOM, false, true, false, false), ALIGN_LEFT(ATTR_LAYOUT_ALIGN_LEFT, LEFT, null, LEFT, null,
+                            false, false, true, false), ALIGN_RIGHT(ATTR_LAYOUT_ALIGN_RIGHT, RIGHT, null, RIGHT, null,
+                                    false, false, true, false), LAYOUT_LEFT_OF(ATTR_LAYOUT_TO_LEFT_OF, RIGHT, null,
+                                            LEFT, null, false, false, true, true), LAYOUT_RIGHT_OF(
+                                                    ATTR_LAYOUT_TO_RIGHT_OF, LEFT, null, RIGHT, null, false, false,
+                                                    true, true), ALIGN_PARENT_TOP(ATTR_LAYOUT_ALIGN_PARENT_TOP, null,
+                                                            TOP, null, TOP, true, true, false,
+                                                            false), ALIGN_BASELINE(ATTR_LAYOUT_ALIGN_BASELINE, null,
+                                                                    BASELINE, null, BASELINE, false, true, false,
+                                                                    false), ALIGN_PARENT_LEFT(
+                                                                            ATTR_LAYOUT_ALIGN_PARENT_LEFT, LEFT, null,
+                                                                            LEFT, null, true, false, true,
+                                                                            false), ALIGN_PARENT_RIGHT(
+                                                                                    ATTR_LAYOUT_ALIGN_PARENT_RIGHT,
+                                                                                    RIGHT, null, RIGHT, null, true,
+                                                                                    false, true,
+                                                                                    false), ALIGN_PARENT_BOTTOM(
+                                                                                            ATTR_LAYOUT_ALIGN_PARENT_BOTTOM,
+                                                                                            null, BOTTOM, null, BOTTOM,
+                                                                                            true, true, false,
+                                                                                            false), LAYOUT_CENTER_HORIZONTAL(
+                                                                                                    ATTR_LAYOUT_CENTER_HORIZONTAL,
+                                                                                                    CENTER_VERTICAL,
+                                                                                                    null,
+                                                                                                    CENTER_VERTICAL,
+                                                                                                    null, true, true,
+                                                                                                    false,
+                                                                                                    false), LAYOUT_CENTER_VERTICAL(
+                                                                                                            ATTR_LAYOUT_CENTER_VERTICAL,
+                                                                                                            null,
+                                                                                                            CENTER_HORIZONTAL,
+                                                                                                            null,
+                                                                                                            CENTER_HORIZONTAL,
+                                                                                                            true, false,
+                                                                                                            true,
+                                                                                                            false), LAYOUT_CENTER_IN_PARENT(
+                                                                                                                    ATTR_LAYOUT_CENTER_IN_PARENT,
+                                                                                                                    CENTER_VERTICAL,
+                                                                                                                    CENTER_HORIZONTAL,
+                                                                                                                    CENTER_VERTICAL,
+                                                                                                                    CENTER_HORIZONTAL,
+                                                                                                                    true,
+                                                                                                                    true,
+                                                                                                                    true,
+                                                                                                                    false);
 
-    private ConstraintType(String name, SegmentType sourceSegmentTypeX,
-            SegmentType sourceSegmentTypeY, SegmentType targetSegmentTypeX,
-            SegmentType targetSegmentTypeY, boolean targetParent, boolean horizontalEdge,
-            boolean verticalEdge, boolean relativeToMargin) {
+    private ConstraintType(String name, SegmentType sourceSegmentTypeX, SegmentType sourceSegmentTypeY,
+            SegmentType targetSegmentTypeX, SegmentType targetSegmentTypeY, boolean targetParent,
+            boolean horizontalEdge, boolean verticalEdge, boolean relativeToMargin) {
         assert horizontalEdge || verticalEdge;
 
         this.name = name;

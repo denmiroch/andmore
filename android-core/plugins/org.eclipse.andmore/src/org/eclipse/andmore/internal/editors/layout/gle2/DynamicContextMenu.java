@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,13 +25,13 @@ import static com.android.SdkConstants.LIST_VIEW;
 import static com.android.SdkConstants.SPINNER;
 import static com.android.SdkConstants.VIEW_FRAGMENT;
 
-import com.android.SdkConstants;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.IViewRule;
-import com.android.ide.common.api.RuleAction;
-import com.android.ide.common.api.RuleAction.Choices;
-import com.android.ide.common.api.RuleAction.NestedAction;
-import com.android.ide.common.api.RuleAction.Toggle;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.common.layout.BaseViewRule;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
@@ -61,13 +58,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.IViewRule;
+import com.android.ide.common.api.RuleAction;
+import com.android.ide.common.api.RuleAction.Choices;
+import com.android.ide.common.api.RuleAction.NestedAction;
+import com.android.ide.common.api.RuleAction.Toggle;
 
 /**
  * Helper class that is responsible for adding and managing the dynamic menu items
@@ -103,10 +100,7 @@ class DynamicContextMenu {
      * @param rootMenu The root of the context menu displayed. In practice this may be the
      *   context menu manager of the {@link LayoutCanvas} or the one from {@link OutlinePage}.
      */
-    public DynamicContextMenu(
-            LayoutEditorDelegate editorDelegate,
-            LayoutCanvas canvas,
-            MenuManager rootMenu) {
+    public DynamicContextMenu(LayoutEditorDelegate editorDelegate, LayoutCanvas canvas, MenuManager rootMenu) {
         mEditorDelegate = editorDelegate;
         mCanvas = canvas;
         mMenuManager = rootMenu;
@@ -154,7 +148,7 @@ class DynamicContextMenu {
         String endId = mMenuManager.getItems()[0].getId();
 
         Separator sep = new Separator();
-        sep.setId("-dyn-gle-sep");  //$NON-NLS-1$
+        sep.setId("-dyn-gle-sep"); //$NON-NLS-1$
         mMenuManager.insertBefore(endId, sep);
         endId = sep.getId();
 
@@ -205,8 +199,7 @@ class DynamicContextMenu {
         List<RuleAction> firstSelectedActions = allActions.get(first);
         String defaultId = getDefaultActionId(first);
         for (RuleAction action : firstSelectedActions) {
-            if (!availableIds.contains(action.getId())
-                    && !(action instanceof RuleAction.Separator)) {
+            if (!availableIds.contains(action.getId()) && !(action instanceof RuleAction.Separator)) {
                 // This action isn't supported by all selected items.
                 continue;
             }
@@ -258,8 +251,7 @@ class DynamicContextMenu {
                 String second = children.get(1).getName();
                 if ((first.equals(FQCN_IMAGE_VIEW) && second.equals(FQCN_TEXT_VIEW))
                         || (first.equals(FQCN_TEXT_VIEW) && second.equals(FQCN_IMAGE_VIEW))) {
-                    mMenuManager.insertBefore(endId, UseCompoundDrawableAction.create(
-                            mEditorDelegate));
+                    mMenuManager.insertBefore(endId, UseCompoundDrawableAction.create(mEditorDelegate));
                 }
             }
         }
@@ -269,8 +261,8 @@ class DynamicContextMenu {
         if (selection.size() == 1 && !(selection.get(0).isRoot())) {
             mMenuManager.insertBefore(endId, UnwrapAction.create(mEditorDelegate));
         }
-        if (selection.size() == 1 && (selection.get(0).isLayout() ||
-                selection.get(0).getViewInfo().getName().equals(FQCN_GESTURE_OVERLAY_VIEW))) {
+        if (selection.size() == 1 && (selection.get(0).isLayout()
+                || selection.get(0).getViewInfo().getName().equals(FQCN_GESTURE_OVERLAY_VIEW))) {
             mMenuManager.insertBefore(endId, ChangeLayoutAction.create(mEditorDelegate));
         } else {
             mMenuManager.insertBefore(endId, ChangeViewAction.create(mEditorDelegate));
@@ -290,8 +282,7 @@ class DynamicContextMenu {
             String name = node.getDescriptor().getXmlLocalName();
             boolean isGrid = name.equals(GRID_VIEW);
             boolean isSpinner = name.equals(SPINNER);
-            if (name.equals(LIST_VIEW) || name.equals(EXPANDABLE_LIST_VIEW)
-                    || isGrid || isSpinner) {
+            if (name.equals(LIST_VIEW) || name.equals(EXPANDABLE_LIST_VIEW) || isGrid || isSpinner) {
                 mMenuManager.insertBefore(endId, new Separator());
                 mMenuManager.insertBefore(endId, new ListViewTypeMenu(mCanvas, isGrid, isSpinner));
                 return;
@@ -392,8 +383,8 @@ class DynamicContextMenu {
      * @return a new {@link ContributionItem} which implements the given action
      *         on the given nodes
      */
-    private ContributionItem createContributionItem(final RuleAction action,
-            final List<INode> nodes, final String defaultId) {
+    private ContributionItem createContributionItem(final RuleAction action, final List<INode> nodes,
+            final String defaultId) {
         if (action instanceof RuleAction.Separator) {
             return new Separator();
         } else if (action instanceof NestedAction) {
@@ -419,8 +410,7 @@ class DynamicContextMenu {
                 mEditorDelegate.getEditor().wrapUndoEditXmlModel(label, new Runnable() {
                     @Override
                     public void run() {
-                        action.getCallback().action(action, nodes,
-                                null/* no valueId for a toggle */, !isChecked);
+                        action.getCallback().action(action, nodes, null/* no valueId for a toggle */, !isChecked);
                         applyPendingChanges();
                     }
                 });
@@ -431,8 +421,7 @@ class DynamicContextMenu {
         return a;
     }
 
-    private IAction createPlainAction(final RuleAction action, final List<INode> nodes,
-            final String defaultId) {
+    private IAction createPlainAction(final RuleAction action, final List<INode> nodes, final String defaultId) {
         IAction a = new Action(action.getTitle(), IAction.AS_PUSH_BUTTON) {
             @Override
             public void run() {
@@ -440,8 +429,7 @@ class DynamicContextMenu {
                 mEditorDelegate.getEditor().wrapUndoEditXmlModel(label, new Runnable() {
                     @Override
                     public void run() {
-                        action.getCallback().action(action, nodes, null,
-                                Boolean.TRUE);
+                        action.getCallback().action(action, nodes, null, Boolean.TRUE);
                         applyPendingChanges();
                     }
                 });
@@ -541,8 +529,7 @@ class DynamicContextMenu {
 
             int count = 0;
             for (RuleAction firstAction : firstSelectedActions) {
-                if (!availableIds.contains(firstAction.getId())
-                        && !(firstAction instanceof RuleAction.Separator)) {
+                if (!availableIds.contains(firstAction.getId()) && !(firstAction instanceof RuleAction.Separator)) {
                     // This action isn't supported by all selected items.
                     continue;
                 }
@@ -590,9 +577,8 @@ class DynamicContextMenu {
             List<String> ids = mParentAction.getIds();
             String current = mParentAction.getCurrent();
             assert titles.size() == ids.size();
-            String[] currentValues = current != null
-                    && current.indexOf(RuleAction.CHOICE_SEP) != -1 ?
-                    current.split(RuleAction.CHOICE_SEP_PATTERN) : null;
+            String[] currentValues = current != null && current.indexOf(RuleAction.CHOICE_SEP) != -1
+                    ? current.split(RuleAction.CHOICE_SEP_PATTERN) : null;
             for (int i = 0, n = Math.min(titles.size(), ids.size()); i < n; i++) {
                 final String id = ids.get(i);
                 if (id == null || id.equals(RuleAction.SEPARATOR)) {
@@ -622,20 +608,19 @@ class DynamicContextMenu {
                 }
 
                 String title = titles.get(i);
-                IAction a = new Action(title,
-                        current != null ? IAction.AS_CHECK_BOX : IAction.AS_PUSH_BUTTON) {
+                IAction a = new Action(title, current != null ? IAction.AS_CHECK_BOX : IAction.AS_PUSH_BUTTON) {
                     @Override
                     public void runWithEvent(Event event) {
                         run();
                     }
+
                     @Override
                     public void run() {
                         String label = createActionLabel(mParentAction, mNodes);
                         mEditorDelegate.getEditor().wrapUndoEditXmlModel(label, new Runnable() {
                             @Override
                             public void run() {
-                                mParentAction.getCallback().action(mParentAction, mNodes, id,
-                                        Boolean.TRUE);
+                                mParentAction.getCallback().action(mParentAction, mNodes, id, Boolean.TRUE);
                                 applyPendingChanges();
                             }
                         });

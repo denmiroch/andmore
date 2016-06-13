@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,9 +12,9 @@
  */
 package org.eclipse.andmore.internal.editors.layout.refactoring;
 
+import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.gle2.CanvasViewInfo;
 import org.eclipse.core.resources.IFile;
@@ -51,8 +48,7 @@ abstract class VisualRefactoringAction implements IWorkbenchWindowActionDelegate
     }
 
     @Override
-    public void dispose() {
-    }
+    public void dispose() {}
 
     /**
      * Examine the selection to determine if the action should be enabled or not.
@@ -81,18 +77,17 @@ abstract class VisualRefactoringAction implements IWorkbenchWindowActionDelegate
             editor = AdtUtils.getActiveEditor();
             mFile = getSelectedFile(editor);
         } else if (selection instanceof ITreeSelection) {
-             Object firstElement = ((ITreeSelection)selection).getFirstElement();
-             if (firstElement instanceof CanvasViewInfo) {
-                 mTreeSelection = (ITreeSelection) selection;
-                 editor = AdtUtils.getActiveEditor();
-                 mFile = getSelectedFile(editor);
-             }
+            Object firstElement = ((ITreeSelection) selection).getFirstElement();
+            if (firstElement instanceof CanvasViewInfo) {
+                mTreeSelection = (ITreeSelection) selection;
+                editor = AdtUtils.getActiveEditor();
+                mFile = getSelectedFile(editor);
+            }
         }
 
         mDelegate = LayoutEditorDelegate.fromEditor(editor);
 
-        action.setEnabled((mTextSelection != null || mTreeSelection != null)
-                && mFile != null && mDelegate != null);
+        action.setEnabled((mTextSelection != null || mTreeSelection != null) && mFile != null && mDelegate != null);
     }
 
     /**
@@ -141,8 +136,7 @@ abstract class VisualRefactoringAction implements IWorkbenchWindowActionDelegate
         private Class<? extends VisualRefactoringAction> mClass;
         private LayoutEditorDelegate mEditorDelegate;
 
-        ActionWrapper(String title, LayoutEditorDelegate editorDelegate,
-                Class<? extends VisualRefactoringAction> clz) {
+        ActionWrapper(String title, LayoutEditorDelegate editorDelegate, Class<? extends VisualRefactoringAction> clz) {
             super(title);
             mEditorDelegate = editorDelegate;
             mClass = clz;

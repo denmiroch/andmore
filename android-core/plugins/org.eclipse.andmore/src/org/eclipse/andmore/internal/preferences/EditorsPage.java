@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,8 +17,6 @@ import static com.android.ide.common.xml.XmlAttributeSortOrder.ALPHABETICAL;
 import static com.android.ide.common.xml.XmlAttributeSortOrder.LOGICAL;
 import static com.android.ide.common.xml.XmlAttributeSortOrder.NO_SORTING;
 
-import com.android.sdkuilib.internal.widgets.ResolutionChooserDialog;
-
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -34,6 +29,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+
+import com.android.sdkuilib.internal.widgets.ResolutionChooserDialog;
 
 /**
  * Preference page for the editors.
@@ -62,13 +59,11 @@ public class EditorsPage extends FieldEditorPreferencePage implements IWorkbench
     protected void createFieldEditors() {
         Composite parent = getFieldEditorParent();
 
-        addField(new DensityFieldEditor(AdtPrefs.PREFS_MONITOR_DENSITY,
-                "Monitor Density", parent));
+        addField(new DensityFieldEditor(AdtPrefs.PREFS_MONITOR_DENSITY, "Monitor Density", parent));
 
-        final MyBooleanFieldEditor editor = new MyBooleanFieldEditor(
-                AdtPrefs.PREFS_USE_CUSTOM_XML_FORMATTER,
-                "Format XML files using the standard Android XML style rather than the \n" +
-                "configured Eclipse XML style (additional options below)",
+        final MyBooleanFieldEditor editor = new MyBooleanFieldEditor(AdtPrefs.PREFS_USE_CUSTOM_XML_FORMATTER,
+                "Format XML files using the standard Android XML style rather than the \n"
+                        + "configured Eclipse XML style (additional options below)",
                 parent);
         addField(editor);
 
@@ -89,47 +84,36 @@ public class EditorsPage extends FieldEditorPreferencePage implements IWorkbench
 
         mIndentEditor = new BooleanFieldEditor(AdtPrefs.PREFS_USE_ECLIPSE_INDENT,
                 "Use Eclipse setting for indentation width and space or tab character "
-                + "indentation \n(Android default is 4 space characters)",
+                        + "indentation \n(Android default is 4 space characters)",
                 parent);
         addField(mIndentEditor);
 
         mRemoveEmptyEditor = new BooleanFieldEditor(AdtPrefs.PREVS_REMOVE_EMPTY_LINES,
-                "Always remove empty lines between elements",
-                parent);
+                "Always remove empty lines between elements", parent);
         addField(mRemoveEmptyEditor);
 
         mOneAttrPerLineEditor = new BooleanFieldEditor(AdtPrefs.PREFS_ONE_ATTR_PER_LINE,
-                "Allow single attributes to appear on the same line as their elements",
-                parent);
+                "Allow single attributes to appear on the same line as their elements", parent);
         addField(mOneAttrPerLineEditor);
 
         mSpaceBeforeCloseEditor = new BooleanFieldEditor(AdtPrefs.PREFS_SPACE_BEFORE_CLOSE,
-                "Add a space before the > or /> in opening tags",
-                parent);
+                "Add a space before the > or /> in opening tags", parent);
         addField(mSpaceBeforeCloseEditor);
 
-        addField(new RadioGroupFieldEditor(AdtPrefs.PREFS_ATTRIBUTE_SORT,
-                "Sort Attributes", 1,
+        addField(new RadioGroupFieldEditor(AdtPrefs.PREFS_ATTRIBUTE_SORT, "Sort Attributes", 1,
                 new String[][] {
-                    { "&Logical (id, style, layout attributes, remaining attributes alphabetically)",
-                        LOGICAL.key },
-                    { "&Alphabetical", ALPHABETICAL.key },
-                    { "&None", NO_SORTING.key },
-                },
+                        { "&Logical (id, style, layout attributes, remaining attributes alphabetically)", LOGICAL.key },
+                        { "&Alphabetical", ALPHABETICAL.key }, { "&None", NO_SORTING.key }, },
                 parent, true));
 
         mFormatGuiXmlEditor = new BooleanFieldEditor(AdtPrefs.PREFS_FORMAT_GUI_XML,
-                "Automatically format the XML edited by the visual layout editor",
-                parent);
+                "Automatically format the XML edited by the visual layout editor", parent);
         addField(mFormatGuiXmlEditor);
 
-        addField(new BooleanFieldEditor(AdtPrefs.PREFS_FORMAT_ON_SAVE,
-                "Format on Save",
-                parent));
+        addField(new BooleanFieldEditor(AdtPrefs.PREFS_FORMAT_ON_SAVE, "Format on Save", parent));
 
         addField(new BooleanFieldEditor(AdtPrefs.PREFS_SHARED_LAYOUT_EDITOR,
-                "Use a single layout editor for all configuration variations of a layout",
-                parent));
+                "Use a single layout editor for all configuration variations of a layout", parent));
 
         boolean enabled = getPreferenceStore().getBoolean(AdtPrefs.PREFS_USE_CUSTOM_XML_FORMATTER);
         updateCustomFormattingOptions(enabled);
@@ -152,6 +136,7 @@ public class EditorsPage extends FieldEditorPreferencePage implements IWorkbench
         public MyBooleanFieldEditor(String name, String label, Composite parent) {
             super(name, label, parent);
         }
+
         @Override
         protected Button getChangeControl(Composite parent) {
             return super.getChangeControl(parent);

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,12 @@
 
 package org.eclipse.andmore.internal.refactorings.extractstring;
 
-
-import com.android.SdkConstants;
-import com.android.ide.common.resources.configuration.FolderConfiguration;
-import com.android.resources.ResourceFolderType;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.internal.ui.ConfigurationSelector;
@@ -29,7 +28,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -46,12 +44,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.SdkConstants;
+import com.android.ide.common.resources.configuration.FolderConfiguration;
+import com.android.resources.ResourceFolderType;
 
 /**
  * @see ExtractStringRefactoring
@@ -80,16 +75,13 @@ class ExtractStringInputPage extends UserInputWizardPage {
 
     /** Regex pattern to read a valid res XML file path. It checks that the are 2 folders and
      *  a leaf file name ending with .xml */
-    private static final Pattern RES_XML_FILE_REGEX = Pattern.compile(
-                                     "/res/[a-z][a-zA-Z0-9_-]+/[^.]+\\.xml");  //$NON-NLS-1$
+    private static final Pattern RES_XML_FILE_REGEX = Pattern.compile("/res/[a-z][a-zA-Z0-9_-]+/[^.]+\\.xml"); //$NON-NLS-1$
     /** Absolute destination folder root, e.g. "/res/" */
-    private static final String RES_FOLDER_ABS =
-        AndmoreAndroidConstants.WS_RESOURCES + AndmoreAndroidConstants.WS_SEP;
+    private static final String RES_FOLDER_ABS = AndmoreAndroidConstants.WS_RESOURCES + AndmoreAndroidConstants.WS_SEP;
     /** Relative destination folder root, e.g. "res/" */
-    private static final String RES_FOLDER_REL =
-        SdkConstants.FD_RESOURCES + AndmoreAndroidConstants.WS_SEP;
+    private static final String RES_FOLDER_REL = SdkConstants.FD_RESOURCES + AndmoreAndroidConstants.WS_SEP;
 
-    private static final String DEFAULT_RES_FILE_PATH = "/res/values/strings.xml";  //$NON-NLS-1$
+    private static final String DEFAULT_RES_FILE_PATH = "/res/values/strings.xml"; //$NON-NLS-1$
 
     private XmlStringFileHelper mXmlHelper = new XmlStringFileHelper();
 
@@ -110,7 +102,7 @@ class ExtractStringInputPage extends UserInputWizardPage {
     };
 
     public ExtractStringInputPage(IProject project) {
-        super("ExtractStringInputPage");  //$NON-NLS-1$
+        super("ExtractStringInputPage"); //$NON-NLS-1$
         mProject = project;
     }
 
@@ -168,7 +160,7 @@ class ExtractStringInputPage extends UserInputWizardPage {
 
         mStringValueField = new Text(group, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
         mStringValueField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        mStringValueField.setText(selectedString != null ? selectedString : "");  //$NON-NLS-1$
+        mStringValueField.setText(selectedString != null ? selectedString : ""); //$NON-NLS-1$
 
         ref.setNewStringValue(mStringValueField.getText());
 
@@ -257,14 +249,16 @@ class ExtractStringInputPage extends UserInputWizardPage {
         options.setLayout(new GridLayout(1, false));
 
         mReplaceAllJava = new Button(options, SWT.CHECK);
-        mReplaceAllJava.setToolTipText("When checked, the exact same string literal will be replaced in all Java files.");
+        mReplaceAllJava
+                .setToolTipText("When checked, the exact same string literal will be replaced in all Java files.");
         mReplaceAllJava.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         mReplaceAllJava.setText("Replace in all &Java files");
         mReplaceAllJava.addSelectionListener(mValidateOnSelection);
 
         mReplaceAllXml = new Button(options, SWT.CHECK);
         mReplaceAllXml.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        mReplaceAllXml.setToolTipText("When checked, string literals will be replaced in other XML resource files having the same name but located in different resource configuration folders.");
+        mReplaceAllXml.setToolTipText(
+                "When checked, string literals will be replaced in other XML resource files having the same name but located in different resource configuration folders.");
         mReplaceAllXml.setText("Replace in all &XML files for different configuration");
         mReplaceAllXml.addSelectionListener(mValidateOnSelection);
     }
@@ -291,18 +285,18 @@ class ExtractStringInputPage extends UserInputWizardPage {
      */
     public static String guessId(String text) {
         if (text == null) {
-            return "";  //$NON-NLS-1$
+            return ""; //$NON-NLS-1$
         }
 
         // make lower case
         text = text.toLowerCase(Locale.US);
 
         // everything not alphanumeric becomes an underscore
-        text = text.replaceAll("[^a-zA-Z0-9]+", "_");  //$NON-NLS-1$ //$NON-NLS-2$
+        text = text.replaceAll("[^a-zA-Z0-9]+", "_"); //$NON-NLS-1$ //$NON-NLS-2$
 
         // the id must be a proper Java identifier, so it can't start with a number
         if (text.length() > 0 && !Character.isJavaIdentifierStart(text.charAt(0))) {
-            text = "_" + text;  //$NON-NLS-1$
+            text = "_" + text; //$NON-NLS-1$
         }
         return text;
     }
@@ -339,13 +333,11 @@ class ExtractStringInputPage extends UserInputWizardPage {
         } else {
             for (int i = 0; i < text.length(); i++) {
                 char c = text.charAt(i);
-                boolean ok = i == 0 ?
-                        Character.isJavaIdentifierStart(c) :
-                        Character.isJavaIdentifierPart(c);
+                boolean ok = i == 0 ? Character.isJavaIdentifierStart(c) : Character.isJavaIdentifierPart(c);
                 if (!ok) {
                     setErrorMessage(String.format(
                             "The resource ID must be a valid Java identifier. The character %1$c at position %2$d is not acceptable.",
-                            c, i+1));
+                            c, i + 1));
                     success = false;
                     break;
                 }
@@ -378,9 +370,7 @@ class ExtractStringInputPage extends UserInputWizardPage {
 
             String idValue = mXmlHelper.valueOfStringId(mProject, resFile, text);
             if (idValue != null) {
-                String msg = String.format("%1$s already contains a string ID '%2$s' with value '%3$s'.",
-                        resFile,
-                        text,
+                String msg = String.format("%1$s already contains a string ID '%2$s' with value '%3$s'.", resFile, text,
                         idValue);
                 if (ref.getMode() == ExtractStringRefactoring.Mode.SELECT_NEW_ID) {
                     setErrorMessage(msg);
@@ -389,9 +379,7 @@ class ExtractStringInputPage extends UserInputWizardPage {
                     setMessage(msg, IMessageProvider.WARNING);
                 }
             } else if (mProject.findMember(resFile) == null) {
-                setMessage(
-                        String.format("File %2$s does not exist and will be created.",
-                                text, resFile),
+                setMessage(String.format("File %2$s does not exist and will be created.", text, resFile),
                         IMessageProvider.INFORMATION);
             } else {
                 setMessage(null);
@@ -427,14 +415,12 @@ class ExtractStringInputPage extends UserInputWizardPage {
     private class OnConfigSelectorUpdated implements Runnable, ModifyListener {
 
         /** Regex pattern to parse a valid res path: it reads (/res/folder-name/)+(filename). */
-        private final Pattern mPathRegex = Pattern.compile(
-            "(/res/[a-z][a-zA-Z0-9_-]+/)(.+)");  //$NON-NLS-1$
+        private final Pattern mPathRegex = Pattern.compile("(/res/[a-z][a-zA-Z0-9_-]+/)(.+)"); //$NON-NLS-1$
 
         /** Temporary config object used to retrieve the Config Selector value. */
         private FolderConfiguration mTempConfig = new FolderConfiguration();
 
-        private HashMap<String, TreeSet<String>> mFolderCache =
-            new HashMap<String, TreeSet<String>>();
+        private HashMap<String, TreeSet<String>> mFolderCache = new HashMap<String, TreeSet<String>>();
         private String mLastFolderUsedInCombo = null;
         private boolean mInternalConfigChange;
         private boolean mInternalFileComboChange;
@@ -459,7 +445,7 @@ class ExtractStringInputPage extends UserInputWizardPage {
             }
 
             // get current leafname, if any
-            String leafName = "";  //$NON-NLS-1$
+            String leafName = ""; //$NON-NLS-1$
             String currPath = mResFileCombo.getText();
             Matcher m = mPathRegex.matcher(currPath);
             if (m.matches()) {
@@ -468,7 +454,7 @@ class ExtractStringInputPage extends UserInputWizardPage {
                 currPath = m.group(1);
             } else {
                 // There was a path but it was invalid. Ignore it.
-                currPath = "";  //$NON-NLS-1$
+                currPath = ""; //$NON-NLS-1$
             }
 
             // recreate the res path from the current configuration
@@ -561,9 +547,9 @@ class ExtractStringInputPage extends UserInputWizardPage {
             // This is a custom path, we need to sanitize it.
             // First it should start with "/res/". Then we need to make sure there are no
             // relative paths, things like "../" or "./" or even "//".
-            wsFolderPath = wsFolderPath.replaceAll("/+\\.\\./+|/+\\./+|//+|\\\\+|^/+", "/");  //$NON-NLS-1$ //$NON-NLS-2$
-            wsFolderPath = wsFolderPath.replaceAll("^\\.\\./+|^\\./+", "");                   //$NON-NLS-1$ //$NON-NLS-2$
-            wsFolderPath = wsFolderPath.replaceAll("/+\\.\\.$|/+\\.$|/+$", "");               //$NON-NLS-1$ //$NON-NLS-2$
+            wsFolderPath = wsFolderPath.replaceAll("/+\\.\\./+|/+\\./+|//+|\\\\+|^/+", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+            wsFolderPath = wsFolderPath.replaceAll("^\\.\\./+|^\\./+", ""); //$NON-NLS-1$ //$NON-NLS-2$
+            wsFolderPath = wsFolderPath.replaceAll("/+\\.\\.$|/+\\.$|/+$", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
             // We get "res/foo" from selections relative to the project when we want a "/res/foo" path.
             if (wsFolderPath.startsWith(RES_FOLDER_REL)) {

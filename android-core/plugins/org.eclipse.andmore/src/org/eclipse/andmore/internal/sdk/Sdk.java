@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -110,7 +107,7 @@ import com.google.common.collect.Maps;
  *
  * To get the list of platforms or add-ons present in the SDK, call {@link #getTargets()}.
  */
-public final class Sdk  {
+public final class Sdk {
     private final static boolean DEBUG = false;
 
     private final static Object LOCK = new Object();
@@ -121,8 +118,7 @@ public final class Sdk  {
      * Map associating {@link IProject} and their state {@link ProjectState}.
      * <p/>This <b>MUST NOT</b> be accessed directly. Instead use {@link #getProjectState(IProject)}.
      */
-    private final static HashMap<IProject, ProjectState> sProjectStateMap =
-            new HashMap<IProject, ProjectState>();
+    private final static HashMap<IProject, ProjectState> sProjectStateMap = new HashMap<IProject, ProjectState>();
 
     /**
      * Data bundled using during the load of Target data.
@@ -141,11 +137,9 @@ public final class Sdk  {
     private final DeviceManager mDeviceManager;
 
     /** Map associating an {@link IAndroidTarget} to an {@link AndroidTargetData} */
-    private final HashMap<IAndroidTarget, AndroidTargetData> mTargetDataMap =
-            new HashMap<IAndroidTarget, AndroidTargetData>();
+    private final HashMap<IAndroidTarget, AndroidTargetData> mTargetDataMap = new HashMap<IAndroidTarget, AndroidTargetData>();
     /** Map associating an {@link IAndroidTarget} and its {@link TargetLoadBundle}. */
-    private final HashMap<IAndroidTarget, TargetLoadBundle> mTargetDataStatusMap =
-            new HashMap<IAndroidTarget, TargetLoadBundle>();
+    private final HashMap<IAndroidTarget, TargetLoadBundle> mTargetDataStatusMap = new HashMap<IAndroidTarget, TargetLoadBundle>();
 
     /**
      * If true the target data will never load anymore. The only way to reload them is to
@@ -243,8 +237,7 @@ public final class Sdk  {
             final ArrayList<String> logMessages = new ArrayList<String>();
             ILogger log = new ILogger() {
                 @Override
-                public void error(@Nullable Throwable throwable, @Nullable String errorFormat,
-                        Object... arg) {
+                public void error(@Nullable Throwable throwable, @Nullable String errorFormat, Object... arg) {
                     hasError.set(true);
                     if (errorFormat != null) {
                         logMessages.add(String.format("Error: " + errorFormat, arg));
@@ -291,8 +284,7 @@ public final class Sdk  {
             } finally {
                 if (hasError.get() || hasWarning.get()) {
                     StringBuilder sb = new StringBuilder(
-                            String.format("%s when loading the SDK:\n",
-                                    hasError.get() ? "Error" : "Warning"));
+                            String.format("%s when loading the SDK:\n", hasError.get() ? "Error" : "Warning"));
                     for (String msg : logMessages) {
                         sb.append('\n');
                         sb.append(msg);
@@ -464,7 +456,7 @@ public final class Sdk  {
 
             if (properties == null) {
                 IPath location = project.getLocation();
-                if (location == null) {  // can return null when the project is being deleted.
+                if (location == null) { // can return null when the project is being deleted.
                     // do nothing and return null;
                     return;
                 }
@@ -502,30 +494,26 @@ public final class Sdk  {
             if (state == null) {
                 // load the project.properties from the project folder.
                 IPath location = project.getLocation();
-                if (location == null) {  // can return null when the project is being deleted.
+                if (location == null) { // can return null when the project is being deleted.
                     // do nothing and return null;
                     return null;
                 }
 
                 String projectLocation = location.toOSString();
 
-                ProjectProperties properties = ProjectProperties.load(projectLocation,
-                        PropertyType.PROJECT);
+                ProjectProperties properties = ProjectProperties.load(projectLocation, PropertyType.PROJECT);
                 if (properties == null) {
                     // legacy support: look for default.properties and rename it if needed.
-                    properties = ProjectProperties.load(projectLocation,
-                            PropertyType.LEGACY_DEFAULT);
+                    properties = ProjectProperties.load(projectLocation, PropertyType.LEGACY_DEFAULT);
 
                     if (properties == null) {
-                        AndmoreAndroidPlugin.log(IStatus.ERROR,
-                                "Failed to load properties file for project '%s'",
+                        AndmoreAndroidPlugin.log(IStatus.ERROR, "Failed to load properties file for project '%s'",
                                 project.getName());
                         return null;
                     } else {
                         //legacy mode.
                         // get a working copy with the new type "project"
-                        ProjectPropertiesWorkingCopy wc = properties.makeWorkingCopy(
-                                PropertyType.PROJECT);
+                        ProjectPropertiesWorkingCopy wc = properties.makeWorkingCopy(PropertyType.PROJECT);
                         // and save it
                         try {
                             wc.save();
@@ -534,8 +522,7 @@ public final class Sdk  {
                             ProjectProperties.delete(projectLocation, PropertyType.LEGACY_DEFAULT);
 
                             // make sure to use the new properties
-                            properties = ProjectProperties.load(projectLocation,
-                                    PropertyType.PROJECT);
+                            properties = ProjectProperties.load(projectLocation, PropertyType.PROJECT);
                         } catch (Exception e) {
                             AndmoreAndroidPlugin.log(IStatus.ERROR,
                                     "Failed to rename properties file to %1$s for project '%s2$'",
@@ -599,8 +586,7 @@ public final class Sdk  {
                     state.setBuildToolInfo(buildToolsInfo);
                 } else {
                     markerMessage = String.format("Unable to resolve %s property value '%s'",
-                            ProjectProperties.PROPERTY_BUILD_TOOLS,
-                            buildToolInfoVersion);
+                            ProjectProperties.PROPERTY_BUILD_TOOLS, buildToolInfoVersion);
                 }
             } else {
                 // this is ok, we'll use the latest one automatically.
@@ -625,15 +611,12 @@ public final class Sdk  {
                 try {
                     if (project.isAccessible()) {
                         // always delete existing marker first
-                        project.deleteMarkers(AndmoreAndroidConstants.MARKER_BUILD_TOOLS, true,
-                                IResource.DEPTH_ZERO);
+                        project.deleteMarkers(AndmoreAndroidConstants.MARKER_BUILD_TOOLS, true, IResource.DEPTH_ZERO);
 
                         // add the new one if needed.
                         if (markerMessage != null) {
-                            BaseProjectHelper.markProject(project,
-                                    AndmoreAndroidConstants.MARKER_BUILD_TOOLS,
-                                    markerMessage, IMarker.SEVERITY_ERROR,
-                                    IMarker.PRIORITY_HIGH);
+                            BaseProjectHelper.markProject(project, AndmoreAndroidConstants.MARKER_BUILD_TOOLS,
+                                    markerMessage, IMarker.SEVERITY_ERROR, IMarker.PRIORITY_HIGH);
                         }
                     }
                 } catch (CoreException e2) {
@@ -678,7 +661,7 @@ public final class Sdk  {
             TargetLoadBundle bundle = mTargetDataStatusMap.get(target);
             if (bundle == null) {
                 bundle = new TargetLoadBundle();
-                mTargetDataStatusMap.put(target,bundle);
+                mTargetDataStatusMap.put(target, bundle);
 
                 // set status to loading
                 bundle.status = LoadStatus.LOADING;
@@ -723,8 +706,8 @@ public final class Sdk  {
 
                                 // Prepare the array of project to recompile.
                                 // The call is done outside of the synchronized block.
-                                javaProjectArray = bundle.projectsToReload.toArray(
-                                        new IJavaProject[bundle.projectsToReload.size()]);
+                                javaProjectArray = bundle.projectsToReload
+                                        .toArray(new IJavaProject[bundle.projectsToReload.size()]);
 
                                 // and update the UI of the editors that depend on the target data.
                                 plugin.updateTargetListeners(target);
@@ -742,10 +725,9 @@ public final class Sdk  {
                             bundle.status = LoadStatus.FAILED;
                         }
 
-                        AndmoreAndroidPlugin.log(t, "Exception in checkAndLoadTargetData.");    //$NON-NLS-1$
+                        AndmoreAndroidPlugin.log(t, "Exception in checkAndLoadTargetData."); //$NON-NLS-1$
                         return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                                String.format(
-                                        "Parsing Data for %1$s failed", //$NON-NLS-1$
+                                String.format("Parsing Data for %1$s failed", //$NON-NLS-1$
                                         target.hashString()),
                                 t);
                     }
@@ -842,8 +824,7 @@ public final class Sdk  {
                 return null;
             }
 
-            return new AndroidVersion(Integer.parseInt(apiLevel),
-                    props.get((IDevice.PROP_BUILD_CODENAME)));
+            return new AndroidVersion(Integer.parseInt(apiLevel), props.get((IDevice.PROP_BUILD_CODENAME)));
         } catch (NumberFormatException e) {
             return null;
         }
@@ -925,19 +906,17 @@ public final class Sdk  {
         // is called back during registration with project opened in the workspace.
         monitor.addResourceEventListener(mResourceEventListener);
         monitor.addProjectListener(mProjectListener);
-        monitor.addFileListener(mFileListener,
-                IResourceDelta.CHANGED | IResourceDelta.ADDED | IResourceDelta.REMOVED);
+        monitor.addFileListener(mFileListener, IResourceDelta.CHANGED | IResourceDelta.ADDED | IResourceDelta.REMOVED);
 
         // pre-compute some paths
-        mDocBaseUrl = getDocumentationBaseUrl(manager.getLocation() +
-                SdkConstants.OS_SDK_DOCS_FOLDER);
+        mDocBaseUrl = getDocumentationBaseUrl(manager.getLocation() + SdkConstants.OS_SDK_DOCS_FOLDER);
 
         mDeviceManager = DeviceManager.createInstance(manager.getLocalSdk().getLocation(),
                 AndmoreAndroidPlugin.getDefault());
 
         // update whatever ProjectState is already present with new IAndroidTarget objects.
         synchronized (LOCK) {
-            for (Entry<IProject, ProjectState> entry: sProjectStateMap.entrySet()) {
+            for (Entry<IProject, ProjectState> entry : sProjectStateMap.entrySet()) {
                 loadTargetAndBuildTools(entry.getValue());
             }
         }
@@ -954,7 +933,7 @@ public final class Sdk  {
 
         // the IAndroidTarget objects are now obsolete so update the project states.
         synchronized (LOCK) {
-            for (Entry<IProject, ProjectState> entry: sProjectStateMap.entrySet()) {
+            for (Entry<IProject, ProjectState> entry : sProjectStateMap.entrySet()) {
                 entry.getValue().setTarget(null);
             }
 
@@ -999,7 +978,7 @@ public final class Sdk  {
 
                 // For some reason the URL class doesn't add the mandatory "//" after
                 // the "file:" protocol name, so it has to be hacked into the path.
-                URL url = new URL("file", null, "//" + path);  //$NON-NLS-1$ //$NON-NLS-2$
+                URL url = new URL("file", null, "//" + path); //$NON-NLS-1$ //$NON-NLS-2$
                 String result = url.toString();
                 return result;
             } catch (MalformedURLException e) {
@@ -1165,8 +1144,7 @@ public final class Sdk  {
                     @Override
                     protected IStatus run(IProgressMonitor monitor) {
                         try {
-                            ProjectHelper.fixProjectClasspathEntries(
-                                    JavaCore.create(openedProject), monitor, true);
+                            ProjectHelper.fixProjectClasspathEntries(JavaCore.create(openedProject), monitor, true);
                         } catch (CoreException e) {
                             AndmoreAndroidPlugin.log(e, "error fixing classpath entries");
                             // Don't return e2.getStatus(); the job control will then produce
@@ -1182,7 +1160,6 @@ public final class Sdk  {
                 fixCpeJob.setPriority(Job.BUILD);
                 fixCpeJob.setRule(ResourcesPlugin.getWorkspace().getRoot());
                 fixCpeJob.schedule();
-
 
                 if (DEBUG) {
                     System.out.println("<<<");
@@ -1201,14 +1178,13 @@ public final class Sdk  {
      */
     private IFileListener mFileListener = new IFileListener() {
         @Override
-        public void fileChanged(final @NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas,
-                int kind, @Nullable String extension, int flags, boolean isAndroidPRoject) {
+        public void fileChanged(final @NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas, int kind,
+                @Nullable String extension, int flags, boolean isAndroidPRoject) {
             if (!isAndroidPRoject) {
                 return;
             }
 
-            if (SdkConstants.FN_PROJECT_PROPERTIES.equals(file.getName()) &&
-                    file.getParent() == file.getProject()) {
+            if (SdkConstants.FN_PROJECT_PROPERTIES.equals(file.getName()) && file.getParent() == file.getProject()) {
                 try {
                     // reload the content of the project.properties file and update
                     // the target.
@@ -1248,10 +1224,8 @@ public final class Sdk  {
                     }
 
                     // apply the new target if needed.
-                    if (newTarget != oldTarget ||
-                            oldRsSupportMode != state.getRenderScriptSupportMode()) {
-                        IJavaProject javaProject = BaseProjectHelper.getJavaProject(
-                                file.getProject());
+                    if (newTarget != oldTarget || oldRsSupportMode != state.getRenderScriptSupportMode()) {
+                        IJavaProject javaProject = BaseProjectHelper.getJavaProject(file.getProject());
                         if (javaProject != null) {
                             ProjectHelper.updateProject(javaProject);
                         }
@@ -1265,9 +1239,8 @@ public final class Sdk  {
                 }
             } else if (kind == IResourceDelta.ADDED || kind == IResourceDelta.REMOVED) {
                 // check if it's an add/remove on a jar files inside libs
-                if (EXT_JAR.equals(extension) &&
-                        file.getProjectRelativePath().segmentCount() == 2 &&
-                        file.getParent().getName().equals(SdkConstants.FD_NATIVE_LIBS)) {
+                if (EXT_JAR.equals(extension) && file.getProjectRelativePath().segmentCount() == 2
+                        && file.getParent().getName().equals(SdkConstants.FD_NATIVE_LIBS)) {
                     // need to update the project and whatever depend on it.
 
                     processJarFileChange(file);
@@ -1300,8 +1273,7 @@ public final class Sdk  {
                         }
                     }
 
-                    ProjectHelper.updateProjects(
-                            projectList.toArray(new IJavaProject[projectList.size()]));
+                    ProjectHelper.updateProjects(projectList.toArray(new IJavaProject[projectList.size()]));
                 }
             } catch (CoreException e) {
                 // This can't happen as it's only for closed project (or non existing)
@@ -1370,13 +1342,12 @@ public final class Sdk  {
             Job job = new Job("Android Library Update") { //$NON-NLS-1$
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
-                    LibraryClasspathContainerInitializer.updateProjects(
-                            projectList.toArray(new IJavaProject[projectList.size()]));
+                    LibraryClasspathContainerInitializer
+                            .updateProjects(projectList.toArray(new IJavaProject[projectList.size()]));
 
                     for (IJavaProject javaProject : projectList) {
                         try {
-                            javaProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD,
-                                    monitor);
+                            javaProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
                         } catch (CoreException e) {
                             // pass
                         }
@@ -1459,8 +1430,7 @@ public final class Sdk  {
             if (value != null) {
                 try {
                     currentVersion = Integer.parseInt(value);
-                } catch (Exception ingore) {
-                }
+                } catch (Exception ingore) {}
             }
 
             // The target version we're comparing to. This must be incremented each time
@@ -1486,8 +1456,7 @@ public final class Sdk  {
                                 IFolder folder = (IFolder) folderResource;
 
                                 for (IResource resource : folder.members()) {
-                                    if (resource instanceof IFile &&
-                                            resource.getName().endsWith(DOT_XML)) {
+                                    if (resource instanceof IFile && resource.getName().endsWith(DOT_XML)) {
                                         fixXmlFile((IFile) resource);
                                     }
                                 }
@@ -1554,8 +1523,7 @@ public final class Sdk  {
         PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
-                HashSet<String> legacyIds =
-                        new HashSet<String>(Arrays.asList(CommonXmlEditor.LEGACY_EDITOR_IDS));
+                HashSet<String> legacyIds = new HashSet<String>(Arrays.asList(CommonXmlEditor.LEGACY_EDITOR_IDS));
 
                 for (IWorkbenchWindow win : PlatformUI.getWorkbench().getWorkbenchWindows()) {
                     for (IWorkbenchPage page : win.getPages()) {
@@ -1563,7 +1531,7 @@ public final class Sdk  {
                             try {
                                 IEditorInput input = ref.getEditorInput();
                                 if (input instanceof IFileEditorInput) {
-                                    IFile file = ((IFileEditorInput)input).getFile();
+                                    IFile file = ((IFileEditorInput) input).getFile();
                                     IEditorPart part = ref.getEditor(true /*restore*/);
                                     if (part != null) {
                                         IWorkbenchPartSite site = part.getSite();
@@ -1587,29 +1555,20 @@ public final class Sdk  {
                 store.setValue(AdtPrefs.PREFS_FIX_LEGACY_EDITORS, targetValue);
             }
 
-            private void fixEditor(
-                    IWorkbenchPage page,
-                    IEditorPart part,
-                    IEditorInput input,
-                    IFile file,
-                    String id) {
+            private void fixEditor(IWorkbenchPage page, IEditorPart part, IEditorInput input, IFile file, String id) {
                 IDE.setDefaultEditor(file, CommonXmlEditor.ID);
 
                 boolean ok = page.closeEditor(part, true /*save*/);
 
-                AndmoreAndroidPlugin.log(IStatus.INFO,
-                        "Closed legacy editor ID %s for %s: %s", //$NON-NLS-1$
-                        id,
-                        file.getFullPath(),
-                        ok ? "Success" : "Failed");//$NON-NLS-1$ //$NON-NLS-2$
+                AndmoreAndroidPlugin.log(IStatus.INFO, "Closed legacy editor ID %s for %s: %s", //$NON-NLS-1$
+                        id, file.getFullPath(), ok ? "Success" : "Failed");//$NON-NLS-1$ //$NON-NLS-2$
 
                 if (ok) {
                     // Try to reopen it with the new ID
                     try {
                         page.openEditor(input, CommonXmlEditor.ID);
                     } catch (PartInitException e) {
-                        AndmoreAndroidPlugin.log(e,
-                                "Failed to reopen %s",          //$NON-NLS-1$
+                        AndmoreAndroidPlugin.log(e, "Failed to reopen %s", //$NON-NLS-1$
                                 file.getFullPath());
                     }
                 }

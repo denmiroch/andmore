@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +12,13 @@
  */
 package org.eclipse.andmore.internal.lint;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.core.resources.IFile;
@@ -47,10 +46,8 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 
 @SuppressWarnings("restriction") // WST DOM access
 class LintListDialog extends TitleAreaDialog implements SelectionListener {
@@ -65,10 +62,7 @@ class LintListDialog extends TitleAreaDialog implements SelectionListener {
     private Button mIgnoreTypeButton;
     private LintList mList;
 
-    LintListDialog(
-            @NonNull Shell parentShell,
-            @NonNull IFile file,
-            @Nullable IEditorPart editor) {
+    LintListDialog(@NonNull Shell parentShell, @NonNull IFile file, @Nullable IEditorPart editor) {
         super(parentShell);
         mFile = file;
         mEditor = editor;
@@ -89,12 +83,12 @@ class LintListDialog extends TitleAreaDialog implements SelectionListener {
 
     @Override
     protected Control createContents(Composite parent) {
-      Control contents = super.createContents(parent);
-      setTitle("Lint Warnings in Layout");
-      setMessage("Lint Errors found for the current layout:");
-      setTitleImage(IconFactory.getInstance().getIcon(PROJECT_LOGO_LARGE));
+        Control contents = super.createContents(parent);
+        setTitle("Lint Warnings in Layout");
+        setMessage("Lint Errors found for the current layout:");
+        setTitleImage(IconFactory.getInstance().getIcon(PROJECT_LOGO_LARGE));
 
-      return contents;
+        return contents;
     }
 
     @SuppressWarnings("unused") // SWT constructors have side effects, they are not unused
@@ -137,7 +131,8 @@ class LintListDialog extends TitleAreaDialog implements SelectionListener {
         mIgnoreAllButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         mIgnoreAllButton.setText("Suppress in Layout");
         mIgnoreAllButton.setEnabled(mEditor instanceof AndroidXmlEditor);
-        mIgnoreAllButton.setToolTipText("Adds an attribute on the root element to suppress all issues of this type in this layout");
+        mIgnoreAllButton.setToolTipText(
+                "Adds an attribute on the root element to suppress all issues of this type in this layout");
         mIgnoreAllButton.addSelectionListener(this);
 
         mIgnoreTypeButton = new Button(container, SWT.NONE);
@@ -148,8 +143,7 @@ class LintListDialog extends TitleAreaDialog implements SelectionListener {
 
         new Label(container, SWT.NONE);
 
-        mDetailsText = new Text(container, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP
-                | SWT.V_SCROLL | SWT.MULTI);
+        mDetailsText = new Text(container, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
         Display display = parent.getDisplay();
         mDetailsText.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
         mDetailsText.setForeground(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
@@ -161,7 +155,7 @@ class LintListDialog extends TitleAreaDialog implements SelectionListener {
 
         mList.addSelectionListener(this);
 
-        mList.setResources(Collections.<IResource>singletonList(mFile));
+        mList.setResources(Collections.<IResource> singletonList(mFile));
         mList.selectFirst();
         if (mList.getSelectedMarkers().size() > 0) {
             updateSelectionState();
@@ -246,8 +240,7 @@ class LintListDialog extends TitleAreaDialog implements SelectionListener {
                     ids.add(id);
                     if (mEditor instanceof AndroidXmlEditor) {
                         AndroidXmlEditor editor = (AndroidXmlEditor) mEditor;
-                        AddSuppressAttribute fix = AddSuppressAttribute.createFixForAll(editor,
-                                marker, id);
+                        AddSuppressAttribute fix = AddSuppressAttribute.createFixForAll(editor, marker, id);
                         if (fix != null) {
                             IStructuredDocument document = editor.getStructuredDocument();
                             fix.apply(document);

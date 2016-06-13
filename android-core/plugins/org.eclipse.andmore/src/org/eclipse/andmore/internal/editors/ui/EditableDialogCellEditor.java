@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,7 @@
 
 package org.eclipse.andmore.internal.editors.ui;
 
-import com.android.SdkConstants;
+import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DialogCellEditor;
@@ -38,7 +35,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
-import java.text.MessageFormat;
+import com.android.SdkConstants;
 
 /**
  * Custom DialogCellEditor, replacing the Label with an editable {@link Text} widget.
@@ -75,7 +72,6 @@ public abstract class EditableDialogCellEditor extends DialogCellEditor {
         return result;
     }
 
-
     @Override
     protected Control createContents(Composite cell) {
         text = new Text(cell, SWT.SINGLE);
@@ -104,8 +100,7 @@ public abstract class EditableDialogCellEditor extends DialogCellEditor {
         text.addTraverseListener(new TraverseListener() {
             @Override
             public void keyTraversed(TraverseEvent e) {
-                if (e.detail == SWT.TRAVERSE_ESCAPE
-                        || e.detail == SWT.TRAVERSE_RETURN) {
+                if (e.detail == SWT.TRAVERSE_ESCAPE || e.detail == SWT.TRAVERSE_RETURN) {
                     e.doit = false;
                 }
             }
@@ -134,7 +129,7 @@ public abstract class EditableDialogCellEditor extends DialogCellEditor {
         return text;
     }
 
-   /**
+    /**
      * Checks to see if the "deletable" state (can delete/
      * nothing to delete) has changed and if so fire an
      * enablement changed notification.
@@ -213,7 +208,6 @@ public abstract class EditableDialogCellEditor extends DialogCellEditor {
         return text.getText();
     }
 
-
     /**
      * Processes a modify event that occurred in this text cell editor.
      * This framework method performs validation and sets the error message
@@ -234,8 +228,7 @@ public abstract class EditableDialogCellEditor extends DialogCellEditor {
 
         if (!newValidState) {
             // try to insert the current value into the error message.
-            setErrorMessage(MessageFormat.format(getErrorMessage(),
-                    new Object[] { value }));
+            setErrorMessage(MessageFormat.format(getErrorMessage(), new Object[] { value }));
         }
         valueChanged(oldValidState, newValidState);
     }
@@ -306,8 +299,7 @@ public abstract class EditableDialogCellEditor extends DialogCellEditor {
         if (text == null || text.isDisposed()) {
             return false;
         }
-        return text.getSelectionCount() > 0
-                || text.getCaretPosition() < text.getCharCount();
+        return text.getSelectionCount() > 0 || text.getCaretPosition() < text.getCharCount();
     }
 
     /**
@@ -377,8 +369,7 @@ public abstract class EditableDialogCellEditor extends DialogCellEditor {
             //
             // An exception is made for Ctrl+Enter for multi-line texts, since
             // a default selection event is not sent in this case.
-            if (text != null && !text.isDisposed()
-                    && (text.getStyle() & SWT.MULTI) != 0) {
+            if (text != null && !text.isDisposed() && (text.getStyle() & SWT.MULTI) != 0) {
                 if ((keyEvent.stateMask & SWT.CTRL) != 0) {
                     super.keyReleaseOccured(keyEvent);
                 }

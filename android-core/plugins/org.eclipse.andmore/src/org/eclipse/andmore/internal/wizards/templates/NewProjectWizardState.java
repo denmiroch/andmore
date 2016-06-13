@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,14 +15,14 @@ package org.eclipse.andmore.internal.wizards.templates;
 
 import static org.eclipse.andmore.internal.wizards.templates.NewProjectWizard.CATEGORY_PROJECTS;
 
-import com.android.sdklib.IAndroidTarget;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.assetstudio.CreateAssetSetWizardState;
 import org.eclipse.ui.IWorkingSet;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * Value object which holds the current state of the wizard pages for the
@@ -34,8 +31,7 @@ import java.util.Map;
 public class NewProjectWizardState {
     /** Creates a new {@link NewProjectWizardState} */
     public NewProjectWizardState() {
-        template = TemplateHandler.createFromName(CATEGORY_PROJECTS,
-                "NewAndroidApplication"); //$NON-NLS-1$
+        template = TemplateHandler.createFromName(CATEGORY_PROJECTS, "NewAndroidApplication"); //$NON-NLS-1$
     }
 
     /** The template handler instantiating the project */

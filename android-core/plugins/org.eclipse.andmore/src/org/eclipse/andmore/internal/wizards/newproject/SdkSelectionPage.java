@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,18 +12,13 @@
  */
 package org.eclipse.andmore.internal.wizards.newproject;
 
-import com.android.SdkConstants;
-import com.android.annotations.Nullable;
-import com.android.ide.common.sdk.LoadStatus;
-import com.android.ide.common.xml.AndroidManifestParser;
-import com.android.ide.common.xml.ManifestData;
-import com.android.io.FileWrapper;
-import com.android.sdklib.AndroidVersion;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.SdkManager;
-import com.android.sdkuilib.internal.widgets.SdkTargetSelector;
-import com.android.utils.NullLogger;
-import com.android.utils.Pair;
+import java.io.File;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.sdk.Sdk;
@@ -44,13 +36,18 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
+import com.android.SdkConstants;
+import com.android.annotations.Nullable;
+import com.android.ide.common.sdk.LoadStatus;
+import com.android.ide.common.xml.AndroidManifestParser;
+import com.android.ide.common.xml.ManifestData;
+import com.android.io.FileWrapper;
+import com.android.sdklib.AndroidVersion;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.SdkManager;
+import com.android.sdkuilib.internal.widgets.SdkTargetSelector;
+import com.android.utils.NullLogger;
+import com.android.utils.Pair;
 
 /** A page in the New Project wizard where you select the target SDK */
 class SdkSelectionPage extends WizardPage implements ITargetChangeListener {
@@ -226,13 +223,11 @@ class SdkSelectionPage extends WizardPage implements ITargetChangeListener {
                     // Case where the sample is at the root of the directory and not
                     // in a per-sample sub-directory.
                     if (path.getName().equals(SdkConstants.FD_SAMPLE)) {
-                        findSampleManifestInDir(
-                                path, path, name, target.getVersion(), mValues.samples);
+                        findSampleManifestInDir(path, path, name, target.getVersion(), mValues.samples);
                     }
 
                     // Scan sub-directories
-                    findSamplesManifests(
-                            path, path, name, target.getVersion(), mValues.samples);
+                    findSamplesManifests(path, path, name, target.getVersion(), mValues.samples);
                 }
             }
 
@@ -276,12 +271,8 @@ class SdkSelectionPage extends WizardPage implements ITargetChangeListener {
      * @param samplesPaths A non-null list filled by this method with all samples found. The
      *   pair is (String: sample display name => File: sample directory).
      */
-    private void findSamplesManifests(
-            File rootDir,
-            File currDir,
-            @Nullable String extraName,
-            @Nullable AndroidVersion targetVersion,
-            List<Pair<String, File>> samplesPaths) {
+    private void findSamplesManifests(File rootDir, File currDir, @Nullable String extraName,
+            @Nullable AndroidVersion targetVersion, List<Pair<String, File>> samplesPaths) {
         if (!currDir.isDirectory()) {
             return;
         }
@@ -294,27 +285,21 @@ class SdkSelectionPage extends WizardPage implements ITargetChangeListener {
                 // We can however skip this recursion for known android sub-dirs that
                 // can't have projects, namely for sources, assets and resources.
                 String leaf = f.getName();
-                if (!SdkConstants.FD_SOURCES.equals(leaf) &&
-                        !SdkConstants.FD_ASSETS.equals(leaf) &&
-                        !SdkConstants.FD_RES.equals(leaf)) {
+                if (!SdkConstants.FD_SOURCES.equals(leaf) && !SdkConstants.FD_ASSETS.equals(leaf)
+                        && !SdkConstants.FD_RES.equals(leaf)) {
                     findSamplesManifests(rootDir, f, extraName, targetVersion, samplesPaths);
                 }
             }
         }
     }
 
-    private void findSampleManifestInDir(
-            File sampleDir,
-            File rootDir,
-            String extraName,
-            AndroidVersion targetVersion,
+    private void findSampleManifestInDir(File sampleDir, File rootDir, String extraName, AndroidVersion targetVersion,
             List<Pair<String, File>> samplesPaths) {
         // Assume this is a sample if it contains an android manifest.
         File manifestFile = new File(sampleDir, SdkConstants.FN_ANDROID_MANIFEST_XML);
         if (manifestFile.isFile()) {
             try {
-                ManifestData data =
-                    AndroidManifestParser.parse(new FileWrapper(manifestFile));
+                ManifestData data = AndroidManifestParser.parse(new FileWrapper(manifestFile));
                 if (data != null) {
                     boolean accept = false;
                     if (targetVersion == null) {
@@ -322,7 +307,7 @@ class SdkSelectionPage extends WizardPage implements ITargetChangeListener {
                     } else if (targetVersion != null) {
                         int i = data.getMinSdkVersion();
                         if (i != ManifestData.MIN_SDK_CODENAME) {
-                           accept = i <= targetVersion.getApiLevel();
+                            accept = i <= targetVersion.getApiLevel();
                         } else {
                             String s = data.getMinSdkVersionString();
                             if (s != null) {
@@ -338,8 +323,7 @@ class SdkSelectionPage extends WizardPage implements ITargetChangeListener {
                 }
             } catch (Exception e) {
                 // Ignore. Don't use a sample which manifest doesn't parse correctly.
-                AndmoreAndroidPlugin.log(IStatus.INFO,
-                        "NPW ignoring malformed manifest %s",   //$NON-NLS-1$
+                AndmoreAndroidPlugin.log(IStatus.INFO, "NPW ignoring malformed manifest %s", //$NON-NLS-1$
                         manifestFile.getAbsolutePath());
             }
         }
@@ -361,23 +345,19 @@ class SdkSelectionPage extends WizardPage implements ITargetChangeListener {
                 if (path.endsWith(File.separator)) {
                     path = path.substring(0, path.length() - 1);
                 }
-                name = path.replaceAll(Pattern.quote(File.separator), " > ");   //$NON-NLS-1$
+                name = path.replaceAll(Pattern.quote(File.separator), " > "); //$NON-NLS-1$
             }
         }
-        if (name == null &&
-                rootDir.equals(sampleDir) &&
-                sampleDir.getName().equals(SdkConstants.FD_SAMPLE) &&
-                extraName != null) {
+        if (name == null && rootDir.equals(sampleDir) && sampleDir.getName().equals(SdkConstants.FD_SAMPLE)
+                && extraName != null) {
             // This is an old-style extra with one single sample directory. Just use the
             // extra's name as the same name.
             return extraName;
         }
         if (name == null) {
             // Otherwise try to use the sample's directory name as the sample name.
-            while (sampleDir != null &&
-                   (name == null ||
-                    SdkConstants.FD_SAMPLE.equals(name) ||
-                    SdkConstants.FD_SAMPLES.equals(name))) {
+            while (sampleDir != null
+                    && (name == null || SdkConstants.FD_SAMPLE.equals(name) || SdkConstants.FD_SAMPLES.equals(name))) {
                 name = sampleDir.getName();
                 sampleDir = sampleDir.getParentFile();
             }
@@ -391,7 +371,7 @@ class SdkSelectionPage extends WizardPage implements ITargetChangeListener {
             }
         }
         if (extraName != null) {
-            name = name + " [" + extraName + ']';                               //$NON-NLS-1$
+            name = name + " [" + extraName + ']'; //$NON-NLS-1$
         }
 
         return name;
@@ -452,11 +432,8 @@ class SdkSelectionPage extends WizardPage implements ITargetChangeListener {
             // for related discussion.)
             IAndroidTarget initialTarget = null;
             for (IAndroidTarget target : targets) {
-                if (target.isPlatform()
-                        && !target.getVersion().isPreview()
-                        && (initialTarget == null ||
-                                target.getVersion().getApiLevel() >
-                                    initialTarget.getVersion().getApiLevel())) {
+                if (target.isPlatform() && !target.getVersion().isPreview() && (initialTarget == null
+                        || target.getVersion().getApiLevel() > initialTarget.getVersion().getApiLevel())) {
                     initialTarget = target;
                 }
             }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,22 +54,19 @@ final class ExtractStringFix extends DocumentFix {
     }
 
     @Override
-    protected void apply(IDocument document, IStructuredModel model, Node node, int start,
-            int end) {
+    protected void apply(IDocument document, IStructuredModel model, Node node, int start, int end) {
         IEditorPart editorPart = AdtUtils.getActiveEditor();
         if (editorPart instanceof AndroidXmlEditor) {
             IFile file = (IFile) mMarker.getResource();
             ITextSelection selection = new TextSelection(start, end - start);
 
-            ExtractStringRefactoring refactoring =
-                new ExtractStringRefactoring(file, editorPart, selection);
+            ExtractStringRefactoring refactoring = new ExtractStringRefactoring(file, editorPart, selection);
             RefactoringWizard wizard = new ExtractStringWizard(refactoring, file.getProject());
             RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
             try {
                 IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                 op.run(window.getShell(), wizard.getDefaultPageTitle());
-            } catch (InterruptedException e) {
-            }
+            } catch (InterruptedException e) {}
         }
     }
 

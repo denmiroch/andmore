@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,90 +41,90 @@ import org.eclipse.ui.PlatformUI;
  */
 public class CleanProjects extends AbstractHandler {
 
-	/**
-	 * Job responsible for cleaning a list of projects
-	 */
-	private final class CleanProjectsJob extends Job {
+    /**
+     * Job responsible for cleaning a list of projects
+     */
+    private final class CleanProjectsJob extends Job {
 
-		private List<IProject> projectList = null;
+        private List<IProject> projectList = null;
 
-		/**
-		 * @param name
-		 * @param stream
-		 * @param sdkPath
-		 */
-		private CleanProjectsJob(List<IProject> projects) {
-			super(AndroidNLS.UI_CleanProjectsJob_Name);
-			projectList = projects;
-		}
+        /**
+         * @param name
+         * @param stream
+         * @param sdkPath
+         */
+        private CleanProjectsJob(List<IProject> projects) {
+            super(AndroidNLS.UI_CleanProjectsJob_Name);
+            projectList = projects;
+        }
 
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-			monitor.beginTask(AndroidNLS.UI_CleanProjectsJob_Description, projectList.size());
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+            monitor.beginTask(AndroidNLS.UI_CleanProjectsJob_Description, projectList.size());
 
-			for (IProject p : projectList) {
-				// Try to clean it and update progress
-				try {
-					p.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
-					monitor.worked(1);
-				} catch (CoreException e) {
-					// Just log the error. Not much we can do about it.
-					AndmoreLogger.error(CleanProjectsJob.class, "Error cleaning project " + p.getName() + ". ", e);
-				}
-			}
+            for (IProject p : projectList) {
+                // Try to clean it and update progress
+                try {
+                    p.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
+                    monitor.worked(1);
+                } catch (CoreException e) {
+                    // Just log the error. Not much we can do about it.
+                    AndmoreLogger.error(CleanProjectsJob.class, "Error cleaning project " + p.getName() + ". ", e);
+                }
+            }
 
-			monitor.done();
-			return Status.OK_STATUS;
-		}
-	}
+            monitor.done();
+            return Status.OK_STATUS;
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
-	 * ExecutionEvent)
-	 */
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
+     * ExecutionEvent)
+     */
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		// Retrieve the selection used in the command
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		if ((workbench != null) && !workbench.isClosing()) {
-			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-			if (window != null) {
-				ISelection selection = window.getSelectionService().getSelection();
-				if (selection instanceof IStructuredSelection) {
-					IStructuredSelection sselection = (IStructuredSelection) selection;
-					Iterator<?> it = sselection.iterator();
+        // Retrieve the selection used in the command
+        IWorkbench workbench = PlatformUI.getWorkbench();
+        if ((workbench != null) && !workbench.isClosing()) {
+            IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+            if (window != null) {
+                ISelection selection = window.getSelectionService().getSelection();
+                if (selection instanceof IStructuredSelection) {
+                    IStructuredSelection sselection = (IStructuredSelection) selection;
+                    Iterator<?> it = sselection.iterator();
 
-					// Construct a list of valid projects to be cleaned
-					List<IProject> projectList = new ArrayList<IProject>(sselection.size());
+                    // Construct a list of valid projects to be cleaned
+                    List<IProject> projectList = new ArrayList<IProject>(sselection.size());
 
-					while (it.hasNext()) {
-						Object resource = it.next();
+                    while (it.hasNext()) {
+                        Object resource = it.next();
 
-						// Check if the selected item is a project
-						if (resource instanceof IProject) {
-							projectList.add(((IProject) resource));
-						} else if (resource instanceof IAdaptable) {
-							IAdaptable adaptable = (IAdaptable) resource;
-							projectList.add((IProject) adaptable.getAdapter(IProject.class));
+                        // Check if the selected item is a project
+                        if (resource instanceof IProject) {
+                            projectList.add(((IProject) resource));
+                        } else if (resource instanceof IAdaptable) {
+                            IAdaptable adaptable = (IAdaptable) resource;
+                            projectList.add(adaptable.getAdapter(IProject.class));
 
-						}
+                        }
 
-					}
+                    }
 
-					// Instantiate the clean job and schedule it.
-					if (projectList.size() > 0) {
-						CleanProjectsJob job = new CleanProjectsJob(projectList);
-						job.schedule();
-					}
+                    // Instantiate the clean job and schedule it.
+                    if (projectList.size() > 0) {
+                        CleanProjectsJob job = new CleanProjectsJob(projectList);
+                        job.schedule();
+                    }
 
-				}
-			}
-		}
-		return null;
-	}
+                }
+            }
+        }
+        return null;
+    }
 
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,8 +17,8 @@ import static com.android.SdkConstants.ANDROID_URI;
 import static com.android.SdkConstants.ATTR_NAME;
 import static org.eclipse.andmore.internal.editors.manifest.descriptors.AndroidManifestDescriptors.USES_PERMISSION;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -57,8 +54,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.Collection;
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 
 /**
  * Multi-page form editor for AndroidManifest.xml.
@@ -82,7 +79,6 @@ public final class ManifestEditor extends AndroidXmlEditor {
     private InstrumentationPage mInstrumentationPage;
 
     private IFileListener mMarkerMonitor;
-
 
     /**
      * Creates the form editor for AndroidManifest.xml.
@@ -194,8 +190,7 @@ public final class ManifestEditor extends AndroidXmlEditor {
             if (info != null) {
                 int newMinSdkVersion = info.getMinSdkVersion();
                 int newTargetSdkVersion = info.getTargetSdkVersion();
-                if (newMinSdkVersion != prevMinSdkVersion
-                        || newTargetSdkVersion != prevTargetSdkVersion) {
+                if (newMinSdkVersion != prevMinSdkVersion || newTargetSdkVersion != prevTargetSdkVersion) {
                     assert project != null;
                     EclipseLintClient.clearMarkers(project);
                 }
@@ -268,11 +263,8 @@ public final class ManifestEditor extends AndroidXmlEditor {
                     return node;
                 }
 
-                for (node = xmlDoc.getFirstChild();
-                     node != null;
-                     node = node.getNextSibling()) {
-                    if (node.getNodeType() == Node.ELEMENT_NODE &&
-                            manifestXmlName.equals(node.getNodeName())) {
+                for (node = xmlDoc.getFirstChild(); node != null; node = node.getNextSibling()) {
+                    if (node.getNodeType() == Node.ELEMENT_NODE && manifestXmlName.equals(node.getNodeName())) {
                         return node;
                     }
                 }
@@ -320,16 +312,15 @@ public final class ManifestEditor extends AndroidXmlEditor {
 
             mMarkerMonitor = new IFileListener() {
                 @Override
-                public void fileChanged(@NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas,
-                        int kind, @Nullable String extension, int flags, boolean isAndroidProject) {
+                public void fileChanged(@NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas, int kind,
+                        @Nullable String extension, int flags, boolean isAndroidProject) {
                     if (isAndroidProject && file.equals(inputFile)) {
                         processMarkerChanges(markerDeltas);
                     }
                 }
             };
 
-            GlobalProjectMonitor.getMonitor().addFileListener(
-                    mMarkerMonitor, IResourceDelta.CHANGED);
+            GlobalProjectMonitor.getMonitor().addFileListener(mMarkerMonitor, IResourceDelta.CHANGED);
         }
     }
 
@@ -341,16 +332,15 @@ public final class ManifestEditor extends AndroidXmlEditor {
     private void updateFromExistingMarkers(IFile inputFile) {
         try {
             // get the markers for the file
-            IMarker[] markers = inputFile.findMarkers(
-                    AndmoreAndroidConstants.MARKER_ANDROID, true, IResource.DEPTH_ZERO);
+            IMarker[] markers = inputFile.findMarkers(AndmoreAndroidConstants.MARKER_ANDROID, true,
+                    IResource.DEPTH_ZERO);
 
             AndroidManifestDescriptors desc = getManifestDescriptors();
             if (desc != null) {
                 ElementDescriptor appElement = desc.getApplicationElement();
 
                 if (appElement != null && mUiManifestNode != null) {
-                    UiElementNode appUiNode = mUiManifestNode.findUiChildNode(
-                            appElement.getXmlName());
+                    UiElementNode appUiNode = mUiManifestNode.findUiChildNode(appElement.getXmlName());
                     List<UiElementNode> children = appUiNode.getUiChildren();
 
                     for (IMarker marker : markers) {
@@ -371,8 +361,8 @@ public final class ManifestEditor extends AndroidXmlEditor {
     private void processMarkerChanges(IMarkerDelta[] markerDeltas) {
         AndroidManifestDescriptors descriptors = getManifestDescriptors();
         if (descriptors != null && descriptors.getApplicationElement() != null) {
-            UiElementNode app_ui_node = mUiManifestNode.findUiChildNode(
-                    descriptors.getApplicationElement().getXmlName());
+            UiElementNode app_ui_node = mUiManifestNode
+                    .findUiChildNode(descriptors.getApplicationElement().getXmlName());
             List<UiElementNode> children = app_ui_node.getUiChildren();
 
             for (IMarkerDelta markerDelta : markerDeltas) {
@@ -403,8 +393,7 @@ public final class ManifestEditor extends AndroidXmlEditor {
         for (UiElementNode ui_node : nodeList) {
             if (ui_node.getDescriptor().getXmlName().equals(nodeType)) {
                 for (UiAttributeNode attr : ui_node.getAllUiAttributes()) {
-                    if (attr.getDescriptor().getXmlLocalName().equals(
-                            AndroidManifestDescriptors.ANDROID_NAME_ATTR)) {
+                    if (attr.getDescriptor().getXmlLocalName().equals(AndroidManifestDescriptors.ANDROID_NAME_ATTR)) {
                         if (attr.getCurrentValue().equals(className)) {
                             if (kind == IResourceDelta.REMOVED) {
                                 attr.setHasError(false);
@@ -468,8 +457,7 @@ public final class ManifestEditor extends AndroidXmlEditor {
             // create a dummy descriptor/uinode until we have real descriptors
             ElementDescriptor desc = new ElementDescriptor("manifest", //$NON-NLS-1$
                     "temporary descriptors due to missing decriptors", //$NON-NLS-1$
-                    null /*tooltip*/, null /*sdk_url*/, null /*attributes*/,
-                    null /*children*/, false /*mandatory*/);
+                    null /*tooltip*/, null /*sdk_url*/, null /*attributes*/, null /*children*/, false /*mandatory*/);
             mUiManifestNode = desc.createUiNode();
             mUiManifestNode.setEditor(this);
         }
@@ -524,8 +512,7 @@ public final class ManifestEditor extends AndroidXmlEditor {
                         index = root.getUiChildren().size();
                     }
                     UiElementNode usesPermission = root.insertNewUiChild(index, descriptor);
-                    usesPermission.setAttributeValue(ATTR_NAME, ANDROID_URI, permission,
-                            true /*override*/);
+                    usesPermission.setAttributeValue(ATTR_NAME, ANDROID_URI, permission, true /*override*/);
                     Node node = usesPermission.createXmlNode();
                     if (show && !shown) {
                         shown = true;

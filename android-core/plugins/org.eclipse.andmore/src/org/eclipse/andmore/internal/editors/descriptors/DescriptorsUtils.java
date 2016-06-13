@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,17 +38,6 @@ import static com.android.SdkConstants.VALUE_WRAP_CONTENT;
 import static com.android.SdkConstants.VIEW_INCLUDE;
 import static com.android.SdkConstants.VIEW_MERGE;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.ide.common.api.IAttributeInfo.Format;
-import com.android.resources.ResourceType;
-
-import org.eclipse.andmore.AndmoreAndroidConstants;
-import org.eclipse.andmore.common.resources.platform.AttributeInfo;
-import org.eclipse.andmore.internal.editors.uimodel.UiDocumentNode;
-import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
-import org.eclipse.swt.graphics.Image;
-
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -63,6 +49,16 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.andmore.AndmoreAndroidConstants;
+import org.eclipse.andmore.common.resources.platform.AttributeInfo;
+import org.eclipse.andmore.internal.editors.uimodel.UiDocumentNode;
+import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
+import org.eclipse.swt.graphics.Image;
+
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.ide.common.api.IAttributeInfo.Format;
+import com.android.resources.ResourceType;
 
 /**
  * Utility methods related to descriptors handling.
@@ -79,13 +75,13 @@ public final class DescriptorsUtils {
      * to {@link AndmoreAndroidConstants#CODESITE_BASE_URL} or to the local SDK
      * documentation.
      */
-    public static final String MANIFEST_SDK_URL = "/reference/android/R.styleable.html#";  //$NON-NLS-1$
+    public static final String MANIFEST_SDK_URL = "/reference/android/R.styleable.html#"; //$NON-NLS-1$
 
     public static final String IMAGE_KEY = "image"; //$NON-NLS-1$
 
-    private static final String CODE  = "$code";  //$NON-NLS-1$
-    private static final String LINK  = "$link";  //$NON-NLS-1$
-    private static final String ELEM  = "$elem";  //$NON-NLS-1$
+    private static final String CODE = "$code"; //$NON-NLS-1$
+    private static final String LINK = "$link"; //$NON-NLS-1$
+    private static final String ELEM = "$elem"; //$NON-NLS-1$
     private static final String BREAK = "$break"; //$NON-NLS-1$
 
     /**
@@ -102,17 +98,14 @@ public final class DescriptorsUtils {
      *        entries in the form "elem-name/attr-name". Elem-name can be "*".
      * @param overrides A map [attribute name => ITextAttributeCreator creator].
      */
-    public static void appendAttributes(List<AttributeDescriptor> attributes,
-            String elementXmlName,
-            String nsUri, AttributeInfo[] infos,
-            Set<String> requiredAttributes,
-            Map<String, ITextAttributeCreator> overrides) {
+    public static void appendAttributes(List<AttributeDescriptor> attributes, String elementXmlName, String nsUri,
+            AttributeInfo[] infos, Set<String> requiredAttributes, Map<String, ITextAttributeCreator> overrides) {
         for (AttributeInfo info : infos) {
             boolean required = false;
             if (requiredAttributes != null) {
                 String attr_name = info.getName();
-                if (requiredAttributes.contains("*/" + attr_name) ||
-                        requiredAttributes.contains(elementXmlName + "/" + attr_name)) {
+                if (requiredAttributes.contains("*/" + attr_name)
+                        || requiredAttributes.contains(elementXmlName + "/" + attr_name)) {
                     required = true;
                 }
             }
@@ -133,11 +126,8 @@ public final class DescriptorsUtils {
      *        a "*" to its UI name as a hint for the user.)
      * @param overrides A map [attribute name => ITextAttributeCreator creator].
      */
-    public static void appendAttribute(List<AttributeDescriptor> attributes,
-            String elementXmlName,
-            String nsUri,
-            AttributeInfo info, boolean required,
-            Map<String, ITextAttributeCreator> overrides) {
+    public static void appendAttribute(List<AttributeDescriptor> attributes, String elementXmlName, String nsUri,
+            AttributeInfo info, boolean required, Map<String, ITextAttributeCreator> overrides) {
         TextAttributeDescriptor attr = null;
 
         String xmlLocalName = info.getName();
@@ -148,13 +138,13 @@ public final class DescriptorsUtils {
         if (flen > 0) {
             // Create a specialized attribute if we can
             if (overrides != null) {
-                for (Entry<String, ITextAttributeCreator> entry: overrides.entrySet()) {
+                for (Entry<String, ITextAttributeCreator> entry : overrides.entrySet()) {
                     // The override key can have the following formats:
                     //   */xmlLocalName
                     //   element/xmlLocalName
                     //   element1,element2,...,elementN/xmlLocalName
                     String key = entry.getKey();
-                    String elements[] = key.split("/");          //$NON-NLS-1$
+                    String elements[] = key.split("/"); //$NON-NLS-1$
                     String overrideAttrLocalName = null;
                     if (elements.length < 1) {
                         continue;
@@ -163,18 +153,17 @@ public final class DescriptorsUtils {
                         elements = null;
                     } else {
                         overrideAttrLocalName = elements[elements.length - 1];
-                        elements = elements[0].split(",");       //$NON-NLS-1$
+                        elements = elements[0].split(","); //$NON-NLS-1$
                     }
 
-                    if (overrideAttrLocalName == null ||
-                            !overrideAttrLocalName.equals(xmlLocalName)) {
+                    if (overrideAttrLocalName == null || !overrideAttrLocalName.equals(xmlLocalName)) {
                         continue;
                     }
 
                     boolean ok_element = elements != null && elements.length < 1;
                     if (!ok_element && elements != null) {
                         for (String element : elements) {
-                            if (element.equals("*")              //$NON-NLS-1$
+                            if (element.equals("*") //$NON-NLS-1$
                                     || element.equals(elementXmlName)) {
                                 ok_element = true;
                                 break;
@@ -197,20 +186,15 @@ public final class DescriptorsUtils {
             if (attr == null) {
                 if (formats_set.contains(Format.REFERENCE)) {
                     // This is either a multi-type reference or a generic reference.
-                    attr = new ReferenceAttributeDescriptor(
-                            xmlLocalName, nsUri, info);
+                    attr = new ReferenceAttributeDescriptor(xmlLocalName, nsUri, info);
                 } else if (formats_set.contains(Format.ENUM)) {
-                    attr = new ListAttributeDescriptor(
-                            xmlLocalName, nsUri, info);
+                    attr = new ListAttributeDescriptor(xmlLocalName, nsUri, info);
                 } else if (formats_set.contains(Format.FLAG)) {
-                    attr = new FlagAttributeDescriptor(
-                            xmlLocalName, nsUri, info);
+                    attr = new FlagAttributeDescriptor(xmlLocalName, nsUri, info);
                 } else if (formats_set.contains(Format.BOOLEAN)) {
-                    attr = new BooleanAttributeDescriptor(
-                            xmlLocalName, nsUri, info);
+                    attr = new BooleanAttributeDescriptor(xmlLocalName, nsUri, info);
                 } else if (formats_set.contains(Format.STRING)) {
-                    attr = new ReferenceAttributeDescriptor(
-                            ResourceType.STRING, xmlLocalName, nsUri, info);
+                    attr = new ReferenceAttributeDescriptor(ResourceType.STRING, xmlLocalName, nsUri, info);
                 }
             }
         }
@@ -239,14 +223,12 @@ public final class DescriptorsUtils {
      * @return True if this {@link AttributeInfo} is already present in
      *         the {@link AttributeDescriptor} list.
      */
-    public static boolean containsAttribute(ArrayList<AttributeDescriptor> attributes,
-            String nsUri,
+    public static boolean containsAttribute(ArrayList<AttributeDescriptor> attributes, String nsUri,
             AttributeInfo info) {
         String xmlLocalName = info.getName();
         for (AttributeDescriptor desc : attributes) {
             if (desc.getXmlLocalName().equals(xmlLocalName)) {
-                if (nsUri.equals(desc.getNamespaceUri()) ||
-                        (nsUri != null && nsUri.equals(desc.getNamespaceUri()))) {
+                if (nsUri.equals(desc.getNamespaceUri()) || (nsUri != null && nsUri.equals(desc.getNamespaceUri()))) {
                     return true;
                 }
             }
@@ -278,9 +260,8 @@ public final class DescriptorsUtils {
                 buf.append(' ');
                 // Use a lower case initial letter for the next word, except if the
                 // word is solely X, Y or Z.
-                if (c >= 'X' && c <= 'Z' &&
-                        (i == len-1 ||
-                            (i < len-1 && Character.isUpperCase(name.charAt(i+1))))) {
+                if (c >= 'X' && c <= 'Z'
+                        && (i == len - 1 || (i < len - 1 && Character.isUpperCase(name.charAt(i + 1))))) {
                     buf.append(c);
                 } else {
                     buf.append(Character.toLowerCase(c));
@@ -332,7 +313,7 @@ public final class DescriptorsUtils {
                 buf.append(c);
             } else if (c == '_') {
                 buf.append(' ');
-                if (i < len -1 && Character.isLowerCase(name.charAt(i + 1))) {
+                if (i < len - 1 && Character.isLowerCase(name.charAt(i + 1))) {
                     buf.append(Character.toUpperCase(name.charAt(i + 1)));
                     i++;
                 }
@@ -387,9 +368,9 @@ public final class DescriptorsUtils {
                     sb.append('"').append(s).append('"');
                 }
             } else if (LINK.equals(s)) {
-                String base   = spans.get(++i);
+                String base = spans.get(++i);
                 String anchor = spans.get(++i);
-                String text   = spans.get(++i);
+                String text = spans.get(++i);
 
                 if (base != null) {
                     base = base.trim();
@@ -448,9 +429,7 @@ public final class DescriptorsUtils {
      * @param androidDocBaseUrl The base URL for the documentation. Cannot be null. Should be
      *   <code>FrameworkResourceManager.getInstance().getDocumentationBaseUrl()</code>
      */
-    public static String formatFormText(String javadoc,
-            ElementDescriptor elementDescriptor,
-            String androidDocBaseUrl) {
+    public static String formatFormText(String javadoc, ElementDescriptor elementDescriptor, String androidDocBaseUrl) {
         ArrayList<String> spans = scanJavadoc(javadoc);
 
         String fullSdkUrl = androidDocBaseUrl + MANIFEST_SDK_URL;
@@ -463,10 +442,10 @@ public final class DescriptorsUtils {
 
         Image icon = elementDescriptor.getCustomizedIcon();
         if (icon != null) {
-            sb.append("<form><li style=\"image\" value=\"" +        //$NON-NLS-1$
-                    IMAGE_KEY + "\">");                             //$NON-NLS-1$
+            sb.append("<form><li style=\"image\" value=\"" + //$NON-NLS-1$
+                    IMAGE_KEY + "\">"); //$NON-NLS-1$
         } else {
-            sb.append("<form><p>");                                 //$NON-NLS-1$
+            sb.append("<form><p>"); //$NON-NLS-1$
         }
 
         for (int n = spans.size(), i = 0; i < n; ++i) {
@@ -474,18 +453,18 @@ public final class DescriptorsUtils {
             if (CODE.equals(s)) {
                 s = spans.get(++i);
                 if (elementDescriptor.getXmlName().equals(s) && fullSdkUrl != null) {
-                    sb.append("<a href=\"");                        //$NON-NLS-1$
+                    sb.append("<a href=\""); //$NON-NLS-1$
                     sb.append(fullSdkUrl);
-                    sb.append("\">");                               //$NON-NLS-1$
+                    sb.append("\">"); //$NON-NLS-1$
                     sb.append(s);
-                    sb.append("</a>");                              //$NON-NLS-1$
+                    sb.append("</a>"); //$NON-NLS-1$
                 } else if (s != null) {
                     sb.append('"').append(s).append('"');
                 }
             } else if (LINK.equals(s)) {
-                String base   = spans.get(++i);
+                String base = spans.get(++i);
                 String anchor = spans.get(++i);
-                String text   = spans.get(++i);
+                String text = spans.get(++i);
 
                 if (base != null) {
                     base = base.trim();
@@ -511,7 +490,7 @@ public final class DescriptorsUtils {
 
                 String url = null;
                 if (base != null && base.length() > 0) {
-                    if (base.startsWith("http")) {                  //$NON-NLS-1$
+                    if (base.startsWith("http")) { //$NON-NLS-1$
                         // If base looks an URL, use it, with the optional anchor
                         url = base;
                         if (anchor != null && anchor.length() > 0) {
@@ -519,7 +498,7 @@ public final class DescriptorsUtils {
                             // removed first. If there's no anchor, we need to add "#"
                             int pos = url.lastIndexOf('#');
                             if (pos < 0) {
-                                url += "#";                         //$NON-NLS-1$
+                                url += "#"; //$NON-NLS-1$
                             } else if (pos < url.length() - 1) {
                                 url = url.substring(0, pos + 1);
                             }
@@ -533,25 +512,25 @@ public final class DescriptorsUtils {
                 }
 
                 if (url != null && text != null) {
-                    sb.append("<a href=\"");                        //$NON-NLS-1$
+                    sb.append("<a href=\""); //$NON-NLS-1$
                     sb.append(url);
-                    sb.append("\">");                               //$NON-NLS-1$
+                    sb.append("\">"); //$NON-NLS-1$
                     sb.append(text);
-                    sb.append("</a>");                              //$NON-NLS-1$
+                    sb.append("</a>"); //$NON-NLS-1$
                 } else if (text != null) {
-                    sb.append("<b>").append(text).append("</b>");   //$NON-NLS-1$ //$NON-NLS-2$
+                    sb.append("<b>").append(text).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
 
             } else if (ELEM.equals(s)) {
                 s = spans.get(++i);
                 if (sdkUrl != null && s != null) {
-                    sb.append("<a href=\"");                        //$NON-NLS-1$
+                    sb.append("<a href=\""); //$NON-NLS-1$
                     sb.append(sdkUrl);
-                    sb.append("\">");                               //$NON-NLS-1$
+                    sb.append("\">"); //$NON-NLS-1$
                     sb.append(s);
-                    sb.append("</a>");                              //$NON-NLS-1$
+                    sb.append("</a>"); //$NON-NLS-1$
                 } else if (s != null) {
-                    sb.append("<b>").append(s).append("</b>");      //$NON-NLS-1$ //$NON-NLS-2$
+                    sb.append("<b>").append(s).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             } else if (BREAK.equals(s)) {
                 // ignore line breaks in pseudo-HTML rendering
@@ -561,9 +540,9 @@ public final class DescriptorsUtils {
         }
 
         if (icon != null) {
-            sb.append("</li></form>");                              //$NON-NLS-1$
+            sb.append("</li></form>"); //$NON-NLS-1$
         } else {
-            sb.append("</p></form>");                               //$NON-NLS-1$
+            sb.append("</p></form>"); //$NON-NLS-1$
         }
         return sb.toString();
     }
@@ -579,20 +558,20 @@ public final class DescriptorsUtils {
         // Detects {@link <base>#<name> <text>} where all 3 are optional
         Pattern p_link = Pattern.compile("\\{@link\\s+([^#\\}\\s]*)(?:#([^\\s\\}]*))?(?:\\s*([^\\}]*))?\\}(.*)"); //$NON-NLS-1$
         // Detects <code>blah</code>
-        Pattern p_code = Pattern.compile("<code>(.+?)</code>(.*)");                 //$NON-NLS-1$
+        Pattern p_code = Pattern.compile("<code>(.+?)</code>(.*)"); //$NON-NLS-1$
         // Detects @blah@, used in hard-coded tooltip descriptors
-        Pattern p_elem = Pattern.compile("@([\\w -]+)@(.*)");                       //$NON-NLS-1$
+        Pattern p_elem = Pattern.compile("@([\\w -]+)@(.*)"); //$NON-NLS-1$
         // Detects a buffer that starts by @@ (request for a break)
-        Pattern p_break = Pattern.compile("@@(.*)");                                //$NON-NLS-1$
+        Pattern p_break = Pattern.compile("@@(.*)"); //$NON-NLS-1$
         // Detects a buffer that starts by @ < or { (one that was not matched above)
-        Pattern p_open = Pattern.compile("([@<\\{])(.*)");                          //$NON-NLS-1$
+        Pattern p_open = Pattern.compile("([@<\\{])(.*)"); //$NON-NLS-1$
         // Detects everything till the next potential separator, i.e. @ < or {
-        Pattern p_text = Pattern.compile("([^@<\\{]+)(.*)");                        //$NON-NLS-1$
+        Pattern p_text = Pattern.compile("([^@<\\{]+)(.*)"); //$NON-NLS-1$
 
         int currentLength = 0;
         String text = null;
 
-        while(javadoc != null && javadoc.length() > 0) {
+        while (javadoc != null && javadoc.length() > 0) {
             Matcher m;
             String s = null;
             if ((m = p_code.matcher(javadoc)).matches()) {
@@ -665,9 +644,9 @@ public final class DescriptorsUtils {
      */
     private static String cleanupJavadocHtml(String s) {
         if (s != null) {
-            s = s.replaceAll(LT_ENTITY, "\"");     //$NON-NLS-1$ $NON-NLS-2$
-            s = s.replaceAll(GT_ENTITY, "\"");     //$NON-NLS-1$ $NON-NLS-2$
-            s = s.replaceAll("<[^>]+>", "");    //$NON-NLS-1$ $NON-NLS-2$
+            s = s.replaceAll(LT_ENTITY, "\""); //$NON-NLS-1$ $NON-NLS-2$
+            s = s.replaceAll(GT_ENTITY, "\""); //$NON-NLS-1$ $NON-NLS-2$
+            s = s.replaceAll("<[^>]+>", ""); //$NON-NLS-1$ $NON-NLS-2$
         }
         return s;
     }
@@ -711,28 +690,17 @@ public final class DescriptorsUtils {
         // Width and height are mandatory in all layouts except GridLayout
         boolean setSize = !node.getUiParent().getDescriptor().getXmlName().equals(GRID_LAYOUT);
         if (setSize) {
-            boolean fill = descriptor.hasChildren() &&
-                           node.getUiParent() instanceof UiDocumentNode;
-            node.setAttributeValue(
-                    ATTR_LAYOUT_WIDTH,
-                    ANDROID_URI,
-                    fill ? VALUE_FILL_PARENT : VALUE_WRAP_CONTENT,
+            boolean fill = descriptor.hasChildren() && node.getUiParent() instanceof UiDocumentNode;
+            node.setAttributeValue(ATTR_LAYOUT_WIDTH, ANDROID_URI, fill ? VALUE_FILL_PARENT : VALUE_WRAP_CONTENT,
                     false /* override */);
-            node.setAttributeValue(
-                    ATTR_LAYOUT_HEIGHT,
-                    ANDROID_URI,
-                    fill ? VALUE_FILL_PARENT : VALUE_WRAP_CONTENT,
+            node.setAttributeValue(ATTR_LAYOUT_HEIGHT, ANDROID_URI, fill ? VALUE_FILL_PARENT : VALUE_WRAP_CONTENT,
                     false /* override */);
         }
 
         if (needsDefaultId(node.getDescriptor())) {
             String freeId = getFreeWidgetId(node);
             if (freeId != null) {
-                node.setAttributeValue(
-                        ATTR_ID,
-                        ANDROID_URI,
-                        freeId,
-                        false /* override */);
+                node.setAttributeValue(ATTR_ID, ANDROID_URI, freeId, false /* override */);
             }
         }
 
@@ -742,28 +710,18 @@ public final class DescriptorsUtils {
                 // Don't set default text value into edit texts - they typically start out blank
                 && !descriptor.getXmlLocalName().equals(EDIT_TEXT)) {
             String type = getBasename(descriptor.getUiName());
-            node.setAttributeValue(
-                ATTR_TEXT,
-                ANDROID_URI,
-                type,
-                false /*override*/);
+            node.setAttributeValue(ATTR_TEXT, ANDROID_URI, type, false /*override*/);
         }
 
         if (updateLayout) {
             UiElementNode parent = node.getUiParent();
-            if (parent != null &&
-                    parent.getDescriptor().getXmlLocalName().equals(
-                            RELATIVE_LAYOUT)) {
+            if (parent != null && parent.getDescriptor().getXmlLocalName().equals(RELATIVE_LAYOUT)) {
                 UiElementNode previous = node.getUiPreviousSibling();
                 if (previous != null) {
                     String id = previous.getAttributeValue(ATTR_ID);
                     if (id != null && id.length() > 0) {
-                        id = id.replace("@+", "@");                     //$NON-NLS-1$ //$NON-NLS-2$
-                        node.setAttributeValue(
-                                ATTR_LAYOUT_BELOW,
-                                ANDROID_URI,
-                                id,
-                                false /* override */);
+                        id = id.replace("@+", "@"); //$NON-NLS-1$ //$NON-NLS-2$
+                        node.setAttributeValue(ATTR_LAYOUT_BELOW, ANDROID_URI, id, false /* override */);
                     }
                 }
             }
@@ -781,12 +739,9 @@ public final class DescriptorsUtils {
     public static boolean needsDefaultId(ElementDescriptor descriptor) {
         // By default, layouts do not need ids.
         String tag = descriptor.getXmlLocalName();
-        if (tag.endsWith("Layout")  //$NON-NLS-1$
-                || tag.equals(VIEW_INCLUDE)
-                || tag.equals(VIEW_MERGE)
-                || tag.equals(SPACE)
-                || tag.endsWith(SPACE) && tag.length() > SPACE.length() &&
-                    tag.charAt(tag.length() - SPACE.length()) == '.') {
+        if (tag.endsWith("Layout") //$NON-NLS-1$
+                || tag.equals(VIEW_INCLUDE) || tag.equals(VIEW_MERGE) || tag.equals(SPACE) || tag.endsWith(SPACE)
+                        && tag.length() > SPACE.length() && tag.charAt(tag.length() - SPACE.length()) == '.') {
             return false;
         }
 
@@ -818,12 +773,11 @@ public final class DescriptorsUtils {
      * (e.g. "@+id/something")
      */
     public static String getFreeWidgetId(UiElementNode uiRoot, String name) {
-        if ("TabWidget".equals(name)) {                        //$NON-NLS-1$
-            return "@android:id/tabs";                         //$NON-NLS-1$
+        if ("TabWidget".equals(name)) { //$NON-NLS-1$
+            return "@android:id/tabs"; //$NON-NLS-1$
         }
 
-        return NEW_ID_PREFIX + getFreeWidgetId(uiRoot,
-                new Object[] { name, null, null, null });
+        return NEW_ID_PREFIX + getFreeWidgetId(uiRoot, new Object[] { name, null, null, null });
     }
 
     /**
@@ -847,15 +801,14 @@ public final class DescriptorsUtils {
      * @return A suitable generated id
      */
     @SuppressWarnings("unchecked")
-    private static String getFreeWidgetId(UiElementNode uiRoot,
-            Object[] params) {
+    private static String getFreeWidgetId(UiElementNode uiRoot, Object[] params) {
 
-        Set<String> map = (Set<String>)params[3];
+        Set<String> map = (Set<String>) params[3];
         if (map == null) {
             params[3] = map = new HashSet<String>();
         }
 
-        int num = params[1] == null ? 0 : ((Integer)params[1]).intValue();
+        int num = params[1] == null ? 0 : ((Integer) params[1]).intValue();
 
         String generated = (String) params[2];
         String prefix = (String) params[0];
@@ -868,7 +821,7 @@ public final class DescriptorsUtils {
             if (pos >= 0) {
                 prefix = prefix.substring(pos + 1);
             }
-            prefix = prefix.replaceAll("[^a-zA-Z]", "");                //$NON-NLS-1$ $NON-NLS-2$
+            prefix = prefix.replaceAll("[^a-zA-Z]", ""); //$NON-NLS-1$ $NON-NLS-2$
             if (prefix.length() == 0) {
                 prefix = DEFAULT_WIDGET_PREFIX;
             } else {
@@ -881,7 +834,7 @@ public final class DescriptorsUtils {
             // the char LATIN SMALL LETTER DOTLESS I.
             do {
                 num++;
-                generated = String.format("%1$s%2$d", prefix, num);   //$NON-NLS-1$
+                generated = String.format("%1$s%2$d", prefix, num); //$NON-NLS-1$
             } while (map.contains(generated.toLowerCase(Locale.US)));
 
             params[0] = prefix;
@@ -891,14 +844,13 @@ public final class DescriptorsUtils {
 
         String id = uiRoot.getAttributeValue(ATTR_ID);
         if (id != null) {
-            id = id.replace(NEW_ID_PREFIX, "");                            //$NON-NLS-1$
-            id = id.replace(ID_PREFIX, "");                                //$NON-NLS-1$
-            if (map.add(id.toLowerCase(Locale.US))
-                    && map.contains(generated.toLowerCase(Locale.US))) {
+            id = id.replace(NEW_ID_PREFIX, ""); //$NON-NLS-1$
+            id = id.replace(ID_PREFIX, ""); //$NON-NLS-1$
+            if (map.add(id.toLowerCase(Locale.US)) && map.contains(generated.toLowerCase(Locale.US))) {
 
                 do {
                     num++;
-                    generated = String.format("%1$s%2$d", prefix, num);   //$NON-NLS-1$
+                    generated = String.format("%1$s%2$d", prefix, num); //$NON-NLS-1$
                 } while (map.contains(generated.toLowerCase(Locale.US)));
 
                 params[1] = num;
@@ -941,8 +893,8 @@ public final class DescriptorsUtils {
                 // whether it's an AdapterView; instead, look at the fixed list of builtin
                 // concrete subclasses of AdapterView
                 String viewName = descriptor.getXmlLocalName();
-                if (viewName.equals(LIST_VIEW) || viewName.equals(EXPANDABLE_LIST_VIEW)
-                        || viewName.equals(GALLERY) || viewName.equals(GRID_VIEW)) {
+                if (viewName.equals(LIST_VIEW) || viewName.equals(EXPANDABLE_LIST_VIEW) || viewName.equals(GALLERY)
+                        || viewName.equals(GRID_VIEW)) {
 
                     // We should really also enforce that
                     // XmlUtils.ANDROID_URI.equals(descriptor.getNameSpace())

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,10 +15,10 @@ package org.eclipse.andmore.internal.editors.layout.gle2;
 
 import static org.eclipse.andmore.internal.editors.layout.gle2.ImageUtils.SHADOW_SIZE;
 
-import com.android.SdkConstants;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.Rect;
-import com.android.ide.common.rendering.api.IImageFactory;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.awt.image.WritableRaster;
+import java.lang.ref.SoftReference;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -31,10 +28,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.awt.image.WritableRaster;
-import java.lang.ref.SoftReference;
+import com.android.SdkConstants;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.Rect;
+import com.android.ide.common.rendering.api.IImageFactory;
 
 /**
  * The {@link ImageOverlay} class renders an image as an overlay.
@@ -48,8 +45,7 @@ public class ImageOverlay extends Overlay implements IImageFactory {
     private static final boolean PRESCALE =
             // Currently this is necessary on Linux because the "Cairo" library
             // seems to be a bottleneck
-            SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_LINUX
-                    && !(Boolean.getBoolean("adt.noprescale")); //$NON-NLS-1$
+            SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_LINUX && !(Boolean.getBoolean("adt.noprescale")); //$NON-NLS-1$
 
     /** Current background image. Null when there's no image. */
     private Image mImage;
@@ -139,8 +135,7 @@ public class ImageOverlay extends Overlay implements IImageFactory {
             if (awtImage == null) {
                 mImage = null;
             } else {
-                mImage = SwtUtils.convertToSwt(mCanvas.getDisplay(), awtImage,
-                        isAlphaChannelImage, -1);
+                mImage = SwtUtils.convertToSwt(mCanvas.getDisplay(), awtImage, isAlphaChannelImage, -1);
             }
         } else {
             assert awtImage instanceof SwtReadyBufferedImage;
@@ -153,7 +148,7 @@ public class ImageOverlay extends Overlay implements IImageFactory {
                 mImage = SwtUtils.convertToSwt(mCanvas.getDisplay(), awtImage, true, -1);
             } else {
                 Image prev = mImage;
-                mImage = ((SwtReadyBufferedImage)awtImage).getSwtImage();
+                mImage = ((SwtReadyBufferedImage) awtImage).getSwtImage();
                 if (prev != mImage && prev != null) {
                     prev.dispose();
                 }
@@ -224,8 +219,7 @@ public class ImageOverlay extends Overlay implements IImageFactory {
             BufferedImage awtImage = mAwtImage.get();
             if (PRESCALE && awtImage != null) {
                 int imageWidth = (mPreScaledImage == null) ? 0
-                        : mPreScaledImage.getImageData().width
-                            - (mShowDropShadow ? SHADOW_SIZE : 0);
+                        : mPreScaledImage.getImageData().width - (mShowDropShadow ? SHADOW_SIZE : 0);
                 if (mPreScaledImage == null || imageWidth != hi.getScaledImgSize()) {
                     double xScale = hi.getScaledImgSize() / (double) awtImage.getWidth();
                     double yScale = vi.getScaledImgSize() / (double) awtImage.getHeight();
@@ -246,11 +240,9 @@ public class ImageOverlay extends Overlay implements IImageFactory {
                         }
                     } else {
                         if (mShowDropShadow) {
-                            scaledAwtImage = ImageUtils.scale(awtImage, xScale, yScale,
-                                    SHADOW_SIZE, SHADOW_SIZE);
+                            scaledAwtImage = ImageUtils.scale(awtImage, xScale, yScale, SHADOW_SIZE, SHADOW_SIZE);
                             ImageUtils.drawRectangleShadow(scaledAwtImage, 0, 0,
-                                    scaledAwtImage.getWidth() - SHADOW_SIZE,
-                                    scaledAwtImage.getHeight() - SHADOW_SIZE);
+                                    scaledAwtImage.getWidth() - SHADOW_SIZE, scaledAwtImage.getHeight() - SHADOW_SIZE);
                         } else {
                             scaledAwtImage = ImageUtils.scale(awtImage, xScale, yScale);
                         }
@@ -286,9 +278,7 @@ public class ImageOverlay extends Overlay implements IImageFactory {
             int destWidth = hi.getScaledImgSize();
             int destHeight = vi.getScaledImgSize();
 
-            gc.drawImage(mImage,
-                    srcX, srcY, srcWidth, srcHeight,
-                    destX, destY, destWidth, destHeight);
+            gc.drawImage(mImage, srcX, srcY, srcWidth, srcHeight, destX, destY, destWidth, destHeight);
 
             if (mShowDropShadow) {
                 SwtUtils.drawRectangleShadow(gc, destX, destY, destWidth, destHeight);
@@ -402,11 +392,9 @@ public class ImageOverlay extends Overlay implements IImageFactory {
             // the drop shadow to get zoomed/scaled along with the scene, making a tiny
             // drop shadow for tablet layouts, a huge drop shadow for tiny QVGA screens, etc.
 
-            ImageData imageData = new ImageData(w, h, 32,
-                    new PaletteData(0x00FF0000, 0x0000FF00, 0x000000FF));
+            ImageData imageData = new ImageData(w, h, 32, new PaletteData(0x00FF0000, 0x0000FF00, 0x000000FF));
 
-            SwtReadyBufferedImage swtReadyImage = new SwtReadyBufferedImage(w, h,
-                    imageData, device);
+            SwtReadyBufferedImage swtReadyImage = new SwtReadyBufferedImage(w, h, imageData, device);
 
             return swtReadyImage;
         }
@@ -418,9 +406,7 @@ public class ImageOverlay extends Overlay implements IImageFactory {
     @Override
     public BufferedImage getImage(int w, int h) {
         BufferedImage awtImage = mAwtImage.get();
-        if (awtImage == null ||
-                awtImage.getWidth() != w ||
-                awtImage.getHeight() != h) {
+        if (awtImage == null || awtImage.getWidth() != w || awtImage.getHeight() != h) {
             mAwtImage.clear();
             awtImage = SwtReadyBufferedImage.createImage(w, h, getDevice());
             mAwtImage = new SoftReference<BufferedImage>(awtImage);

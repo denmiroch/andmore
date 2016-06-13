@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,9 +12,7 @@
  */
 package org.eclipse.andmore.internal.wizards.newproject;
 
-import com.android.SdkConstants;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
+import java.io.File;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.wizards.newproject.NewProjectWizardState.Mode;
@@ -44,7 +39,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
-import java.io.File;
+import com.android.SdkConstants;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
 
 /** Page where the user can select a sample to "instantiate" */
 class SampleSelectionPage extends WizardPage implements SelectionListener, ModifyListener {
@@ -151,8 +148,7 @@ class SampleSelectionPage extends WizardPage implements SelectionListener, Modif
         mValues.chosenSample = sample;
         if (sample != null && !mValues.projectNameModifiedByUser) {
             mValues.projectName = sample.getName();
-            if (SdkConstants.FD_SAMPLE.equals(mValues.projectName) &&
-                    sample.getParentFile() != null) {
+            if (SdkConstants.FD_SAMPLE.equals(mValues.projectName) && sample.getParentFile() != null) {
                 mValues.projectName = sample.getParentFile().getName() + '_' + mValues.projectName;
             }
             try {
@@ -189,8 +185,7 @@ class SampleSelectionPage extends WizardPage implements SelectionListener, Modif
     }
 
     @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
+    public void widgetDefaultSelected(SelectionEvent e) {}
 
     @Override
     public void modifyText(ModifyEvent e) {
@@ -261,8 +256,7 @@ class SampleSelectionPage extends WizardPage implements SelectionListener, Modif
         setPageComplete(status == null || status.getSeverity() != IStatus.ERROR);
         if (status != null) {
             setMessage(status.getMessage(),
-                    status.getSeverity() == IStatus.ERROR
-                        ? IMessageProvider.ERROR : IMessageProvider.WARNING);
+                    status.getSeverity() == IStatus.ERROR ? IMessageProvider.ERROR : IMessageProvider.WARNING);
         } else {
             setErrorMessage(null);
             setMessage(null);

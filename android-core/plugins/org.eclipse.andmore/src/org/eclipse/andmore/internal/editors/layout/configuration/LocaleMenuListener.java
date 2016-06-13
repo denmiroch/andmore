@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +13,7 @@
 
 package org.eclipse.andmore.internal.editors.layout.configuration;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
+import java.util.List;
 
 import org.eclipse.andmore.internal.editors.layout.gle2.RenderPreviewMode;
 import org.eclipse.andmore.internal.wizards.newxmlfile.AddTranslationDialog;
@@ -33,7 +29,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolItem;
 
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 
 /**
  * The {@linkplain LocaleMenuListener} class is responsible for generating the locale
@@ -47,10 +44,7 @@ class LocaleMenuListener extends SelectionAdapter {
     private final int mAction;
     private final Locale mLocale;
 
-    LocaleMenuListener(
-            @NonNull ConfigurationChooser configChooser,
-            int action,
-            @Nullable Locale locale) {
+    LocaleMenuListener(@NonNull ConfigurationChooser configChooser, int action, @Nullable Locale locale) {
         mConfigChooser = configChooser;
         mAction = action;
         mLocale = locale;
@@ -71,7 +65,8 @@ class LocaleMenuListener extends SelectionAdapter {
                 dialog.open();
                 break;
             }
-            default: assert false : mAction;
+            default:
+                assert false : mAction;
         }
     }
 
@@ -93,8 +88,7 @@ class LocaleMenuListener extends SelectionAdapter {
                 item.setSelection(true);
             }
 
-            LocaleMenuListener listener = new LocaleMenuListener(chooser, ACTION_SET_LOCALE,
-                    locale);
+            LocaleMenuListener listener = new LocaleMenuListener(chooser, ACTION_SET_LOCALE, locale);
             item.addSelectionListener(listener);
         }
 
@@ -102,8 +96,8 @@ class LocaleMenuListener extends SelectionAdapter {
             @SuppressWarnings("unused")
             MenuItem separator = new MenuItem(menu, SWT.SEPARATOR);
 
-            ConfigurationMenuListener.addTogglePreviewModeAction(menu,
-                    "Preview All Locales", chooser, RenderPreviewMode.LOCALES);
+            ConfigurationMenuListener.addTogglePreviewModeAction(menu, "Preview All Locales", chooser,
+                    RenderPreviewMode.LOCALES);
         }
 
         @SuppressWarnings("unused")
@@ -111,8 +105,7 @@ class LocaleMenuListener extends SelectionAdapter {
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Add New Translation...");
-        LocaleMenuListener listener = new LocaleMenuListener(chooser,
-                ACTION_ADD_TRANSLATION, null);
+        LocaleMenuListener listener = new LocaleMenuListener(chooser, ACTION_ADD_TRANSLATION, null);
         item.addSelectionListener(listener);
 
         Rectangle bounds = combo.getBounds();

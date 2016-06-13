@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +13,7 @@
 
 package org.eclipse.andmore.internal.launch;
 
-import com.android.ide.common.xml.ManifestData;
-import com.android.ide.common.xml.ManifestData.Activity;
+import java.util.ArrayList;
 
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.andmore.internal.project.AndroidManifestHelper;
@@ -53,7 +49,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
-import java.util.ArrayList;
+import com.android.ide.common.xml.ManifestData;
+import com.android.ide.common.xml.ManifestData.Activity;
 
 /**
  * Class for the main launch configuration tab.
@@ -110,8 +107,7 @@ public class MainLaunchConfigTab extends AbstractLaunchConfigurationTab {
         }
     }
 
-    public MainLaunchConfigTab() {
-    }
+    public MainLaunchConfigTab() {}
 
     protected IProjectChooserFilter getProjectFilter() {
         return new NonLibraryProjectOnlyFilter();
@@ -218,19 +214,16 @@ public class MainLaunchConfigTab extends AbstractLaunchConfigurationTab {
 
     @Override
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(
-                IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, mProjText.getText());
-        configuration.setAttribute(
-                IJavaLaunchConfigurationConstants.ATTR_ALLOW_TERMINATE, true);
+        configuration.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, mProjText.getText());
+        configuration.setAttribute(IJavaLaunchConfigurationConstants.ATTR_ALLOW_TERMINATE, true);
 
         // add the launch mode
         configuration.setAttribute(LaunchConfigDelegate.ATTR_LAUNCH_ACTION, mLaunchAction);
 
         // add the activity
         int selection = mActivityCombo.getSelectionIndex();
-        if (mActivities != null && selection >=0 && selection < mActivities.size()) {
-            configuration.setAttribute(LaunchConfigDelegate.ATTR_ACTIVITY,
-                    mActivities.get(selection).getName());
+        if (mActivities != null && selection >= 0 && selection < mActivities.size()) {
+            configuration.setAttribute(LaunchConfigDelegate.ATTR_ACTIVITY, mActivities.get(selection).getName());
         }
 
         // link the project and the launch config.
@@ -239,8 +232,7 @@ public class MainLaunchConfigTab extends AbstractLaunchConfigurationTab {
 
     @Override
     public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(LaunchConfigDelegate.ATTR_LAUNCH_ACTION,
-                LaunchConfigDelegate.DEFAULT_LAUNCH_ACTION);
+        configuration.setAttribute(LaunchConfigDelegate.ATTR_LAUNCH_ACTION, LaunchConfigDelegate.DEFAULT_LAUNCH_ACTION);
     }
 
     /**
@@ -298,12 +290,11 @@ public class MainLaunchConfigTab extends AbstractLaunchConfigurationTab {
      * constraining the search for main types to the specified project.
      */
     protected void handleProjectButtonSelected() {
-        IJavaProject javaProject = mProjectChooserHelper.chooseJavaProject(
-                mProjText.getText().trim(),
+        IJavaProject javaProject = mProjectChooserHelper.chooseJavaProject(mProjText.getText().trim(),
                 "Please select a project to launch");
         if (javaProject == null) {
             return;
-        }// end if
+        } // end if
         String projectName = javaProject.getElementName();
         mProjText.setText(projectName);
 
@@ -326,11 +317,9 @@ public class MainLaunchConfigTab extends AbstractLaunchConfigurationTab {
     public void initializeFrom(ILaunchConfiguration config) {
         String projectName = EMPTY_STRING;
         try {
-            projectName = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
-                    EMPTY_STRING);
-        }// end try
-        catch (CoreException ce) {
-        }
+            projectName = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING);
+        } // end try
+        catch (CoreException ce) {}
         mProjText.setText(projectName);
 
         IProject proj = mProjectChooserHelper.getAndroidProject(projectName);
@@ -339,23 +328,21 @@ public class MainLaunchConfigTab extends AbstractLaunchConfigurationTab {
         // load the launch action.
         mLaunchAction = LaunchConfigDelegate.DEFAULT_LAUNCH_ACTION;
         try {
-            mLaunchAction = config.getAttribute(LaunchConfigDelegate.ATTR_LAUNCH_ACTION,
-                    mLaunchAction);
+            mLaunchAction = config.getAttribute(LaunchConfigDelegate.ATTR_LAUNCH_ACTION, mLaunchAction);
         } catch (CoreException e) {
             // nothing to be done really. launchAction will keep its default value.
         }
 
         mDefaultActionButton.setSelection(mLaunchAction == LaunchConfigDelegate.ACTION_DEFAULT);
         mActivityActionButton.setSelection(mLaunchAction == LaunchConfigDelegate.ACTION_ACTIVITY);
-        mDoNothingActionButton.setSelection(
-                mLaunchAction == LaunchConfigDelegate.ACTION_DO_NOTHING);
+        mDoNothingActionButton.setSelection(mLaunchAction == LaunchConfigDelegate.ACTION_DO_NOTHING);
 
         // now look for the activity and load it if present, otherwise, revert
         // to the current one.
         String activityName = EMPTY_STRING;
         try {
             activityName = config.getAttribute(LaunchConfigDelegate.ATTR_ACTIVITY, EMPTY_STRING);
-        }// end try
+        } // end try
         catch (CoreException ce) {
             // nothing to be done really. activityName will stay empty
         }
@@ -370,7 +357,7 @@ public class MainLaunchConfigTab extends AbstractLaunchConfigurationTab {
             } else if (mActivities != null && mActivities.size() > 0) {
                 // look for the name of the activity in the combo.
                 boolean found = false;
-                for (int i = 0 ; i < mActivities.size() ; i++) {
+                for (int i = 0; i < mActivities.size(); i++) {
                     if (activityName.equals(mActivities.get(i).getName())) {
                         found = true;
                         mActivityCombo.select(i);
@@ -479,8 +466,7 @@ public class MainLaunchConfigTab extends AbstractLaunchConfigurationTab {
                 if (found != null) {
                     setErrorMessage(null);
                 } else {
-                    setErrorMessage(String.format("There is no android project named '%1$s'",
-                            text));
+                    setErrorMessage(String.format("There is no android project named '%1$s'", text));
                 }
 
                 return found;

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,10 +12,11 @@
  */
 package org.eclipse.andmore.internal.lint;
 
-
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.tools.lint.client.api.IssueRegistry;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
@@ -31,17 +29,15 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.widgets.Shell;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.tools.lint.client.api.IssueRegistry;
 
 /**
  * Eclipse implementation for running lint on workspace files and projects.
  */
 public class EclipseLintRunner {
-    static final String MARKER_CHECKID_PROPERTY = "checkid";    //$NON-NLS-1$
+    static final String MARKER_CHECKID_PROPERTY = "checkid"; //$NON-NLS-1$
 
     /**
      * Runs lint and updates the markers, and waits for the result. Returns
@@ -53,14 +49,10 @@ public class EclipseLintRunner {
      * @param fatalOnly if true, only report fatal issues (severity=error)
      * @return true if any fatal errors were encountered.
      */
-    private static boolean runLint(
-            @NonNull List<? extends IResource> resources,
-            @Nullable IResource source,
-            @Nullable IDocument doc,
-            boolean fatalOnly) {
+    private static boolean runLint(@NonNull List<? extends IResource> resources, @Nullable IResource source,
+            @Nullable IDocument doc, boolean fatalOnly) {
         resources = addLibraries(resources);
-        LintJob job = (LintJob) startLint(resources, source,  doc, fatalOnly,
-                false /*show*/);
+        LintJob job = (LintJob) startLint(resources, source, doc, fatalOnly, false /*show*/);
         try {
             job.join();
             boolean fatal = job.isFatal();
@@ -94,12 +86,8 @@ public class EclipseLintRunner {
      * @param show if true, show the results in a {@link LintViewPart}
      * @return the job running lint in the background.
      */
-    public static Job startLint(
-            @NonNull List<? extends IResource> resources,
-            @Nullable IResource source,
-            @Nullable IDocument doc,
-            boolean fatalOnly,
-            boolean show) {
+    public static Job startLint(@NonNull List<? extends IResource> resources, @Nullable IResource source,
+            @Nullable IDocument doc, boolean fatalOnly, boolean show) {
         IssueRegistry registry = EclipseLintClient.getRegistry();
         EclipseLintClient client = new EclipseLintClient(registry, resources, doc, fatalOnly);
         return startLint(client, resources, source, show);
@@ -121,11 +109,8 @@ public class EclipseLintRunner {
      * @param show if true, show the results in a {@link LintViewPart}
      * @return the job running lint in the background.
      */
-    public static Job startLint(
-            @NonNull EclipseLintClient client,
-            @NonNull List<? extends IResource> resources,
-            @Nullable IResource source,
-            boolean show) {
+    public static Job startLint(@NonNull EclipseLintClient client, @NonNull List<? extends IResource> resources,
+            @Nullable IResource source, boolean show) {
         if (resources != null && !resources.isEmpty()) {
             if (!AdtPrefs.getPrefs().getSkipLibrariesFromLint()) {
                 resources = addLibraries(resources);
@@ -157,16 +142,14 @@ public class EclipseLintRunner {
      */
     public static boolean runLintOnExport(Shell shell, IProject project) {
         if (AdtPrefs.getPrefs().isLintOnExport()) {
-            boolean fatal = EclipseLintRunner.runLint(Collections.singletonList(project),
-                    null, null, true /*fatalOnly*/);
+            boolean fatal = EclipseLintRunner.runLint(Collections.singletonList(project), null, null,
+                    true /*fatalOnly*/);
             if (fatal) {
-                MessageDialog.openWarning(shell,
-                        "Export Aborted",
-                        "Export aborted because fatal lint errors were found. These " +
-                        "are listed in the Lint View. Either fix these before " +
-                        "running Export again, or turn off \"Run full error check " +
-                        "when exporting app\" in the Android > Lint Error Checking " +
-                        "preference page.");
+                MessageDialog.openWarning(shell, "Export Aborted",
+                        "Export aborted because fatal lint errors were found. These "
+                                + "are listed in the Lint View. Either fix these before "
+                                + "running Export again, or turn off \"Run full error check "
+                                + "when exporting app\" in the Android > Lint Error Checking " + "preference page.");
                 return false;
             }
         }

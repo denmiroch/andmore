@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +15,11 @@ package org.eclipse.andmore.internal.lint;
 import static com.android.SdkConstants.DOT_JAVA;
 import static com.android.SdkConstants.DOT_XML;
 
-import com.android.tools.lint.detector.api.LintUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.IconFactory;
@@ -71,11 +72,7 @@ import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.android.tools.lint.detector.api.LintUtils;
 
 /**
  * Eclipse View which shows lint warnings for the current project
@@ -83,20 +80,20 @@ import java.util.Set;
 public class LintViewPart extends ViewPart implements SelectionListener, IJobChangeListener {
     /** The view id for this view part */
     public static final String ID = "org.eclipse.andmore.internal.lint.LintViewPart"; //$NON-NLS-1$
-    private static final String QUICKFIX_DISABLED_ICON = "quickfix-disabled";         //$NON-NLS-1$
-    private static final String QUICKFIX_ICON = "quickfix";                           //$NON-NLS-1$
-    private static final String REFRESH_ICON = "refresh";                             //$NON-NLS-1$
-    private static final String EXPAND_DISABLED_ICON = "expandall-disabled";          //$NON-NLS-1$
-    private static final String EXPAND_ICON = "expandall";                            //$NON-NLS-1$
-    private static final String COLUMNS_ICON = "columns";                             //$NON-NLS-1$
-    private static final String OPTIONS_ICON = "options";                             //$NON-NLS-1$
-    private static final String IGNORE_THIS_ICON = "ignore-this";                     //$NON-NLS-1$
-    private static final String IGNORE_THIS_DISABLED_ICON = "ignore-this-disabled";   //$NON-NLS-1$
-    private static final String IGNORE_FILE_ICON = "ignore-file";                     //$NON-NLS-1$
-    private static final String IGNORE_FILE_DISABLED_ICON = "ignore-file-disabled";   //$NON-NLS-1$
-    private static final String IGNORE_PRJ_ICON = "ignore-project";                   //$NON-NLS-1$
+    private static final String QUICKFIX_DISABLED_ICON = "quickfix-disabled"; //$NON-NLS-1$
+    private static final String QUICKFIX_ICON = "quickfix"; //$NON-NLS-1$
+    private static final String REFRESH_ICON = "refresh"; //$NON-NLS-1$
+    private static final String EXPAND_DISABLED_ICON = "expandall-disabled"; //$NON-NLS-1$
+    private static final String EXPAND_ICON = "expandall"; //$NON-NLS-1$
+    private static final String COLUMNS_ICON = "columns"; //$NON-NLS-1$
+    private static final String OPTIONS_ICON = "options"; //$NON-NLS-1$
+    private static final String IGNORE_THIS_ICON = "ignore-this"; //$NON-NLS-1$
+    private static final String IGNORE_THIS_DISABLED_ICON = "ignore-this-disabled"; //$NON-NLS-1$
+    private static final String IGNORE_FILE_ICON = "ignore-file"; //$NON-NLS-1$
+    private static final String IGNORE_FILE_DISABLED_ICON = "ignore-file-disabled"; //$NON-NLS-1$
+    private static final String IGNORE_PRJ_ICON = "ignore-project"; //$NON-NLS-1$
     private static final String IGNORE_PRJ_DISABLED_ICON = "ignore-project-disabled"; //$NON-NLS-1$
-    private static final String IGNORE_ALL_ICON = "ignore-all";                   //$NON-NLS-1$
+    private static final String IGNORE_ALL_ICON = "ignore-all"; //$NON-NLS-1$
     private static final String IGNORE_ALL_DISABLED_ICON = "ignore-all-disabled"; //$NON-NLS-1$
     private IMemento mMemento;
     private LintList mLintView;
@@ -125,8 +122,7 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
     /**
      * Constructs a new {@link LintViewPart}
      */
-    public LintViewPart() {
-    }
+    public LintViewPart() {}
 
     @Override
     public void init(IViewSite site, IMemento memento) throws PartInitException {
@@ -165,14 +161,13 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
         mSashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         mLintView = new LintList(getSite(), mSashForm, mMemento, false /*singleFile*/);
 
-        mDetailsText = new Text(mSashForm,
-                SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
+        mDetailsText = new Text(mSashForm, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
         Display display = parent.getDisplay();
         mDetailsText.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
         mDetailsText.setForeground(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
 
         mLintView.addSelectionListener(this);
-        mSashForm.setWeights(new int[] {8, 2});
+        mSashForm.setWeights(new int[] { 8, 2 });
 
         createActions();
         initializeToolBar();
@@ -205,12 +200,10 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
     private void createActions() {
         ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
         IconFactory iconFactory = IconFactory.getInstance();
-        mFixAction = new LintViewAction("Fix", ACTION_FIX,
-                iconFactory.getImageDescriptor(QUICKFIX_ICON),
+        mFixAction = new LintViewAction("Fix", ACTION_FIX, iconFactory.getImageDescriptor(QUICKFIX_ICON),
                 iconFactory.getImageDescriptor(QUICKFIX_DISABLED_ICON));
 
-        mIgnoreAction = new LintViewAction("Suppress this error with an annotation/attribute",
-                ACTION_IGNORE_THIS,
+        mIgnoreAction = new LintViewAction("Suppress this error with an annotation/attribute", ACTION_IGNORE_THIS,
                 iconFactory.getImageDescriptor(IGNORE_THIS_ICON),
                 iconFactory.getImageDescriptor(IGNORE_THIS_DISABLED_ICON));
         mIgnoreFileAction = new LintViewAction("Ignore in this file", ACTION_IGNORE_FILE,
@@ -236,20 +229,16 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
                 sharedImages.getImageDescriptor(ISharedImages.IMG_ELCL_COLLAPSEALL),
                 sharedImages.getImageDescriptor(ISharedImages.IMG_ELCL_COLLAPSEALL_DISABLED));
         mCollapseAll.setEnabled(true);
-        mExpandAll = new LintViewAction("Expand All", ACTION_EXPAND,
-                iconFactory.getImageDescriptor(EXPAND_ICON),
+        mExpandAll = new LintViewAction("Expand All", ACTION_EXPAND, iconFactory.getImageDescriptor(EXPAND_ICON),
                 iconFactory.getImageDescriptor(EXPAND_DISABLED_ICON));
         mExpandAll.setEnabled(true);
 
         mConfigureColumns = new LintViewAction("Configure Columns...", ACTION_COLUMNS,
-                iconFactory.getImageDescriptor(COLUMNS_ICON),
-                null);
+                iconFactory.getImageDescriptor(COLUMNS_ICON), null);
 
-        mOptions = new LintViewAction("Options...", ACTION_OPTIONS,
-                iconFactory.getImageDescriptor(OPTIONS_ICON),
-                null);
+        mOptions = new LintViewAction("Options...", ACTION_OPTIONS, iconFactory.getImageDescriptor(OPTIONS_ICON), null);
 
-        enableActions(Collections.<IMarker>emptyList(), false /*updateWidgets*/);
+        enableActions(Collections.<IMarker> emptyList(), false /*updateWidgets*/);
     }
 
     /**
@@ -294,14 +283,12 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
         Job[] currentJobs = LintJob.getCurrentJobs();
         if (currentJobs.length > 0) {
             ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
-            mRefreshAction.setImageDescriptor(sharedImages.getImageDescriptor(
-                    ISharedImages.IMG_ELCL_STOP));
+            mRefreshAction.setImageDescriptor(sharedImages.getImageDescriptor(ISharedImages.IMG_ELCL_STOP));
             for (Job job : currentJobs) {
                 job.addJobChangeListener(this);
             }
         } else {
-            mRefreshAction.setImageDescriptor(
-                    IconFactory.getInstance().getImageDescriptor(REFRESH_ICON));
+            mRefreshAction.setImageDescriptor(IconFactory.getInstance().getImageDescriptor(REFRESH_ICON));
 
         }
     }
@@ -387,11 +374,10 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
 
     @Override
     public void done(IJobChangeEvent event) {
-        mRefreshAction.setImageDescriptor(
-                IconFactory.getInstance().getImageDescriptor(REFRESH_ICON));
+        mRefreshAction.setImageDescriptor(IconFactory.getInstance().getImageDescriptor(REFRESH_ICON));
 
         if (!mLintView.isDisposed()) {
-            mLintView.getDisplay().asyncExec(new Runnable()  {
+            mLintView.getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {
                     if (!mLintView.isDisposed()) {
@@ -409,24 +395,19 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
     }
 
     @Override
-    public void aboutToRun(IJobChangeEvent event) {
-    }
+    public void aboutToRun(IJobChangeEvent event) {}
 
     @Override
-    public void awake(IJobChangeEvent event) {
-    }
+    public void awake(IJobChangeEvent event) {}
 
     @Override
-    public void running(IJobChangeEvent event) {
-    }
+    public void running(IJobChangeEvent event) {}
 
     @Override
-    public void scheduled(IJobChangeEvent event) {
-    }
+    public void scheduled(IJobChangeEvent event) {}
 
     @Override
-    public void sleeping(IJobChangeEvent event) {
-    }
+    public void sleeping(IJobChangeEvent event) {}
 
     // ---- Actions ----
 
@@ -447,8 +428,7 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
 
         private final int mAction;
 
-        private LintViewAction(String label, int action,
-                ImageDescriptor imageDesc, ImageDescriptor disabledImageDesc) {
+        private LintViewAction(String label, int action, ImageDescriptor imageDesc, ImageDescriptor disabledImageDesc) {
             super(label);
             mAction = action;
             setImageDescriptor(imageDesc);
@@ -474,13 +454,12 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
                         if (resources == null) {
                             return;
                         }
-                        Job job = EclipseLintRunner.startLint(resources, null, null,
-                                false /*fatalOnly*/, false /*show*/);
+                        Job job = EclipseLintRunner.startLint(resources, null, null, false /*fatalOnly*/,
+                                false /*show*/);
                         if (job != null && workbench != null) {
                             job.addJobChangeListener(LintViewPart.this);
                             ISharedImages sharedImages = workbench.getSharedImages();
-                            setImageDescriptor(sharedImages.getImageDescriptor(
-                                    ISharedImages.IMG_ELCL_STOP));
+                            setImageDescriptor(sharedImages.getImageDescriptor(ISharedImages.IMG_ELCL_STOP));
                         }
                     }
                     break;
@@ -488,8 +467,7 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
                 case ACTION_FIX: {
                     List<IMarker> markers = mLintView.getSelectedMarkers();
                     for (IMarker marker : markers) {
-                        List<LintFix> fixes = LintFix.getFixes(EclipseLintClient.getId(marker),
-                                marker);
+                        List<LintFix> fixes = LintFix.getFixes(EclipseLintClient.getId(marker), marker);
                         if (fixes == null) {
                             continue;
                         }
@@ -515,8 +493,8 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
                             if (document != null) {
                                 fix.apply(document);
                                 if (!fix.needsFocus()) {
-                                    provider.saveDocument(new NullProgressMonitor(), resource,
-                                            document,  true /*overwrite*/);
+                                    provider.saveDocument(new NullProgressMonitor(), resource, document,
+                                            true /*overwrite*/);
                                 }
                             }
                         } catch (Exception e) {
@@ -557,8 +535,7 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
                         String id = EclipseLintClient.getId(marker);
                         if (id != null) {
                             IResource resource = marker.getResource();
-                            LintFixGenerator.suppressDetector(id, true,
-                                    ignoreInFile ? resource : resource.getProject(),
+                            LintFixGenerator.suppressDetector(id, true, ignoreInFile ? resource : resource.getProject(),
                                     ignoreInFile);
                         }
                     }
@@ -591,7 +568,6 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
                     IPreferenceNode node = new PreferenceNode(title, page);
                     manager.addToRoot(node);
 
-
                     List<? extends IResource> resources = mLintView.getResources();
                     if (resources != null) {
                         Set<IProject> projects = new HashSet<IProject>();
@@ -601,8 +577,7 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
                         if (projects.size() > 0) {
                             for (IProject project : projects) {
                                 page = new LintPreferencePage();
-                                page.setTitle(String.format("Settings for %1$s",
-                                        project.getName()));
+                                page.setTitle(String.format("Settings for %1$s", project.getName()));
                                 page.setElement(project);
                                 node = new PreferenceNode(project.getName(), page);
                                 manager.addToRoot(node);
@@ -610,7 +585,7 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
                         }
                     }
 
-                    Shell shell = LintViewPart.this.getSite().getShell();
+                    Shell shell = getSite().getShell();
                     PreferenceDialog dialog = new PreferenceDialog(shell, manager);
                     dialog.create();
                     dialog.setSelectedNode(title);
@@ -638,8 +613,7 @@ public class LintViewPart extends ViewPart implements SelectionListener, IJobCha
                 try {
                     // Pass initial project context via static field read by constructor
                     sInitialResources = projects;
-                    IViewPart view = page.showView(LintViewPart.ID, null,
-                            IWorkbenchPage.VIEW_ACTIVATE);
+                    IViewPart view = page.showView(LintViewPart.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
                     if (sInitialResources != null && view instanceof LintViewPart) {
                         // The view must be showing already since the constructor was not
                         // run, so reconfigure the view instead

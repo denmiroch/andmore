@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,15 +13,13 @@
 
 package org.eclipse.andmore.internal.wizards.export;
 
-import com.android.ide.common.xml.ManifestData;
-
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.andmore.internal.project.AndroidManifestHelper;
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
 import org.eclipse.andmore.internal.project.ProjectChooserHelper;
-import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.andmore.internal.project.ProjectChooserHelper.NonLibraryProjectOnlyFilter;
+import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.andmore.internal.wizards.export.ExportWizard.ExportWizardPage;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -42,6 +37,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import com.android.ide.common.xml.ManifestData;
 
 /**
  * First Export Wizard Page. Display warning/errors.
@@ -70,8 +67,7 @@ final class ProjectCheckPage extends ExportWizardPage {
 
     @Override
     public void createControl(Composite parent) {
-        mProjectChooserHelper = new ProjectChooserHelper(parent.getShell(),
-                new NonLibraryProjectOnlyFilter());
+        mProjectChooserHelper = new ProjectChooserHelper(parent.getShell(), new NonLibraryProjectOnlyFilter());
 
         GridLayout gl = null;
         GridData gd = null;
@@ -106,8 +102,7 @@ final class ProjectCheckPage extends ExportWizardPage {
         browseButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                IJavaProject javaProject = mProjectChooserHelper.chooseJavaProject(
-                        mProjectText.getText().trim(),
+                IJavaProject javaProject = mProjectChooserHelper.chooseJavaProject(mProjectText.getText().trim(),
                         "Please select a project to export");
 
                 if (javaProject != null) {
@@ -161,15 +156,14 @@ final class ProjectCheckPage extends ExportWizardPage {
                     addError(mErrorComposite, "Project is not an Android project.");
                 } else {
                     // check for errors
-                    if (ProjectHelper.hasError(project, true))  {
+                    if (ProjectHelper.hasError(project, true)) {
                         addError(mErrorComposite, "Project has compilation error(s)");
                     }
 
                     // check the project output
                     IFolder outputIFolder = BaseProjectHelper.getJavaOutputFolder(project);
                     if (outputIFolder == null) {
-                        addError(mErrorComposite,
-                                "Unable to get the output folder of the project!");
+                        addError(mErrorComposite, "Unable to get the output folder of the project!");
                     }
 
                     // project is an android project, we check the debuggable attribute.
@@ -181,9 +175,9 @@ final class ProjectCheckPage extends ExportWizardPage {
 
                     if (debuggable != null && debuggable == Boolean.TRUE) {
                         addWarning(mErrorComposite,
-                                "The manifest 'debuggable' attribute is set to true.\n" +
-                                "You should set it to false for applications that you release to the public.\n\n" +
-                                "Applications with debuggable=true are compiled in debug mode always.");
+                                "The manifest 'debuggable' attribute is set to true.\n"
+                                        + "You should set it to false for applications that you release to the public.\n\n"
+                                        + "Applications with debuggable=true are compiled in debug mode always.");
                     }
 
                     // check for mapview stuff
@@ -283,8 +277,7 @@ final class ProjectCheckPage extends ExportWizardPage {
                 // now rebuild the error ui.
                 buildErrorUi(found);
             } else {
-                setErrorMessage(String.format("There is no android project named '%1$s'",
-                        text));
+                setErrorMessage(String.format("There is no android project named '%1$s'", text));
             }
         }
     }

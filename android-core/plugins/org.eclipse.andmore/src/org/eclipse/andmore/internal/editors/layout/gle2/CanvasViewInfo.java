@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,15 +18,12 @@ import static com.android.SdkConstants.FQCN_SPACE_V7;
 import static com.android.SdkConstants.GESTURE_OVERLAY_VIEW;
 import static com.android.SdkConstants.VIEW_MERGE;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.Margins;
-import com.android.ide.common.api.Rect;
-import com.android.ide.common.rendering.api.Capability;
-import com.android.ide.common.rendering.api.MergeCookie;
-import com.android.ide.common.rendering.api.ViewInfo;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.andmore.common.layout.GridLayoutRule;
 import org.eclipse.andmore.internal.editors.descriptors.AttributeDescriptor;
@@ -44,12 +38,15 @@ import org.eclipse.ui.views.properties.IPropertySource;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.Margins;
+import com.android.ide.common.api.Rect;
+import com.android.ide.common.rendering.api.Capability;
+import com.android.ide.common.rendering.api.MergeCookie;
+import com.android.ide.common.rendering.api.ViewInfo;
+import com.android.utils.Pair;
 
 /**
  * Maps a {@link ViewInfo} in a structure more adapted to our needs.
@@ -104,14 +101,13 @@ public class CanvasViewInfo implements IPropertySource {
     /**
      * Constructs a {@link CanvasViewInfo} initialized with the given initial values.
      */
-    private CanvasViewInfo(CanvasViewInfo parent, String name,
-            Object viewObject, UiViewElementNode node, Rectangle absRect,
-            Rectangle selectionRect, ViewInfo viewInfo) {
+    private CanvasViewInfo(CanvasViewInfo parent, String name, Object viewObject, UiViewElementNode node,
+            Rectangle absRect, Rectangle selectionRect, ViewInfo viewInfo) {
         mParent = parent;
         mName = name;
         mViewObject = viewObject;
         mViewInfo = viewInfo;
-        mUiViewNode  = node;
+        mUiViewNode = node;
         mAbsRect = absRect;
         mSelectionRect = selectionRect;
     }
@@ -335,12 +331,9 @@ public class CanvasViewInfo implements IPropertySource {
             int topMargin = mViewInfo.getTopMargin();
             int rightMargin = mViewInfo.getRightMargin();
             int bottomMargin = mViewInfo.getBottomMargin();
-            return new Margins(
-                leftMargin != Integer.MIN_VALUE ? leftMargin : 0,
-                rightMargin != Integer.MIN_VALUE ? rightMargin : 0,
-                topMargin != Integer.MIN_VALUE ? topMargin : 0,
-                bottomMargin != Integer.MIN_VALUE ? bottomMargin : 0
-            );
+            return new Margins(leftMargin != Integer.MIN_VALUE ? leftMargin : 0,
+                    rightMargin != Integer.MIN_VALUE ? rightMargin : 0, topMargin != Integer.MIN_VALUE ? topMargin : 0,
+                    bottomMargin != Integer.MIN_VALUE ? bottomMargin : 0);
         }
 
         return null;
@@ -432,15 +425,13 @@ public class CanvasViewInfo implements IPropertySource {
         // and purposes it is its layout child that is the real root so treat that one as the
         // root as well (such that the whole layout canvas does not highlight as part of hovers
         // etc)
-        if (mParent != null
-                && mParent.mName.endsWith(GESTURE_OVERLAY_VIEW)
-                && mParent.isRoot()
+        if (mParent != null && mParent.mName.endsWith(GESTURE_OVERLAY_VIEW) && mParent.isRoot()
                 && mParent.mChildren.size() == 1) {
             return true;
         }
 
-        return mUiViewNode == null || mUiViewNode.getUiParent() == null ||
-            mUiViewNode.getUiParent().getUiParent() == null;
+        return mUiViewNode == null || mUiViewNode.getUiParent() == null
+                || mUiViewNode.getUiParent().getUiParent() == null;
     }
 
     /**
@@ -457,8 +448,8 @@ public class CanvasViewInfo implements IPropertySource {
         }
 
         if (mAbsRect.width < SELECTION_MIN_SIZE || mAbsRect.height < SELECTION_MIN_SIZE) {
-            return mUiViewNode != null && (mUiViewNode.getDescriptor().hasChildren() ||
-                    mAbsRect.width <= 0 || mAbsRect.height <= 0);
+            return mUiViewNode != null
+                    && (mUiViewNode.getDescriptor().hasChildren() || mAbsRect.width <= 0 || mAbsRect.height <= 0);
         }
 
         return false;
@@ -531,10 +522,7 @@ public class CanvasViewInfo implements IPropertySource {
             String value = attr.getCurrentValue();
             if (value != null && value.length() > 0) {
                 AttributeDescriptor attrDesc = attr.getDescriptor();
-                SimpleAttribute a = new SimpleAttribute(
-                        attrDesc.getNamespaceUri(),
-                        attrDesc.getXmlLocalName(),
-                        value);
+                SimpleAttribute a = new SimpleAttribute(attrDesc.getNamespaceUri(), attrDesc.getXmlLocalName(), value);
                 e.addAttribute(a);
             }
         }
@@ -565,8 +553,7 @@ public class CanvasViewInfo implements IPropertySource {
                 Node node = curr.mUiViewNode.getXmlNode();
                 if (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
                     String nodeName = node.getNodeName();
-                    if (node.getNamespaceURI() == null
-                            && SdkConstants.VIEW_INCLUDE.equals(nodeName)) {
+                    if (node.getNamespaceURI() == null && SdkConstants.VIEW_INCLUDE.equals(nodeName)) {
                         // Note: the layout attribute is NOT in the Android namespace
                         Element element = (Element) node;
                         String url = element.getAttribute(SdkConstants.ATTR_LAYOUT);
@@ -644,7 +631,7 @@ public class CanvasViewInfo implements IPropertySource {
      * @return a {@link CanvasViewInfo} hierarchy
      */
     @NonNull
-    public static Pair<CanvasViewInfo,List<Rectangle>> create(ViewInfo root, boolean layoutlib5) {
+    public static Pair<CanvasViewInfo, List<Rectangle>> create(ViewInfo root, boolean layoutlib5) {
         return new Builder(layoutlib5).create(root);
     }
 
@@ -671,7 +658,7 @@ public class CanvasViewInfo implements IPropertySource {
          * Creates a hierarchy of {@link CanvasViewInfo} objects and merge bounding
          * rectangles from the given {@link ViewInfo} hierarchy
          */
-        private Pair<CanvasViewInfo,List<Rectangle>> create(ViewInfo root) {
+        private Pair<CanvasViewInfo, List<Rectangle>> create(ViewInfo root) {
             Object cookie = root.getCookie();
             if (cookie == null) {
                 // Special case: If the root-most view does not have a view cookie,
@@ -696,8 +683,7 @@ public class CanvasViewInfo implements IPropertySource {
                     // and where the view sits at the top level inside the include-context node.
                     UiViewElementNode merge = null;
                     List<CanvasViewInfo> merged = new ArrayList<CanvasViewInfo>();
-                    for (Map.Entry<UiViewElementNode, List<CanvasViewInfo>> entry : mMergeNodeMap
-                            .entrySet()) {
+                    for (Map.Entry<UiViewElementNode, List<CanvasViewInfo>> entry : mMergeNodeMap.entrySet()) {
                         UiViewElementNode node = entry.getKey();
                         if (!hasMergeParent(node)) {
                             continue;
@@ -727,8 +713,8 @@ public class CanvasViewInfo implements IPropertySource {
                             }
                         }
 
-                        CanvasViewInfo mergeView = new CanvasViewInfo(rootView, VIEW_MERGE, null,
-                                merge, absRect, absRect, null /* viewInfo */);
+                        CanvasViewInfo mergeView = new CanvasViewInfo(rootView, VIEW_MERGE, null, merge, absRect,
+                                absRect, null /* viewInfo */);
                         for (CanvasViewInfo view : merged) {
                             if (rootView.removeChild(view)) {
                                 mergeView.addChild(view);
@@ -749,9 +735,8 @@ public class CanvasViewInfo implements IPropertySource {
                 // in drag & drop operations, such that we can show it in the outline, etc
                 if (rootView != null && hasMergeParent(rootView.getUiViewNode())) {
                     CanvasViewInfo merge = new CanvasViewInfo(null, VIEW_MERGE, null,
-                            (UiViewElementNode) rootView.getUiViewNode().getUiParent(),
-                            rootView.getAbsRect(), rootView.getSelectionRect(),
-                            null /* viewInfo */);
+                            (UiViewElementNode) rootView.getUiViewNode().getUiParent(), rootView.getAbsRect(),
+                            rootView.getSelectionRect(), null /* viewInfo */);
                     // Insert the <merge> as the new real root
                     rootView.mParent = merge;
                     merge.addChild(rootView);
@@ -769,8 +754,7 @@ public class CanvasViewInfo implements IPropertySource {
         }
 
         /** Creates a {@link CanvasViewInfo} for a given {@link ViewInfo} but does not recurse */
-        private CanvasViewInfo createView(CanvasViewInfo parent, ViewInfo root, int parentX,
-                int parentY) {
+        private CanvasViewInfo createView(CanvasViewInfo parent, ViewInfo root, int parentX, int parentY) {
             Object cookie = root.getCookie();
             UiViewElementNode node = null;
             if (cookie instanceof UiViewElementNode) {
@@ -781,16 +765,14 @@ public class CanvasViewInfo implements IPropertySource {
                     node = (UiViewElementNode) cookie;
                     CanvasViewInfo view = createView(parent, root, parentX, parentY, node);
                     if (root.getCookie() instanceof MergeCookie && view.mNodeSiblings == null) {
-                        List<CanvasViewInfo> v = mMergeNodeMap == null ?
-                                null : mMergeNodeMap.get(node);
+                        List<CanvasViewInfo> v = mMergeNodeMap == null ? null : mMergeNodeMap.get(node);
                         if (v != null) {
                             v.add(view);
                         } else {
                             v = new ArrayList<CanvasViewInfo>();
                             v.add(view);
                             if (mMergeNodeMap == null) {
-                                mMergeNodeMap =
-                                    new HashMap<UiViewElementNode, List<CanvasViewInfo>>();
+                                mMergeNodeMap = new HashMap<UiViewElementNode, List<CanvasViewInfo>>();
                             }
                             mMergeNodeMap.put(node, v);
                         }
@@ -809,8 +791,8 @@ public class CanvasViewInfo implements IPropertySource {
          * This method specifies an explicit {@link UiViewElementNode} to use rather than
          * relying on the view cookie in the info object.
          */
-        private CanvasViewInfo createView(CanvasViewInfo parent, ViewInfo root, int parentX,
-                int parentY, UiViewElementNode node) {
+        private CanvasViewInfo createView(CanvasViewInfo parent, ViewInfo root, int parentX, int parentY,
+                UiViewElementNode node) {
 
             int x = root.getLeft();
             int y = root.getTop();
@@ -836,13 +818,12 @@ public class CanvasViewInfo implements IPropertySource {
 
             Rectangle selectionRect = new Rectangle(x, y, w - 1, h - 1);
 
-            return new CanvasViewInfo(parent, root.getClassName(), root.getViewObject(), node,
-                    absRect, selectionRect, root);
+            return new CanvasViewInfo(parent, root.getClassName(), root.getViewObject(), node, absRect, selectionRect,
+                    root);
         }
 
         /** Create a subtree recursively until you run out of keys */
-        private CanvasViewInfo createSubtree(CanvasViewInfo parent, ViewInfo viewInfo,
-                int parentX, int parentY) {
+        private CanvasViewInfo createSubtree(CanvasViewInfo parent, ViewInfo viewInfo, int parentX, int parentY) {
             assert viewInfo.getCookie() != null;
 
             CanvasViewInfo view = createView(parent, viewInfo, parentX, parentY);
@@ -863,8 +844,7 @@ public class CanvasViewInfo implements IPropertySource {
                 for (ViewInfo child : children) {
                     Object cookie = child.getCookie();
                     if (cookie instanceof UiViewElementNode || cookie instanceof MergeCookie) {
-                        CanvasViewInfo childView = createSubtree(view, child,
-                                parentX, parentY);
+                        CanvasViewInfo childView = createSubtree(view, child, parentX, parentY);
                         if (childView != null) {
                             view.addChild(childView);
                         }
@@ -895,8 +875,7 @@ public class CanvasViewInfo implements IPropertySource {
                 // No missing nodes; this is the normal case, and we can just continue to
                 // recursively add our children
                 for (ViewInfo child : children) {
-                    CanvasViewInfo childView = createSubtree(view, child,
-                            parentX, parentY);
+                    CanvasViewInfo childView = createSubtree(view, child, parentX, parentY);
                     view.addChild(childView);
                 }
 
@@ -908,8 +887,7 @@ public class CanvasViewInfo implements IPropertySource {
                 // as the root element.
 
                 UiViewElementNode uiViewNode = view.getUiViewNode();
-                String containerName = uiViewNode != null
-                    ? uiViewNode.getDescriptor().getXmlLocalName() : ""; //$NON-NLS-1$
+                String containerName = uiViewNode != null ? uiViewNode.getDescriptor().getXmlLocalName() : ""; //$NON-NLS-1$
                 if (containerName.equals(SdkConstants.VIEW_INCLUDE)) {
                     // This is expected -- we don't WANT to get node keys for the content
                     // of an include since it's in a different file and should be treated
@@ -946,12 +924,11 @@ public class CanvasViewInfo implements IPropertySource {
                             for (ViewInfo child : children) {
                                 if (child.getCookie() == null) {
                                     // Only create a flat (non-recursive) view
-                                    CanvasViewInfo childView = createView(view, child, parentX,
-                                            parentY, unused.removeFirst());
+                                    CanvasViewInfo childView = createView(view, child, parentX, parentY,
+                                            unused.removeFirst());
                                     view.addChild(childView);
                                 } else {
-                                    CanvasViewInfo childView = createSubtree(view, child, parentX,
-                                            parentY);
+                                    CanvasViewInfo childView = createSubtree(view, child, parentX, parentY);
                                     view.addChild(childView);
                                 }
                             }
@@ -971,8 +948,7 @@ public class CanvasViewInfo implements IPropertySource {
                         // such that you can operate on them. Just ignore these.
                         for (ViewInfo child : children) {
                             if (child.getCookie() != null) {
-                                CanvasViewInfo childView = createSubtree(view, child,
-                                        parentX, parentY);
+                                CanvasViewInfo childView = createSubtree(view, child, parentX, parentY);
                                 view.addChild(childView);
                             }
                         }
@@ -989,8 +965,8 @@ public class CanvasViewInfo implements IPropertySource {
          * objects. This method attempts to account for this, by matching the views in
          * the right order.
          */
-        private void addMismatched(CanvasViewInfo parentView, int parentX, int parentY,
-                List<ViewInfo> children, LinkedList<UiViewElementNode> unused) {
+        private void addMismatched(CanvasViewInfo parentView, int parentX, int parentY, List<ViewInfo> children,
+                LinkedList<UiViewElementNode> unused) {
             UiViewElementNode afterNode = null;
             UiViewElementNode beforeNode = null;
             // We have one important clue we can use when matching unused nodes
@@ -1030,8 +1006,7 @@ public class CanvasViewInfo implements IPropertySource {
 
                     if (matching != null) {
                         unused.remove(matching);
-                        CanvasViewInfo childView = createView(parentView, child, parentX, parentY,
-                                matching);
+                        CanvasViewInfo childView = createView(parentView, child, parentX, parentY, matching);
                         parentView.addChild(childView);
                         afterNode = matching;
                     } else {
@@ -1045,10 +1020,8 @@ public class CanvasViewInfo implements IPropertySource {
             // Add zero-bounded boxes for all remaining nodes since they need to show
             // up in the outline, need to be selectable so you can press Delete, etc.
             if (unused.size() > 0) {
-                Map<UiViewElementNode, Integer> rankMap =
-                    new HashMap<UiViewElementNode, Integer>();
-                Map<UiViewElementNode, CanvasViewInfo> infoMap =
-                    new HashMap<UiViewElementNode, CanvasViewInfo>();
+                Map<UiViewElementNode, Integer> rankMap = new HashMap<UiViewElementNode, Integer>();
+                Map<UiViewElementNode, CanvasViewInfo> infoMap = new HashMap<UiViewElementNode, CanvasViewInfo>();
                 UiElementNode parent = unused.get(0).getUiParent();
                 if (parent != null) {
                     int index = 0;
@@ -1079,8 +1052,8 @@ public class CanvasViewInfo implements IPropertySource {
                         if (found != null) {
                             Rectangle absRect = new Rectangle(parentX, parentY, 0, 0);
                             String name = found.getDescriptor().getXmlLocalName();
-                            CanvasViewInfo v = new CanvasViewInfo(parentView, name, null, found,
-                                    absRect, absRect, null /* viewInfo */);
+                            CanvasViewInfo v = new CanvasViewInfo(parentView, name, null, found, absRect, absRect,
+                                    null /* viewInfo */);
                             // Find corresponding index in the parent view
                             List<CanvasViewInfo> siblings = parentView.getChildren();
                             int insertPosition = siblings.size();
@@ -1104,8 +1077,8 @@ public class CanvasViewInfo implements IPropertySource {
                 for (UiViewElementNode node : unused) {
                     Rectangle absRect = new Rectangle(parentX, parentY, 0, 0);
                     String name = node.getDescriptor().getXmlLocalName();
-                    CanvasViewInfo v = new CanvasViewInfo(parentView, name, null, node, absRect,
-                            absRect, null /* viewInfo */);
+                    CanvasViewInfo v = new CanvasViewInfo(parentView, name, null, node, absRect, absRect,
+                            null /* viewInfo */);
                     parentView.addChild(v);
                 }
             }
@@ -1152,8 +1125,7 @@ public class CanvasViewInfo implements IPropertySource {
         }
 
         /** Search for a subtree with valid keys and add those subtrees */
-        private CanvasViewInfo addKeyedSubtrees(CanvasViewInfo parent, ViewInfo viewInfo,
-                int parentX, int parentY) {
+        private CanvasViewInfo addKeyedSubtrees(CanvasViewInfo parent, ViewInfo viewInfo, int parentX, int parentY) {
             // We don't include MergeCookies when searching down for the first non-null key,
             // since this means we are in a "Show Included In" context, and the include tag itself
             // (which the merge cookie is pointing to) is still in the including-document rather
@@ -1167,8 +1139,7 @@ public class CanvasViewInfo implements IPropertySource {
                 return subtree;
             } else {
                 for (ViewInfo child : viewInfo.getChildren()) {
-                    addKeyedSubtrees(parent, child, parentX + viewInfo.getLeft(), parentY
-                            + viewInfo.getTop());
+                    addKeyedSubtrees(parent, child, parentX + viewInfo.getLeft(), parentY + viewInfo.getTop());
                 }
 
                 return null;

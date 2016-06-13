@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,9 @@ import static com.android.SdkConstants.ANDROID_URI;
 import static com.android.SdkConstants.ATTR_LAYOUT_GRAVITY;
 import static com.android.SdkConstants.ATTR_LAYOUT_HEIGHT;
 import static com.android.SdkConstants.ATTR_LAYOUT_WIDTH;
+
+import java.util.List;
+import java.util.Map;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
@@ -39,9 +39,6 @@ import com.android.ide.common.api.Rect;
 import com.android.ide.common.api.RuleAction;
 import com.android.utils.Pair;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * An {@link IViewRule} for android.widget.FrameLayout and all its derived
  * classes.
@@ -60,18 +57,13 @@ public class FrameLayoutRule extends BaseLayoutRule {
 
         return new DropFeedback(null, new IFeedbackPainter() {
             @Override
-            public void paint(@NonNull IGraphics gc, @NonNull INode node,
-                    @NonNull DropFeedback feedback) {
+            public void paint(@NonNull IGraphics gc, @NonNull INode node, @NonNull DropFeedback feedback) {
                 drawFeedback(gc, node, elements, feedback);
             }
         });
     }
 
-    protected void drawFeedback(
-            IGraphics gc,
-            INode targetNode,
-            IDragElement[] elements,
-            DropFeedback feedback) {
+    protected void drawFeedback(IGraphics gc, INode targetNode, IDragElement[] elements, DropFeedback feedback) {
         Rect b = targetNode.getBounds();
         if (!b.isValid()) {
             return;
@@ -163,9 +155,7 @@ public class FrameLayoutRule extends BaseLayoutRule {
     }
 
     @Override
-    public void addLayoutActions(
-            @NonNull List<RuleAction> actions,
-            final @NonNull INode parentNode,
+    public void addLayoutActions(@NonNull List<RuleAction> actions, final @NonNull INode parentNode,
             final @NonNull List<? extends INode> children) {
         super.addLayoutActions(actions, parentNode, children);
         actions.add(RuleAction.createSeparator(25));
@@ -176,8 +166,7 @@ public class FrameLayoutRule extends BaseLayoutRule {
     }
 
     @Override
-    public void onChildInserted(@NonNull INode node, @NonNull INode parent,
-            @NonNull InsertType insertType) {
+    public void onChildInserted(@NonNull INode node, @NonNull INode parent, @NonNull InsertType insertType) {
         // Look at the fill preferences and fill embedded layouts etc
         String fqcn = node.getFqcn();
         IViewMetadata metadata = mRulesEngine.getMetadata(fqcn);

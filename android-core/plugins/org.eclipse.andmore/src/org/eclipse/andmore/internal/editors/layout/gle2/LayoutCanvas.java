@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,16 +13,9 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.IDragElement.IDragAttribute;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.api.Margins;
-import com.android.ide.common.api.Point;
-import com.android.ide.common.rendering.api.Capability;
-import com.android.ide.common.rendering.api.RenderSession;
-import com.android.resources.Density;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.descriptors.DescriptorsUtils;
@@ -99,9 +89,16 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.w3c.dom.Node;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.IDragElement.IDragAttribute;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.api.Margins;
+import com.android.ide.common.api.Point;
+import com.android.ide.common.rendering.api.Capability;
+import com.android.ide.common.rendering.api.RenderSession;
+import com.android.resources.Density;
 
 /**
  * Displays the image rendered by the {@link GraphicalEditorPart} and handles
@@ -118,8 +115,7 @@ import java.util.Set;
  */
 @SuppressWarnings("restriction") // For WorkBench "Show In" support
 public class LayoutCanvas extends Canvas {
-    private final static QualifiedName NAME_ZOOM =
-        new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "zoom");//$NON-NLS-1$
+    private final static QualifiedName NAME_ZOOM = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "zoom");//$NON-NLS-1$
 
     private static final boolean DEBUG = false;
 
@@ -254,10 +250,7 @@ public class LayoutCanvas extends Canvas {
      * @param parent parent SWT widget
      * @param style the SWT style
      */
-    public LayoutCanvas(LayoutEditorDelegate editorDelegate,
-            RulesEngine rulesEngine,
-            Composite parent,
-            int style) {
+    public LayoutCanvas(LayoutEditorDelegate editorDelegate, RulesEngine rulesEngine, Composite parent, int style) {
         super(parent, style | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL);
         mEditorDelegate = editorDelegate;
         mRulesEngine = rulesEngine;
@@ -384,8 +377,7 @@ public class LayoutCanvas extends Canvas {
             int fullHeight = imageHeight;
 
             if (mPreviewManager.hasPreviews()) {
-                fullHeight = Math.max(fullHeight,
-                        (int) (mPreviewManager.getHeight() / mHScale.getScale()));
+                fullHeight = Math.max(fullHeight, (int) (mPreviewManager.getHeight() / mHScale.getScale()));
             }
 
             if (clientWidth == 0) {
@@ -478,8 +470,7 @@ public class LayoutCanvas extends Canvas {
                 setScale(1, true);
             } else if (c == '0' && actionBar.isZoomingAllowed()) {
                 setFitScale(true, true /*allowZoomIn*/);
-            } else if (e.keyCode == '0' && (e.stateMask & SWT.MOD2) != 0
-                    && actionBar.isZoomingAllowed()) {
+            } else if (e.keyCode == '0' && (e.stateMask & SWT.MOD2) != 0 && actionBar.isZoomingAllowed()) {
                 setFitScale(false, true /*allowZoomIn*/);
             } else if ((c == '+' || c == '=') && actionBar.isZoomingAllowed()) {
                 if ((e.stateMask & SWT.MOD1) != 0) {
@@ -750,15 +741,13 @@ public class LayoutCanvas extends Canvas {
      *            {@link #showInvisibleViews(boolean)}) where individual invisible nodes
      *            are padded during certain interactions.
      */
-    void setSession(RenderSession session, Set<UiElementNode> explodedNodes,
-            boolean layoutlib5) {
+    void setSession(RenderSession session, Set<UiElementNode> explodedNodes, boolean layoutlib5) {
         // disable any hover
         clearHover();
 
         mViewHierarchy.setSession(session, explodedNodes, layoutlib5);
         if (mViewHierarchy.isValid() && session != null) {
-            Image image = mImageOverlay.setImage(session.getImage(),
-                    session.isAlphaChannelImage());
+            Image image = mImageOverlay.setImage(session.getImage(), session.isAlphaChannelImage());
 
             mOutlinePage.setModel(mViewHierarchy.getRoot());
             getGraphicalEditor().setModel(mViewHierarchy.getRoot());
@@ -937,17 +926,14 @@ public class LayoutCanvas extends Canvas {
      */
     IAction getAction(String actionId) {
         String prefix = PREFIX_CANVAS_ACTION;
-        if (mMenuManager == null ||
-                actionId == null ||
-                !actionId.startsWith(prefix)) {
+        if (mMenuManager == null || actionId == null || !actionId.startsWith(prefix)) {
             return null;
         }
 
         actionId = actionId.substring(prefix.length());
 
         for (IContributionItem contrib : mMenuManager.getItems()) {
-            if (contrib instanceof ActionContributionItem &&
-                    actionId.equals(contrib.getId())) {
+            if (contrib instanceof ActionContributionItem && actionId.equals(contrib.getId())) {
                 return ((ActionContributionItem) contrib).getAction();
             }
         }
@@ -1179,8 +1165,7 @@ public class LayoutCanvas extends Canvas {
                     LayoutEditorDelegate delegate = LayoutEditorDelegate.fromEditor(openAlready);
                     if (delegate != null) {
                         GraphicalEditorPart gEditor = delegate.getGraphicalEditor();
-                        if (gEditor != null &&
-                                gEditor.renderingSupports(Capability.EMBEDDED_LAYOUT)) {
+                        if (gEditor != null && gEditor.renderingSupports(Capability.EMBEDDED_LAYOUT)) {
                             gEditor.showIn(next);
                         }
                     }
@@ -1189,8 +1174,7 @@ public class LayoutCanvas extends Canvas {
                         // Set initial state of a new file
                         // TODO: Only set rendering target portion of the state
                         String state = ConfigurationDescription.getDescription(leavingFile);
-                        xmlFile.setSessionProperty(GraphicalEditorPart.NAME_INITIAL_STATE,
-                                state);
+                        xmlFile.setSessionProperty(GraphicalEditorPart.NAME_INITIAL_STATE, state);
                     } catch (CoreException e) {
                         // pass
                     }
@@ -1290,10 +1274,7 @@ public class LayoutCanvas extends Canvas {
      */
     /* package */static DragSource createDragSource(Control control) {
         DragSource source = new DragSource(control, DND.DROP_COPY | DND.DROP_MOVE);
-        source.setTransfer(new Transfer[] {
-                TextTransfer.getInstance(),
-                SimpleXmlTransfer.getInstance()
-        });
+        source.setTransfer(new Transfer[] { TextTransfer.getInstance(), SimpleXmlTransfer.getInstance() });
         return source;
     }
 
@@ -1301,11 +1282,8 @@ public class LayoutCanvas extends Canvas {
      * Helper to create the drop target for the given control.
      */
     private static DropTarget createDropTarget(Control control) {
-        DropTarget dropTarget = new DropTarget(
-                control, DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_DEFAULT);
-        dropTarget.setTransfer(new Transfer[] {
-            SimpleXmlTransfer.getInstance()
-        });
+        DropTarget dropTarget = new DropTarget(control, DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_DEFAULT);
+        dropTarget.setTransfer(new Transfer[] { SimpleXmlTransfer.getInstance() });
         return dropTarget;
     }
 
@@ -1353,9 +1331,7 @@ public class LayoutCanvas extends Canvas {
         mDeleteAction = new Action() {
             @Override
             public void run() {
-                mClipboardSupport.deleteSelection(
-                        getDeleteLabel(),
-                        mSelectionManager.getSnapshot());
+                mClipboardSupport.deleteSelection(getDeleteLabel(), mSelectionManager.getSnapshot());
             }
         };
 
@@ -1443,20 +1419,14 @@ public class LayoutCanvas extends Canvas {
             }
             bars.setGlobalActionHandler(ActionFactory.REDO.getId(), mRedoAction);
         } else {
-            bars.setGlobalActionHandler(ActionFactory.CUT.getId(),
-                    editor.getAction(ActionFactory.CUT.getId()));
-            bars.setGlobalActionHandler(ActionFactory.COPY.getId(),
-                    editor.getAction(ActionFactory.COPY.getId()));
-            bars.setGlobalActionHandler(ActionFactory.PASTE.getId(),
-                    editor.getAction(ActionFactory.PASTE.getId()));
-            bars.setGlobalActionHandler(ActionFactory.DELETE.getId(),
-                    editor.getAction(ActionFactory.DELETE.getId()));
+            bars.setGlobalActionHandler(ActionFactory.CUT.getId(), editor.getAction(ActionFactory.CUT.getId()));
+            bars.setGlobalActionHandler(ActionFactory.COPY.getId(), editor.getAction(ActionFactory.COPY.getId()));
+            bars.setGlobalActionHandler(ActionFactory.PASTE.getId(), editor.getAction(ActionFactory.PASTE.getId()));
+            bars.setGlobalActionHandler(ActionFactory.DELETE.getId(), editor.getAction(ActionFactory.DELETE.getId()));
             bars.setGlobalActionHandler(ActionFactory.SELECT_ALL.getId(),
                     editor.getAction(ActionFactory.SELECT_ALL.getId()));
-            bars.setGlobalActionHandler(ActionFactory.UNDO.getId(),
-                    editor.getAction(ActionFactory.UNDO.getId()));
-            bars.setGlobalActionHandler(ActionFactory.REDO.getId(),
-                    editor.getAction(ActionFactory.REDO.getId()));
+            bars.setGlobalActionHandler(ActionFactory.UNDO.getId(), editor.getAction(ActionFactory.UNDO.getId()));
+            bars.setGlobalActionHandler(ActionFactory.REDO.getId(), editor.getAction(ActionFactory.REDO.getId()));
         }
 
         bars.updateActionBars();
@@ -1473,8 +1443,7 @@ public class LayoutCanvas extends Canvas {
      * global actions such as copy, cut, paste, delete and select-all.
      */
     private void copyActionAttributes(Action action, ActionFactory factory) {
-        IWorkbenchAction wa = factory.create(
-                mEditorDelegate.getEditor().getEditorSite().getWorkbenchWindow());
+        IWorkbenchAction wa = factory.create(mEditorDelegate.getEditor().getEditorSite().getWorkbenchWindow());
         action.setId(wa.getId());
         action.setText(wa.getText());
         action.setEnabled(wa.isEnabled());
@@ -1559,9 +1528,8 @@ public class LayoutCanvas extends Canvas {
         // actions contributed by the workbench.
         String showInLabel = IDEWorkbenchMessages.Workbench_showIn;
         MenuManager showInSubMenu = new MenuManager(showInLabel);
-        showInSubMenu.add(
-                ContributionItemFactory.VIEWS_SHOW_IN.create(
-                        mEditorDelegate.getEditor().getSite().getWorkbenchWindow()));
+        showInSubMenu.add(ContributionItemFactory.VIEWS_SHOW_IN
+                .create(mEditorDelegate.getEditor().getSite().getWorkbenchWindow()));
         manager.add(showInSubMenu);
     }
 
@@ -1591,8 +1559,7 @@ public class LayoutCanvas extends Canvas {
         // Need a valid empty document to create the new root
         final UiDocumentNode uiDoc = mEditorDelegate.getUiRootNode();
         if (uiDoc == null || uiDoc.getUiChildren().size() > 0) {
-            debugPrintf("Failed to create document root for %1$s: document is not empty",
-                    rootFqcn);
+            debugPrintf("Failed to create document root for %1$s: document is not empty", rootFqcn);
             return;
         }
 
@@ -1618,10 +1585,7 @@ public class LayoutCanvas extends Canvas {
                 UiElementNode uiNew = uiDoc.appendNewUiChild(viewDesc);
 
                 // A root node requires the Android XMLNS
-                uiNew.setAttributeValue(
-                        SdkConstants.ANDROID_NS_NAME,
-                        SdkConstants.XMLNS_URI,
-                        SdkConstants.NS_RESOURCES,
+                uiNew.setAttributeValue(SdkConstants.ANDROID_NS_NAME, SdkConstants.XMLNS_URI, SdkConstants.NS_RESOURCES,
                         true /*override*/);
 
                 IDragAttribute[] attributes = root.getAttributes();
@@ -1708,8 +1672,8 @@ public class LayoutCanvas extends Canvas {
 
     /** Ensures that the configuration previews are up to date for this canvas */
     public void syncPreviewMode() {
-        if (mImageOverlay != null && mImageOverlay.getImage() != null &&
-            getGraphicalEditor().getConfigurationChooser().getResources() != null) {
+        if (mImageOverlay != null && mImageOverlay.getImage() != null
+                && getGraphicalEditor().getConfigurationChooser().getResources() != null) {
             if (mPreviewManager.recomputePreviews(false)) {
                 // Zoom when syncing modes
                 mZoomFitNextImage = true;

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +13,8 @@
 
 package org.eclipse.andmore.internal.editors.layout.refactoring;
 
-import com.android.ide.common.resources.ResourceUrl;
-import com.android.resources.ResourceType;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -57,8 +54,8 @@ import org.eclipse.wst.sse.ui.StructuredTextEditor;
 import org.eclipse.wst.xml.core.internal.regions.DOMRegionContext;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.ide.common.resources.ResourceUrl;
+import com.android.resources.ResourceType;
 
 /**
  * QuickAssistProcessor which helps invoke refactoring operations on text elements.
@@ -69,8 +66,7 @@ public class RefactoringAssistant implements IQuickAssistProcessor {
     /**
      * Creates a new {@link RefactoringAssistant}
      */
-    public RefactoringAssistant() {
-    }
+    public RefactoringAssistant() {}
 
     @Override
     public boolean canAssist(IQuickAssistInvocationContext invocationContext) {
@@ -83,8 +79,7 @@ public class RefactoringAssistant implements IQuickAssistProcessor {
     }
 
     @Override
-    public ICompletionProposal[] computeQuickAssistProposals(
-            IQuickAssistInvocationContext invocationContext) {
+    public ICompletionProposal[] computeQuickAssistProposals(IQuickAssistInvocationContext invocationContext) {
 
         ISourceViewer sourceViewer = invocationContext.getSourceViewer();
         AndroidXmlEditor xmlEditor = AndroidXmlEditor.fromTextViewer(sourceViewer);
@@ -124,11 +119,10 @@ public class RefactoringAssistant implements IQuickAssistProcessor {
                         isReferenceValue = true;
                         resource = RenameResourceXmlTextAction.findResource(doc, offset);
                     }
-                } else if (type.equals(DOMRegionContext.XML_TAG_NAME)
-                        || type.equals(DOMRegionContext.XML_TAG_OPEN)
+                } else if (type.equals(DOMRegionContext.XML_TAG_NAME) || type.equals(DOMRegionContext.XML_TAG_OPEN)
                         || type.equals(DOMRegionContext.XML_TAG_CLOSE)) {
                     isTagName = true;
-                } else if (type.equals(DOMRegionContext.XML_TAG_ATTRIBUTE_NAME) ) {
+                } else if (type.equals(DOMRegionContext.XML_TAG_ATTRIBUTE_NAME)) {
                     isAttributeName = true;
                     String name = region.getText(subRegion);
                     int index = name.indexOf(':');
@@ -184,8 +178,8 @@ public class RefactoringAssistant implements IQuickAssistProcessor {
                     proposals.add(new RefactoringProposal(xmlEditor,
                             new ExtractStringRefactoring(file, xmlEditor, textSelection)));
                 } else if (resource != null) {
-                    RenameResourceProcessor processor = new RenameResourceProcessor(
-                            file.getProject(), resource.type, resource.name, null);
+                    RenameResourceProcessor processor = new RenameResourceProcessor(file.getProject(), resource.type,
+                            resource.name, null);
                     RenameRefactoring refactoring = new RenameRefactoring(processor);
                     proposals.add(new RefactoringProposal(xmlEditor, refactoring));
                 }
@@ -194,66 +188,31 @@ public class RefactoringAssistant implements IQuickAssistProcessor {
                 if (delegate != null) {
                     boolean showStyleFirst = isValue || (isAttributeName && isStylableAttribute);
                     if (showStyleFirst) {
-                        proposals.add(new RefactoringProposal(
-                                xmlEditor,
-                                new ExtractStyleRefactoring(
-                                        file,
-                                        delegate,
-                                        originalSelection,
-                                        null)));
+                        proposals.add(new RefactoringProposal(xmlEditor,
+                                new ExtractStyleRefactoring(file, delegate, originalSelection, null)));
                     }
 
                     if (selectionOkay) {
-                        proposals.add(new RefactoringProposal(
-                                xmlEditor,
-                                new WrapInRefactoring(
-                                        file,
-                                        delegate,
-                                        textSelection,
-                                        null)));
-                        proposals.add(new RefactoringProposal(
-                                xmlEditor,
-                                new UnwrapRefactoring(
-                                        file,
-                                        delegate,
-                                        textSelection,
-                                        null)));
-                        proposals.add(new RefactoringProposal(
-                                xmlEditor,
-                                new ChangeViewRefactoring(
-                                        file,
-                                        delegate,
-                                        textSelection,
-                                        null)));
-                        proposals.add(new RefactoringProposal(
-                                xmlEditor,
-                                new ChangeLayoutRefactoring(
-                                        file,
-                                        delegate,
-                                        textSelection,
-                                        null)));
+                        proposals.add(new RefactoringProposal(xmlEditor,
+                                new WrapInRefactoring(file, delegate, textSelection, null)));
+                        proposals.add(new RefactoringProposal(xmlEditor,
+                                new UnwrapRefactoring(file, delegate, textSelection, null)));
+                        proposals.add(new RefactoringProposal(xmlEditor,
+                                new ChangeViewRefactoring(file, delegate, textSelection, null)));
+                        proposals.add(new RefactoringProposal(xmlEditor,
+                                new ChangeLayoutRefactoring(file, delegate, textSelection, null)));
                     }
 
                     // Extract Include must always have an actual block to be extracted
                     if (textSelection.getLength() > 0) {
-                        proposals.add(new RefactoringProposal(
-                                xmlEditor,
-                                new ExtractIncludeRefactoring(
-                                        file,
-                                        delegate,
-                                        textSelection,
-                                        null)));
+                        proposals.add(new RefactoringProposal(xmlEditor,
+                                new ExtractIncludeRefactoring(file, delegate, textSelection, null)));
                     }
 
                     // If it's not a value or attribute name, don't place it on top
                     if (!showStyleFirst) {
-                        proposals.add(new RefactoringProposal(
-                                xmlEditor,
-                                new ExtractStyleRefactoring(
-                                        file,
-                                        delegate,
-                                        originalSelection,
-                                        null)));
+                        proposals.add(new RefactoringProposal(xmlEditor,
+                                new ExtractStyleRefactoring(file, delegate, originalSelection, null)));
                     }
                 }
             }
@@ -271,8 +230,7 @@ public class RefactoringAssistant implements IQuickAssistProcessor {
         return null;
     }
 
-    private static class RefactoringProposal
-            implements ICompletionProposal {
+    private static class RefactoringProposal implements ICompletionProposal {
         private final AndroidXmlEditor mEditor;
         private final Refactoring mRefactoring;
 
@@ -288,12 +246,10 @@ public class RefactoringAssistant implements IQuickAssistProcessor {
             if (mRefactoring instanceof VisualRefactoring) {
                 wizard = ((VisualRefactoring) mRefactoring).createWizard();
             } else if (mRefactoring instanceof ExtractStringRefactoring) {
-                wizard = new ExtractStringWizard((ExtractStringRefactoring) mRefactoring,
-                        mEditor.getProject());
+                wizard = new ExtractStringWizard((ExtractStringRefactoring) mRefactoring, mEditor.getProject());
             } else if (mRefactoring instanceof RenameRefactoring) {
                 RenameRefactoring refactoring = (RenameRefactoring) mRefactoring;
-                RenameResourceProcessor processor =
-                        (RenameResourceProcessor) refactoring.getProcessor();
+                RenameResourceProcessor processor = (RenameResourceProcessor) refactoring.getProcessor();
                 ResourceType type = processor.getType();
                 wizard = new RenameResourceWizard((RenameRefactoring) mRefactoring, type, false);
             } else {
@@ -304,8 +260,7 @@ public class RefactoringAssistant implements IQuickAssistProcessor {
             try {
                 IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                 op.run(window.getShell(), wizard.getDefaultPageTitle());
-            } catch (InterruptedException e) {
-            }
+            } catch (InterruptedException e) {}
         }
 
         @Override

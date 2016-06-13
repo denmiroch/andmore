@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,9 +11,6 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.editors.layout.gle2;
-
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.Rect;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -27,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.Rect;
 
 /**
  * This class implements 2D bin packing: packing rectangles into a given area as
@@ -141,18 +138,16 @@ class BinPacker {
             if (rect.w >= width && rect.h >= height) {
                 if (width < height) {
                     int distance = rect.w - width;
-                    if (distance < bestShortDistance ||
-                            distance == bestShortDistance &&
-                            (rect.h - height) < bestLongDistance) {
+                    if (distance < bestShortDistance
+                            || distance == bestShortDistance && (rect.h - height) < bestLongDistance) {
                         bestShortDistance = distance;
                         bestLongDistance = rect.h - height;
                         bestIndex = i;
                     }
                 } else {
                     int distance = rect.w - width;
-                    if (distance < bestShortDistance ||
-                            distance == bestShortDistance &&
-                            (rect.h - height) < bestLongDistance) {
+                    if (distance < bestShortDistance
+                            || distance == bestShortDistance && (rect.h - height) < bestLongDistance) {
                         bestShortDistance = distance;
                         bestLongDistance = rect.h - height;
                         bestIndex = i;
@@ -208,7 +203,6 @@ class BinPacker {
                 i--;
             }
         }
-
 
         // Split along vertical line x = rect.x + width:
         // (rect.x,rect.y)
@@ -287,6 +281,7 @@ class BinPacker {
     private List<Rect> mAllocated;
     private static int sLayoutId;
     private static int sRectId;
+
     private void dumpImage() {
         if (DEBUG) {
             int width = 100;
@@ -303,12 +298,8 @@ class BinPacker {
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, image.getWidth(), image.getHeight());
 
-            Color[] colors = new Color[] {
-                    Color.blue, Color.cyan,
-                    Color.green, Color.magenta, Color.orange,
-                    Color.pink, Color.red, Color.white, Color.yellow, Color.darkGray,
-                    Color.lightGray, Color.gray,
-            };
+            Color[] colors = new Color[] { Color.blue, Color.cyan, Color.green, Color.magenta, Color.orange, Color.pink,
+                    Color.red, Color.white, Color.yellow, Color.darkGray, Color.lightGray, Color.gray, };
 
             char allocated = 'A';
             for (Rect rect : mAllocated) {
@@ -318,8 +309,7 @@ class BinPacker {
                 g.fillRect(rect.x, rect.y, rect.w, rect.h);
                 g.setColor(Color.WHITE);
                 g.drawRect(rect.x, rect.y, rect.w, rect.h);
-                g.drawString("" + (allocated++),
-                        rect.x + rect.w / 2, rect.y + rect.h / 2);
+                g.drawString("" + (allocated++), rect.x + rect.w / 2, rect.y + rect.h / 2);
             }
 
             int colorIndex = 0;
@@ -332,10 +322,8 @@ class BinPacker {
 
                 g.fillRect(rect.x, rect.y, rect.w, rect.h);
                 g.setColor(Color.WHITE);
-                g.drawString(Integer.toString(colorIndex),
-                        rect.x + rect.w / 2, rect.y + rect.h / 2);
+                g.drawString(Integer.toString(colorIndex), rect.x + rect.w / 2, rect.y + rect.h / 2);
             }
-
 
             g.dispose();
 

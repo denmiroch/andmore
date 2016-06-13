@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +13,11 @@
 
 package org.eclipse.andmore.io;
 
-import com.android.io.IAbstractFile;
-import com.android.io.IAbstractFolder;
-import com.android.io.StreamException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -26,11 +25,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.android.io.IAbstractFile;
+import com.android.io.IAbstractFolder;
+import com.android.io.StreamException;
 
 /**
  * An implementation of {@link IAbstractFile} on top of an {@link IFile} object.
@@ -127,7 +124,7 @@ public class IFileWrapper implements IAbstractFile {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof IFileWrapper) {
-            return mFile.equals(((IFileWrapper)obj).mFile);
+            return mFile.equals(((IFileWrapper) obj).mFile);
         }
 
         if (obj instanceof IFile) {

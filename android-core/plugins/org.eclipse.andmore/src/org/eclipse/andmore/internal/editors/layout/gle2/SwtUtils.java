@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +14,13 @@ package org.eclipse.andmore.internal.editors.layout.gle2;
 
 import static org.eclipse.andmore.internal.editors.layout.gle2.ImageUtils.SHADOW_SIZE;
 
-import com.android.ide.common.api.Rect;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
+import java.awt.image.WritableRaster;
+import java.util.List;
 
 import org.eclipse.andmore.internal.editors.IconFactory;
 import org.eclipse.swt.SWTException;
@@ -32,21 +35,14 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
-import java.awt.image.WritableRaster;
-import java.util.List;
+import com.android.ide.common.api.Rect;
 
 /**
  * Various generic SWT utilities such as image conversion.
  */
 public class SwtUtils {
 
-    private SwtUtils() {
-    }
+    private SwtUtils() {}
 
     /**
      * Returns the {@link PaletteData} describing the ARGB ordering expected from integers
@@ -101,8 +97,7 @@ public class SwtUtils {
      * @return a new image that is in a guaranteed compatible format
      */
     private static BufferedImage convertToCompatibleFormat(BufferedImage image) {
-        BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(),
-                BufferedImage.TYPE_INT_ARGB);
+        BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = converted.getGraphics();
         graphics.drawImage(image, 0, 0, null);
         graphics.dispose();
@@ -127,8 +122,7 @@ public class SwtUtils {
      * @return A new SWT {@link Image} with the same contents as the source
      *         {@link BufferedImage}
      */
-    public static Image convertToSwt(Device display, BufferedImage awtImage,
-            boolean transferAlpha, int globalAlpha) {
+    public static Image convertToSwt(Device display, BufferedImage awtImage, boolean transferAlpha, int globalAlpha) {
         if (!isSupportedPaletteType(awtImage.getType())) {
             awtImage = convertToCompatibleFormat(awtImage);
         }
@@ -138,8 +132,7 @@ public class SwtUtils {
 
         WritableRaster raster = awtImage.getRaster();
         DataBuffer dataBuffer = raster.getDataBuffer();
-        ImageData imageData =
-            new ImageData(width, height, 32, getAwtPaletteData(awtImage.getType()));
+        ImageData imageData = new ImageData(width, height, 32, getAwtPaletteData(awtImage.getType()));
 
         if (dataBuffer instanceof DataBufferInt) {
             int[] imageDataBuffer = ((DataBufferInt) dataBuffer).getData();
@@ -150,8 +143,7 @@ public class SwtUtils {
                 imageData.setPixels(0, 0, imageDataBuffer.length, imageDataBuffer, 0);
             } catch (SWTException se) {
                 // Unsupported depth
-                return convertToSwt(display, convertToCompatibleFormat(awtImage),
-                        transferAlpha, globalAlpha);
+                return convertToSwt(display, convertToCompatibleFormat(awtImage), transferAlpha, globalAlpha);
             }
         }
 
@@ -191,8 +183,7 @@ public class SwtUtils {
      */
     public static BufferedImage convertToAwt(Image swtImage) {
         ImageData swtData = swtImage.getImageData();
-        BufferedImage awtImage =
-            new BufferedImage(swtData.width, swtData.height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage awtImage = new BufferedImage(swtData.width, swtData.height, BufferedImage.TYPE_INT_ARGB);
         PaletteData swtPalette = swtData.palette;
         if (swtPalette.isDirect) {
             PaletteData awtPalette = getAwtPaletteData(awtImage.getType());
@@ -201,29 +192,29 @@ public class SwtUtils {
                 // No color conversion needed.
                 for (int y = 0; y < swtData.height; y++) {
                     for (int x = 0; x < swtData.width; x++) {
-                      int pixel = swtData.getPixel(x, y);
-                      awtImage.setRGB(x, y, 0xFF000000 | pixel);
+                        int pixel = swtData.getPixel(x, y);
+                        awtImage.setRGB(x, y, 0xFF000000 | pixel);
                     }
                 }
             } else {
                 // We need to remap the colors
-                int sr = -awtPalette.redShift   + swtPalette.redShift;
+                int sr = -awtPalette.redShift + swtPalette.redShift;
                 int sg = -awtPalette.greenShift + swtPalette.greenShift;
-                int sb = -awtPalette.blueShift  + swtPalette.blueShift;
+                int sb = -awtPalette.blueShift + swtPalette.blueShift;
 
                 for (int y = 0; y < swtData.height; y++) {
                     for (int x = 0; x < swtData.width; x++) {
-                      int pixel = swtData.getPixel(x, y);
+                        int pixel = swtData.getPixel(x, y);
 
-                      int r = pixel & swtPalette.redMask;
-                      int g = pixel & swtPalette.greenMask;
-                      int b = pixel & swtPalette.blueMask;
-                      r = (sr < 0) ? r >>> -sr : r << sr;
-                      g = (sg < 0) ? g >>> -sg : g << sg;
-                      b = (sb < 0) ? b >>> -sb : b << sb;
+                        int r = pixel & swtPalette.redMask;
+                        int g = pixel & swtPalette.greenMask;
+                        int b = pixel & swtPalette.blueMask;
+                        r = (sr < 0) ? r >>> -sr : r << sr;
+                        g = (sg < 0) ? g >>> -sg : g << sg;
+                        b = (sb < 0) ? b >>> -sb : b << sb;
 
-                      pixel = 0xFF000000 | r | g | b;
-                      awtImage.setRGB(x, y, pixel);
+                        pixel = 0xFF000000 | r | g | b;
+                        awtImage.setRGB(x, y, pixel);
                     }
                 }
             }
@@ -255,8 +246,8 @@ public class SwtUtils {
      *         image that the crop begins (multiplied by the scale). May return null if
      *         there are no selected items.
      */
-    public static Image drawRectangles(Image image,
-            List<Rectangle> rectangles, Rectangle boundingBox, double scale, byte alpha) {
+    public static Image drawRectangles(Image image, List<Rectangle> rectangles, Rectangle boundingBox, double scale,
+            byte alpha) {
 
         if (rectangles.size() == 0 || boundingBox == null || boundingBox.isEmpty()) {
             return null;
@@ -299,10 +290,8 @@ public class SwtUtils {
                 int dxDelta = dx2 - dx1;
                 int syDelta = sy2 - sy1;
                 int dyDelta = dy2 - dy1;
-                for (int dy = dy1, sy = sy1; dy < dy2; dy++, sy = (dy - dy1) * syDelta / dyDelta
-                        + sy1) {
-                    for (int dx = dx1, sx = sx1; dx < dx2; dx++, sx = (dx - dx1) * sxDelta
-                            / dxDelta + sx1) {
+                for (int dy = dy1, sy = sy1; dy < dy2; dy++, sy = (dy - dy1) * syDelta / dyDelta + sy1) {
+                    for (int dx = dx1, sx = sx1; dx < dx2; dx++, sx = (dx - dx1) * sxDelta / dxDelta + sx1) {
                         assert sx < sx2 && sy < sy2;
                         destData.setPixel(dx, dy, srcData.getPixel(sx, sy));
                         alphaData[dy * destWidth + dx] = alpha;
@@ -412,11 +401,11 @@ public class SwtUtils {
         if (sShadowBottomLeft == null) {
             IconFactory icons = IconFactory.getInstance();
             // See ImageUtils.drawRectangleShadow for an explanation of the assets.
-            sShadowBottomLeft  = icons.getIcon("shadow-bl"); //$NON-NLS-1$
-            sShadowBottom      = icons.getIcon("shadow-b");  //$NON-NLS-1$
+            sShadowBottomLeft = icons.getIcon("shadow-bl"); //$NON-NLS-1$
+            sShadowBottom = icons.getIcon("shadow-b"); //$NON-NLS-1$
             sShadowBottomRight = icons.getIcon("shadow-br"); //$NON-NLS-1$
-            sShadowRight       = icons.getIcon("shadow-r");  //$NON-NLS-1$
-            sShadowTopRight    = icons.getIcon("shadow-tr"); //$NON-NLS-1$
+            sShadowRight = icons.getIcon("shadow-r"); //$NON-NLS-1$
+            sShadowTopRight = icons.getIcon("shadow-tr"); //$NON-NLS-1$
             assert sShadowBottomRight.getImageData().width == SHADOW_SIZE;
             assert sShadowBottomRight.getImageData().height == SHADOW_SIZE;
         }
@@ -437,15 +426,9 @@ public class SwtUtils {
         gc.drawImage(sShadowBottomLeft, x, y + height);
         gc.drawImage(sShadowBottomRight, x + width, y + height);
         gc.drawImage(sShadowTopRight, x + width, y);
-        gc.drawImage(sShadowBottom,
-                0, 0,
-                bottomData.width, bottomData.height,
-                x + bottomLeftData.width, y + height,
+        gc.drawImage(sShadowBottom, 0, 0, bottomData.width, bottomData.height, x + bottomLeftData.width, y + height,
                 width - bottomLeftData.width, bottomData.height);
-        gc.drawImage(sShadowRight,
-                0, 0,
-                rightData.width, rightData.height,
-                x + width, y + topRightData.height,
+        gc.drawImage(sShadowRight, 0, 0, rightData.width, rightData.height, x + width, y + topRightData.height,
                 rightData.width, height - topRightData.height);
     }
 

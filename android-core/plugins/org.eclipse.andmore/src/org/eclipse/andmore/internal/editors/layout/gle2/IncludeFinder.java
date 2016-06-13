@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,14 +28,15 @@ import static org.eclipse.core.resources.IResourceDelta.CHANGED;
 import static org.eclipse.core.resources.IResourceDelta.CONTENT;
 import static org.eclipse.core.resources.IResourceDelta.REMOVED;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.resources.ResourceFile;
-import com.android.ide.common.resources.ResourceFolder;
-import com.android.ide.common.resources.ResourceItem;
-import com.android.io.IAbstractFile;
-import com.android.resources.ResourceType;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
@@ -63,15 +61,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.resources.ResourceFile;
+import com.android.ide.common.resources.ResourceFolder;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.io.IAbstractFile;
+import com.android.resources.ResourceType;
 
 /**
  * The include finder finds other XML files that are including a given XML file, and does
@@ -80,8 +77,7 @@ import java.util.Set;
 @SuppressWarnings("restriction") // XML model
 public class IncludeFinder {
     /** Qualified name for the per-project persistent property include-map */
-    private final static QualifiedName CONFIG_INCLUDES = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID,
-            "includes");//$NON-NLS-1$
+    private final static QualifiedName CONFIG_INCLUDES = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "includes");//$NON-NLS-1$
 
     /**
      * Qualified name for the per-project non-persistent property storing the
@@ -332,7 +328,7 @@ public class IncludeFinder {
                         }
 
                         if (c == '}') {
-                            if (i < end-1 && encoded.charAt(i+1) == ',') {
+                            if (i < end - 1 && encoded.charAt(i + 1) == ',') {
                                 i++;
                             }
                             break;
@@ -549,8 +545,7 @@ public class IncludeFinder {
     }
 
     @Nullable
-    private static List<String> findIncludesInDocument(@NonNull Node node,
-            @Nullable List<String> urls) {
+    private static List<String> findIncludesInDocument(@NonNull Node node, @Nullable List<String> urls) {
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             String tag = node.getNodeName();
             boolean isInclude = tag.equals(VIEW_INCLUDE);
@@ -583,7 +578,6 @@ public class IncludeFinder {
 
         return urls;
     }
-
 
     /**
      * Returns the layout URL to a local resource name (provided the URL is a local
@@ -871,8 +865,7 @@ public class IncludeFinder {
 
                             // Adding a resource will force a refresh on the file;
                             // ignore these updates
-                            BaseProjectHelper.markResource(resource, markerId, message, lineNumber,
-                                    severity);
+                            BaseProjectHelper.markResource(resource, markerId, message, lineNumber, severity);
                         } finally {
                             sRefreshing = false;
                         }
@@ -1009,18 +1002,23 @@ public class IncludeFinder {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
             Reference other = (Reference) obj;
             if (mId == null) {
-                if (other.mId != null)
+                if (other.mId != null) {
                     return false;
-            } else if (!mId.equals(other.mId))
+                }
+            } else if (!mId.equals(other.mId)) {
                 return false;
+            }
             return true;
         }
 

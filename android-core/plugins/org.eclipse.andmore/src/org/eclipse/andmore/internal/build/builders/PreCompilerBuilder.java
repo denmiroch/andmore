@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,30 +13,14 @@
 
 package org.eclipse.andmore.internal.build.builders;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.xml.ManifestData;
-import com.android.io.StreamException;
-import com.android.manifmerger.ManifestMerger;
-import com.android.manifmerger.MergerLog;
-import com.android.sdklib.AndroidVersion;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.build.RenderScriptChecker;
-import com.android.sdklib.build.RenderScriptProcessor;
-import com.android.sdklib.internal.build.BuildConfigGenerator;
-import com.android.sdklib.internal.build.SymbolLoader;
-import com.android.sdklib.internal.build.SymbolWriter;
-import com.android.sdklib.internal.project.ProjectProperties;
-import com.android.sdklib.io.FileOp;
-import com.android.sdklib.repository.FullRevision;
-import com.android.utils.ILogger;
-import com.android.utils.Pair;
-import com.android.xml.AndroidManifest;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -83,14 +64,30 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.xml.ManifestData;
+import com.android.io.StreamException;
+import com.android.manifmerger.ManifestMerger;
+import com.android.manifmerger.MergerLog;
+import com.android.sdklib.AndroidVersion;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.build.RenderScriptChecker;
+import com.android.sdklib.build.RenderScriptProcessor;
+import com.android.sdklib.internal.build.BuildConfigGenerator;
+import com.android.sdklib.internal.build.SymbolLoader;
+import com.android.sdklib.internal.build.SymbolWriter;
+import com.android.sdklib.internal.project.ProjectProperties;
+import com.android.sdklib.io.FileOp;
+import com.android.sdklib.repository.FullRevision;
+import com.android.utils.ILogger;
+import com.android.utils.Pair;
+import com.android.xml.AndroidManifest;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 
 /**
  * Pre Java Compiler.
@@ -172,8 +169,7 @@ public class PreCompilerBuilder extends BaseBuilder {
         }
 
         @Override
-        public void beginTask(String name, int totalWork) {
-        }
+        public void beginTask(String name, int totalWork) {}
 
         @Override
         public void done() {
@@ -209,8 +205,7 @@ public class PreCompilerBuilder extends BaseBuilder {
         }
 
         @Override
-        public void internalWorked(double work) {
-        }
+        public void internalWorked(double work) {}
 
         @Override
         public boolean isCanceled() {
@@ -223,16 +218,13 @@ public class PreCompilerBuilder extends BaseBuilder {
         }
 
         @Override
-        public void setTaskName(String name) {
-        }
+        public void setTaskName(String name) {}
 
         @Override
-        public void subTask(String name) {
-        }
+        public void subTask(String name) {}
 
         @Override
-        public void worked(int work) {
-        }
+        public void worked(int work) {}
     }
 
     public PreCompilerBuilder() {
@@ -241,10 +233,7 @@ public class PreCompilerBuilder extends BaseBuilder {
 
     // build() returns a list of project from which this project depends for future compilation.
     @Override
-    protected IProject[] build(
-            int kind,
-            @SuppressWarnings("rawtypes") Map args,
-            IProgressMonitor monitor)
+    protected IProject[] build(int kind, @SuppressWarnings("rawtypes") Map args, IProgressMonitor monitor)
             throws CoreException {
         // get a project object
         IProject project = getProject();
@@ -292,8 +281,7 @@ public class PreCompilerBuilder extends BaseBuilder {
 
             resOutFolder = getResOutFolder(androidOutputFolder);
 
-            setupSourceProcessors(javaProject, projectState, sourceFolderPathList,
-                    androidOutputFolder);
+            setupSourceProcessors(javaProject, projectState, sourceFolderPathList, androidOutputFolder);
 
             PreCompilerDeltaVisitor dv = null;
             String javaPackage = null;
@@ -331,8 +319,7 @@ public class PreCompilerBuilder extends BaseBuilder {
                     mAidlProcessor.prepareFullBuild(project);
                     mRenderScriptSourceChangeHandler.prepareFullBuild();
                 } else {
-                    dv = new PreCompilerDeltaVisitor(this, sourceFolderPathList,
-                            mAidlProcessor.getChangeHandler(),
+                    dv = new PreCompilerDeltaVisitor(this, sourceFolderPathList, mAidlProcessor.getChangeHandler(),
                             mRenderScriptSourceChangeHandler);
                     delta.accept(dv);
 
@@ -346,8 +333,7 @@ public class PreCompilerBuilder extends BaseBuilder {
                     if (ResourceManager.isAutoBuilding()) {
                         ProjectResources projectResources = resManager.getProjectResources(project);
 
-                        IdeScanningContext context = new IdeScanningContext(projectResources,
-                                project, true);
+                        IdeScanningContext context = new IdeScanningContext(projectResources, project, true);
 
                         boolean wasCleared = projectResources.ensureInitialized();
 
@@ -390,15 +376,13 @@ public class PreCompilerBuilder extends BaseBuilder {
                 for (IProject libProject : libProjects) {
                     IResourceDelta delta = getDelta(libProject);
                     if (delta != null) {
-                        PatternBasedDeltaVisitor visitor = new PatternBasedDeltaVisitor(
-                                project, libProject,
+                        PatternBasedDeltaVisitor visitor = new PatternBasedDeltaVisitor(project, libProject,
                                 "PRE:LibManifest"); //$NON-NLS-1$
                         visitor.addSet(ChangedFileSetHelper.MANIFEST);
 
                         ChangedFileSet textSymbolCFS = null;
                         if (isLibrary == false) {
-                            textSymbolCFS = ChangedFileSetHelper.getTextSymbols(
-                                    libProject);
+                            textSymbolCFS = ChangedFileSetHelper.getTextSymbols(libProject);
                             visitor.addSet(textSymbolCFS);
                         }
 
@@ -411,8 +395,7 @@ public class PreCompilerBuilder extends BaseBuilder {
                         }
 
                         // no need to test others if we have all flags at true.
-                        if (mMustMergeManifest &&
-                                (mMustCompileResources || textSymbolCFS == null)) {
+                        if (mMustMergeManifest && (mMustCompileResources || textSymbolCFS == null)) {
                             break;
                         }
                     }
@@ -433,7 +416,7 @@ public class PreCompilerBuilder extends BaseBuilder {
             }
 
             if (projectState.getRenderScriptSupportMode()) {
-                FullRevision minBuildToolsRev = new FullRevision(19,0,3);
+                FullRevision minBuildToolsRev = new FullRevision(19, 0, 3);
                 if (mBuildToolInfo.getRevision().compareTo(minBuildToolsRev) == -1) {
                     String msg = "RenderScript support mode requires Build-Tools 19.0.3 or later.";
                     AndmoreAndroidPlugin.printErrorToConsole(project, msg);
@@ -447,8 +430,7 @@ public class PreCompilerBuilder extends BaseBuilder {
             IFile manifestFile = ProjectHelper.getManifest(project);
 
             if (manifestFile == null) {
-                String msg = String.format(Messages.s_File_Missing,
-                        SdkConstants.FN_ANDROID_MANIFEST_XML);
+                String msg = String.format(Messages.s_File_Missing, SdkConstants.FN_ANDROID_MANIFEST_XML);
                 AndmoreAndroidPlugin.printErrorToConsole(project, msg);
                 markProject(AndmoreAndroidConstants.MARKER_ADT, msg, IMarker.SEVERITY_ERROR);
 
@@ -463,17 +445,14 @@ public class PreCompilerBuilder extends BaseBuilder {
             if (dv == null || dv.getCheckedManifestXml() == false) {
                 BasicXmlErrorListener errorListener = new BasicXmlErrorListener();
                 try {
-                    ManifestData parser = AndroidManifestHelper.parseUnchecked(
-                            new IFileWrapper(manifestFile),
-                            true /*gather data*/,
-                            errorListener);
+                    ManifestData parser = AndroidManifestHelper.parseUnchecked(new IFileWrapper(manifestFile),
+                            true /*gather data*/, errorListener);
 
                     if (errorListener.mHasXmlError == true) {
                         // There was an error in the manifest, its file has been marked
                         // by the XmlErrorHandler. The stopBuild() call below will abort
                         // this with an exception.
-                        String msg = String.format(Messages.s_Contains_Xml_Error,
-                                SdkConstants.FN_ANDROID_MANIFEST_XML);
+                        String msg = String.format(Messages.s_Contains_Xml_Error, SdkConstants.FN_ANDROID_MANIFEST_XML);
                         AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project, msg);
                         markProject(AndmoreAndroidConstants.MARKER_ADT, msg, IMarker.SEVERITY_ERROR);
 
@@ -492,27 +471,20 @@ public class PreCompilerBuilder extends BaseBuilder {
 
                     return result;
                 } catch (ParserConfigurationException e) {
-                    String msg = String.format(
-                            "Bad parser configuration for %s: %s",
-                            manifestFile.getFullPath(),
+                    String msg = String.format("Bad parser configuration for %s: %s", manifestFile.getFullPath(),
                             e.getMessage());
 
                     handleException(e, msg);
                     return result;
 
                 } catch (SAXException e) {
-                    String msg = String.format(
-                            "Parser exception for %s: %s",
-                            manifestFile.getFullPath(),
+                    String msg = String.format("Parser exception for %s: %s", manifestFile.getFullPath(),
                             e.getMessage());
 
                     handleException(e, msg);
                     return result;
                 } catch (IOException e) {
-                    String msg = String.format(
-                            "I/O error for %s: %s",
-                            manifestFile.getFullPath(),
-                            e.getMessage());
+                    String msg = String.format("I/O error for %s: %s", manifestFile.getFullPath(), e.getMessage());
 
                     handleException(e, msg);
                     return result;
@@ -541,18 +513,17 @@ public class PreCompilerBuilder extends BaseBuilder {
                                 "Platform %1$s is a preview and requires application manifest to set %2$s to '%1$s'",
                                 codename, AndroidManifest.ATTRIBUTE_MIN_SDK_VERSION);
                         AndmoreAndroidPlugin.printErrorToConsole(project, msg);
-                        BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT,
-                                msg, IMarker.SEVERITY_ERROR);
+                        BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT, msg,
+                                IMarker.SEVERITY_ERROR);
                         return result;
                     } else if (minSdkValue > targetVersion.getApiLevel()) {
                         // integer minSdk is too high for the target => warning
                         String msg = String.format(
                                 "Attribute %1$s (%2$d) is higher than the project target API level (%3$d)",
-                                AndroidManifest.ATTRIBUTE_MIN_SDK_VERSION,
-                                minSdkValue, targetVersion.getApiLevel());
+                                AndroidManifest.ATTRIBUTE_MIN_SDK_VERSION, minSdkValue, targetVersion.getApiLevel());
                         AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project, msg);
-                        BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT,
-                                msg, IMarker.SEVERITY_WARNING);
+                        BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT, msg,
+                                IMarker.SEVERITY_WARNING);
                     }
                 } else {
                     // looks like the min sdk is a codename, check it matches the codename
@@ -560,12 +531,11 @@ public class PreCompilerBuilder extends BaseBuilder {
                     String codename = targetVersion.getCodename();
                     if (codename == null) {
                         // platform is not a preview => fatal error
-                        String msg = String.format(
-                                "Manifest attribute '%1$s' is set to '%2$s'. Integer is expected.",
+                        String msg = String.format("Manifest attribute '%1$s' is set to '%2$s'. Integer is expected.",
                                 AndroidManifest.ATTRIBUTE_MIN_SDK_VERSION, minSdkVersion);
                         AndmoreAndroidPlugin.printErrorToConsole(project, msg);
-                        BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT,
-                                msg, IMarker.SEVERITY_ERROR);
+                        BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT, msg,
+                                IMarker.SEVERITY_ERROR);
                         return result;
                     } else if (codename.equals(minSdkVersion) == false) {
                         // platform and manifest codenames don't match => fatal error.
@@ -573,8 +543,8 @@ public class PreCompilerBuilder extends BaseBuilder {
                                 "Value of manifest attribute '%1$s' does not match platform codename '%2$s'",
                                 AndroidManifest.ATTRIBUTE_MIN_SDK_VERSION, codename);
                         AndmoreAndroidPlugin.printErrorToConsole(project, msg);
-                        BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT,
-                                msg, IMarker.SEVERITY_ERROR);
+                        BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT, msg,
+                                IMarker.SEVERITY_ERROR);
                         return result;
                     }
 
@@ -588,8 +558,8 @@ public class PreCompilerBuilder extends BaseBuilder {
                 // Display an error
                 String codename = projectTarget.getVersion().getCodename();
                 String msg = String.format(
-                        "Platform %1$s is a preview and requires application manifests to set %2$s to '%1$s'",
-                        codename, AndroidManifest.ATTRIBUTE_MIN_SDK_VERSION);
+                        "Platform %1$s is a preview and requires application manifests to set %2$s to '%1$s'", codename,
+                        AndroidManifest.ATTRIBUTE_MIN_SDK_VERSION);
                 AndmoreAndroidPlugin.printErrorToConsole(project, msg);
                 BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT, msg,
                         IMarker.SEVERITY_ERROR);
@@ -601,18 +571,17 @@ public class PreCompilerBuilder extends BaseBuilder {
                 String msg = String.format(Messages.s_Doesnt_Declare_Package_Error,
                         SdkConstants.FN_ANDROID_MANIFEST_XML);
                 AndmoreAndroidPlugin.printErrorToConsole(project, msg);
-                BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT,
-                        msg, IMarker.SEVERITY_ERROR);
+                BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT, msg,
+                        IMarker.SEVERITY_ERROR);
 
                 return result;
             } else if (javaPackage.indexOf('.') == -1) {
                 // The application package name does not contain 2+ segments!
-                String msg = String.format(
-                        "Application package '%1$s' must have a minimum of 2 segments.",
+                String msg = String.format("Application package '%1$s' must have a minimum of 2 segments.",
                         SdkConstants.FN_ANDROID_MANIFEST_XML);
                 AndmoreAndroidPlugin.printErrorToConsole(project, msg);
-                BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT,
-                        msg, IMarker.SEVERITY_ERROR);
+                BaseProjectHelper.markResource(manifestFile, AndmoreAndroidConstants.MARKER_ADT, msg,
+                        IMarker.SEVERITY_ERROR);
 
                 return result;
             }
@@ -626,8 +595,7 @@ public class PreCompilerBuilder extends BaseBuilder {
                     AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project,
                             Messages.Checking_Package_Change);
 
-                    FixLaunchConfig flc = new FixLaunchConfig(project, mManifestPackage,
-                            javaPackage);
+                    FixLaunchConfig flc = new FixLaunchConfig(project, mManifestPackage, javaPackage);
                     flc.start();
                 }
 
@@ -670,18 +638,14 @@ public class PreCompilerBuilder extends BaseBuilder {
 
             List<File> libProjectsOut = new ArrayList<File>(libProjects.size());
             for (IProject libProject : libProjects) {
-                libProjectsOut.add(
-                        BaseProjectHelper.getAndroidOutputFolder(libProject)
-                            .getLocation().toFile());
+                libProjectsOut.add(BaseProjectHelper.getAndroidOutputFolder(libProject).getLocation().toFile());
             }
 
             // run the source processors
             int processorStatus = SourceProcessor.COMPILE_STATUS_NONE;
 
-
             try {
-                processorStatus |= mAidlProcessor.compileFiles(this,
-                        project, projectTarget, sourceFolderPathList,
+                processorStatus |= mAidlProcessor.compileFiles(this, project, projectTarget, sourceFolderPathList,
                         libProjectsOut, monitor);
             } catch (Throwable t) {
                 handleException(t, "Failed to run aidl. Check workspace log for detail.");
@@ -689,8 +653,7 @@ public class PreCompilerBuilder extends BaseBuilder {
             }
 
             try {
-                processorStatus |= compileRs(minSdkValue, projectState, androidOutputFolder,
-                        resOutFolder, monitor);
+                processorStatus |= compileRs(minSdkValue, projectState, androidOutputFolder, resOutFolder, monitor);
             } catch (Throwable t) {
                 handleException(t, "Failed to run renderscript. Check workspace log for detail.");
                 return result;
@@ -716,14 +679,12 @@ public class PreCompilerBuilder extends BaseBuilder {
                     proguardFile = androidOutputFolder.getFile(AndmoreAndroidConstants.FN_AAPT_PROGUARD);
                 }
 
-                handleResources(project, javaPackage, projectTarget, manifestFile, resOutFolder,
-                        libProjects, isLibrary, proguardFile);
+                handleResources(project, javaPackage, projectTarget, manifestFile, resOutFolder, libProjects, isLibrary,
+                        proguardFile);
             }
 
-            if (processorStatus == SourceProcessor.COMPILE_STATUS_NONE &&
-                    compiledTheResources == false) {
-                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project,
-                        Messages.Nothing_To_Compile);
+            if (processorStatus == SourceProcessor.COMPILE_STATUS_NONE && compiledTheResources == false) {
+                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project, Messages.Nothing_To_Compile);
             }
         } catch (AbortBuildException e) {
             return result;
@@ -758,8 +719,7 @@ public class PreCompilerBuilder extends BaseBuilder {
     }
 
     private void doClean(IProject project, IProgressMonitor monitor) throws CoreException {
-        AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project,
-                Messages.Removing_Generated_Classes);
+        AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project, Messages.Removing_Generated_Classes);
 
         // remove all the derived resources from the 'gen' source folder.
         if (mGenFolder != null && mGenFolder.exists()) {
@@ -817,10 +777,8 @@ public class PreCompilerBuilder extends BaseBuilder {
         }
     }
 
-    private void setupSourceProcessors(@NonNull IJavaProject javaProject,
-            @NonNull ProjectState projectState,
-            @NonNull List<IPath> sourceFolderPathList,
-            @NonNull IFolder androidOutputFolder) {
+    private void setupSourceProcessors(@NonNull IJavaProject javaProject, @NonNull ProjectState projectState,
+            @NonNull List<IPath> sourceFolderPathList, @NonNull IFolder androidOutputFolder) {
         if (mAidlProcessor == null) {
             mAidlProcessor = new AidlProcessor(javaProject, mBuildToolInfo, mGenFolder);
         } else {
@@ -845,12 +803,8 @@ public class PreCompilerBuilder extends BaseBuilder {
         mRenderScriptSourceChangeHandler = new RsSourceChangeHandler(checker);
     }
 
-    private int compileRs(int minSdkValue,
-            @NonNull ProjectState projectState,
-            @NonNull IFolder androidOutputFolder,
-            @NonNull IFolder resOutFolder,
-            @NonNull IProgressMonitor monitor)
-            throws IOException, InterruptedException {
+    private int compileRs(int minSdkValue, @NonNull ProjectState projectState, @NonNull IFolder androidOutputFolder,
+            @NonNull IFolder resOutFolder, @NonNull IProgressMonitor monitor) throws IOException, InterruptedException {
         if (!mRenderScriptSourceChangeHandler.mustCompile()) {
             return SourceProcessor.COMPILE_STATUS_NONE;
         }
@@ -861,7 +815,6 @@ public class PreCompilerBuilder extends BaseBuilder {
         List<File> importFolders = checker.getSourceFolders();
         File buildFolder = androidOutputFolder.getLocation().toFile();
 
-
         // get the renderscript target
         int rsTarget = minSdkValue == -1 ? 11 : minSdkValue;
         String rsTargetStr = projectState.getProperty(ProjectProperties.PROPERTY_RS_TARGET);
@@ -869,25 +822,16 @@ public class PreCompilerBuilder extends BaseBuilder {
             try {
                 rsTarget = Integer.parseInt(rsTargetStr);
             } catch (NumberFormatException e) {
-                handleException(e, String.format(
-                        "Property %s is not an integer.",
-                        ProjectProperties.PROPERTY_RS_TARGET));
+                handleException(e,
+                        String.format("Property %s is not an integer.", ProjectProperties.PROPERTY_RS_TARGET));
                 return SourceProcessor.COMPILE_STATUS_NONE;
             }
         }
 
-        RenderScriptProcessor processor = new RenderScriptProcessor(
-                inputs,
-                importFolders,
-                buildFolder,
-                mGenFolder.getLocation().toFile(),
-                resOutFolder.getLocation().toFile(),
-                new File(buildFolder, SdkConstants.FD_RS_OBJ),
-                new File(buildFolder, SdkConstants.FD_RS_LIBS),
-                mBuildToolInfo,
-                rsTarget,
-                false /*debugBuild, always false for now*/,
-                3,
+        RenderScriptProcessor processor = new RenderScriptProcessor(inputs, importFolders, buildFolder,
+                mGenFolder.getLocation().toFile(), resOutFolder.getLocation().toFile(),
+                new File(buildFolder, SdkConstants.FD_RS_OBJ), new File(buildFolder, SdkConstants.FD_RS_LIBS),
+                mBuildToolInfo, rsTarget, false /*debugBuild, always false for now*/, 3,
                 projectState.getRenderScriptSupportMode());
 
         // clean old dependency files fiest
@@ -896,11 +840,7 @@ public class PreCompilerBuilder extends BaseBuilder {
         // then clean old output files
         processor.cleanOldOutput(checker.getOldOutputs());
 
-        RenderScriptLauncher launcher = new RenderScriptLauncher(
-                getProject(),
-                mGenFolder,
-                resOutFolder,
-                monitor,
+        RenderScriptLauncher launcher = new RenderScriptLauncher(getProject(), mGenFolder, resOutFolder, monitor,
                 AdtPrefs.getPrefs().getBuildVerbosity() == BuildVerbosity.VERBOSE /*verbose*/);
 
         // and run the build
@@ -910,12 +850,11 @@ public class PreCompilerBuilder extends BaseBuilder {
     }
 
     @SuppressWarnings("deprecation")
-    private void handleBuildConfig(@SuppressWarnings("rawtypes") Map args)
-            throws IOException, CoreException {
+    private void handleBuildConfig(@SuppressWarnings("rawtypes") Map args) throws IOException, CoreException {
         boolean debugMode = !args.containsKey(RELEASE_REQUESTED);
 
-        BuildConfigGenerator generator = new BuildConfigGenerator(
-                mGenFolder.getLocation().toOSString(), mManifestPackage, debugMode);
+        BuildConfigGenerator generator = new BuildConfigGenerator(mGenFolder.getLocation().toOSString(),
+                mManifestPackage, debugMode);
 
         if (mMustCreateBuildConfig == false) {
             // check the file is present.
@@ -923,14 +862,12 @@ public class PreCompilerBuilder extends BaseBuilder {
             if (folder.exists(new Path(BuildConfigGenerator.BUILD_CONFIG_NAME)) == false) {
                 mMustCreateBuildConfig = true;
                 AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, getProject(),
-                        String.format("Class %1$s is missing!",
-                                BuildConfigGenerator.BUILD_CONFIG_NAME));
+                        String.format("Class %1$s is missing!", BuildConfigGenerator.BUILD_CONFIG_NAME));
             } else if (debugMode != mLastBuildConfigMode) {
                 // else if the build mode changed, force creation
                 mMustCreateBuildConfig = true;
-                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, getProject(),
-                        String.format("Different build mode, must update %1$s!",
-                                BuildConfigGenerator.BUILD_CONFIG_NAME));
+                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, getProject(), String
+                        .format("Different build mode, must update %1$s!", BuildConfigGenerator.BUILD_CONFIG_NAME));
             }
         }
 
@@ -949,8 +886,8 @@ public class PreCompilerBuilder extends BaseBuilder {
         }
     }
 
-    private boolean mergeManifest(IFolder androidOutFolder, List<IProject> libProjects,
-            boolean enabled) throws CoreException {
+    private boolean mergeManifest(IFolder androidOutFolder, List<IProject> libProjects, boolean enabled)
+            throws CoreException {
         if (DEBUG_LOG) {
             AndmoreAndroidPlugin.log(IStatus.INFO, "%s merging manifests!", getProject().getName());
         }
@@ -966,8 +903,7 @@ public class PreCompilerBuilder extends BaseBuilder {
         // manifest over.
         if (enabled == false || libProjects.size() == 0) {
             try {
-                new FileOp().copyFile(manifest.getLocation().toFile(),
-                        outFile.getLocation().toFile());
+                new FileOp().copyFile(manifest.getLocation().toFile(), outFile.getLocation().toFile());
 
                 outFile.refreshLocal(IResource.DEPTH_INFINITE, mDerivedProgressMonitor);
 
@@ -981,42 +917,35 @@ public class PreCompilerBuilder extends BaseBuilder {
 
             // TODO change MergerLog.wrapSdkLog by a custom IMergerLog that will create
             // and maintain error markers.
-            ManifestMerger merger = new ManifestMerger(
-                MergerLog.wrapSdkLog(new ILogger() {
-                    @Override
-                    public void warning(@NonNull String warningFormat, Object... args) {
-                        AndmoreAndroidPlugin.printToConsole(getProject(), String.format(warningFormat, args));
-                    }
+            ManifestMerger merger = new ManifestMerger(MergerLog.wrapSdkLog(new ILogger() {
+                @Override
+                public void warning(@NonNull String warningFormat, Object... args) {
+                    AndmoreAndroidPlugin.printToConsole(getProject(), String.format(warningFormat, args));
+                }
 
-                    @Override
-                    public void info(@NonNull String msgFormat, Object... args) {
-                        AndmoreAndroidPlugin.printToConsole(getProject(), String.format(msgFormat, args));
-                    }
+                @Override
+                public void info(@NonNull String msgFormat, Object... args) {
+                    AndmoreAndroidPlugin.printToConsole(getProject(), String.format(msgFormat, args));
+                }
 
-                    @Override
-                    public void verbose(@NonNull String msgFormat, Object... args) {
-                        info(msgFormat, args);
-                    }
+                @Override
+                public void verbose(@NonNull String msgFormat, Object... args) {
+                    info(msgFormat, args);
+                }
 
-                    @Override
-                    public void error(@Nullable Throwable t, @Nullable String errorFormat,
-                            Object... args) {
-                        errors.add(String.format(errorFormat, args));
-                    }
-                }),
-                new AdtManifestMergeCallback());
+                @Override
+                public void error(@Nullable Throwable t, @Nullable String errorFormat, Object... args) {
+                    errors.add(String.format(errorFormat, args));
+                }
+            }), new AdtManifestMergeCallback());
 
             File[] libManifests = new File[libProjects.size()];
             int libIndex = 0;
             for (IProject lib : libProjects) {
-                libManifests[libIndex++] = lib.getFile(SdkConstants.FN_ANDROID_MANIFEST_XML)
-                        .getLocation().toFile();
+                libManifests[libIndex++] = lib.getFile(SdkConstants.FN_ANDROID_MANIFEST_XML).getLocation().toFile();
             }
 
-            if (merger.process(
-                    outFile.getLocation().toFile(),
-                    manifest.getLocation().toFile(),
-                    libManifests,
+            if (merger.process(outFile.getLocation().toFile(), manifest.getLocation().toFile(), libManifests,
                     null /*injectAttributes*/, null /*packageOverride*/) == false) {
                 if (errors.size() > 1) {
                     StringBuilder sb = new StringBuilder();
@@ -1024,12 +953,10 @@ public class PreCompilerBuilder extends BaseBuilder {
                         sb.append(s).append('\n');
                     }
 
-                    markProject(AndmoreAndroidConstants.MARKER_MANIFMERGER, sb.toString(),
-                            IMarker.SEVERITY_ERROR);
+                    markProject(AndmoreAndroidConstants.MARKER_MANIFMERGER, sb.toString(), IMarker.SEVERITY_ERROR);
 
                 } else if (errors.size() == 1) {
-                    markProject(AndmoreAndroidConstants.MARKER_MANIFMERGER, errors.get(0),
-                            IMarker.SEVERITY_ERROR);
+                    markProject(AndmoreAndroidConstants.MARKER_MANIFMERGER, errors.get(0), IMarker.SEVERITY_ERROR);
                 } else {
                     markProject(AndmoreAndroidConstants.MARKER_MANIFMERGER, "Unknown error merging manifest",
                             IMarker.SEVERITY_ERROR);
@@ -1055,9 +982,9 @@ public class PreCompilerBuilder extends BaseBuilder {
      * @throws CoreException
      * @throws AbortBuildException
      */
-    private void handleResources(IProject project, String javaPackage, IAndroidTarget projectTarget,
-            IFile manifest, IFolder resOutFolder, List<IProject> libProjects, boolean isLibrary,
-            IFile proguardFile) throws CoreException, AbortBuildException {
+    private void handleResources(IProject project, String javaPackage, IAndroidTarget projectTarget, IFile manifest,
+            IFolder resOutFolder, List<IProject> libProjects, boolean isLibrary, IFile proguardFile)
+            throws CoreException, AbortBuildException {
         // get the resource folder
         IFolder resFolder = project.getFolder(AndmoreAndroidConstants.WS_RESOURCES);
 
@@ -1067,8 +994,7 @@ public class PreCompilerBuilder extends BaseBuilder {
         IPath manifestLocation = manifest == null ? null : manifest.getLocation();
 
         // those locations have to exist for us to do something!
-        if (outputLocation != null && resLocation != null
-                && manifestLocation != null) {
+        if (outputLocation != null && resLocation != null && manifestLocation != null) {
             String osOutputPath = outputLocation.toOSString();
             String osResPath = resLocation.toOSString();
             String osManifestPath = manifestLocation.toOSString();
@@ -1103,24 +1029,20 @@ public class PreCompilerBuilder extends BaseBuilder {
                             IFolder libOutput = BaseProjectHelper.getAndroidOutputFolder(lib);
                             File libOutputFolder = libOutput.getLocation().toFile();
 
-                            libRFiles.add(Pair.of(
-                                    new File(libOutputFolder, "R.txt"),
-                                    libJavaPackage));
+                            libRFiles.add(Pair.of(new File(libOutputFolder, "R.txt"), libJavaPackage));
 
                         }
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
                 }
             }
 
-            String proguardFilePath = proguardFile != null ?
-                    proguardFile.getLocation().toOSString(): null;
+            String proguardFilePath = proguardFile != null ? proguardFile.getLocation().toOSString() : null;
 
             File resOutFile = resOutFolder.getLocation().toFile();
             String resOutPath = resOutFile.isDirectory() ? resOutFile.getAbsolutePath() : null;
 
-            execAapt(project, projectTarget, osOutputPath, resOutPath, osResPath, osManifestPath,
-                    mainPackageFolder, libResFolders, libRFiles, isLibrary, proguardFilePath);
+            execAapt(project, projectTarget, osOutputPath, resOutPath, osResPath, osManifestPath, mainPackageFolder,
+                    libResFolders, libRFiles, isLibrary, proguardFilePath);
         }
     }
 
@@ -1143,11 +1065,9 @@ public class PreCompilerBuilder extends BaseBuilder {
      * @throws AbortBuildException
      */
     @SuppressWarnings("deprecation")
-    private void execAapt(IProject project, IAndroidTarget projectTarget, String osOutputPath,
-            String osBcOutPath, String osResPath, String osManifestPath, IFolder packageFolder,
-            ArrayList<IFolder> libResFolders, List<Pair<File, String>> libRFiles,
-            boolean isLibrary, String proguardFile)
-            throws AbortBuildException {
+    private void execAapt(IProject project, IAndroidTarget projectTarget, String osOutputPath, String osBcOutPath,
+            String osResPath, String osManifestPath, IFolder packageFolder, ArrayList<IFolder> libResFolders,
+            List<Pair<File, String>> libRFiles, boolean isLibrary, String proguardFile) throws AbortBuildException {
 
         // We actually need to delete the manifest.java as it may become empty and
         // in this case aapt doesn't generate an empty one, but instead doesn't
@@ -1176,8 +1096,7 @@ public class PreCompilerBuilder extends BaseBuilder {
         }
 
         // If a library or has libraries, generate a text version of the R symbols.
-        File outputFolder = BaseProjectHelper.getAndroidOutputFolder(project).getLocation()
-                .toFile();
+        File outputFolder = BaseProjectHelper.getAndroidOutputFolder(project).getLocation().toFile();
 
         if (isLibrary || !libRFiles.isEmpty()) {
             array.add("--output-text-symbols"); //$NON-NLS-1$
@@ -1221,8 +1140,7 @@ public class PreCompilerBuilder extends BaseBuilder {
         // launch
         try {
             // launch the command line process
-            Process process = Runtime.getRuntime().exec(
-                    array.toArray(new String[array.size()]));
+            Process process = Runtime.getRuntime().exec(array.toArray(new String[array.size()]));
 
             // list to store each line of stderr
             ArrayList<String> stdErr = new ArrayList<String>();
@@ -1238,8 +1156,7 @@ public class PreCompilerBuilder extends BaseBuilder {
                 if (returnCode != 0) {
                     AndmoreAndroidPlugin.printErrorToConsole(project, stdErr.toArray());
                 } else {
-                    AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.NORMAL,
-                            project, stdErr.toArray());
+                    AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.NORMAL, project, stdErr.toArray());
                 }
             }
 
@@ -1248,18 +1165,16 @@ public class PreCompilerBuilder extends BaseBuilder {
                 // (and therefore not all files that should have been marked,
                 // were marked), we put a generic marker on the project and abort.
                 if (parsingError) {
-                    markProject(AndmoreAndroidConstants.MARKER_ADT,
-                            Messages.Unparsed_AAPT_Errors, IMarker.SEVERITY_ERROR);
+                    markProject(AndmoreAndroidConstants.MARKER_ADT, Messages.Unparsed_AAPT_Errors,
+                            IMarker.SEVERITY_ERROR);
                 } else if (stdErr.size() == 0) {
                     // no parsing error because sdterr was empty. We still need to put
                     // a marker otherwise there's no user visible feedback.
                     markProject(AndmoreAndroidConstants.MARKER_ADT,
-                            String.format(Messages.AAPT_Exec_Error_d, returnCode),
-                            IMarker.SEVERITY_ERROR);
+                            String.format(Messages.AAPT_Exec_Error_d, returnCode), IMarker.SEVERITY_ERROR);
                 }
 
-                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project,
-                        Messages.AAPT_Error);
+                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project, Messages.AAPT_Error);
 
                 // abort if exec failed.
                 throw new AbortBuildException();
@@ -1300,8 +1215,7 @@ public class PreCompilerBuilder extends BaseBuilder {
                     for (String packageName : libMap.keySet()) {
                         Collection<SymbolLoader> symbols = libMap.get(packageName);
 
-                        SymbolWriter writer = new SymbolWriter(osOutputPath, packageName,
-                                fullSymbolValues);
+                        SymbolWriter writer = new SymbolWriter(osOutputPath, packageName, fullSymbolValues);
                         for (SymbolLoader symbolLoader : symbols) {
                             writer.addSymbolsToWrite(symbolLoader);
                         }
@@ -1335,8 +1249,7 @@ public class PreCompilerBuilder extends BaseBuilder {
             // scenario.
             if (SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_LINUX
                     && System.getProperty("os.arch").endsWith("64") //$NON-NLS-1$ //$NON-NLS-2$
-                    && new File(aaptPath).exists()
-                    && new File("/usr/bin/apt-get").exists()) {     //$NON-NLS-1$
+                    && new File(aaptPath).exists() && new File("/usr/bin/apt-get").exists()) { //$NON-NLS-1$
                 markProject(AndmoreAndroidConstants.MARKER_ADT,
                         "Hint: On 64-bit systems, make sure the 32-bit libraries are installed: \"sudo apt-get install ia32-libs\" or on some systems, \"sudo apt-get install lib32z1\"",
                         IMarker.SEVERITY_ERROR);
@@ -1358,8 +1271,7 @@ public class PreCompilerBuilder extends BaseBuilder {
         } finally {
             // we've at least attempted to run aapt, save the fact that we don't have to
             // run it again, unless there's a new resource change.
-            saveProjectBooleanProperty(PROPERTY_COMPILE_RESOURCES,
-                    mMustCompileResources = false);
+            saveProjectBooleanProperty(PROPERTY_COMPILE_RESOURCES, mMustCompileResources = false);
             ResourceManager.clearAaptRequest(project);
         }
     }
@@ -1374,8 +1286,8 @@ public class PreCompilerBuilder extends BaseBuilder {
 
         StringBuilder path = new StringBuilder();
         for (String s : segments) {
-           path.append(AndmoreAndroidConstants.WS_SEP_CHAR);
-           path.append(s);
+            path.append(AndmoreAndroidConstants.WS_SEP_CHAR);
+            path.append(s);
         }
 
         return new Path(path.toString());

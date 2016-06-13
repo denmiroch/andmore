@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +47,7 @@ public final class DexWrapper {
     public final static String DEX_MAIN_FIELD_OUTPUT_ARRAYS = "dexOutputArrays"; //$NON-NLS-1$
     public final static String DEX_MAIN_FIELD_CLASSES_IN_MAIN_DEX = "classesInMainDex"; //$NON-NLS-1$
     public final static String DEX_MAIN_FIELD_OUTPUT_RESOURCES = "outputResources"; //$NON-NLS-1$
-    
+
     public final static String DEX_ARGUMENTS_FIELD_OUT_NAME = "outName"; //$NON-NLS-1$
     public final static String DEX_ARGUMENTS_FIELD_JAR_OUTPUT = "jarOutput"; //$NON-NLS-1$
     public final static String DEX_ARGUMENTS_FIELD_FILES_NAMES = "fileNames"; //$NON-NLS-1$
@@ -59,11 +56,11 @@ public final class DexWrapper {
     public final static String DEX_ARGUMENTS_FIELD_MULTI_DEX = "multiDex"; //$NON-NLS-1$
     public final static String DEX_ARGUMENTS_FIELD_MAIN_DEX_LIST_FILE = "mainDexListFile"; //$NON-NLS-1$
     public final static String DEX_ARGUMENTS_FIELD_MINIMAL_MAIN_DEX = "minimalMainDex"; //$NON-NLS-1$
-    
+
     private final static String MAIN_RUN = "run"; //$NON-NLS-1$
 
     private Method mRunMethod;
-    
+
     private Field mDexOutputFutures;
     private Field mDexOutputArrays;
     private Field mClassesInMainDex;
@@ -78,7 +75,7 @@ public final class DexWrapper {
     private Field mArgMultiDex;
     private Field mArgMainDexListFile;
     private Field mArgMinimalMainDex;
-    
+
     private Field mConsoleOut;
     private Field mConsoleErr;
 
@@ -95,14 +92,13 @@ public final class DexWrapper {
         try {
             File f = new File(osFilepath);
             if (f.isFile() == false) {
-                return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, String.format(
-                        Messages.DexWrapper_s_does_not_exists, osFilepath));
+                return new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
+                        String.format(Messages.DexWrapper_s_does_not_exists, osFilepath));
             }
             URL url = f.toURI().toURL();
 
             @SuppressWarnings("resource")
-			URLClassLoader loader = new URLClassLoader(new URL[] { url },
-                    DexWrapper.class.getClassLoader());
+            URLClassLoader loader = new URLClassLoader(new URL[] { url }, DexWrapper.class.getClassLoader());
 
             // get the classes.
             Class<?> mainClass = loader.loadClass(DEX_MAIN);
@@ -112,23 +108,23 @@ public final class DexWrapper {
             try {
                 // now get the fields/methods we need
                 mRunMethod = mainClass.getMethod(MAIN_RUN, argClass);
-                
+
                 try {
-                	// this field is not required when it is not yet available in Main.
-                	mDexOutputFutures = mainClass.getDeclaredField(DEX_MAIN_FIELD_OUTPUT_FUTURES);
+                    // this field is not required when it is not yet available in Main.
+                    mDexOutputFutures = mainClass.getDeclaredField(DEX_MAIN_FIELD_OUTPUT_FUTURES);
                 } catch (Exception e) {}
-                
+
                 mDexOutputArrays = mainClass.getDeclaredField(DEX_MAIN_FIELD_OUTPUT_ARRAYS);
                 mClassesInMainDex = mainClass.getDeclaredField(DEX_MAIN_FIELD_CLASSES_IN_MAIN_DEX);
                 mOutputResources = mainClass.getDeclaredField(DEX_MAIN_FIELD_OUTPUT_RESOURCES);
-                
+
                 mArgConstructor = argClass.getConstructor();
-                mArgOutName = argClass.getField(DEX_ARGUMENTS_FIELD_OUT_NAME); //$NON-NLS-1$
-                mArgJarOutput = argClass.getField(DEX_ARGUMENTS_FIELD_JAR_OUTPUT); //$NON-NLS-1$
-                mArgFileNames = argClass.getField(DEX_ARGUMENTS_FIELD_FILES_NAMES); //$NON-NLS-1$
-                mArgVerbose = argClass.getField(DEX_ARGUMENTS_FIELD_VERBOSE); //$NON-NLS-1$
-                mArgForceJumbo = argClass.getField(DEX_ARGUMENTS_FIELD_FORCE_JUMBO); //$NON-NLS-1$
-                mArgMultiDex = argClass.getField(DEX_ARGUMENTS_FIELD_MULTI_DEX); //$NON-NLS-1$
+                mArgOutName = argClass.getField(DEX_ARGUMENTS_FIELD_OUT_NAME);
+                mArgJarOutput = argClass.getField(DEX_ARGUMENTS_FIELD_JAR_OUTPUT);
+                mArgFileNames = argClass.getField(DEX_ARGUMENTS_FIELD_FILES_NAMES);
+                mArgVerbose = argClass.getField(DEX_ARGUMENTS_FIELD_VERBOSE);
+                mArgForceJumbo = argClass.getField(DEX_ARGUMENTS_FIELD_FORCE_JUMBO);
+                mArgMultiDex = argClass.getField(DEX_ARGUMENTS_FIELD_MULTI_DEX);
                 mArgMainDexListFile = argClass.getField(DEX_ARGUMENTS_FIELD_MAIN_DEX_LIST_FILE);
                 mArgMinimalMainDex = argClass.getField(DEX_ARGUMENTS_FIELD_MINIMAL_MAIN_DEX);
 
@@ -146,11 +142,9 @@ public final class DexWrapper {
             return Status.OK_STATUS;
         } catch (MalformedURLException e) {
             // really this should not happen.
-            return createErrorStatus(
-                    String.format(Messages.DexWrapper_Failed_to_load_s, osFilepath), e);
+            return createErrorStatus(String.format(Messages.DexWrapper_Failed_to_load_s, osFilepath), e);
         } catch (ClassNotFoundException e) {
-            return createErrorStatus(
-                    String.format(Messages.DexWrapper_Failed_to_load_s, osFilepath), e);
+            return createErrorStatus(String.format(Messages.DexWrapper_Failed_to_load_s, osFilepath), e);
         }
     }
 
@@ -163,12 +157,12 @@ public final class DexWrapper {
      */
     public synchronized void unload() {
         mRunMethod = null;
-        
+
         mDexOutputFutures = null;
         mDexOutputArrays = null;
         mClassesInMainDex = null;
         mOutputResources = null;
-        
+
         mArgConstructor = null;
         mArgOutName = null;
         mArgJarOutput = null;
@@ -188,35 +182,35 @@ public final class DexWrapper {
      * @throws Exception
      */
     private synchronized void resetDexMain() throws Exception {
-    	assert mDexOutputArrays != null;
-    	assert mClassesInMainDex != null;
-    	assert mOutputResources != null;
-    	
-    	if(mDexOutputFutures != null) { // not required when not available
-	    	if(!mDexOutputFutures.isAccessible()) {
-	    		mDexOutputFutures.setAccessible(true);
-	    	}
-	    	
-	    	mDexOutputFutures.set(null, new ArrayList<Future<byte[]>>());
-    	}
-    	
-    	if(!mDexOutputArrays.isAccessible()) {
-    		mDexOutputArrays.setAccessible(true);
-    	}
-    	
-    	if(!mClassesInMainDex.isAccessible()) {
-    		mClassesInMainDex.setAccessible(true);
-    	}
-    	
-    	if(!mOutputResources.isAccessible()) {
-    		mOutputResources.setAccessible(true);
-    	}
-    	
+        assert mDexOutputArrays != null;
+        assert mClassesInMainDex != null;
+        assert mOutputResources != null;
+
+        if (mDexOutputFutures != null) { // not required when not available
+            if (!mDexOutputFutures.isAccessible()) {
+                mDexOutputFutures.setAccessible(true);
+            }
+
+            mDexOutputFutures.set(null, new ArrayList<Future<byte[]>>());
+        }
+
+        if (!mDexOutputArrays.isAccessible()) {
+            mDexOutputArrays.setAccessible(true);
+        }
+
+        if (!mClassesInMainDex.isAccessible()) {
+            mClassesInMainDex.setAccessible(true);
+        }
+
+        if (!mOutputResources.isAccessible()) {
+            mOutputResources.setAccessible(true);
+        }
+
         mDexOutputArrays.set(null, new ArrayList<byte[]>());
         mClassesInMainDex.set(null, null);
         mOutputResources.set(null, null);
-     }
-    
+    }
+
     /**
      * Runs the dex command.
      * The wrapper must have been initialized via {@link #loadDex(String)} first.
@@ -230,8 +224,8 @@ public final class DexWrapper {
      * @return the integer return code of com.android.dx.command.dexer.Main.run()
      * @throws CoreException
      */
-    public synchronized int run(String osOutFilePath, Collection<String> osFilenames,
-            boolean forceJumbo, boolean enableMultiDex, String mainDexListFile, boolean minimalMainDex, boolean verbose,
+    public synchronized int run(String osOutFilePath, Collection<String> osFilenames, boolean forceJumbo,
+            boolean enableMultiDex, String mainDexListFile, boolean minimalMainDex, boolean verbose,
             PrintStream outStream, PrintStream errStream) throws CoreException {
 
         assert mRunMethod != null;
@@ -249,8 +243,7 @@ public final class DexWrapper {
 
         if (mRunMethod == null) {
             throw new CoreException(createErrorStatus(
-                    String.format(Messages.DexWrapper_Unable_To_Execute_Dex_s,
-                            "wrapper was not properly loaded first"),
+                    String.format(Messages.DexWrapper_Unable_To_Execute_Dex_s, "wrapper was not properly loaded first"),
                     null /*exception*/));
         }
 
@@ -258,21 +251,20 @@ public final class DexWrapper {
             // set the stream
             mConsoleErr.set(null /* obj: static field */, errStream);
             mConsoleOut.set(null /* obj: static field */, outStream);
-            
+
             // create the Arguments object.
             Object args = mArgConstructor.newInstance();
             mArgMultiDex.set(args, enableMultiDex);
-            
-            if(enableMultiDex)
-            {
-            	resetDexMain();
-            	
-            	mArgMainDexListFile.set(args, mainDexListFile);
-            	mArgMinimalMainDex.set(args, minimalMainDex);
+
+            if (enableMultiDex) {
+                resetDexMain();
+
+                mArgMainDexListFile.set(args, mainDexListFile);
+                mArgMinimalMainDex.set(args, minimalMainDex);
             }
-            
+
             mArgFileNames.set(args, osFilenames.toArray(new String[osFilenames.size()]));
-            
+
             mArgOutName.set(args, osOutFilePath);
             mArgJarOutput.set(args, osOutFilePath.endsWith(SdkConstants.DOT_JAR));
             mArgForceJumbo.set(args, forceJumbo);
@@ -282,7 +274,7 @@ public final class DexWrapper {
             Object res = mRunMethod.invoke(null /* obj: static method */, args);
 
             if (res instanceof Integer) {
-                return ((Integer)res).intValue();
+                return ((Integer) res).intValue();
             }
 
             return -1;
@@ -294,12 +286,11 @@ public final class DexWrapper {
 
             String msg = t.getMessage();
             if (msg == null) {
-                msg = String.format("%s. Check the Eclipse log for stack trace.",
-                        t.getClass().getName());
+                msg = String.format("%s. Check the Eclipse log for stack trace.", t.getClass().getName());
             }
 
-            throw new CoreException(createErrorStatus(
-                    String.format(Messages.DexWrapper_Unable_To_Execute_Dex_s, msg), t));
+            throw new CoreException(
+                    createErrorStatus(String.format(Messages.DexWrapper_Unable_To_Execute_Dex_s, msg), t));
         }
     }
 

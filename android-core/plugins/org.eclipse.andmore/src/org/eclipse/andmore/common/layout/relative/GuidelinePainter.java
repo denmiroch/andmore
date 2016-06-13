@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,6 +20,13 @@ import static com.android.SdkConstants.ATTR_LAYOUT_RESOURCE_PREFIX;
 import static com.android.SdkConstants.ID_PREFIX;
 import static com.android.SdkConstants.NEW_ID_PREFIX;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.eclipse.andmore.common.layout.relative.DependencyGraph.Constraint;
+
 import com.android.annotations.NonNull;
 import com.android.ide.common.api.DrawingStyle;
 import com.android.ide.common.api.DropFeedback;
@@ -32,13 +36,6 @@ import com.android.ide.common.api.INode;
 import com.android.ide.common.api.Point;
 import com.android.ide.common.api.Rect;
 import com.android.ide.common.api.SegmentType;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.eclipse.andmore.common.layout.relative.DependencyGraph.Constraint;
 
 /**
  * The {@link GuidelinePainter} is responsible for painting guidelines during an operation
@@ -97,14 +94,10 @@ public final class GuidelinePainter implements IFeedbackPainter {
 
         List<String> strings = new ArrayList<String>();
 
-        showMatch(gc, state.mCurrentLeftMatch, state, strings,
-                state.mLeftMargin, ATTR_LAYOUT_MARGIN_LEFT);
-        showMatch(gc, state.mCurrentRightMatch, state, strings,
-                state.mRightMargin, ATTR_LAYOUT_MARGIN_RIGHT);
-        showMatch(gc, state.mCurrentTopMatch, state, strings,
-                state.mTopMargin, ATTR_LAYOUT_MARGIN_TOP);
-        showMatch(gc, state.mCurrentBottomMatch, state, strings,
-                state.mBottomMargin, ATTR_LAYOUT_MARGIN_BOTTOM);
+        showMatch(gc, state.mCurrentLeftMatch, state, strings, state.mLeftMargin, ATTR_LAYOUT_MARGIN_LEFT);
+        showMatch(gc, state.mCurrentRightMatch, state, strings, state.mRightMargin, ATTR_LAYOUT_MARGIN_RIGHT);
+        showMatch(gc, state.mCurrentTopMatch, state, strings, state.mTopMargin, ATTR_LAYOUT_MARGIN_TOP);
+        showMatch(gc, state.mCurrentBottomMatch, state, strings, state.mBottomMargin, ATTR_LAYOUT_MARGIN_BOTTOM);
 
         if (strings.size() > 0) {
             // Update the drag tooltip
@@ -142,8 +135,8 @@ public final class GuidelinePainter implements IFeedbackPainter {
     }
 
     /** Paints a particular match constraint */
-    private void showMatch(IGraphics gc, Match m, GuidelineHandler state, List<String> strings,
-            int margin, String marginAttribute) {
+    private void showMatch(IGraphics gc, Match m, GuidelineHandler state, List<String> strings, int margin,
+            String marginAttribute) {
         if (m == null) {
             return;
         }
@@ -203,7 +196,7 @@ public final class GuidelinePainter implements IFeedbackPainter {
         points.add(points.get(0));
 
         for (int i = 1, n = points.size(); i < n; i++) {
-            gc.drawLine(points.get(i-1), points.get(i));
+            gc.drawLine(points.get(i - 1), points.get(i));
         }
     }
 }

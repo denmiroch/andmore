@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,11 +24,10 @@ import static com.android.SdkConstants.TOOLS_URI;
 import static com.android.SdkConstants.VIEW_FRAGMENT;
 import static com.android.SdkConstants.VIEW_TAG;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.ide.common.xml.ManifestData;
-import com.android.resources.ResourceFolderType;
-import com.android.utils.SdkUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -82,10 +78,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.ide.common.xml.ManifestData;
+import com.android.resources.ResourceFolderType;
+import com.android.utils.SdkUtils;
 
 /**
  * A participant to participate in refactorings that rename a package in an Android project.
@@ -134,24 +131,17 @@ public class AndroidPackageRenameParticipant extends RenameParticipant {
             // There's no line wrapping in the error dialog, so split up the message into
             // individually digestible pieces of information
             RefactoringStatusContext ctx = new FileStatusContext(mManifestFile, region);
-            RefactoringStatus status = RefactoringStatus.createInfoStatus(
-                    "You are refactoring the same package as your application's " +
-                    "package (specified in the manifest).\n", ctx);
-            status.addInfo(
-                    "Note that this refactoring does NOT also update your " +
-                    "application package.", ctx);
+            RefactoringStatus status = RefactoringStatus
+                    .createInfoStatus("You are refactoring the same package as your application's "
+                            + "package (specified in the manifest).\n", ctx);
+            status.addInfo("Note that this refactoring does NOT also update your " + "application package.", ctx);
             status.addInfo("The application package defines your application's identity.", ctx);
-            status.addInfo(
-                    "If you change it, then it is considered to be a different application.", ctx);
-            status.addInfo("(Users of the previous version cannot update to the new version.)",
+            status.addInfo("If you change it, then it is considered to be a different application.", ctx);
+            status.addInfo("(Users of the previous version cannot update to the new version.)", ctx);
+            status.addInfo("The application package, and the package containing the code, can differ.", ctx);
+            status.addInfo("To really change application package, "
+                    + "choose \"Android Tools\" > \"Rename  Application Package.\" " + "from the project context menu.",
                     ctx);
-            status.addInfo(
-                    "The application package, and the package containing the code, can differ.",
-                    ctx);
-            status.addInfo(
-                    "To really change application package, " +
-                    "choose \"Android Tools\" > \"Rename  Application Package.\" " +
-                    "from the project context menu.", ctx);
             return status;
         }
 
@@ -172,17 +162,14 @@ public class AndroidPackageRenameParticipant extends RenameParticipant {
                 if (!mPackageFragment.containsJavaResources()) {
                     return false;
                 }
-                IJavaProject javaProject = (IJavaProject) mPackageFragment
-                        .getAncestor(IJavaElement.JAVA_PROJECT);
+                IJavaProject javaProject = (IJavaProject) mPackageFragment.getAncestor(IJavaElement.JAVA_PROJECT);
                 mProject = javaProject.getProject();
-                IResource manifestResource = mProject.findMember(AndmoreAndroidConstants.WS_SEP
-                        + SdkConstants.FN_ANDROID_MANIFEST_XML);
+                IResource manifestResource = mProject
+                        .findMember(AndmoreAndroidConstants.WS_SEP + SdkConstants.FN_ANDROID_MANIFEST_XML);
 
-                if (manifestResource == null || !manifestResource.exists()
-                        || !(manifestResource instanceof IFile)) {
-                    RefactoringUtil.logInfo("Invalid or missing the "
-                            + SdkConstants.FN_ANDROID_MANIFEST_XML + " in the "
-                            + mProject.getName() + " project.");
+                if (manifestResource == null || !manifestResource.exists() || !(manifestResource instanceof IFile)) {
+                    RefactoringUtil.logInfo("Invalid or missing the " + SdkConstants.FN_ANDROID_MANIFEST_XML
+                            + " in the " + mProject.getName() + " project.");
                     return false;
                 }
                 mManifestFile = (IFile) manifestResource;
@@ -199,23 +186,18 @@ public class AndroidPackageRenameParticipant extends RenameParticipant {
                     return false;
                 }
 
-                if (RefactoringUtil.isRefactorAppPackage()
-                        && mAppPackage != null
-                        && mAppPackage.equals(packageName)) {
+                if (RefactoringUtil.isRefactorAppPackage() && mAppPackage != null && mAppPackage.equals(packageName)) {
                     mRefactoringAppPackage = true;
                 }
 
                 return true;
             }
-        } catch (JavaModelException ignore) {
-        }
+        } catch (JavaModelException ignore) {}
         return false;
     }
 
-
     @Override
-    public Change createChange(IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+    public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
         if (pm.isCanceled()) {
             return null;
         }
@@ -225,8 +207,7 @@ public class AndroidPackageRenameParticipant extends RenameParticipant {
 
         RefactoringProcessor p = getProcessor();
         if (p instanceof RenameCompilationUnitProcessor) {
-            RenameTypeProcessor rtp =
-                    ((RenameCompilationUnitProcessor) p).getRenameTypeProcessor();
+            RenameTypeProcessor rtp = ((RenameCompilationUnitProcessor) p).getRenameTypeProcessor();
             if (rtp != null) {
                 String pattern = rtp.getFilePatterns();
                 boolean updQualf = rtp.getUpdateQualifiedNames();
@@ -274,8 +255,7 @@ public class AndroidPackageRenameParticipant extends RenameParticipant {
             return new NullChange("Update Imports") {
                 @Override
                 public Change perform(IProgressMonitor monitor) throws CoreException {
-                    FixImportsJob job = new FixImportsJob("Fix Rename Package",
-                            mManifestFile, mNewPackage);
+                    FixImportsJob job = new FixImportsJob("Fix Rename Package", mManifestFile, mNewPackage);
                     job.schedule(500);
 
                     // Not undoable: just return null instead of an undo-change.
@@ -296,8 +276,7 @@ public class AndroidPackageRenameParticipant extends RenameParticipant {
      * @throws CoreException if an error happens
      * @throws OperationCanceledException if the operation is canceled
      */
-    public Change getGenPackageChange(IProgressMonitor pm) throws CoreException,
-            OperationCanceledException {
+    public Change getGenPackageChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
         if (mRefactoringAppPackage) {
             IPackageFragment genJavaPackageFragment = getGenPackageFragment();
             if (genJavaPackageFragment != null && genJavaPackageFragment.exists()) {
@@ -311,16 +290,14 @@ public class AndroidPackageRenameParticipant extends RenameParticipant {
      * Return the gen package fragment
      */
     private IPackageFragment getGenPackageFragment() throws JavaModelException {
-        IJavaProject javaProject = (IJavaProject) mPackageFragment
-                .getAncestor(IJavaElement.JAVA_PROJECT);
+        IJavaProject javaProject = (IJavaProject) mPackageFragment.getAncestor(IJavaElement.JAVA_PROJECT);
         if (javaProject != null && javaProject.isOpen()) {
             IProject project = javaProject.getProject();
             IFolder genFolder = project.getFolder(SdkConstants.FD_GEN_SOURCES);
             if (genFolder.exists()) {
                 String javaPackagePath = mAppPackage.replace('.', '/');
                 IPath genJavaPackagePath = genFolder.getFullPath().append(javaPackagePath);
-                IPackageFragment genPackageFragment = javaProject
-                        .findPackageFragment(genJavaPackagePath);
+                IPackageFragment genPackageFragment = javaProject.findPackageFragment(genJavaPackagePath);
                 return genPackageFragment;
             }
         }
@@ -430,14 +407,11 @@ public class AndroidPackageRenameParticipant extends RenameParticipant {
     }
 
     private boolean isInRenamedPackage(String fqcn) {
-        return fqcn.startsWith(mOldPackage)
-                && fqcn.length() > mOldPackage.length()
+        return fqcn.startsWith(mOldPackage) && fqcn.length() > mOldPackage.length()
                 && fqcn.indexOf('.', mOldPackage.length() + 1) == -1;
     }
 
-    private void addLayoutReplacements(
-            @NonNull List<TextEdit> edits,
-            @NonNull Element element,
+    private void addLayoutReplacements(@NonNull List<TextEdit> edits, @NonNull Element element,
             @NonNull IStructuredDocument document) {
         String tag = element.getTagName();
         if (isInRenamedPackage(tag)) {
@@ -482,12 +456,9 @@ public class AndroidPackageRenameParticipant extends RenameParticipant {
         }
     }
 
-    private void addManifestReplacements(
-            @NonNull List<TextEdit> edits,
-            @NonNull Element element,
+    private void addManifestReplacements(@NonNull List<TextEdit> edits, @NonNull Element element,
             @NonNull IStructuredDocument document) {
-        if (mRefactoringAppPackage &&
-                element == element.getOwnerDocument().getDocumentElement()) {
+        if (mRefactoringAppPackage && element == element.getOwnerDocument().getDocumentElement()) {
             // Update the app package declaration
             Attr pkg = element.getAttributeNode(ATTR_PACKAGE);
             if (pkg != null && pkg.getValue().equals(mOldPackage)) {

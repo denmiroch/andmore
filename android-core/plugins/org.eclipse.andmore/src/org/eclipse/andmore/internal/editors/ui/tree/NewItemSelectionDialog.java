@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +12,13 @@
  */
 
 package org.eclipse.andmore.internal.editors.ui.tree;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
@@ -38,13 +42,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.dialogs.AbstractElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 import org.eclipse.ui.part.FileEditorInput;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
 /**
  * A selection dialog to select the type of the new element node to
@@ -82,10 +79,8 @@ public class NewItemSelectionDialog extends AbstractElementListSelectionDialog {
      * @param ui_node The selected node, or null if none is selected.
      * @param root_node The root of the Ui Tree, either the UiDocumentNode or a sub-node.
      */
-    public NewItemSelectionDialog(Shell shell, ILabelProvider labelProvider,
-            ElementDescriptor[] descriptorFilters,
-            UiElementNode ui_node,
-            UiElementNode root_node) {
+    public NewItemSelectionDialog(Shell shell, ILabelProvider labelProvider, ElementDescriptor[] descriptorFilters,
+            UiElementNode ui_node, UiElementNode root_node) {
         super(shell, labelProvider);
         mDescriptorFilters = descriptorFilters;
         mLocalRootNode = root_node;
@@ -203,10 +198,7 @@ public class NewItemSelectionDialog extends AbstractElementListSelectionDialog {
      *                {@link ElementDescriptor}.
      */
     private void setLastUsedXmlName(Object[] objects) {
-        if (mLastUsedKey != null &&
-                objects != null &&
-                objects.length > 0 &&
-                objects[0] instanceof ElementDescriptor) {
+        if (mLastUsedKey != null && objects != null && objects.length > 0 && objects[0] instanceof ElementDescriptor) {
             ElementDescriptor desc = (ElementDescriptor) objects[0];
             sLastUsedXmlName.put(mLastUsedKey, desc.getXmlName());
         }
@@ -309,7 +301,7 @@ public class NewItemSelectionDialog extends AbstractElementListSelectionDialog {
 
         if (mInitialXmlName != null && mInitialXmlName.length() > 0) {
             String name = mInitialXmlName;
-            boolean partial = name.startsWith("*");   //$NON-NLS-1$
+            boolean partial = name.startsWith("*"); //$NON-NLS-1$
             if (partial) {
                 name = name.substring(1).toLowerCase(Locale.US);
             }
@@ -403,9 +395,7 @@ public class NewItemSelectionDialog extends AbstractElementListSelectionDialog {
      * @return A non-null array of {@link ElementDescriptor}. The array might be empty.
      */
     private ElementDescriptor[] getAllowedDescriptors(UiElementNode ui_node) {
-        if (ui_node == mLocalRootNode &&
-                mDescriptorFilters != null &&
-                mDescriptorFilters.length != 0) {
+        if (ui_node == mLocalRootNode && mDescriptorFilters != null && mDescriptorFilters.length != 0) {
             return mDescriptorFilters;
         } else {
             return ui_node.getDescriptor().getChildren();

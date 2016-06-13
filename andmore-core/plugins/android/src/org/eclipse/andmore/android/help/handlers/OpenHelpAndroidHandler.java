@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,35 +26,36 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 public class OpenHelpAndroidHandler extends AbstractHandler {
-	private static final String URL_STRING = "http://community.developer.motorola.com/mtrl/";
+    private static final String URL_STRING = "http://community.developer.motorola.com/mtrl/";
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
 
-		/*
-		 * open the browser
-		 */
-		IWebBrowser browser;
-		try {
-			// always use external browser on Linux
-			if (FileUtil.getOS() == FileUtil.OS_LINUX) {
-				browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR
-						| IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.AS_EXTERNAL,
-						"AndmoreHelpAndroid", null, null);
-			} else {
-				browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR
-						| IWorkbenchBrowserSupport.NAVIGATION_BAR, "AndmoreHelpAndroid", null, null);
-			}
+        /*
+         * open the browser
+         */
+        IWebBrowser browser;
+        try {
+            // always use external browser on Linux
+            if (FileUtil.getOS() == FileUtil.OS_LINUX) {
+                browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.LOCATION_BAR
+                        | IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.AS_EXTERNAL,
+                        "AndmoreHelpAndroid", null, null);
+            } else {
+                browser = browserSupport.createBrowser(
+                        IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR,
+                        "AndmoreHelpAndroid", null, null);
+            }
 
-			browser.openURL(new URL(URL_STRING));
+            browser.openURL(new URL(URL_STRING));
 
-		} catch (PartInitException e) {
-			AndmoreLogger.error("Error opening Discussion Board - Android page: " + e.getMessage());
-		} catch (MalformedURLException e) {
-			AndmoreLogger.error("Error opening Discussion Board - Android  page: " + e.getMessage());
-		}
-		return null;
-	}
+        } catch (PartInitException e) {
+            AndmoreLogger.error("Error opening Discussion Board - Android page: " + e.getMessage());
+        } catch (MalformedURLException e) {
+            AndmoreLogger.error("Error opening Discussion Board - Android  page: " + e.getMessage());
+        }
+        return null;
+    }
 
 }

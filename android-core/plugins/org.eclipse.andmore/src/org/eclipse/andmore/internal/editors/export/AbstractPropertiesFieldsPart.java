@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,9 @@
 
 package org.eclipse.andmore.internal.editors.export;
 
-import com.android.SdkConstants;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.ui.SectionHelper.ManifestSectionPart;
@@ -31,11 +30,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.Section;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import com.android.SdkConstants;
 
 /**
  * Section part for editing fields of a properties file in an Export editor.
@@ -154,8 +150,7 @@ abstract class AbstractPropertiesFieldsPart extends ManifestSectionPart {
             // ignore
         }
         if (delim == null || delim.length() == 0) {
-            delim = SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_WINDOWS ?
-                    "\r\n" : "\n"; //$NON-NLS-1$ //$NON-NLS-2#
+            delim = SdkConstants.CURRENT_PLATFORM == SdkConstants.PLATFORM_WINDOWS ? "\r\n" : "\n"; //$NON-NLS-1$ //$NON-NLS-2#
         }
 
         for (int i = 0; i < numLines; i++) {
@@ -163,7 +158,7 @@ abstract class AbstractPropertiesFieldsPart extends ManifestSectionPart {
                 IRegion info = doc.getLineInformation(i);
                 String line = doc.get(info.getOffset(), info.getLength());
                 line = line.trim();
-                if (line.startsWith("#")) {  //$NON-NLS-1$
+                if (line.startsWith("#")) { //$NON-NLS-1$
                     continue;
                 }
 
@@ -278,7 +273,7 @@ abstract class AbstractPropertiesFieldsPart extends ManifestSectionPart {
                 IRegion info = doc.getLineInformation(i);
                 String line = doc.get(info.getOffset(), info.getLength());
                 line = line.trim();
-                if (line.startsWith("#")) {  //$NON-NLS-1$
+                if (line.startsWith("#")) { //$NON-NLS-1$
                     continue;
                 }
 

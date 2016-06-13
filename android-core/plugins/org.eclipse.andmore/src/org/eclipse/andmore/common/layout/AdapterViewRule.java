@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,10 +30,9 @@ public class AdapterViewRule extends BaseLayoutRule {
             @Nullable IDragElement[] elements) {
         // You are not allowed to insert children into AdapterViews; you must
         // use the dedicated addView methods etc dynamically
-        DropFeedback dropFeedback = new DropFeedback(null,  new IFeedbackPainter() {
+        DropFeedback dropFeedback = new DropFeedback(null, new IFeedbackPainter() {
             @Override
-            public void paint(@NonNull IGraphics gc, @NonNull INode node,
-                    @NonNull DropFeedback feedback) {
+            public void paint(@NonNull IGraphics gc, @NonNull INode node, @NonNull DropFeedback feedback) {
                 Rect b = node.getBounds();
                 if (b.isValid()) {
                     gc.useStyle(DrawingStyle.DROP_RECIPIENT);
@@ -45,10 +41,9 @@ public class AdapterViewRule extends BaseLayoutRule {
             }
         });
         String fqcn = targetNode.getFqcn();
-        String name = fqcn.substring(fqcn.lastIndexOf('.') +1);
-        dropFeedback.errorMessage = String.format(
-                "%s cannot be configured via XML; add content to the AdapterView using Java code",
-                name);
+        String name = fqcn.substring(fqcn.lastIndexOf('.') + 1);
+        dropFeedback.errorMessage = String
+                .format("%s cannot be configured via XML; add content to the AdapterView using Java code", name);
         dropFeedback.invalidTarget = true;
         return dropFeedback;
     }

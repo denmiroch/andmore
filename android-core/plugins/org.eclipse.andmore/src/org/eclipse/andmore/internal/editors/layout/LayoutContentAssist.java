@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,10 +24,14 @@ import static com.android.SdkConstants.CLASS_VIEW;
 import static com.android.SdkConstants.VIEW_FRAGMENT;
 import static com.android.SdkConstants.VIEW_TAG;
 
-import com.android.annotations.Nullable;
-import com.android.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
-import com.google.common.collect.ObjectArrays;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.AndroidContentAssist;
@@ -49,14 +50,10 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.android.annotations.Nullable;
+import com.android.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
+import com.google.common.collect.ObjectArrays;
 
 /**
  * Content Assist Processor for /res/layout XML files
@@ -116,8 +113,7 @@ public final class LayoutContentAssist extends AndroidContentAssist {
         // Add in custom views, if any
         List<ElementDescriptor> descriptors = getCustomViews();
         if (descriptors != null && !descriptors.isEmpty()) {
-            ElementDescriptor[] array = descriptors.toArray(
-                    new ElementDescriptor[descriptors.size()]);
+            ElementDescriptor[] array = descriptors.toArray(new ElementDescriptor[descriptors.size()]);
             choices = ObjectArrays.concat(choices, array, ElementDescriptor.class);
             choices = sort(choices);
         }
@@ -152,16 +148,15 @@ public final class LayoutContentAssist extends AndroidContentAssist {
     }
 
     @Override
-    protected boolean computeAttributeValues(List<ICompletionProposal> proposals, int offset,
-            String parentTagName, String attributeName, Node node, String wordPrefix,
-            boolean skipEndTag, int replaceLength) {
-        super.computeAttributeValues(proposals, offset, parentTagName, attributeName, node,
-                wordPrefix, skipEndTag, replaceLength);
+    protected boolean computeAttributeValues(List<ICompletionProposal> proposals, int offset, String parentTagName,
+            String attributeName, Node node, String wordPrefix, boolean skipEndTag, int replaceLength) {
+        super.computeAttributeValues(proposals, offset, parentTagName, attributeName, node, wordPrefix, skipEndTag,
+                replaceLength);
 
         boolean projectOnly = false;
         List<String> superClasses = null;
-        if (VIEW_FRAGMENT.equals(parentTagName) && (attributeName.endsWith(ATTR_NAME)
-                || attributeName.equals(ATTR_CLASS))) {
+        if (VIEW_FRAGMENT.equals(parentTagName)
+                && (attributeName.endsWith(ATTR_NAME) || attributeName.equals(ATTR_CLASS))) {
             // Insert fragment class matches
             superClasses = Arrays.asList(CLASS_V4_FRAGMENT, CLASS_FRAGMENT);
         } else if (VIEW_TAG.equals(parentTagName) && attributeName.endsWith(ATTR_CLASS)) {
@@ -195,8 +190,7 @@ public final class LayoutContentAssist extends AndroidContentAssist {
                 if (superClasses.size() == 2) {
                     type = javaProject.findType(superClasses.get(1));
                     if (type != null) {
-                        ITypeHierarchy hierarchy = type.newTypeHierarchy(
-                                new NullProgressMonitor());
+                        ITypeHierarchy hierarchy = type.newTypeHierarchy(new NullProgressMonitor());
                         IType[] allSubtypes = hierarchy.getAllSubtypes(type);
                         for (IType subType : allSubtypes) {
                             if (!projectOnly || subType.getResource() != null) {
@@ -220,9 +214,8 @@ public final class LayoutContentAssist extends AndroidContentAssist {
                         return fqcn1.compareTo(fqcn2);
                     }
                 });
-                addMatchingProposals(proposals, sorted.toArray(), offset, node, wordPrefix,
-                        (char) 0, false /* isAttribute */, false /* isNew */,
-                        false /* skipEndTag */, replaceLength);
+                addMatchingProposals(proposals, sorted.toArray(), offset, node, wordPrefix, (char) 0,
+                        false /* isAttribute */, false /* isNew */, false /* skipEndTag */, replaceLength);
                 return true;
             } catch (CoreException e) {
                 AndmoreAndroidPlugin.log(e, null);

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,19 +13,19 @@
 
 package org.eclipse.andmore.internal.project;
 
-import com.android.ddmlib.AndroidDebugBridge;
-import com.android.ddmlib.AndroidDebugBridge.IDebugBridgeChangeListener;
-import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
-import com.android.ddmlib.IDevice;
-import com.android.ddmlib.MultiLineReceiver;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IProjectListener;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 
-import java.util.HashSet;
-import java.util.Iterator;
+import com.android.ddmlib.AndroidDebugBridge;
+import com.android.ddmlib.AndroidDebugBridge.IDebugBridgeChangeListener;
+import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
+import com.android.ddmlib.IDevice;
+import com.android.ddmlib.MultiLineReceiver;
 
 /**
  * Registers which apk was installed on which device.
@@ -60,10 +57,10 @@ public final class ApkInstallManager {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof ApkInstall) {
-                ApkInstall apkObj = (ApkInstall)obj;
+                ApkInstall apkObj = (ApkInstall) obj;
 
-                return (device == apkObj.device && project.equals(apkObj.project) &&
-                        packageName.equals(apkObj.packageName));
+                return (device == apkObj.device && project.equals(apkObj.project)
+                        && packageName.equals(apkObj.packageName));
             }
 
             return false;
@@ -84,6 +81,7 @@ public final class ApkInstallManager {
      */
     private final static class PmReceiver extends MultiLineReceiver {
         boolean foundPackage = false;
+
         @Override
         public void processNewLines(String[] lines) {
             // if the package if found, then pm will show a line starting with "package:/"
@@ -135,8 +133,8 @@ public final class ApkInstallManager {
         synchronized (mInstallList) {
             ApkInstall found = null;
             for (ApkInstall install : mInstallList) {
-                if (project.equals(install.project) && packageName.equals(install.packageName) &&
-                        device == install.device) {
+                if (project.equals(install.project) && packageName.equals(install.packageName)
+                        && device == install.device) {
                     found = install;
                     break;
                 }

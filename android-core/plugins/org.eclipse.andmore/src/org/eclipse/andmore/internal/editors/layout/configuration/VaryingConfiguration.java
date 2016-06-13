@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +11,11 @@
  * limitations under the License.
  */
 package org.eclipse.andmore.internal.editors.layout.configuration;
+
+import java.util.Collection;
+import java.util.List;
+
+import org.eclipse.andmore.internal.editors.manifest.ManifestInfo;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
@@ -26,11 +28,6 @@ import com.android.sdklib.devices.Device;
 import com.android.sdklib.devices.Hardware;
 import com.android.sdklib.devices.Screen;
 import com.android.sdklib.devices.State;
-
-import java.util.Collection;
-import java.util.List;
-
-import org.eclipse.andmore.internal.editors.manifest.ManifestInfo;
 
 /**
  * An {@linkplain VaryingConfiguration} is a {@link Configuration} which
@@ -65,9 +62,7 @@ public class VaryingConfiguration extends NestedConfiguration {
      * @param chooser the associated chooser
      * @param configuration the configuration to inherit from
      */
-    private VaryingConfiguration(
-            @NonNull ConfigurationChooser chooser,
-            @NonNull Configuration configuration) {
+    private VaryingConfiguration(@NonNull ConfigurationChooser chooser, @NonNull Configuration configuration) {
         super(chooser, configuration);
     }
 
@@ -81,8 +76,7 @@ public class VaryingConfiguration extends NestedConfiguration {
      * @return a new configuration
      */
     @NonNull
-    public static VaryingConfiguration create(@NonNull ConfigurationChooser chooser,
-            @NonNull Configuration parent) {
+    public static VaryingConfiguration create(@NonNull ConfigurationChooser chooser, @NonNull Configuration parent) {
         return new VaryingConfiguration(chooser, parent);
     }
 
@@ -95,11 +89,8 @@ public class VaryingConfiguration extends NestedConfiguration {
      * @return a new configuration
      */
     @NonNull
-    public static VaryingConfiguration create(
-            @NonNull VaryingConfiguration other,
-            @NonNull Configuration parent) {
-        VaryingConfiguration configuration =
-                new VaryingConfiguration(other.mConfigChooser, parent);
+    public static VaryingConfiguration create(@NonNull VaryingConfiguration other, @NonNull Configuration parent) {
+        VaryingConfiguration configuration = new VaryingConfiguration(other.mConfigChooser, parent);
         initFrom(configuration, other, other, false);
         configuration.mAlternate = other.mAlternate;
         configuration.mVariation = other.mVariation;
@@ -246,7 +237,6 @@ public class VaryingConfiguration extends NestedConfiguration {
             // very similar phones as having the same kind of variety as the 7" and 10"
             // tablets which are sitting right next to each other in the device list.
             // Instead, do this by screen size.
-
 
             double smallest = 100;
             double biggest = 1;

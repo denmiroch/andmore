@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,14 +16,18 @@ import static com.android.SdkConstants.ATTR_ID;
 import static com.android.SdkConstants.ATTR_LAYOUT_MARGIN;
 import static com.android.SdkConstants.ATTR_LAYOUT_RESOURCE_PREFIX;
 
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.IAttributeInfo;
-import com.android.ide.common.api.IAttributeInfo.Format;
-import com.android.tools.lint.detector.api.LintUtils;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import org.eclipse.andmore.internal.editors.descriptors.AttributeDescriptor;
 import org.eclipse.andmore.internal.editors.descriptors.DescriptorsUtils;
@@ -56,18 +57,14 @@ import org.eclipse.wb.internal.core.model.property.category.PropertyCategory;
 import org.eclipse.wb.internal.core.model.property.editor.PropertyEditor;
 import org.eclipse.wb.internal.core.model.property.editor.presentation.ButtonPropertyEditorPresentation;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.IAttributeInfo;
+import com.android.ide.common.api.IAttributeInfo.Format;
+import com.android.tools.lint.detector.api.LintUtils;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 
 /**
  * The {@link PropertyFactory} creates (and caches) the set of {@link Property}
@@ -95,15 +92,12 @@ public class PropertyFactory {
     private static final int PRIO_LAST = 100000;
 
     private final GraphicalEditorPart mGraphicalEditorPart;
-    private Map<UiViewElementNode, Property[]> mCache =
-            new WeakHashMap<UiViewElementNode, Property[]>();
+    private Map<UiViewElementNode, Property[]> mCache = new WeakHashMap<UiViewElementNode, Property[]>();
     private UiViewElementNode mCurrentViewCookie;
 
     /** Sorting orders for the properties */
     public enum SortingMode {
-        NATURAL,
-        BY_ORIGIN,
-        ALPHABETICAL;
+        NATURAL, BY_ORIGIN, ALPHABETICAL;
     }
 
     /** The default sorting mode */
@@ -171,7 +165,6 @@ public class PropertyFactory {
         return properties;
     }
 
-
     protected Collection<? extends Property> getProperties(UiViewElementNode node) {
         ViewMetadataRepository repository = ViewMetadataRepository.get();
         ViewElementDescriptor viewDescriptor = (ViewElementDescriptor) node.getDescriptor();
@@ -225,7 +218,7 @@ public class PropertyFactory {
                 // Prefer attributes defined on the specific type of this
                 // widget
                 // NOTE: This doesn't work very well for TextViews
-               /* IAttributeInfo attributeInfo = descriptor.getAttributeInfo();
+                /* IAttributeInfo attributeInfo = descriptor.getAttributeInfo();
                 if (attributeInfo != null && fqcn.equals(attributeInfo.getDefinedBy())) {
                     category = PropertyCategory.PREFERRED;
                 } else*/ if (PropertyMetadata.isAdvanced(name)) {
@@ -251,16 +244,12 @@ public class PropertyFactory {
         }
     }
 
-    protected Collection<? extends Property> sortAlphabetically(
-            UiViewElementNode node,
-            List<XmlProperty> properties) {
+    protected Collection<? extends Property> sortAlphabetically(UiViewElementNode node, List<XmlProperty> properties) {
         Collections.sort(properties, Property.ALPHABETICAL);
         return properties;
     }
 
-    protected Collection<? extends Property> sortByOrigin(
-            UiViewElementNode node,
-            List<XmlProperty> properties) {
+    protected Collection<? extends Property> sortByOrigin(UiViewElementNode node, List<XmlProperty> properties) {
         List<Property> collapsed = new ArrayList<Property>(properties.size());
         List<Property> layoutProperties = Lists.newArrayListWithExpectedSize(20);
         List<Property> marginProperties = null;
@@ -272,8 +261,7 @@ public class PropertyFactory {
             return properties;
         }
 
-        ViewElementDescriptor parent = (ViewElementDescriptor) properties.get(0).getDescriptor()
-                .getParent();
+        ViewElementDescriptor parent = (ViewElementDescriptor) properties.get(0).getDescriptor().getParent();
         Map<String, Integer> categoryPriorities = Maps.newHashMap();
         int nextCategoryPriority = 100;
         while (parent != null) {
@@ -324,8 +312,7 @@ public class PropertyFactory {
                 // within a category will always find it there, even if for this specific
                 // view type it's a common attribute and replicated up at the top.
                 XmlProperty oldProperty = property;
-                property = new XmlProperty(oldProperty.getEditor(), this, node,
-                        oldProperty.getDescriptor());
+                property = new XmlProperty(oldProperty.getEditor(), this, node, oldProperty.getDescriptor());
                 property.setPriority(oldProperty.getPriority());
             }
 
@@ -334,9 +321,7 @@ public class PropertyFactory {
                 String category = attributeInfo.getDefinedBy();
                 ComplexProperty complex = categoryToProperty.get(category);
                 if (complex == null) {
-                    complex = new ComplexProperty(
-                            category.substring(category.lastIndexOf('.') + 1),
-                            "[]",
+                    complex = new ComplexProperty(category.substring(category.lastIndexOf('.') + 1), "[]",
                             null /* properties */);
                     categoryToProperty.put(category, complex);
                     Integer categoryPriority = categoryPriorities.get(category);
@@ -394,12 +379,8 @@ public class PropertyFactory {
 
         if (layoutProperties.size() > 0 || marginProperties != null) {
             if (marginProperties != null) {
-                XmlProperty[] m =
-                        marginProperties.toArray(new XmlProperty[marginProperties.size()]);
-                Property marginProperty = new ComplexProperty(
-                        "Margins",
-                        "[]",
-                        m);
+                XmlProperty[] m = marginProperties.toArray(new XmlProperty[marginProperties.size()]);
+                Property marginProperty = new ComplexProperty("Margins", "[]", m);
                 layoutProperties.add(marginProperty);
                 marginProperty.setPriority(PRIO_LAST);
 
@@ -409,10 +390,7 @@ public class PropertyFactory {
             }
             Property[] l = layoutProperties.toArray(new Property[layoutProperties.size()]);
             Arrays.sort(l, Property.PRIORITY);
-            Property property = new ComplexProperty(
-                    "Layout Parameters",
-                    "[]",
-                    l);
+            Property property = new ComplexProperty("Layout Parameters", "[]", l);
             for (Property p : l) {
                 if (p instanceof XmlProperty) {
                     ((XmlProperty) p).setParent(property);
@@ -424,9 +402,7 @@ public class PropertyFactory {
         }
 
         if (deprecatedProperties != null && deprecatedProperties.size() > 0) {
-            Property property = new ComplexProperty(
-                    "Deprecated",
-                    "(Deprecated Properties)",
+            Property property = new ComplexProperty("Deprecated", "(Deprecated Properties)",
                     deprecatedProperties.toArray(new Property[deprecatedProperties.size()]));
             property.setPriority(PRIO_LAST);
             collapsed.add(property);
@@ -437,9 +413,7 @@ public class PropertyFactory {
         return collapsed;
     }
 
-    protected Collection<? extends Property> sortNatural(
-            UiViewElementNode node,
-            List<XmlProperty> properties) {
+    protected Collection<? extends Property> sortNatural(UiViewElementNode node, List<XmlProperty> properties) {
         Collections.sort(properties, Property.ALPHABETICAL);
         List<Property> collapsed = new ArrayList<Property>(properties.size());
         List<Property> layoutProperties = Lists.newArrayListWithExpectedSize(20);
@@ -485,10 +459,7 @@ public class PropertyFactory {
             if (category != null) {
                 ComplexProperty complex = categoryToProperty.get(category);
                 if (complex == null) {
-                    complex = new ComplexProperty(
-                            category,
-                            "[]",
-                            null /* properties */);
+                    complex = new ComplexProperty(category, "[]", null /* properties */);
                     categoryToProperty.put(category, complex);
                     complex.setPriority(property.getPriority());
                 }
@@ -507,8 +478,7 @@ public class PropertyFactory {
 
             // Scout forwards and see how many properties we can combine
             int j = i + 1;
-            if (property.getCategory() != PropertyCategory.PREFERRED
-                    && !property.getDescriptor().isDeprecated()) {
+            if (property.getCategory() != PropertyCategory.PREFERRED && !property.getDescriptor().isDeprecated()) {
                 for (; j < max; j++) {
                     XmlProperty next = properties.get(j);
                     String nextName = next.getName();
@@ -566,8 +536,7 @@ public class PropertyFactory {
                                 // character; if not, we could have something like
                                 // scrollBar
                                 // scrollingBehavior
-                                && nextName.length() > common
-                                && Character.isUpperCase(nextName.charAt(common))) {
+                                && nextName.length() > common && Character.isUpperCase(nextName.charAt(common))) {
                             // New prefix is okay
                         } else {
                             common = firstNameIndex;
@@ -579,10 +548,7 @@ public class PropertyFactory {
 
                 String base = firstName.substring(0, firstNameIndex);
                 base = DescriptorsUtils.capitalize(base);
-                Property complexProperty = new ComplexProperty(
-                        base,
-                        "[]",
-                        subprops);
+                Property complexProperty = new ComplexProperty(base, "[]", subprops);
                 complexProperty.setPriority(subprops[0].getPriority());
                 //complexProperty.setCategory(PropertyCategory.PREFERRED);
                 collapsed.add(complexProperty);
@@ -647,12 +613,8 @@ public class PropertyFactory {
 
         if (layoutProperties.size() > 0 || marginProperties != null) {
             if (marginProperties != null) {
-                XmlProperty[] m =
-                        marginProperties.toArray(new XmlProperty[marginProperties.size()]);
-                Property marginProperty = new ComplexProperty(
-                        "Margins",
-                        "[]",
-                        m);
+                XmlProperty[] m = marginProperties.toArray(new XmlProperty[marginProperties.size()]);
+                Property marginProperty = new ComplexProperty("Margins", "[]", m);
                 layoutProperties.add(marginProperty);
                 marginProperty.setPriority(PRIO_LAST);
 
@@ -662,10 +624,7 @@ public class PropertyFactory {
             }
             Property[] l = layoutProperties.toArray(new Property[layoutProperties.size()]);
             Arrays.sort(l, Property.PRIORITY);
-            Property property = new ComplexProperty(
-                    "Layout Parameters",
-                    "[]",
-                    l);
+            Property property = new ComplexProperty("Layout Parameters", "[]", l);
             for (Property p : l) {
                 if (p instanceof XmlProperty) {
                     ((XmlProperty) p).setParent(property);
@@ -677,9 +636,7 @@ public class PropertyFactory {
         }
 
         if (deprecatedProperties != null && deprecatedProperties.size() > 0) {
-            Property property = new ComplexProperty(
-                    "Deprecated",
-                    "(Deprecated Properties)",
+            Property property = new ComplexProperty("Deprecated", "(Deprecated Properties)",
                     deprecatedProperties.toArray(new Property[deprecatedProperties.size()]));
             property.setPriority(PRIO_LAST);
             collapsed.add(property);
@@ -710,10 +667,9 @@ public class PropertyFactory {
             Composite top = new Composite(parent, SWT.NONE);
             top.setLayout(new GridLayout(1, false));
             Label label = new Label(top, SWT.WRAP);
-            label.setText(
-                    "This dialog is shown instead of an inline text editor as a\n" +
-                    "workaround for an Eclipse bug specific to OSX Mountain Lion.\n" +
-                    "It should be fixed in Eclipse 4.3.");
+            label.setText("This dialog is shown instead of an inline text editor as a\n"
+                    + "workaround for an Eclipse bug specific to OSX Mountain Lion.\n"
+                    + "It should be fixed in Eclipse 4.3.");
             label.setForeground(top.getDisplay().getSystemColor(SWT.COLOR_RED));
             GridData data = new GridData();
             data.grabExcessVerticalSpace = false;
@@ -733,11 +689,8 @@ public class PropertyFactory {
                         IWebBrowser browser = workbench.getBrowserSupport().getExternalBrowser();
                         browser.openURL(new URL(event.text));
                     } catch (Exception e) {
-                        String message = String.format(
-                                "Could not open browser. Vist\n%1$s\ninstead.",
-                                event.text);
-                        MessageDialog.openError(((Link)event.getSource()).getShell(),
-                                "Browser Error", message);
+                        String message = String.format("Could not open browser. Vist\n%1$s\ninstead.", event.text);
+                        MessageDialog.openError(((Link) event.getSource()).getShell(), "Browser Error", message);
                     }
                 }
             });

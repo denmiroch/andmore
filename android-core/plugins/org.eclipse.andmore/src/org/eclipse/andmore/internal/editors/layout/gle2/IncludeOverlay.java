@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,9 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.annotations.VisibleForTesting;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -24,9 +23,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.android.annotations.VisibleForTesting;
 
 /**
  * The {@link IncludeOverlay} class renders masks to -partially- hide everything outside
@@ -77,8 +74,8 @@ public class IncludeOverlay extends Overlay {
 
         for (Rectangle mask : masks) {
             ControlPoint topLeft = LayoutPoint.create(mCanvas, mask.x, mask.y).toControl();
-            ControlPoint bottomRight = LayoutPoint.create(mCanvas, mask.x + mask.width,
-                    mask.y + mask.height).toControl();
+            ControlPoint bottomRight = LayoutPoint.create(mCanvas, mask.x + mask.width, mask.y + mask.height)
+                    .toControl();
             int x1 = topLeft.x;
             int y1 = topLeft.y;
             int x2 = bottomRight.x;
@@ -99,8 +96,7 @@ public class IncludeOverlay extends Overlay {
      * @return a list of sub rectangles that remain after subtracting out the given list of holes
      */
     @VisibleForTesting
-    static Collection<Rectangle> subtractRectangles(
-            Rectangle rectangle, Collection<Rectangle> holes) {
+    static Collection<Rectangle> subtractRectangles(Rectangle rectangle, Collection<Rectangle> holes) {
         List<Rectangle> result = new ArrayList<Rectangle>();
         result.add(rectangle);
 

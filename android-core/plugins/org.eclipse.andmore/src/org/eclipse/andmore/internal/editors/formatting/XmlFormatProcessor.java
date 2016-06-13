@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,8 +32,7 @@ import org.eclipse.wst.xml.core.text.IXMLPartitions;
 @SuppressWarnings("restriction")
 public class XmlFormatProcessor extends XMLFormatterFormatProcessor {
     /** Constructs a new {@link XmlFormatProcessor} */
-    public XmlFormatProcessor() {
-    }
+    public XmlFormatProcessor() {}
 
     @Override
     public void formatModel(IStructuredModel structuredModel, int start, int length) {
@@ -49,8 +45,7 @@ public class XmlFormatProcessor extends XMLFormatterFormatProcessor {
         IStructuredDocument document = structuredModel.getStructuredDocument();
         FormattingContext context = new FormattingContext();
         context.setProperty(CONTEXT_MEDIUM, document);
-        context.setProperty(CONTEXT_PARTITION, new TypedPosition(start, length,
-                IXMLPartitions.XML_DEFAULT));
+        context.setProperty(CONTEXT_PARTITION, new TypedPosition(start, length, IXMLPartitions.XML_DEFAULT));
         context.setProperty(CONTEXT_REGION, new org.eclipse.jface.text.Region(start, length));
         formatter.formatMaster(context, document, start, length);
     }

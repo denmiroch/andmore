@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,16 +13,17 @@
 
 package org.eclipse.andmore.internal.wizards.exportgradle;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
 import org.eclipse.andmore.internal.sdk.ProjectState;
-import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.andmore.internal.sdk.ProjectState.LibraryState;
+import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -38,11 +36,10 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Class to setup the project and its modules.
@@ -93,8 +90,7 @@ public class ProjectSetupBuilder {
     }
 
     @NonNull
-    public String setProject(@NonNull List<IJavaProject> selectedProjects)
-            throws CoreException {
+    public String setProject(@NonNull List<IJavaProject> selectedProjects) throws CoreException {
         mModules.clear();
 
         // build a list of all projects that must be included. This is in case
@@ -219,17 +215,13 @@ public class ProjectSetupBuilder {
                     module.addDependency(libModule);
                 } else {
                     throw new InternalException(String.format(
-                            "Project %1$s is missing. Needed by %2$s.\n" +
-                            "Make sure all dependencies are opened.",
-                            libraryState.getRelativePath(),
-                            javaProject.getProject().getName()));
+                            "Project %1$s is missing. Needed by %2$s.\n" + "Make sure all dependencies are opened.",
+                            libraryState.getRelativePath(), javaProject.getProject().getName()));
                 }
             } else {
                 throw new InternalException(String.format(
-                        "Project %1$s is missing. Needed by %2$s.\n" +
-                        "Make sure all dependencies are opened.",
-                        libraryState.getRelativePath(),
-                        javaProject.getProject().getName()));
+                        "Project %1$s is missing. Needed by %2$s.\n" + "Make sure all dependencies are opened.",
+                        libraryState.getRelativePath(), javaProject.getProject().getName()));
             }
         }
 
@@ -244,8 +236,7 @@ public class ProjectSetupBuilder {
     }
 
     @NonNull
-    private GradleModule processJavaProject(@NonNull IJavaProject javaProject)
-            throws InternalException, CoreException {
+    private GradleModule processJavaProject(@NonNull IJavaProject javaProject) throws InternalException, CoreException {
         // get/create the module
         GradleModule module = createModuleOnDemand(javaProject);
 
@@ -261,8 +252,7 @@ public class ProjectSetupBuilder {
             // Java project should not reference Android project!
             if (javaDep.getProject().hasNature(AndmoreAndroidConstants.NATURE_DEFAULT)) {
                 throw new InternalException(String.format(
-                        "Java project %1$s depends on Android project %2$s!\n" +
-                        "This is not a valid dependency",
+                        "Java project %1$s depends on Android project %2$s!\n" + "This is not a valid dependency",
                         javaProject.getProject().getName(), javaDep.getProject().getName()));
             }
             GradleModule libModule = processJavaProject(javaDep);
@@ -278,8 +268,7 @@ public class ProjectSetupBuilder {
 
         // compute all the relative paths.
         for (GradleModule module : modules) {
-            String path = getGradlePath(module.getJavaProject().getProject().getLocation(),
-                    mCommonRoot);
+            String path = getGradlePath(module.getJavaProject().getProject().getLocation(), mCommonRoot);
 
             module.setPath(path);
         }
@@ -291,15 +280,13 @@ public class ProjectSetupBuilder {
      * @throws InternalException
      */
     @NonNull
-    private static IPath determineCommonRoot(Collection<GradleModule> modules)
-            throws InternalException {
+    private static IPath determineCommonRoot(Collection<GradleModule> modules) throws InternalException {
         IPath commonRoot = null;
         for (GradleModule module : modules) {
             if (commonRoot == null) {
                 commonRoot = module.getJavaProject().getProject().getLocation();
             } else {
-                commonRoot = findCommonRoot(commonRoot,
-                        module.getJavaProject().getProject().getLocation());
+                commonRoot = findCommonRoot(commonRoot, module.getJavaProject().getProject().getLocation());
             }
         }
 
@@ -322,12 +309,10 @@ public class ProjectSetupBuilder {
      * @throws InternalException
      */
     @NonNull
-    private static IPath findCommonRoot(@NonNull IPath path1, @NonNull IPath path2)
-            throws InternalException {
+    private static IPath findCommonRoot(@NonNull IPath path1, @NonNull IPath path2) throws InternalException {
         if (path1.getDevice() != null && !path1.getDevice().equals(path2.getDevice())) {
-            throw new InternalException(
-                    "Different modules have been detected on different drives.\n" +
-                    "This prevents finding a common root to all modules.");
+            throw new InternalException("Different modules have been detected on different drives.\n"
+                    + "This prevents finding a common root to all modules.");
         }
 
         IPath result = path1.uptoSegment(0);
@@ -379,10 +364,9 @@ public class ProjectSetupBuilder {
                     projects.add(subProject);
                 } else {
                     throw new InternalException(String.format(
-                            "Project '%s' is missing project dependency '%s' in Eclipse workspace.\n" +
-                            "Make sure all dependencies are opened.",
-                            javaProject.getProject().getName(),
-                            classpathEntry.getPath().toString()));
+                            "Project '%s' is missing project dependency '%s' in Eclipse workspace.\n"
+                                    + "Make sure all dependencies are opened.",
+                            javaProject.getProject().getName(), classpathEntry.getPath().toString()));
                 }
             }
         }
@@ -399,8 +383,7 @@ public class ProjectSetupBuilder {
         if (path.segmentCount() == 1) {
             return getJavaProjectByName(root);
         }
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-                .findMember(path);
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
         if (resource != null && resource.getType() == IResource.PROJECT) {
             if (resource.exists()) {
                 return (IJavaProject) JavaCore.create(resource);
@@ -418,8 +401,7 @@ public class ProjectSetupBuilder {
             if (project.exists()) {
                 return JavaCore.create(project);
             }
-        } catch (IllegalArgumentException iae) {
-        }
+        } catch (IllegalArgumentException iae) {}
         return null;
     }
 }

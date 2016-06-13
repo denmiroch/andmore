@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,13 +15,20 @@ package org.eclipse.andmore.internal.project;
 
 import static com.android.sdklib.internal.project.ProjectProperties.PROPERTY_SDK;
 
-import com.android.SdkConstants;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.build.ApkCreationException;
-import com.android.sdklib.build.DuplicateFileException;
-import com.android.sdklib.internal.project.ProjectProperties;
-import com.android.tools.lint.detector.api.LintUtils;
-import com.android.xml.AndroidManifest;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -55,29 +59,22 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
+import com.android.SdkConstants;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.build.ApkCreationException;
+import com.android.sdklib.build.DuplicateFileException;
+import com.android.sdklib.internal.project.ProjectProperties;
+import com.android.tools.lint.detector.api.LintUtils;
+import com.android.xml.AndroidManifest;
 
 /**
  * Export helper to export release version of APKs.
  */
 public final class ExportHelper {
-    private static final String HOME_PROPERTY = "user.home";                    //$NON-NLS-1$
+    private static final String HOME_PROPERTY = "user.home"; //$NON-NLS-1$
     private static final String HOME_PROPERTY_REF = "${" + HOME_PROPERTY + '}'; //$NON-NLS-1$
-    private static final String SDK_PROPERTY_REF = "${" + PROPERTY_SDK + '}';   //$NON-NLS-1$
-    private final static String TEMP_PREFIX = "android_";                       //$NON-NLS-1$
+    private static final String SDK_PROPERTY_REF = "${" + PROPERTY_SDK + '}'; //$NON-NLS-1$
+    private final static String TEMP_PREFIX = "android_"; //$NON-NLS-1$
 
     /**
      * Exports a release version of the application created by the given project.
@@ -88,8 +85,8 @@ public final class ExportHelper {
      * @param monitor progress monitor
      * @throws CoreException if an error occurs
      */
-    public static void exportReleaseApk(IProject project, File outputFile, PrivateKey key,
-            X509Certificate certificate, IProgressMonitor monitor) throws CoreException {
+    public static void exportReleaseApk(IProject project, File outputFile, PrivateKey key, X509Certificate certificate,
+            IProgressMonitor monitor) throws CoreException {
 
         // the export, takes the output of the precompiler & Java builders so it's
         // important to call build in case the auto-build option of the workspace is disabled.
@@ -135,13 +132,8 @@ public final class ExportHelper {
 
             BuildToolInfo buildToolInfo = getBuildTools(projectState);
 
-            BuildHelper helper = new BuildHelper(
-                    projectState,
-                    buildToolInfo,
-                    fakeStream, fakeStream,
-                    jumbo.booleanValue(),
-                    dexMerger.booleanValue(),
-                    debugMode, false /*verbose*/,
+            BuildHelper helper = new BuildHelper(projectState, buildToolInfo, fakeStream, fakeStream,
+                    jumbo.booleanValue(), dexMerger.booleanValue(), debugMode, false /*verbose*/,
                     null /*resourceMarker*/);
 
             // get the list of library projects
@@ -159,18 +151,12 @@ public final class ExportHelper {
 
             // get the merged manifest
             IFolder androidOutputFolder = BaseProjectHelper.getAndroidOutputFolder(project);
-            IFile mergedManifestFile = androidOutputFolder.getFile(
-                    SdkConstants.FN_ANDROID_MANIFEST_XML);
-
+            IFile mergedManifestFile = androidOutputFolder.getFile(SdkConstants.FN_ANDROID_MANIFEST_XML);
 
             // package the resources.
-            helper.packageResources(
-                    mergedManifestFile,
-                    libProjects,
-                    null,   // res filter
-                    0,      // versionCode
-                    resourceFile.getParent(),
-                    resourceFile.getName());
+            helper.packageResources(mergedManifestFile, libProjects, null, // res filter
+                    0, // versionCode
+                    resourceFile.getParent(), resourceFile.getName());
 
             // Step 2. Convert the byte code to Dalvik bytecode
 
@@ -179,8 +165,7 @@ public final class ExportHelper {
             dexFile.deleteOnExit();
 
             ProjectState state = Sdk.getProjectState(project);
-            String proguardConfig = state.getProperties().getProperty(
-                    ProjectProperties.PROPERTY_PROGUARD_CONFIG);
+            String proguardConfig = state.getProperties().getProperty(ProjectProperties.PROPERTY_PROGUARD_CONFIG);
 
             boolean runProguard = false;
             List<File> proguardConfigFiles = null;
@@ -195,11 +180,9 @@ public final class ExportHelper {
                 Iterable<String> paths = LintUtils.splitPath(proguardConfig);
                 for (String path : paths) {
                     if (path.startsWith(SDK_PROPERTY_REF)) {
-                        path = AdtPrefs.getPrefs().getOsSdkFolder() +
-                                path.substring(SDK_PROPERTY_REF.length());
+                        path = AdtPrefs.getPrefs().getOsSdkFolder() + path.substring(SDK_PROPERTY_REF.length());
                     } else if (path.startsWith(HOME_PROPERTY_REF)) {
-                        path = System.getProperty(HOME_PROPERTY) +
-                                path.substring(HOME_PROPERTY_REF.length());
+                        path = System.getProperty(HOME_PROPERTY) + path.substring(HOME_PROPERTY_REF.length());
                     }
                     File proguardConfigFile = new File(path);
                     if (proguardConfigFile.isAbsolute() == false) {
@@ -212,9 +195,11 @@ public final class ExportHelper {
                         proguardConfigFiles.add(proguardConfigFile);
                         runProguard = true;
                     } else {
-                        throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                                "Invalid proguard configuration file path " + proguardConfigFile
-                                + " does not exist or is not a regular file", null));
+                        throw new CoreException(
+                                new Status(IStatus.ERROR,
+                                        AndmoreAndroidPlugin.PLUGIN_ID, "Invalid proguard configuration file path "
+                                                + proguardConfigFile + " does not exist or is not a regular file",
+                                        null));
                     }
                 }
 
@@ -275,56 +260,42 @@ public final class ExportHelper {
 
             // Step 3. Gather dex files
             List<File> dexFiles = helper.listDexFiles(javaProject);
-            
+
             // Step 4. Final package
-            
-            helper.finalPackage(
-                    resourceFile.getAbsolutePath(),
-                    dexFiles,
-                    outputFile.getAbsolutePath(),
-                    libProjects,
-                    key,
-                    certificate,
-                    null); //resourceMarker
+
+            helper.finalPackage(resourceFile.getAbsolutePath(), dexFiles, outputFile.getAbsolutePath(), libProjects,
+                    key, certificate, null); //resourceMarker
 
             // success!
         } catch (CoreException e) {
             throw e;
         } catch (ProguardResultException e) {
-            String msg = String.format("Proguard returned with error code %d. See console",
-                    e.getErrorCode());
+            String msg = String.format("Proguard returned with error code %d. See console", e.getErrorCode());
             AndmoreAndroidPlugin.printErrorToConsole(project, msg);
             AndmoreAndroidPlugin.printErrorToConsole(project, (Object[]) e.getOutput());
-            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    msg, e));
+            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, msg, e));
         } catch (ProguardExecException e) {
             String msg = String.format("Failed to run proguard: %s", e.getMessage());
             AndmoreAndroidPlugin.printErrorToConsole(project, msg);
-            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    msg, e));
+            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, msg, e));
         } catch (DuplicateFileException e) {
-            String msg = String.format(
-                    "Found duplicate file for APK: %1$s\nOrigin 1: %2$s\nOrigin 2: %3$s",
+            String msg = String.format("Found duplicate file for APK: %1$s\nOrigin 1: %2$s\nOrigin 2: %3$s",
                     e.getArchivePath(), e.getFile1(), e.getFile2());
             AndmoreAndroidPlugin.printErrorToConsole(project, msg);
-            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    e.getMessage(), e));
+            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, e.getMessage(), e));
         } catch (NativeLibInJarException e) {
             String msg = e.getMessage();
 
             AndmoreAndroidPlugin.printErrorToConsole(project, msg);
             AndmoreAndroidPlugin.printErrorToConsole(project, (Object[]) e.getAdditionalInfo());
-            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    e.getMessage(), e));
+            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, e.getMessage(), e));
         } catch (DexException e) {
-            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    e.getMessage(), e));
+            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, e.getMessage(), e));
         } catch (ApkCreationException e) {
-            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    e.getMessage(), e));
+            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, e.getMessage(), e));
         } catch (Exception e) {
-            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    "Failed to export application", e));
+            throw new CoreException(
+                    new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, "Failed to export application", e));
         } finally {
             // move back to a debug build.
             // By using a normal build, we'll simply rebuild the debug version, and let the
@@ -334,16 +305,15 @@ public final class ExportHelper {
         }
     }
 
-    public static BuildToolInfo getBuildTools(ProjectState projectState)
-            throws CoreException {
+    public static BuildToolInfo getBuildTools(ProjectState projectState) throws CoreException {
         BuildToolInfo buildToolInfo = projectState.getBuildToolInfo();
         if (buildToolInfo == null) {
             buildToolInfo = Sdk.getCurrent().getLatestBuildTool();
         }
 
         if (buildToolInfo == null) {
-            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    "No Build Tools installed in the SDK."));
+            throw new CoreException(
+                    new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, "No Build Tools installed in the SDK."));
         }
         return buildToolInfo;
     }
@@ -373,25 +343,23 @@ public final class ExportHelper {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
-                        exportReleaseApk(project,
-                                new File(saveLocation),
-                                null, //key
+                        exportReleaseApk(project, new File(saveLocation), null, //key
                                 null, //certificate
                                 monitor);
 
                         // this is unsigned export. Let's tell the developers to run zip align
-                        AndmoreAndroidPlugin.displayWarning("Android IDE Plug-in", String.format(
-                                "An unsigned package of the application was saved at\n%1$s\n\n" +
-                                "Before publishing the application you will need to:\n" +
-                                "- Sign the application with your release key,\n" +
-                                "- run zipalign on the signed package. ZipAlign is located in <SDK>/tools/\n\n" +
-                                "Aligning applications allows Android to use application resources\n" +
-                                "more efficiently.", saveLocation));
+                        AndmoreAndroidPlugin.displayWarning("Android IDE Plug-in",
+                                String.format("An unsigned package of the application was saved at\n%1$s\n\n"
+                                        + "Before publishing the application you will need to:\n"
+                                        + "- Sign the application with your release key,\n"
+                                        + "- run zipalign on the signed package. ZipAlign is located in <SDK>/tools/\n\n"
+                                        + "Aligning applications allows Android to use application resources\n"
+                                        + "more efficiently.", saveLocation));
 
                         return Status.OK_STATUS;
                     } catch (CoreException e) {
-                        AndmoreAndroidPlugin.displayError("Android IDE Plug-in", String.format(
-                                "Error exporting application:\n\n%1$s", e.getMessage()));
+                        AndmoreAndroidPlugin.displayError("Android IDE Plug-in",
+                                String.format("Error exporting application:\n\n%1$s", e.getMessage()));
                         return e.getStatus();
                     }
                 }
@@ -408,11 +376,10 @@ public final class ExportHelper {
      * @param rootDirectory the rootDirectory.
      * @throws IOException
      */
-    private static void addFileToJar(JarOutputStream jar, File file, File rootDirectory)
-            throws IOException {
+    private static void addFileToJar(JarOutputStream jar, File file, File rootDirectory) throws IOException {
         if (file.isDirectory()) {
             if (file.getName().equals("META-INF") == false) {
-                for (File child: file.listFiles()) {
+                for (File child : file.listFiles()) {
                     addFileToJar(jar, child, rootDirectory);
                 }
             }
@@ -441,8 +408,7 @@ public final class ExportHelper {
                 if (bis != null) {
                     try {
                         bis.close();
-                    } catch (IOException ignore) {
-                    }
+                    } catch (IOException ignore) {}
                 }
             }
             jar.closeEntry();

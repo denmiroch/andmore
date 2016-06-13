@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,25 +13,25 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.rendering.RenderSecurityManager;
-import com.android.ide.common.rendering.api.LayoutLog;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.core.runtime.IStatus;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.core.runtime.IStatus;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.rendering.RenderSecurityManager;
+import com.android.ide.common.rendering.api.LayoutLog;
 
 /**
  * A {@link LayoutLog} which records the problems it encounters and offers them as a
  * single summary at the end
  */
 public class RenderLogger extends LayoutLog {
-    static final String TAG_MISSING_DIMENSION = "missing.dimension";     //$NON-NLS-1$
+    static final String TAG_MISSING_DIMENSION = "missing.dimension"; //$NON-NLS-1$
 
     private final String mName;
     private List<String> mFidelityWarnings;
@@ -58,8 +55,7 @@ public class RenderLogger extends LayoutLog {
      * @return true if there were problems during the render
      */
     public boolean hasProblems() {
-        return mFidelityWarnings != null || mErrors != null || mWarnings != null ||
-            mHaveExceptions;
+        return mFidelityWarnings != null || mErrors != null || mWarnings != null || mHaveExceptions;
     }
 
     /**
@@ -129,8 +125,7 @@ public class RenderLogger extends LayoutLog {
         appendToIdeLog(null, IStatus.ERROR, description);
 
         // Workaround: older layout libraries don't provide a tag for this error
-        if (tag == null && message != null
-                && message.startsWith("Failed to find style ")) { //$NON-NLS-1$
+        if (tag == null && message != null && message.startsWith("Failed to find style ")) { //$NON-NLS-1$
             tag = LayoutLog.TAG_RESOURCES_RESOLVE_THEME_ATTR;
         }
 
@@ -154,8 +149,7 @@ public class RenderLogger extends LayoutLog {
                 return;
             }
 
-            if (description.equals(throwable.getLocalizedMessage()) ||
-                    description.equals(throwable.getMessage())) {
+            if (description.equals(throwable.getLocalizedMessage()) || description.equals(throwable.getMessage())) {
                 description = "Exception raised during rendering: " + description;
             }
             recordThrowable(throwable);
@@ -183,8 +177,8 @@ public class RenderLogger extends LayoutLog {
 
         boolean log = true;
         if (TAG_RESOURCES_FORMAT.equals(tag)) {
-            if (description.equals("You must supply a layout_width attribute.")       //$NON-NLS-1$
-                || description.equals("You must supply a layout_height attribute.")) {//$NON-NLS-1$
+            if (description.equals("You must supply a layout_width attribute.") //$NON-NLS-1$
+                    || description.equals("You must supply a layout_height attribute.")) {//$NON-NLS-1$
                 tag = TAG_MISSING_DIMENSION;
                 log = false;
             }

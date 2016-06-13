@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,14 +13,14 @@
 
 package org.eclipse.andmore.internal.editors.manifest.descriptors;
 
-import com.android.SdkConstants;
-
 import org.eclipse.andmore.internal.editors.manifest.model.UiClassAttributeNode.IPostTypeCreationAction;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+
+import com.android.SdkConstants;
 
 /**
  * Action to be executed after an Activity class is created.
@@ -35,7 +32,6 @@ class PostActivityCreationAction implements IPostTypeCreationAction {
     private PostActivityCreationAction() {
         // private constructor to enforce singleton.
     }
-
 
     /**
      * Returns the action.
@@ -51,16 +47,11 @@ class PostActivityCreationAction implements IPostTypeCreationAction {
     @Override
     public void processNewType(IType newType) {
         try {
-            String methodContent =
-                "    /** Called when the activity is first created. */\n" +
-                "    @Override\n" +
-                "    public void onCreate(Bundle savedInstanceState) {\n" +
-                "        super.onCreate(savedInstanceState);\n" +
-                "\n" +
-                "        // TODO Auto-generated method stub\n" +
-                "    }";
-            newType.createMethod(methodContent, null /* sibling*/, false /* force */,
-                    new NullProgressMonitor());
+            String methodContent = "    /** Called when the activity is first created. */\n" + "    @Override\n"
+                    + "    public void onCreate(Bundle savedInstanceState) {\n"
+                    + "        super.onCreate(savedInstanceState);\n" + "\n"
+                    + "        // TODO Auto-generated method stub\n" + "    }";
+            newType.createMethod(methodContent, null /* sibling*/, false /* force */, new NullProgressMonitor());
 
             // we need to add the import for Bundle, so we need the compilation unit.
             // Since the type could be enclosed in other types, we loop till we find it.
@@ -68,9 +59,9 @@ class PostActivityCreationAction implements IPostTypeCreationAction {
             IJavaElement element = newType;
             do {
                 IJavaElement parentElement = element.getParent();
-                if (parentElement !=  null) {
+                if (parentElement != null) {
                     if (parentElement.getElementType() == IJavaElement.COMPILATION_UNIT) {
-                        compilationUnit = (ICompilationUnit)parentElement;
+                        compilationUnit = (ICompilationUnit) parentElement;
                     }
 
                     element = parentElement;
@@ -80,10 +71,8 @@ class PostActivityCreationAction implements IPostTypeCreationAction {
             } while (compilationUnit == null);
 
             if (compilationUnit != null) {
-                compilationUnit.createImport(SdkConstants.CLASS_BUNDLE,
-                        null /* sibling */, new NullProgressMonitor());
+                compilationUnit.createImport(SdkConstants.CLASS_BUNDLE, null /* sibling */, new NullProgressMonitor());
             }
-        } catch (JavaModelException e) {
-        }
+        } catch (JavaModelException e) {}
     }
 }

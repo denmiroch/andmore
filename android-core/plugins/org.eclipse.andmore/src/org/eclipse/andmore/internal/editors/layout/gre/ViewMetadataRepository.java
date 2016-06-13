@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,26 +23,6 @@ import static com.android.SdkConstants.NEW_ID_PREFIX;
 import static com.android.SdkConstants.VIEW_FRAGMENT;
 import static com.android.SdkConstants.VIEW_INCLUDE;
 
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.api.IViewMetadata.FillPreference;
-import com.android.ide.common.api.Margins;
-import com.android.ide.common.api.ResizePolicy;
-import com.android.resources.Density;
-import com.android.utils.Pair;
-import com.google.common.base.Splitter;
-import com.google.common.io.Closeables;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.internal.editors.IconFactory;
-import org.eclipse.andmore.internal.editors.layout.descriptors.LayoutDescriptors;
-import org.eclipse.andmore.internal.editors.layout.descriptors.ViewElementDescriptor;
-import org.eclipse.andmore.internal.sdk.AndroidTargetData;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -62,13 +39,33 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.internal.editors.IconFactory;
+import org.eclipse.andmore.internal.editors.layout.descriptors.LayoutDescriptors;
+import org.eclipse.andmore.internal.editors.layout.descriptors.ViewElementDescriptor;
+import org.eclipse.andmore.internal.sdk.AndroidTargetData;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.api.IViewMetadata.FillPreference;
+import com.android.ide.common.api.Margins;
+import com.android.ide.common.api.ResizePolicy;
+import com.android.resources.Density;
+import com.android.utils.Pair;
+import com.google.common.base.Splitter;
+import com.google.common.io.Closeables;
+
 /**
  * The {@link ViewMetadataRepository} contains additional metadata for Android view
  * classes
  */
 public class ViewMetadataRepository {
-    private static final String PREVIEW_CONFIG_FILENAME = "rendering-configs.xml";  //$NON-NLS-1$
-    private static final String METADATA_FILENAME = "extra-view-metadata.xml";  //$NON-NLS-1$
+    private static final String PREVIEW_CONFIG_FILENAME = "rendering-configs.xml"; //$NON-NLS-1$
+    private static final String METADATA_FILENAME = "extra-view-metadata.xml"; //$NON-NLS-1$
 
     /** Singleton instance */
     private static ViewMetadataRepository sInstance = new ViewMetadataRepository();
@@ -101,8 +98,7 @@ public class ViewMetadataRepository {
     private Map<String, ViewData> mClassToView;
 
     /** Hidden constructor: Create via factory {@link #get()} instead */
-    private ViewMetadataRepository() {
-    }
+    private ViewMetadataRepository() {}
 
     /** Returns a map from class fully qualified names to {@link ViewData} objects */
     private Map<String, ViewData> getClassToView() {
@@ -232,8 +228,8 @@ public class ViewMetadataRepository {
                                 Node childNode = children.item(j);
                                 if (childNode.getNodeType() == Node.ELEMENT_NODE) {
                                     Element child = (Element) childNode;
-                                    ViewData view = createViewData(fillTypes, child,
-                                            null, FillPreference.NONE, RenderMode.NORMAL, null);
+                                    ViewData view = createViewData(fillTypes, child, null, FillPreference.NONE,
+                                            RenderMode.NORMAL, null);
                                     category.addView(view);
                                 }
                             }
@@ -249,9 +245,8 @@ public class ViewMetadataRepository {
         return mCategories;
     }
 
-    private ViewData createViewData(Map<String, FillPreference> fillTypes,
-            Element child, String defaultFqcn, FillPreference defaultFill,
-            RenderMode defaultRender, String defaultSize) {
+    private ViewData createViewData(Map<String, FillPreference> fillTypes, Element child, String defaultFqcn,
+            FillPreference defaultFill, RenderMode defaultRender, String defaultSize) {
         String fqcn = child.getAttribute("class"); //$NON-NLS-1$
         if (fqcn.length() == 0) {
             fqcn = defaultFqcn;
@@ -279,8 +274,7 @@ public class ViewMetadataRepository {
         String topAttrs = child.getAttribute("topAttrs"); //$NON-NLS-1$
         String resize = child.getAttribute("resize"); //$NON-NLS-1$
         ViewData view = new ViewData(fqcn, displayName, fillPreference,
-                skip.length() == 0 ? false : Boolean.valueOf(skip),
-                renderMode, relatedTo, resize, topAttrs);
+                skip.length() == 0 ? false : Boolean.valueOf(skip), renderMode, relatedTo, resize, topAttrs);
 
         String init = child.getAttribute("init"); //$NON-NLS-1$
         String icon = child.getAttribute("icon"); //$NON-NLS-1$
@@ -298,8 +292,8 @@ public class ViewMetadataRepository {
                 Node variationNode = childNodes.item(k);
                 if (variationNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element variation = (Element) variationNode;
-                    ViewData variationView = createViewData(fillTypes, variation,
-                            fqcn, fillPreference, renderMode, resize);
+                    ViewData variationView = createViewData(fillTypes, variation, fqcn, fillPreference, renderMode,
+                            resize);
                     view.addVariation(variationView);
                 }
             }
@@ -318,10 +312,9 @@ public class ViewMetadataRepository {
      * @return a list of pairs where each pair contains of the category label and an
      *         ordered list of elements to be included in that category
      */
-    public List<Pair<String, List<ViewElementDescriptor>>> getPaletteEntries(
-            AndroidTargetData targetData, boolean alphabetical, boolean createCategories) {
-        List<Pair<String, List<ViewElementDescriptor>>> result =
-            new ArrayList<Pair<String, List<ViewElementDescriptor>>>();
+    public List<Pair<String, List<ViewElementDescriptor>>> getPaletteEntries(AndroidTargetData targetData,
+            boolean alphabetical, boolean createCategories) {
+        List<Pair<String, List<ViewElementDescriptor>>> result = new ArrayList<Pair<String, List<ViewElementDescriptor>>>();
 
         List<List<ViewElementDescriptor>> lists = new ArrayList<List<ViewElementDescriptor>>(2);
         LayoutDescriptors layoutDescriptors = targetData.getLayoutDescriptors();
@@ -330,8 +323,7 @@ public class ViewMetadataRepository {
 
         // First record map of FQCN to ViewElementDescriptor such that we can quickly
         // determine if a particular palette entry is available
-        Map<String, ViewElementDescriptor> fqcnToDescriptor =
-            new HashMap<String, ViewElementDescriptor>();
+        Map<String, ViewElementDescriptor> fqcnToDescriptor = new HashMap<String, ViewElementDescriptor>();
         for (List<ViewElementDescriptor> list : lists) {
             for (ViewElementDescriptor view : list) {
                 String fqcn = view.getFullClassName();
@@ -344,8 +336,7 @@ public class ViewMetadataRepository {
         }
 
         Set<ViewElementDescriptor> remaining = new HashSet<ViewElementDescriptor>(
-                layoutDescriptors.getViewDescriptors().size()
-                + layoutDescriptors.getLayoutDescriptors().size());
+                layoutDescriptors.getViewDescriptors().size() + layoutDescriptors.getLayoutDescriptors().size());
         remaining.addAll(layoutDescriptors.getViewDescriptors());
         remaining.addAll(layoutDescriptors.getLayoutDescriptors());
 
@@ -366,8 +357,8 @@ public class ViewMetadataRepository {
                     }
 
                     if (view.getDisplayName() != null || view.getInitString().length() > 0) {
-                        categoryItems.add(new PaletteMetadataDescriptor(descriptor,
-                                view.getDisplayName(), view.getInitString(), view.getIconName()));
+                        categoryItems.add(new PaletteMetadataDescriptor(descriptor, view.getDisplayName(),
+                                view.getInitString(), view.getIconName()));
                     } else {
                         categoryItems.add(descriptor);
                     }
@@ -393,8 +384,7 @@ public class ViewMetadataRepository {
         }
 
         if (remaining.size() > 0) {
-            List<ViewElementDescriptor> otherItems =
-                    new ArrayList<ViewElementDescriptor>(remaining);
+            List<ViewElementDescriptor> otherItems = new ArrayList<ViewElementDescriptor>(remaining);
             // Always sorted, we don't have a natural order for these unknowns
             Collections.sort(otherItems);
             if (createCategories) {
@@ -491,9 +481,8 @@ public class ViewMetadataRepository {
         private String mTopAttrs;
 
         /** Constructs a new view data for the given class */
-        private ViewData(String fqcn, String displayName,
-                FillPreference fillPreference, boolean skip, RenderMode renderMode,
-                String relatedTo, String resize, String topAttrs) {
+        private ViewData(String fqcn, String displayName, FillPreference fillPreference, boolean skip,
+                RenderMode renderMode, String relatedTo, String resize, String topAttrs) {
             super();
             mFqcn = fqcn;
             mDisplayName = displayName;
@@ -579,7 +568,7 @@ public class ViewMetadataRepository {
                 for (int i = 0, n = split.length; i < n; i++) {
                     topAttributes.add(split[i]);
                 }
-                return Collections.<String>unmodifiableList(topAttributes);
+                return Collections.<String> unmodifiableList(topAttributes);
             }
         }
 
@@ -599,7 +588,7 @@ public class ViewMetadataRepository {
         }
 
         private void setInitString(String initString) {
-            this.mInitString = initString;
+            mInitString = initString;
         }
 
         private String getInitString() {
@@ -607,7 +596,7 @@ public class ViewMetadataRepository {
         }
 
         private void setIconName(String iconName) {
-            this.mIconName = iconName;
+            mIconName = iconName;
         }
 
         private String getIconName() {
@@ -752,7 +741,7 @@ public class ViewMetadataRepository {
          * @return a corresponding {@link RenderMode}, never null
          */
         public static RenderMode get(String render) {
-            if ("alone".equals(render)) {       //$NON-NLS-1$
+            if ("alone".equals(render)) { //$NON-NLS-1$
                 return ALONE;
             } else if ("skip".equals(render)) { //$NON-NLS-1$
                 return SKIP;

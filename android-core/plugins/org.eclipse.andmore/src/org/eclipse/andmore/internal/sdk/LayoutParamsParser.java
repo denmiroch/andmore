@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,16 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.sdk;
-
-import com.android.SdkConstants;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.common.resources.platform.AttrsXmlParser;
-import org.eclipse.andmore.common.resources.platform.ViewClassInfo;
-import org.eclipse.andmore.common.resources.platform.ViewClassInfo.LayoutParamsInfo;
-import org.eclipse.andmore.internal.sdk.IAndroidClassLoader.IClassDescriptor;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,6 +22,16 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.management.InvalidAttributeValueException;
+
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.common.resources.platform.AttrsXmlParser;
+import org.eclipse.andmore.common.resources.platform.ViewClassInfo;
+import org.eclipse.andmore.common.resources.platform.ViewClassInfo.LayoutParamsInfo;
+import org.eclipse.andmore.internal.sdk.IAndroidClassLoader.IClassDescriptor;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
+
+import com.android.SdkConstants;
 
 /*
  * TODO: refactor this. Could use some cleanup.
@@ -61,8 +58,7 @@ public class LayoutParamsParser {
 
         private boolean mIsInstantiable;
 
-        ExtViewClassInfo(boolean instantiable, boolean isLayout, String canonicalClassName,
-                String shortClassName) {
+        ExtViewClassInfo(boolean instantiable, boolean isLayout, String canonicalClassName, String shortClassName) {
             super(isLayout, canonicalClassName, shortClassName);
             mIsInstantiable = instantiable;
         }
@@ -104,8 +100,7 @@ public class LayoutParamsParser {
      * @param classLoader The android.jar class loader
      * @param attrsXmlParser The parser of the attrs.xml file
      */
-    public LayoutParamsParser(IAndroidClassLoader classLoader,
-            AttrsXmlParser attrsXmlParser) {
+    public LayoutParamsParser(IAndroidClassLoader classLoader, AttrsXmlParser attrsXmlParser) {
         mClassLoader = classLoader;
         mAttrsXmlParser = attrsXmlParser;
     }
@@ -130,22 +125,16 @@ public class LayoutParamsParser {
      * @param monitor A progress monitor. Can be null. Caller is responsible for calling done.
      */
     public void parseLayoutClasses(IProgressMonitor monitor) {
-        parseClasses(monitor,
-                SdkConstants.CLASS_VIEW,
-                SdkConstants.CLASS_VIEWGROUP,
+        parseClasses(monitor, SdkConstants.CLASS_VIEW, SdkConstants.CLASS_VIEWGROUP,
                 SdkConstants.CLASS_VIEWGROUP_LAYOUTPARAMS);
     }
 
     public void parsePreferencesClasses(IProgressMonitor monitor) {
-        parseClasses(monitor,
-                SdkConstants.CLASS_PREFERENCE,
-                SdkConstants.CLASS_PREFERENCEGROUP,
+        parseClasses(monitor, SdkConstants.CLASS_PREFERENCE, SdkConstants.CLASS_PREFERENCEGROUP,
                 null /* paramsClassName */ );
     }
 
-    private void parseClasses(IProgressMonitor monitor,
-            String rootClassName,
-            String groupClassName,
+    private void parseClasses(IProgressMonitor monitor, String rootClassName, String groupClassName,
             String paramsClassName) {
         try {
             SubMonitor progress = SubMonitor.convert(monitor, 100);
@@ -156,8 +145,8 @@ public class LayoutParamsParser {
             if (paramsClassName != null) {
                 superClasses[2] = paramsClassName;
             }
-            HashMap<String, ArrayList<IClassDescriptor>> found =
-                    mClassLoader.findClassesDerivingFrom("android.", superClasses);  //$NON-NLS-1$
+            HashMap<String, ArrayList<IClassDescriptor>> found = mClassLoader.findClassesDerivingFrom("android.", //$NON-NLS-1$
+                    superClasses);
             mTopViewClass = mClassLoader.getClass(rootClassName);
             mTopGroupClass = mClassLoader.getClass(groupClassName);
             if (paramsClassName != null) {
@@ -202,7 +191,7 @@ public class LayoutParamsParser {
                 progress.worked(1);
             }
         } catch (ClassNotFoundException e) {
-            AndmoreAndroidPlugin.log(e, "Problem loading class %1$s or %2$s",  //$NON-NLS-1$
+            AndmoreAndroidPlugin.log(e, "Problem loading class %1$s or %2$s", //$NON-NLS-1$
                     rootClassName, groupClassName);
         } catch (InvalidAttributeValueException e) {
             AndmoreAndroidPlugin.log(e, "Problem loading classes"); //$NON-NLS-1$
@@ -225,8 +214,8 @@ public class LayoutParamsParser {
             return mGroupMap.get(fqcn);
         }
 
-        ExtViewClassInfo info = new ExtViewClassInfo(viewClass.isInstantiable(),
-                false /* layout */, fqcn, viewClass.getSimpleName());
+        ExtViewClassInfo info = new ExtViewClassInfo(viewClass.isInstantiable(), false /* layout */, fqcn,
+                viewClass.getSimpleName());
         mViewMap.put(fqcn, info);
 
         // All view classes derive from mTopViewClass by design.
@@ -251,8 +240,8 @@ public class LayoutParamsParser {
             return mGroupMap.get(fqcn);
         }
 
-        ExtViewClassInfo info = new ExtViewClassInfo(groupClass.isInstantiable(),
-                true /* layout */, fqcn, groupClass.getSimpleName());
+        ExtViewClassInfo info = new ExtViewClassInfo(groupClass.isInstantiable(), true /* layout */, fqcn,
+                groupClass.getSimpleName());
         mGroupMap.put(fqcn, info);
 
         // All groups derive from android.view.ViewGroup, which in turns derives from
@@ -293,11 +282,9 @@ public class LayoutParamsParser {
         // if there's no layout data in the group class, link to the one from the
         // super class.
         if (layoutParamsClass == null) {
-            for (IClassDescriptor superClass = groupClass.getSuperclass();
-                    layoutParamsClass == null &&
-                        superClass != null &&
-                        superClass.equals(mTopViewClass) == false;
-                    superClass = superClass.getSuperclass()) {
+            for (IClassDescriptor superClass = groupClass.getSuperclass(); layoutParamsClass == null
+                    && superClass != null
+                    && superClass.equals(mTopViewClass) == false; superClass = superClass.getSuperclass()) {
                 layoutParamsClass = findLayoutParams(superClass);
             }
         }
@@ -331,8 +318,8 @@ public class LayoutParamsParser {
         // Find the link on the enclosing ViewGroup
         ExtViewClassInfo enclosingGroupInfo = addGroup(layoutParamsClass.getEnclosingClass());
 
-        layoutParamsInfo = new ExtViewClassInfo.LayoutParamsInfo(
-                enclosingGroupInfo, layoutParamsClass.getSimpleName(), superClassInfo);
+        layoutParamsInfo = new ExtViewClassInfo.LayoutParamsInfo(enclosingGroupInfo, layoutParamsClass.getSimpleName(),
+                superClassInfo);
         mLayoutParamsMap.put(fqcn, layoutParamsInfo);
 
         mAttrsXmlParser.loadLayoutParamsAttributes(layoutParamsInfo);

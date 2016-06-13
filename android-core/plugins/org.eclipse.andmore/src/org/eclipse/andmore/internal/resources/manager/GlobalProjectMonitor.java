@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,7 @@
 
 package org.eclipse.andmore.internal.resources.manager;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.resources.ResourceFile;
-import com.android.ide.common.resources.ResourceFolder;
+import java.util.ArrayList;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -41,7 +35,10 @@ import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
-import java.util.ArrayList;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.resources.ResourceFile;
+import com.android.ide.common.resources.ResourceFolder;
 
 /**
  * The Global Project Monitor tracks project file changes, and forward them to simple project,
@@ -79,8 +76,8 @@ public final class GlobalProjectMonitor {
          *            on what changed in the file
          * @param isAndroidProject whether the parent project is an Android Project
          */
-        public void fileChanged(@NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas,
-                int kind, @Nullable String extension, int flags, boolean isAndroidProject);
+        public void fileChanged(@NonNull IFile file, @NonNull IMarkerDelta[] markerDeltas, int kind,
+                @Nullable String extension, int flags, boolean isAndroidProject);
     }
 
     /**
@@ -150,6 +147,7 @@ public final class GlobalProjectMonitor {
      */
     public interface IResourceEventListener {
         public void resourceChangeEventStart();
+
         public void resourceChangeEventEnd();
     }
 
@@ -195,19 +193,15 @@ public final class GlobalProjectMonitor {
         IFolderListener listener;
     }
 
-    private final ArrayList<FileListenerBundle> mFileListeners =
-        new ArrayList<FileListenerBundle>();
+    private final ArrayList<FileListenerBundle> mFileListeners = new ArrayList<FileListenerBundle>();
 
-    private final ArrayList<FolderListenerBundle> mFolderListeners =
-        new ArrayList<FolderListenerBundle>();
+    private final ArrayList<FolderListenerBundle> mFolderListeners = new ArrayList<FolderListenerBundle>();
 
     private final ArrayList<IProjectListener> mProjectListeners = new ArrayList<IProjectListener>();
 
-    private final ArrayList<IResourceEventListener> mEventListeners =
-        new ArrayList<IResourceEventListener>();
+    private final ArrayList<IResourceEventListener> mEventListeners = new ArrayList<IResourceEventListener>();
 
-    private final ArrayList<IRawDeltaListener> mRawDeltaListeners =
-        new ArrayList<IRawDeltaListener>();
+    private final ArrayList<IRawDeltaListener> mRawDeltaListeners = new ArrayList<IRawDeltaListener>();
 
     private IWorkspace mWorkspace;
 
@@ -227,13 +221,12 @@ public final class GlobalProjectMonitor {
                 int kind = delta.getKind();
                 // notify the listeners.
                 for (FileListenerBundle bundle : mFileListeners) {
-                    if (bundle.kindMask == ListenerBundle.MASK_NONE
-                            || (bundle.kindMask & kind) != 0) {
+                    if (bundle.kindMask == ListenerBundle.MASK_NONE || (bundle.kindMask & kind) != 0) {
                         try {
-                            bundle.listener.fileChanged((IFile)r, delta.getMarkerDeltas(), kind,
-                                    r.getFileExtension(), delta.getFlags(), mIsAndroidProject);
+                            bundle.listener.fileChanged((IFile) r, delta.getMarkerDeltas(), kind, r.getFileExtension(),
+                                    delta.getFlags(), mIsAndroidProject);
                         } catch (Throwable t) {
-                            AndmoreAndroidPlugin.log(t,"Failed to call IFileListener.fileChanged");
+                            AndmoreAndroidPlugin.log(t, "Failed to call IFileListener.fileChanged");
                         }
                     }
                 }
@@ -242,18 +235,17 @@ public final class GlobalProjectMonitor {
                 int kind = delta.getKind();
                 // notify the listeners.
                 for (FolderListenerBundle bundle : mFolderListeners) {
-                    if (bundle.kindMask == ListenerBundle.MASK_NONE
-                            || (bundle.kindMask & kind) != 0) {
+                    if (bundle.kindMask == ListenerBundle.MASK_NONE || (bundle.kindMask & kind) != 0) {
                         try {
-                            bundle.listener.folderChanged((IFolder)r, kind, mIsAndroidProject);
+                            bundle.listener.folderChanged((IFolder) r, kind, mIsAndroidProject);
                         } catch (Throwable t) {
-                            AndmoreAndroidPlugin.log(t,"Failed to call IFileListener.folderChanged");
+                            AndmoreAndroidPlugin.log(t, "Failed to call IFileListener.folderChanged");
                         }
                     }
                 }
                 return true;
             } else if (type == IResource.PROJECT) {
-                IProject project = (IProject)r;
+                IProject project = (IProject) r;
 
                 try {
                     mIsAndroidProject = project.hasNature(AndmoreAndroidConstants.NATURE_DEFAULT);
@@ -281,7 +273,7 @@ public final class GlobalProjectMonitor {
                             try {
                                 pl.projectOpened(project);
                             } catch (Throwable t) {
-                                AndmoreAndroidPlugin.log(t,"Failed to call IProjectListener.projectOpened");
+                                AndmoreAndroidPlugin.log(t, "Failed to call IProjectListener.projectOpened");
                             }
                         }
                     } else {
@@ -290,7 +282,7 @@ public final class GlobalProjectMonitor {
                             try {
                                 pl.projectClosed(project);
                             } catch (Throwable t) {
-                                AndmoreAndroidPlugin.log(t,"Failed to call IProjectListener.projectClosed");
+                                AndmoreAndroidPlugin.log(t, "Failed to call IProjectListener.projectClosed");
                             }
                         }
                     }
@@ -302,7 +294,7 @@ public final class GlobalProjectMonitor {
                             try {
                                 pl.projectRenamed(project, from);
                             } catch (Throwable t) {
-                                AndmoreAndroidPlugin.log(t,"Failed to call IProjectListener.projectRenamed");
+                                AndmoreAndroidPlugin.log(t, "Failed to call IProjectListener.projectRenamed");
                             }
                         }
                     }
@@ -316,7 +308,6 @@ public final class GlobalProjectMonitor {
     public static GlobalProjectMonitor getMonitor() {
         return sThis;
     }
-
 
     /**
      * Starts the resource monitoring.
@@ -367,7 +358,7 @@ public final class GlobalProjectMonitor {
      * @param listener the listener to remove.
      */
     public synchronized void removeFileListener(IFileListener listener) {
-        for (int i = 0 ; i < mFileListeners.size() ; i++) {
+        for (int i = 0; i < mFileListeners.size(); i++) {
             FileListenerBundle bundle = mFileListeners.get(i);
             if (bundle.listener == listener) {
                 mFileListeners.remove(i);
@@ -396,7 +387,7 @@ public final class GlobalProjectMonitor {
      * @param listener the listener to remove.
      */
     public synchronized void removeFolderListener(IFolderListener listener) {
-        for (int i = 0 ; i < mFolderListeners.size() ; i++) {
+        for (int i = 0; i < mFolderListeners.size(); i++) {
             FolderListenerBundle bundle = mFolderListeners.get(i);
             if (bundle.listener == listener) {
                 mFolderListeners.remove(i);
@@ -417,9 +408,7 @@ public final class GlobalProjectMonitor {
         // get the list of opened android projects.
         IWorkspaceRoot workspaceRoot = mWorkspace.getRoot();
         IJavaModel javaModel = JavaCore.create(workspaceRoot);
-        IJavaProject[] androidProjects = BaseProjectHelper.getAndroidProjects(javaModel,
-                null /*filter*/);
-
+        IJavaProject[] androidProjects = BaseProjectHelper.getAndroidProjects(javaModel, null /*filter*/);
 
         notifyResourceEventStart();
 
@@ -477,7 +466,7 @@ public final class GlobalProjectMonitor {
             try {
                 listener.resourceChangeEventStart();
             } catch (Throwable t) {
-                AndmoreAndroidPlugin.log(t,"Failed to call IResourceEventListener.resourceChangeEventStart");
+                AndmoreAndroidPlugin.log(t, "Failed to call IResourceEventListener.resourceChangeEventStart");
             }
         }
     }
@@ -487,7 +476,7 @@ public final class GlobalProjectMonitor {
             try {
                 listener.resourceChangeEventEnd();
             } catch (Throwable t) {
-                AndmoreAndroidPlugin.log(t,"Failed to call IResourceEventListener.resourceChangeEventEnd");
+                AndmoreAndroidPlugin.log(t, "Failed to call IResourceEventListener.resourceChangeEventEnd");
             }
         }
     }
@@ -516,7 +505,7 @@ public final class GlobalProjectMonitor {
                             try {
                                 pl.projectDeleted(project);
                             } catch (Throwable t) {
-                                AndmoreAndroidPlugin.log(t,"Failed to call IProjectListener.projectDeleted");
+                                AndmoreAndroidPlugin.log(t, "Failed to call IProjectListener.projectDeleted");
                             }
                         }
                     } catch (CoreException e) {
@@ -535,8 +524,7 @@ public final class GlobalProjectMonitor {
                 DeltaVisitor visitor = new DeltaVisitor();
                 try {
                     delta.accept(visitor);
-                } catch (CoreException e) {
-                }
+                } catch (CoreException e) {}
             }
 
             // we're done, notify the event listeners.

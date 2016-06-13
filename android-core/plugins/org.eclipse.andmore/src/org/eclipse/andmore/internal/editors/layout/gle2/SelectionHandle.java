@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,14 +38,9 @@ public class SelectionHandle {
 
     /** The position of the handle in the selection rectangle */
     enum Position {
-        TOP_MIDDLE(SWT.CURSOR_SIZEN),
-        TOP_RIGHT(SWT.CURSOR_SIZENE),
-        RIGHT_MIDDLE(SWT.CURSOR_SIZEE),
-        BOTTOM_RIGHT(SWT.CURSOR_SIZESE),
-        BOTTOM_MIDDLE(SWT.CURSOR_SIZES),
-        BOTTOM_LEFT(SWT.CURSOR_SIZESW),
-        LEFT_MIDDLE(SWT.CURSOR_SIZEW),
-        TOP_LEFT(SWT.CURSOR_SIZENW);
+        TOP_MIDDLE(SWT.CURSOR_SIZEN), TOP_RIGHT(SWT.CURSOR_SIZENE), RIGHT_MIDDLE(SWT.CURSOR_SIZEE), BOTTOM_RIGHT(
+                SWT.CURSOR_SIZESE), BOTTOM_MIDDLE(SWT.CURSOR_SIZES), BOTTOM_LEFT(
+                        SWT.CURSOR_SIZESW), LEFT_MIDDLE(SWT.CURSOR_SIZEW), TOP_LEFT(SWT.CURSOR_SIZENW);
 
         /** Corresponding SWT cursor value */
         private int mSwtCursor;
@@ -115,10 +107,8 @@ public class SelectionHandle {
      * @return true if the given point is within the given distance of this handle
      */
     public boolean contains(LayoutPoint point, int distance) {
-        return (point.x >= centerX - distance
-              && point.x <= centerX + distance
-              && point.y >= centerY - distance
-              && point.y <= centerY + distance);
+        return (point.x >= centerX - distance && point.x <= centerX + distance && point.y >= centerY - distance
+                && point.y <= centerY + distance);
     }
 
     /**

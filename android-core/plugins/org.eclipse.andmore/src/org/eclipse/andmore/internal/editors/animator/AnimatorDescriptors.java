@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -75,29 +72,21 @@ public class AnimatorDescriptors implements IDescriptorProvider {
             return;
         }
 
-        XmlnsAttributeDescriptor xmlns = new XmlnsAttributeDescriptor(ANDROID_NS_NAME,
-                ANDROID_URI);
+        XmlnsAttributeDescriptor xmlns = new XmlnsAttributeDescriptor(ANDROID_NS_NAME, ANDROID_URI);
 
         List<ElementDescriptor> descriptors = new ArrayList<ElementDescriptor>();
 
-        String sdkUrl =
-            "http://developer.android.com/guide/topics/graphics/animation.html"; //$NON-NLS-1$
+        String sdkUrl = "http://developer.android.com/guide/topics/graphics/animation.html"; //$NON-NLS-1$
 
-        ElementDescriptor set = addElement(descriptors, styleMap,
-                "set", "Animator Set", "AnimatorSet", null, //$NON-NLS-1$ //$NON-NLS-3$
-                null /* tooltip */, sdkUrl,
-                xmlns, null, true /*mandatory*/);
+        ElementDescriptor set = addElement(descriptors, styleMap, "set", "Animator Set", "AnimatorSet", null, //$NON-NLS-1$ //$NON-NLS-3$
+                null /* tooltip */, sdkUrl, xmlns, null, true /*mandatory*/);
 
-        ElementDescriptor objectAnimator = addElement(descriptors, styleMap,
-                "objectAnimator", "Object Animator", //$NON-NLS-1$
+        ElementDescriptor objectAnimator = addElement(descriptors, styleMap, "objectAnimator", "Object Animator", //$NON-NLS-1$
                 "PropertyAnimator", "Animator", //$NON-NLS-1$ //$NON-NLS-2$
-                null /* tooltip */, sdkUrl,
-                xmlns, null, true /*mandatory*/);
+                null /* tooltip */, sdkUrl, xmlns, null, true /*mandatory*/);
 
-        ElementDescriptor animator = addElement(descriptors, styleMap,
-                "animator", "Animator", "Animator", null, //$NON-NLS-1$ //$NON-NLS-3$
-                null /* tooltip */, sdkUrl,
-                xmlns, null, true /*mandatory*/);
+        ElementDescriptor animator = addElement(descriptors, styleMap, "animator", "Animator", "Animator", null, //$NON-NLS-1$ //$NON-NLS-3$
+                null /* tooltip */, sdkUrl, xmlns, null, true /*mandatory*/);
 
         mRootDescriptors = descriptors.toArray(new ElementDescriptor[descriptors.size()]);
 
@@ -133,40 +122,30 @@ public class AnimatorDescriptors implements IDescriptorProvider {
      * @param mandatory if true, this element is mandatory
      * @return a newly created element, or null if the style does not exist
      */
-    public static ElementDescriptor addElement(
-            List<ElementDescriptor> descriptors,
-            Map<String, DeclareStyleableInfo> styleMap,
-            String xmlName, String uiName, String styleName, String extraStyle,
-            String tooltip, String sdkUrl,
-            AttributeDescriptor extraAttribute,
-            ElementDescriptor[] childrenElements,
-            boolean mandatory) {
+    public static ElementDescriptor addElement(List<ElementDescriptor> descriptors,
+            Map<String, DeclareStyleableInfo> styleMap, String xmlName, String uiName, String styleName,
+            String extraStyle, String tooltip, String sdkUrl, AttributeDescriptor extraAttribute,
+            ElementDescriptor[] childrenElements, boolean mandatory) {
         DeclareStyleableInfo style = styleMap.get(styleName);
         if (style == null) {
             return null;
         }
-        ElementDescriptor element = new ElementDescriptor(xmlName, uiName, tooltip, sdkUrl,
-                null, childrenElements, mandatory);
+        ElementDescriptor element = new ElementDescriptor(xmlName, uiName, tooltip, sdkUrl, null, childrenElements,
+                mandatory);
 
         ArrayList<AttributeDescriptor> descs = new ArrayList<AttributeDescriptor>();
 
-        DescriptorsUtils.appendAttributes(descs,
-                null,   // elementName
-                ANDROID_URI,
-                style.getAttributes(),
-                null,   // requiredAttributes
-                null);  // overrides
+        DescriptorsUtils.appendAttributes(descs, null, // elementName
+                ANDROID_URI, style.getAttributes(), null, // requiredAttributes
+                null); // overrides
         element.setTooltip(style.getJavaDoc());
 
         if (extraStyle != null) {
             style = styleMap.get(extraStyle);
             if (style != null) {
-                DescriptorsUtils.appendAttributes(descs,
-                        null,   // elementName
-                        ANDROID_URI,
-                        style.getAttributes(),
-                        null,   // requiredAttributes
-                        null);  // overrides
+                DescriptorsUtils.appendAttributes(descs, null, // elementName
+                        ANDROID_URI, style.getAttributes(), null, // requiredAttributes
+                        null); // overrides
             }
         }
 

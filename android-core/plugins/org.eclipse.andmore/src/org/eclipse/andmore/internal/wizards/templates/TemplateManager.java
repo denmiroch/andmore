@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,19 +17,6 @@ import static com.android.SdkConstants.FD_TEMPLATES;
 import static com.android.SdkConstants.FD_TOOLS;
 import static org.eclipse.andmore.internal.wizards.templates.TemplateHandler.TEMPLATE_XML;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.google.common.base.Charsets;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.io.Files;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
-import org.eclipse.andmore.internal.editors.layout.gle2.DomUtilities;
-import org.eclipse.andmore.internal.preferences.AdtPrefs;
-import org.w3c.dom.Document;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,13 +26,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.internal.editors.layout.gle2.DomUtilities;
+import org.eclipse.andmore.internal.preferences.AdtPrefs;
+import org.w3c.dom.Document;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.io.Files;
+
 /** Handles locating templates and providing template metadata */
 public class TemplateManager {
-	private static final Set<String> EXCLUDED_CATEGORIES = Sets.newHashSet("Folder", "Google");
-	private static final Set<String> EXCLUDED_FORMFACTORS = Sets.newHashSet("Wear", "TV");
-	
-    TemplateManager() {
-    }
+    private static final Set<String> EXCLUDED_CATEGORIES = Sets.newHashSet("Folder", "Google");
+    private static final Set<String> EXCLUDED_FORMFACTORS = Sets.newHashSet("Wear", "TV");
+
+    TemplateManager() {}
 
     /** @return the root folder containing templates */
     @Nullable
@@ -109,8 +105,7 @@ public class TemplateManager {
         File templateRoot = getTemplateRootFolder();
         if (templateRoot != null) {
             String rootPath = root.getPath();
-            File templateFile = new File(templateRoot,
-                    rootPath.replace('/', File.separatorChar) + File.separator
+            File templateFile = new File(templateRoot, rootPath.replace('/', File.separatorChar) + File.separator
                     + relativePath.replace('/', File.separatorChar));
             if (templateFile.exists()) {
                 return templateFile;
@@ -130,8 +125,7 @@ public class TemplateManager {
     public static File getTemplateLocation(@NonNull String relativePath) {
         File templateRoot = getTemplateRootFolder();
         if (templateRoot != null) {
-            File templateFile = new File(templateRoot,
-                    relativePath.replace('/', File.separatorChar));
+            File templateFile = new File(templateRoot, relativePath.replace('/', File.separatorChar));
             if (templateFile.exists()) {
                 return templateFile;
             }
@@ -244,9 +238,9 @@ public class TemplateManager {
                 Document doc = DomUtilities.parseDocument(xml, true);
                 if (doc != null && doc.getDocumentElement() != null) {
                     TemplateMetadata metadata = new TemplateMetadata(doc);
-                    if (EXCLUDED_CATEGORIES.contains(metadata.getCategory()) ||
-                    	EXCLUDED_FORMFACTORS.contains(metadata.getFormFactor())) {
-                    	return null;
+                    if (EXCLUDED_CATEGORIES.contains(metadata.getCategory())
+                            || EXCLUDED_FORMFACTORS.contains(metadata.getFormFactor())) {
+                        return null;
                     }
                     mTemplateMap.put(templateDir, metadata);
                     return metadata;

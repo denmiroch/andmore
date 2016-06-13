@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,10 +20,7 @@ import static com.android.SdkConstants.ATTR_NAME;
 import static com.android.SdkConstants.ATTR_TYPE;
 import static com.android.SdkConstants.TAG_ITEM;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.resources.ResourceUrl;
-import com.android.resources.ResourceType;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.gle2.DomUtilities;
@@ -62,7 +56,10 @@ import org.eclipse.ui.texteditor.ITextEditorExtension2;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.resources.ResourceUrl;
+import com.android.resources.ResourceType;
 
 /**
  * Text action for XML files to invoke renaming
@@ -142,29 +139,27 @@ public final class RenameResourceXmlTextAction extends Action {
                 try {
                     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
                     op.run(window.getShell(), wizard.getDefaultPageTitle());
-                } catch (InterruptedException e) {
-                }
+                } catch (InterruptedException e) {}
             }
 
             return;
         }
 
         // Fallback: tell user the cursor isn't in the right place
-        MessageDialog.openInformation(mEditor.getSite().getShell(),
-                "Rename",
-                "Operation unavailable on the current selection.\n"
-                        + "Select an Android resource name or class.");
+        MessageDialog.openInformation(mEditor.getSite().getShell(), "Rename",
+                "Operation unavailable on the current selection.\n" + "Select an Android resource name or class.");
     }
 
     private boolean validateEditorInputState() {
-        if (mEditor instanceof ITextEditorExtension2)
+        if (mEditor instanceof ITextEditorExtension2) {
             return ((ITextEditorExtension2) mEditor).validateEditorInputState();
-        else if (mEditor instanceof ITextEditorExtension)
+        } else if (mEditor instanceof ITextEditorExtension) {
             return !((ITextEditorExtension) mEditor).isEditorInputReadOnly();
-        else if (mEditor != null)
+        } else if (mEditor != null) {
             return mEditor.isEditable();
-        else
+        } else {
             return false;
+        }
     }
 
     /**
@@ -278,10 +273,7 @@ public final class RenameResourceXmlTextAction extends Action {
      * @return a resource pair, or null if not found
      */
     @Nullable
-    public static String findClassName(
-            @NonNull IDocument document,
-            @Nullable IFile file,
-            int offset) {
+    public static String findClassName(@NonNull IDocument document, @Nullable IFile file, int offset) {
         try {
             int max = document.getLength();
             if (offset >= max) {

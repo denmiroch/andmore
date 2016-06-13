@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,38 +15,20 @@ package org.eclipse.andmore.internal.lint;
 import static com.android.SdkConstants.DOT_JAR;
 import static com.android.SdkConstants.DOT_XML;
 import static com.android.SdkConstants.FD_NATIVE_LIBS;
-import static org.eclipse.andmore.AndmoreAndroidConstants.MARKER_LINT;
 import static org.eclipse.andmore.AdtUtils.workspacePathToFile;
+import static org.eclipse.andmore.AndmoreAndroidConstants.MARKER_LINT;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.sdklib.IAndroidTarget;
-import com.android.tools.lint.checks.BuiltinIssueRegistry;
-import com.android.tools.lint.client.api.Configuration;
-import com.android.tools.lint.client.api.IssueRegistry;
-import com.android.tools.lint.client.api.JavaParser;
-import com.android.tools.lint.client.api.LintClient;
-import com.android.tools.lint.client.api.XmlParser;
-import com.android.tools.lint.detector.api.ClassContext;
-import com.android.tools.lint.detector.api.Context;
-import com.android.tools.lint.detector.api.DefaultPosition;
-import com.android.tools.lint.detector.api.Detector;
-import com.android.tools.lint.detector.api.Issue;
-import com.android.tools.lint.detector.api.JavaContext;
-import com.android.tools.lint.detector.api.LintUtils;
-import com.android.tools.lint.detector.api.Location;
-import com.android.tools.lint.detector.api.Location.Handle;
-import com.android.tools.lint.detector.api.Position;
-import com.android.tools.lint.detector.api.Project;
-import com.android.tools.lint.detector.api.Severity;
-import com.android.tools.lint.detector.api.TextFormat;
-import com.android.tools.lint.detector.api.XmlContext;
-import com.android.utils.Pair;
-import com.android.utils.SdkUtils;
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.uimodel.UiViewElementNode;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
@@ -97,14 +76,32 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.sdklib.IAndroidTarget;
+import com.android.tools.lint.checks.BuiltinIssueRegistry;
+import com.android.tools.lint.client.api.Configuration;
+import com.android.tools.lint.client.api.IssueRegistry;
+import com.android.tools.lint.client.api.JavaParser;
+import com.android.tools.lint.client.api.LintClient;
+import com.android.tools.lint.client.api.XmlParser;
+import com.android.tools.lint.detector.api.ClassContext;
+import com.android.tools.lint.detector.api.Context;
+import com.android.tools.lint.detector.api.DefaultPosition;
+import com.android.tools.lint.detector.api.Detector;
+import com.android.tools.lint.detector.api.Issue;
+import com.android.tools.lint.detector.api.JavaContext;
+import com.android.tools.lint.detector.api.LintUtils;
+import com.android.tools.lint.detector.api.Location;
+import com.android.tools.lint.detector.api.Location.Handle;
+import com.android.tools.lint.detector.api.Position;
+import com.android.tools.lint.detector.api.Project;
+import com.android.tools.lint.detector.api.Severity;
+import com.android.tools.lint.detector.api.TextFormat;
+import com.android.tools.lint.detector.api.XmlContext;
+import com.android.utils.Pair;
+import com.android.utils.SdkUtils;
+import com.google.common.collect.Maps;
 
 import lombok.ast.ecj.EcjTreeConverter;
 import lombok.ast.grammar.ParseProblem;
@@ -115,8 +112,8 @@ import lombok.ast.grammar.Source;
  */
 @SuppressWarnings("restriction") // DOM model
 public class EclipseLintClient extends LintClient {
-    static final String MARKER_CHECKID_PROPERTY = "checkid";    //$NON-NLS-1$
-    private static final String MODEL_PROPERTY = "model";       //$NON-NLS-1$
+    static final String MARKER_CHECKID_PROPERTY = "checkid"; //$NON-NLS-1$
+    private static final String MODEL_PROPERTY = "model"; //$NON-NLS-1$
     private final List<? extends IResource> mResources;
     private final IDocument mDocument;
     private boolean mWasFatal;
@@ -134,8 +131,8 @@ public class EclipseLintClient extends LintClient {
      *            param is not a file
      * @param fatalOnly whether only fatal issues should be reported (and therefore checked)
      */
-    public EclipseLintClient(IssueRegistry registry, List<? extends IResource> resources,
-            IDocument document, boolean fatalOnly) {
+    public EclipseLintClient(IssueRegistry registry, List<? extends IResource> resources, IDocument document,
+            boolean fatalOnly) {
         mResources = resources;
         mDocument = document;
         mFatalOnly = fatalOnly;
@@ -196,8 +193,8 @@ public class EclipseLintClient extends LintClient {
     // ----- Extends LintClient -----
 
     @Override
-    public void log(@NonNull Severity severity, @Nullable Throwable exception,
-            @Nullable String format, @Nullable Object... args) {
+    public void log(@NonNull Severity severity, @Nullable Throwable exception, @Nullable String format,
+            @Nullable Object... args) {
         if (exception == null) {
             AndmoreAndroidPlugin.log(IStatus.WARNING, format, args);
         } else {
@@ -244,20 +241,17 @@ public class EclipseLintClient extends LintClient {
             @Override
             public @NonNull Location getLocation(@NonNull XmlContext context, @NonNull Node node) {
                 IStructuredModel model = (IStructuredModel) context.getProperty(MODEL_PROPERTY);
-                return new LazyLocation(context.file, model.getStructuredDocument(),
-                        (IndexedRegion) node);
+                return new LazyLocation(context.file, model.getStructuredDocument(), (IndexedRegion) node);
             }
 
             @Override
-            public @NonNull Location getLocation(@NonNull XmlContext context, @NonNull Node node,
-                    int start, int end) {
+            public @NonNull Location getLocation(@NonNull XmlContext context, @NonNull Node node, int start, int end) {
                 IndexedRegion region = (IndexedRegion) node;
                 int nodeStart = region.getStartOffset();
 
                 IStructuredModel model = (IStructuredModel) context.getProperty(MODEL_PROPERTY);
                 // Get line number
-                LazyLocation location = new LazyLocation(context.file,
-                        model.getStructuredDocument(), region);
+                LazyLocation location = new LazyLocation(context.file, model.getStructuredDocument(), region);
                 int line = location.getStart().getLine();
 
                 Position startPos = new DefaultPosition(line, -1, nodeStart + start);
@@ -278,11 +272,9 @@ public class EclipseLintClient extends LintClient {
             }
 
             @Override
-            public @NonNull Handle createLocationHandle(final @NonNull XmlContext context,
-                    final @NonNull Node node) {
+            public @NonNull Handle createLocationHandle(final @NonNull XmlContext context, final @NonNull Node node) {
                 IStructuredModel model = (IStructuredModel) context.getProperty(MODEL_PROPERTY);
-                return new LazyLocation(context.file, model.getStructuredDocument(),
-                        (IndexedRegion) node);
+                return new LazyLocation(context.file, model.getStructuredDocument(), (IndexedRegion) node);
             }
 
             @Override
@@ -294,17 +286,17 @@ public class EclipseLintClient extends LintClient {
                 }
             }
 
-			@Override
-			public Location getNameLocation(XmlContext arg0, Node arg1) {
-				// TODO Auto-generated method stub
-				throw new UnsupportedOperationException();
-			}
+            @Override
+            public Location getNameLocation(XmlContext arg0, Node arg1) {
+                // TODO Auto-generated method stub
+                throw new UnsupportedOperationException();
+            }
 
-			@Override
-			public Location getValueLocation(XmlContext arg0, Attr arg1) {
-				// TODO Auto-generated method stub
-				throw new UnsupportedOperationException();
-			}
+            @Override
+            public Location getValueLocation(XmlContext arg0, Attr arg1) {
+                // TODO Auto-generated method stub
+                throw new UnsupportedOperationException();
+            }
         };
     }
 
@@ -385,8 +377,7 @@ public class EclipseLintClient extends LintClient {
     }
 
     @Override
-    public void report(@NonNull Context context, @NonNull Issue issue, @NonNull Severity s,
-            @Nullable Location location,
+    public void report(@NonNull Context context, @NonNull Issue issue, @NonNull Severity s, @Nullable Location location,
             @NonNull String message, TextFormat arg5) {
         int severity = getMarkerSeverity(s);
         IMarker marker = null;
@@ -396,8 +387,7 @@ public class EclipseLintClient extends LintClient {
                 if (location.getFile() != null) {
                     IResource resource = AdtUtils.fileToResource(location.getFile());
                     if (resource != null && resource.isAccessible()) {
-                        marker = BaseProjectHelper.markResource(resource, MARKER_LINT,
-                                message, 0, severity);
+                        marker = BaseProjectHelper.markResource(resource, MARKER_LINT, message, 0, severity);
                     }
                 }
             } else {
@@ -405,19 +395,17 @@ public class EclipseLintClient extends LintClient {
                 int line = startPosition.getLine() + 1; // Marker API is 1-based
                 IFile file = AdtUtils.fileToIFile(location.getFile());
                 if (file != null && file.isAccessible()) {
-                    Pair<Integer, Integer> r = getRange(file, mDocument,
-                            startPosition, endPosition);
+                    Pair<Integer, Integer> r = getRange(file, mDocument, startPosition, endPosition);
                     int startOffset = r.getFirst();
                     int endOffset = r.getSecond();
-                    marker = BaseProjectHelper.markResource(file, MARKER_LINT,
-                            message, line, startOffset, endOffset, severity);
+                    marker = BaseProjectHelper.markResource(file, MARKER_LINT, message, line, startOffset, endOffset,
+                            severity);
                 }
             }
         }
 
         if (marker == null) {
-            marker = BaseProjectHelper.markResource(mResources.get(0), MARKER_LINT,
-                        message, 0, severity);
+            marker = BaseProjectHelper.markResource(mResources.get(0), MARKER_LINT, message, 0, severity);
         }
 
         if (marker != null) {
@@ -565,8 +553,8 @@ public class EclipseLintClient extends LintClient {
         }
     }
 
-    private static Pair<Integer, Integer> getRange(IFile file, IDocument doc,
-            Position startPosition, Position endPosition) {
+    private static Pair<Integer, Integer> getRange(IFile file, IDocument doc, Position startPosition,
+            Position endPosition) {
         int startOffset = startPosition.getOffset();
         int endOffset = endPosition != null ? endPosition.getOffset() : -1;
         if (endOffset != -1) {
@@ -602,8 +590,7 @@ public class EclipseLintClient extends LintClient {
      * warnings on attributes would just overlap with the whole-element
      * highlighting.
      */
-    private static Pair<Integer, Integer> adjustOffsets(IDocument doc, int startOffset,
-            int endOffset) {
+    private static Pair<Integer, Integer> adjustOffsets(IDocument doc, int startOffset, int endOffset) {
         int originalStart = startOffset;
         int originalEnd = endOffset;
 
@@ -681,8 +668,7 @@ public class EclipseLintClient extends LintClient {
         try {
             sb.append((String) marker.getAttribute(IMarker.MESSAGE));
             sb.append('\n').append('\n');
-        } catch (CoreException e) {
-        }
+        } catch (CoreException e) {}
         sb.append("Issue: ");
         sb.append(summary);
         sb.append('\n');
@@ -729,8 +715,7 @@ public class EclipseLintClient extends LintClient {
 
             IResource resource = marker.getResource();
             if (resource instanceof IFile) {
-                IEditorPart editor =
-                        AndmoreAndroidPlugin.openFile((IFile) resource, region, true /* showEditorTab */);
+                IEditorPart editor = AndmoreAndroidPlugin.openFile((IFile) resource, region, true /* showEditorTab */);
                 if (editor != null) {
                     IDE.gotoMarker(editor, marker);
                 }
@@ -747,10 +732,7 @@ public class EclipseLintClient extends LintClient {
      * @param file the file to show the errors for
      * @param editor the editor for the file, if known
      */
-    public static void showErrors(
-            @NonNull Shell shell,
-            @NonNull IFile file,
-            @Nullable IEditorPart editor) {
+    public static void showErrors(@NonNull Shell shell, @NonNull IFile file, @Nullable IEditorPart editor) {
         LintListDialog dialog = new LintListDialog(shell, file, editor);
         dialog.open();
     }
@@ -913,8 +895,7 @@ public class EclipseLintClient extends LintClient {
     }
 
     @Override
-    public @NonNull Class<? extends Detector> replaceDetector(
-            @NonNull Class<? extends Detector> detectorClass) {
+    public @NonNull Class<? extends Detector> replaceDetector(@NonNull Class<? extends Detector> detectorClass) {
         return detectorClass;
     }
 
@@ -982,9 +963,7 @@ public class EclipseLintClient extends LintClient {
                 IType superType = hierarchy.getSuperclass(type);
                 if (superType != null) {
                     String key = superType.getKey();
-                    if (!key.isEmpty()
-                            && key.charAt(0) == 'L'
-                            && key.charAt(key.length() - 1) == ';') {
+                    if (!key.isEmpty() && key.charAt(0) == 'L' && key.charAt(key.length() - 1) == ';') {
                         return key.substring(1, key.length() - 1);
                     } else {
                         String fqcn = superType.getFullyQualifiedName();
@@ -1003,10 +982,7 @@ public class EclipseLintClient extends LintClient {
 
     @Override
     @Nullable
-    public Boolean isSubclassOf(
-            @NonNull Project project,
-            @NonNull String name, @NonNull
-            String superClassName) {
+    public Boolean isSubclassOf(@NonNull Project project, @NonNull String name, @NonNull String superClassName) {
         if (!mSearchForSuperClasses) {
             // Super type search using the Eclipse index is potentially slow, so
             // only do this when necessary
@@ -1069,8 +1045,7 @@ public class EclipseLintClient extends LintClient {
 
                 if (mRegion instanceof org.w3c.dom.Text && mDocument != null) {
                     // For text nodes, skip whitespace prefix, if any
-                    for (int i = offset;
-                            i < mRegion.getEndOffset() && i < mDocument.getLength(); i++) {
+                    for (int i = offset; i < mRegion.getEndOffset() && i < mDocument.getLength(); i++) {
                         try {
                             char c = mDocument.getChar(i);
                             if (!Character.isWhitespace(c)) {
@@ -1130,10 +1105,8 @@ public class EclipseLintClient extends LintClient {
                 options.sourceLevel = ClassFileConstants.JDK1_7;
                 options.targetJDK = ClassFileConstants.JDK1_7;
                 options.parseLiteralExpressionsAsConstants = true;
-                ProblemReporter problemReporter = new ProblemReporter(
-                        DefaultErrorHandlingPolicies.exitOnFirstError(),
-                        options,
-                        new DefaultProblemFactory());
+                ProblemReporter problemReporter = new ProblemReporter(DefaultErrorHandlingPolicies.exitOnFirstError(),
+                        options, new DefaultProblemFactory());
                 mParser = new Parser(problemReporter, options.parseLiteralExpressionsAsConstants);
                 mParser.javadocParser.checkDocComment = false;
             } else {
@@ -1153,8 +1126,7 @@ public class EclipseLintClient extends LintClient {
                 EcjTreeConverter converter = new EcjTreeConverter();
                 String code = context.getContents();
 
-                CompilationUnit sourceUnit = new CompilationUnit(code.toCharArray(),
-                        context.file.getName(), "UTF-8"); //$NON-NLS-1$
+                CompilationUnit sourceUnit = new CompilationUnit(code.toCharArray(), context.file.getName(), "UTF-8"); //$NON-NLS-1$
                 CompilationResult compilationResult = new CompilationResult(sourceUnit, 0, 0, 0);
                 CompilationUnitDeclaration unit = null;
                 try {
@@ -1210,7 +1182,7 @@ public class EclipseLintClient extends LintClient {
                                 IssueRegistry.PARSER_ERROR, location,
                                 message,
                                 null);
-
+                    
                     }
                     */
                     return null;
@@ -1228,35 +1200,28 @@ public class EclipseLintClient extends LintClient {
         }
 
         @Override
-        public @NonNull Location getLocation(@NonNull JavaContext context,
-                @NonNull lombok.ast.Node node) {
+        public @NonNull Location getLocation(@NonNull JavaContext context, @NonNull lombok.ast.Node node) {
             lombok.ast.Position position = node.getPosition();
-            return Location.create(context.file, context.getContents(),
-                    position.getStart(), position.getEnd());
+            return Location.create(context.file, context.getContents(), position.getStart(), position.getEnd());
         }
 
         @Override
-        public @NonNull Handle createLocationHandle(@NonNull JavaContext context,
-                @NonNull lombok.ast.Node node) {
+        public @NonNull Handle createLocationHandle(@NonNull JavaContext context, @NonNull lombok.ast.Node node) {
             return new LocationHandle(context.file, node);
         }
 
         @Override
-        public void dispose(@NonNull JavaContext context,
-                @NonNull lombok.ast.Node compilationUnit) {
-        }
+        public void dispose(@NonNull JavaContext context, @NonNull lombok.ast.Node compilationUnit) {}
 
         @Override
         @Nullable
-        public ResolvedNode resolve(@NonNull JavaContext context,
-                @NonNull lombok.ast.Node node) {
+        public ResolvedNode resolve(@NonNull JavaContext context, @NonNull lombok.ast.Node node) {
             return null;
         }
 
         @Override
         @Nullable
-        public TypeDescriptor getType(@NonNull JavaContext context,
-                @NonNull lombok.ast.Node node) {
+        public TypeDescriptor getType(@NonNull JavaContext context, @NonNull lombok.ast.Node node) {
             return null;
         }
 
@@ -1290,4 +1255,3 @@ public class EclipseLintClient extends LintClient {
         }
     }
 }
-

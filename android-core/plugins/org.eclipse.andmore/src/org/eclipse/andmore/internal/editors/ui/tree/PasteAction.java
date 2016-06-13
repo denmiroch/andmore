@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +29,6 @@ import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocumentReg
 import org.eclipse.wst.xml.core.internal.document.NodeContainer;
 import org.w3c.dom.Node;
 
-
 /**
  * Provides Paste operation for the tree nodes
  */
@@ -50,8 +46,7 @@ public class PasteAction extends Action {
         ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
         setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_PASTE));
         setHoverImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_PASTE));
-        setDisabledImageDescriptor(
-                images.getImageDescriptor(ISharedImages.IMG_TOOL_PASTE_DISABLED));
+        setDisabledImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_PASTE_DISABLED));
 
         mUiNode = ui_node;
     }
@@ -92,8 +87,7 @@ public class PasteAction extends Action {
                                 Node xml_node = mUiNode.getXmlNode();
                                 if (xml_node instanceof NodeContainer) {
                                     NodeContainer container = (NodeContainer) xml_node;
-                                    IStructuredDocumentRegion start_tag =
-                                        container.getStartStructuredDocumentRegion();
+                                    IStructuredDocumentRegion start_tag = container.getStartStructuredDocumentRegion();
                                     if (start_tag != null) {
                                         sse_doc.replace(start_tag.getEndOffset(), 0, data);
                                         return; // we're done, no need to try the other case
@@ -116,8 +110,7 @@ public class PasteAction extends Action {
                         }
 
                     } catch (BadLocationException e) {
-                        AndmoreAndroidPlugin.log(e,
-                                "ParseAction failed for UI Node %2$s, content '%1$s'", //$NON-NLS-1$
+                        AndmoreAndroidPlugin.log(e, "ParseAction failed for UI Node %2$s, content '%1$s'", //$NON-NLS-1$
                                 mUiNode.getBreadcrumbTrailDescription(true), data);
                     }
                 }
@@ -125,4 +118,3 @@ public class PasteAction extends Action {
         }
     }
 }
-

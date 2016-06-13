@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +13,6 @@
 
 package org.eclipse.andmore.internal.editors.manifest.model;
 
-import com.android.SdkConstants;
-
 import org.eclipse.andmore.internal.editors.descriptors.ElementDescriptor;
 import org.eclipse.andmore.internal.editors.manifest.descriptors.AndroidManifestDescriptors;
 import org.eclipse.andmore.internal.editors.manifest.descriptors.ManifestElementDescriptor;
@@ -25,6 +20,8 @@ import org.eclipse.andmore.internal.editors.uimodel.UiAttributeNode;
 import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
 import org.eclipse.andmore.internal.sdk.AndroidTargetData;
 import org.w3c.dom.Element;
+
+import com.android.SdkConstants;
 
 /**
  * Represents an XML node that can be modified by the user interface in the XML editor.
@@ -69,25 +66,21 @@ public final class UiManifestElementNode extends UiElementNode {
 
         String name = getDescriptor().getUiName();
 
-        if (manifestDescriptors != null &&
-                getXmlNode() != null &&
-                getXmlNode() instanceof Element &&
-                getXmlNode().hasAttributes()) {
+        if (manifestDescriptors != null && getXmlNode() != null && getXmlNode() instanceof Element
+                && getXmlNode().hasAttributes()) {
 
             // Application and Manifest nodes have a special treatment: they are unique nodes
             // so we don't bother trying to differentiate their strings and we fall back to
             // just using the UI name below.
             ElementDescriptor desc = getDescriptor();
-            if (desc != manifestDescriptors.getManifestElement() &&
-                    desc != manifestDescriptors.getApplicationElement()) {
+            if (desc != manifestDescriptors.getManifestElement()
+                    && desc != manifestDescriptors.getApplicationElement()) {
                 Element elem = (Element) getXmlNode();
-                String attr = _Element_getAttributeNS(elem,
-                                    SdkConstants.NS_RESOURCES,
-                                    AndroidManifestDescriptors.ANDROID_NAME_ATTR);
+                String attr = _Element_getAttributeNS(elem, SdkConstants.NS_RESOURCES,
+                        AndroidManifestDescriptors.ANDROID_NAME_ATTR);
                 if (attr == null || attr.length() == 0) {
-                    attr = _Element_getAttributeNS(elem,
-                                    SdkConstants.NS_RESOURCES,
-                                    AndroidManifestDescriptors.ANDROID_LABEL_ATTR);
+                    attr = _Element_getAttributeNS(elem, SdkConstants.NS_RESOURCES,
+                            AndroidManifestDescriptors.ANDROID_LABEL_ATTR);
                 }
                 if (attr != null && attr.length() > 0) {
                     // If the ui name is repeated in the attribute value, don't use it.
@@ -119,9 +112,7 @@ public final class UiManifestElementNode extends UiElementNode {
      * @see <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=318108">https://bugs.eclipse.org/bugs/show_bug.cgi?id=318108</a>
      * @return The result from {@link Element#getAttributeNS(String, String)} or or an empty string.
      */
-    private String _Element_getAttributeNS(Element element,
-            String namespaceURI,
-            String localName) {
+    private String _Element_getAttributeNS(Element element, String namespaceURI, String localName) {
         try {
             return element.getAttributeNS(namespaceURI, localName);
         } catch (Exception ignore) {
@@ -129,4 +120,3 @@ public final class UiManifestElementNode extends UiElementNode {
         }
     }
 }
-

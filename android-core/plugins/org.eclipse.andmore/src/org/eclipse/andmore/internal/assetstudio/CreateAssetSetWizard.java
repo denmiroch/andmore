@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +12,21 @@
  */
 package org.eclipse.andmore.internal.assetstudio;
 
-import com.android.utils.Pair;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
+import javax.imageio.ImageIO;
+
+import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.AndroidXmlEditor;
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
 import org.eclipse.core.resources.IContainer;
@@ -50,17 +57,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import javax.imageio.ImageIO;
+import com.android.utils.Pair;
 
 /**
  * Wizard for creating a new icon set
@@ -90,8 +87,7 @@ public class CreateAssetSetWizard extends Wizard implements INewWizard {
 
     @Override
     public boolean performFinish() {
-        Map<String, Map<String, BufferedImage>> categories =
-                ConfigureAssetSetPage.generateImages(mValues, false, null);
+        Map<String, Map<String, BufferedImage>> categories = ConfigureAssetSetPage.generateImages(mValues, false, null);
 
         IProject project = mValues.project;
 
@@ -108,13 +104,13 @@ public class CreateAssetSetWizard extends Wizard implements INewWizard {
                     // Warn that the file already exists and ask the user what to do
                     if (!yesToAll) {
                         MessageDialog dialog = new MessageDialog(null, "File Already Exists", null,
-                                String.format(
-                                        "%1$s already exists.\nWould you like to replace it?",
+                                String.format("%1$s already exists.\nWould you like to replace it?",
                                         file.getProjectRelativePath().toOSString()),
-                                MessageDialog.QUESTION, new String[] {
+                                MessageDialog.QUESTION,
+                                new String[] {
                                         // Yes will be moved to the end because it's the default
-                                        "Yes", "No", "Cancel", "Yes to All"
-                                }, 0);
+                                        "Yes", "No", "Cancel", "Yes to All" },
+                                0);
                         int result = dialog.open();
                         switch (result) {
                             case 0:
@@ -254,7 +250,7 @@ public class CreateAssetSetWizard extends Wizard implements INewWizard {
 
         for (Object element : selection.toList()) {
             if (element instanceof IAdaptable) {
-                IResource res = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+                IResource res = ((IAdaptable) element).getAdapter(IResource.class);
                 IProject project = res != null ? res.getProject() : null;
 
                 // Is this an Android project?

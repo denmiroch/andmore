@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +13,9 @@
 
 package org.eclipse.andmore.internal.ui;
 
-import com.android.ide.common.resources.ResourceItem;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.resources.ResourceType;
+import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.layout.properties.PropertyFactory;
@@ -52,9 +49,9 @@ import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 
-import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.ide.common.resources.ResourceItem;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.resources.ResourceType;
 
 /**
  * A dialog to let the user choose a reference to a resource.
@@ -79,8 +76,7 @@ public class ReferenceChooserDialog extends SelectionStatusDialog {
      * @param project
      * @param parent
      */
-    public ReferenceChooserDialog(IProject project, ResourceRepository projectResources,
-            Shell parent) {
+    public ReferenceChooserDialog(IProject project, ResourceRepository projectResources, Shell parent) {
         super(parent);
         mProject = project;
         mProjectResources = projectResources;
@@ -106,7 +102,6 @@ public class ReferenceChooserDialog extends SelectionStatusDialog {
         return mCurrentResource;
     }
 
-
     /* (non-Javadoc)
      * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
      */
@@ -117,8 +112,8 @@ public class ReferenceChooserDialog extends SelectionStatusDialog {
         if (treeSelection != null) {
             if (treeSelection.getSegmentCount() == 2) {
                 // get the resource type and the resource item
-                ResourceType resourceType = (ResourceType)treeSelection.getFirstSegment();
-                ResourceItem resourceItem = (ResourceItem)treeSelection.getLastSegment();
+                ResourceType resourceType = (ResourceType) treeSelection.getFirstSegment();
+                ResourceItem resourceItem = (ResourceItem) treeSelection.getLastSegment();
 
                 mCurrentResource = resourceItem.getXmlString(resourceType, false /* system */);
             }
@@ -127,7 +122,7 @@ public class ReferenceChooserDialog extends SelectionStatusDialog {
 
     @Override
     protected Control createDialogArea(Composite parent) {
-        Composite top = (Composite)super.createDialogArea(parent);
+        Composite top = (Composite) super.createDialogArea(parent);
 
         // create the standard message area
         createMessageArea(top);
@@ -162,8 +157,7 @@ public class ReferenceChooserDialog extends SelectionStatusDialog {
     }
 
     private void createFilteredTree(Composite parent) {
-        mFilteredTree = new FilteredTree(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION,
-                new PatternFilter());
+        mFilteredTree = new FilteredTree(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION, new PatternFilter());
 
         GridData data = new GridData();
         data.widthHint = convertWidthInCharsToPixels(60);
@@ -228,7 +222,7 @@ public class ReferenceChooserDialog extends SelectionStatusDialog {
     private TreePath getSelection() {
         ISelection selection = mFilteredTree.getViewer().getSelection();
         if (selection instanceof TreeSelection) {
-            TreeSelection treeSelection = (TreeSelection)selection;
+            TreeSelection treeSelection = (TreeSelection) selection;
             TreePath[] treePaths = treeSelection.getPaths();
 
             // the selection mode is SWT.SINGLE, so we just get the first one.
@@ -246,17 +240,14 @@ public class ReferenceChooserDialog extends SelectionStatusDialog {
         IStatus status;
         if (treeSelection != null) {
             if (treeSelection.getSegmentCount() == 2) {
-                status = new Status(IStatus.OK, AndmoreAndroidPlugin.PLUGIN_ID,
-                        IStatus.OK, "", //$NON-NLS-1$
+                status = new Status(IStatus.OK, AndmoreAndroidPlugin.PLUGIN_ID, IStatus.OK, "", //$NON-NLS-1$
                         null);
             } else {
-                status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                        IStatus.ERROR, "You must select a Resource Item",
-                        null);
+                status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, IStatus.ERROR,
+                        "You must select a Resource Item", null);
             }
         } else {
-            status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID,
-                    IStatus.ERROR, "", //$NON-NLS-1$
+            status = new Status(IStatus.ERROR, AndmoreAndroidPlugin.PLUGIN_ID, IStatus.ERROR, "", //$NON-NLS-1$
                     null);
         }
 
@@ -275,8 +266,7 @@ public class ReferenceChooserDialog extends SelectionStatusDialog {
         // We only support adding new strings right now
         mNewResButton.setEnabled(type == ResourceType.STRING);
 
-        String title = String.format("New %1$s...",
-                type == null ? "Resource" : type.getDisplayName());
+        String title = String.format("New %1$s...", type == null ? "Resource" : type.getDisplayName());
         mNewResButton.setText(title);
         mNewResButton.pack();
     }
@@ -286,33 +276,32 @@ public class ReferenceChooserDialog extends SelectionStatusDialog {
      */
     private class OnNewResButtonSelected extends SelectionAdapter {
         @Override
-         public void widgetSelected(SelectionEvent e) {
-             super.widgetSelected(e);
+        public void widgetSelected(SelectionEvent e) {
+            super.widgetSelected(e);
 
-             ResourceType type = getSelectedResourceType();
+            ResourceType type = getSelectedResourceType();
 
-             // We currently only support strings
-             if (type == ResourceType.STRING) {
+            // We currently only support strings
+            if (type == ResourceType.STRING) {
 
-                 ExtractStringRefactoring ref = new ExtractStringRefactoring(
-                         mProject, true /*enforceNew*/);
-                 RefactoringWizard wizard = new ExtractStringWizard(ref, mProject);
-                 RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
-                 try {
-                     IWorkbench w = PlatformUI.getWorkbench();
-                     if (op.run(w.getDisplay().getActiveShell(), wizard.getDefaultPageTitle()) ==
-                             IDialogConstants.OK_ID) {
-                         mTreeViewer.refresh();
+                ExtractStringRefactoring ref = new ExtractStringRefactoring(mProject, true /*enforceNew*/);
+                RefactoringWizard wizard = new ExtractStringWizard(ref, mProject);
+                RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
+                try {
+                    IWorkbench w = PlatformUI.getWorkbench();
+                    if (op.run(w.getDisplay().getActiveShell(),
+                            wizard.getDefaultPageTitle()) == IDialogConstants.OK_ID) {
+                        mTreeViewer.refresh();
 
-                         // select it if possible
-                         setupInitialSelection(type, ref.getXmlStringId());
-                     }
-                 } catch (InterruptedException ex) {
-                     // Interrupted. Pass.
-                 }
-             }
-         }
-     }
+                        // select it if possible
+                        setupInitialSelection(type, ref.getXmlStringId());
+                    }
+                } catch (InterruptedException ex) {
+                    // Interrupted. Pass.
+                }
+            }
+        }
+    }
 
     /**
      * Returns the {@link ResourceType} of the selected element, if any.
@@ -369,16 +358,13 @@ public class ReferenceChooserDialog extends SelectionStatusDialog {
      */
     private void setupInitialSelection(ResourceType resourceType, String resourceName) {
         // get all the resources of this type
-        Collection<ResourceItem> resourceItems =
-                mProjectResources.getResourceItemsOfType(resourceType);
+        Collection<ResourceItem> resourceItems = mProjectResources.getResourceItemsOfType(resourceType);
 
         for (ResourceItem resourceItem : resourceItems) {
             if (resourceName.equals(resourceItem.getName())) {
                 // name of the resource match, we select it,
                 TreePath treePath = new TreePath(new Object[] { resourceType, resourceItem });
-                mFilteredTree.getViewer().setSelection(
-                        new TreeSelection(treePath),
-                        true /*reveal*/);
+                mFilteredTree.getViewer().setSelection(new TreeSelection(treePath), true /*reveal*/);
 
                 // and we're done.
                 return;
@@ -388,9 +374,7 @@ public class ReferenceChooserDialog extends SelectionStatusDialog {
         // if we get here, the resource type is valid, but the resource is missing.
         // we select and expand the resource type element.
         TreePath treePath = new TreePath(new Object[] { resourceType });
-        mFilteredTree.getViewer().setSelection(
-                new TreeSelection(treePath),
-                true /*reveal*/);
+        mFilteredTree.getViewer().setSelection(new TreeSelection(treePath), true /*reveal*/);
         mFilteredTree.getViewer().setExpandedState(resourceType, true /* expanded */);
     }
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,12 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.properties;
-
-import com.android.SdkConstants;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.internal.project.ProjectProperties;
-import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
-import com.android.sdkuilib.internal.widgets.SdkTargetSelector;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.sdk.ProjectState;
@@ -39,6 +30,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.dialogs.PropertyPage;
 
+import com.android.SdkConstants;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.internal.project.ProjectProperties;
+import com.android.sdklib.internal.project.ProjectPropertiesWorkingCopy;
+import com.android.sdkuilib.internal.widgets.SdkTargetSelector;
+
 /**
  * Property page for "Android" project.
  * This is accessible from the Package Explorer when right clicking a project and choosing
@@ -51,7 +48,7 @@ public class AndroidPropertyPage extends PropertyPage {
     private SdkTargetSelector mSelector;
     private Button mIsLibrary;
     // APK-SPLIT: This is not yet supported, so we hide the UI
-//    private Button mSplitByDensity;
+    //    private Button mSplitByDensity;
     private LibraryProperties mLibraryDependencies;
     private ProjectPropertiesWorkingCopy mPropertiesWorkingCopy;
 
@@ -62,7 +59,7 @@ public class AndroidPropertyPage extends PropertyPage {
     @Override
     protected Control createContents(Composite parent) {
         // get the element (this is not yet valid in the constructor).
-        mProject = (IProject)getElement();
+        mProject = (IProject) getElement();
 
         // get the targets from the sdk
         IAndroidTarget[] targets = null;
@@ -123,8 +120,7 @@ public class AndroidPropertyPage extends PropertyPage {
 
             IAndroidTarget newTarget = mSelector.getSelected();
             if (state == null || newTarget != state.getTarget()) {
-                mPropertiesWorkingCopy.setProperty(ProjectProperties.PROPERTY_TARGET,
-                        newTarget.hashString());
+                mPropertiesWorkingCopy.setProperty(ProjectProperties.PROPERTY_TARGET, newTarget.hashString());
                 mustSaveProp = true;
             }
 
@@ -147,8 +143,7 @@ public class AndroidPropertyPage extends PropertyPage {
                         projectProp.refreshLocal(IResource.DEPTH_ZERO, new NullProgressMonitor());
                     }
                 } catch (Exception e) {
-                    String msg = String.format(
-                            "Failed to save %1$s for project %2$s",
+                    String msg = String.format("Failed to save %1$s for project %2$s",
                             SdkConstants.FN_PROJECT_PROPERTIES, mProject.getName());
                     AndmoreAndroidPlugin.log(e, msg);
                 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,15 +13,10 @@
 
 package org.eclipse.andmore.internal.resources.manager;
 
-import com.android.SdkConstants;
-import com.android.ide.common.resources.FrameworkResources;
-import com.android.ide.common.resources.ResourceFile;
-import com.android.ide.common.resources.ResourceFolder;
-import com.android.ide.common.resources.ResourceRepository;
-import com.android.ide.common.resources.ScanningContext;
-import com.android.io.FolderWrapper;
-import com.android.resources.ResourceFolderType;
-import com.android.sdklib.IAndroidTarget;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -49,10 +41,15 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import com.android.SdkConstants;
+import com.android.ide.common.resources.FrameworkResources;
+import com.android.ide.common.resources.ResourceFile;
+import com.android.ide.common.resources.ResourceFolder;
+import com.android.ide.common.resources.ResourceRepository;
+import com.android.ide.common.resources.ScanningContext;
+import com.android.io.FolderWrapper;
+import com.android.resources.ResourceFolderType;
+import com.android.sdklib.IAndroidTarget;
 
 /**
  * The ResourceManager tracks resources for all opened projects.
@@ -81,8 +78,7 @@ public final class ResourceManager {
      * <p/><b>All accesses must be inside a synchronized(mMap) block</b>, and do as a little as
      * possible and <b>not call out to other classes</b>.
      */
-    private final Map<IProject, ProjectResources> mMap =
-        new HashMap<IProject, ProjectResources>();
+    private final Map<IProject, ProjectResources> mMap = new HashMap<IProject, ProjectResources>();
 
     /**
      * Interface to be notified of resource changes.
@@ -98,6 +94,7 @@ public final class ResourceManager {
          * @param eventType the type of event. See {@link IResourceDelta}.
          */
         void fileChanged(IProject project, ResourceFile file, int eventType);
+
         /**
          * Notification for resource folder change.
          * @param project the project of the file.
@@ -194,7 +191,7 @@ public final class ResourceManager {
         // Skip over deltas that don't fit our mask
         int mask = IResourceDelta.ADDED | IResourceDelta.REMOVED | IResourceDelta.CHANGED;
         int kind = delta.getKind();
-        if ( (mask & kind) == 0) {
+        if ((mask & kind) == 0) {
             return;
         }
 
@@ -205,16 +202,16 @@ public final class ResourceManager {
 
         if (type == IResource.FILE) {
             context.startScanning(r);
-            updateFile((IFile)r, delta.getMarkerDeltas(), kind, context);
+            updateFile((IFile) r, delta.getMarkerDeltas(), kind, context);
             context.finishScanning(r);
         } else if (type == IResource.FOLDER) {
-            updateFolder((IFolder)r, kind, context);
+            updateFolder((IFolder) r, kind, context);
         } // We only care about files and folders.
           // Project deltas are handled by our project listener
 
         // Now, process children recursively
         IResourceDelta[] children = delta.getAffectedChildren();
-        for (IResourceDelta child : children)  {
+        for (IResourceDelta child : children) {
             processDelta(child, context);
         }
     }
@@ -257,8 +254,7 @@ public final class ResourceManager {
                             }
                         }
 
-                        ResourceFolder newFolder = resources.processFolder(
-                                new IFolderWrapper(folder));
+                        ResourceFolder newFolder = resources.processFolder(new IFolderWrapper(folder));
                         if (newFolder != null) {
                             notifyListenerOnFolderChange(project, newFolder, kind);
                         }
@@ -283,12 +279,10 @@ public final class ResourceManager {
                 }
                 if (resources != null) {
                     // lets get the folder type
-                    ResourceFolderType type = ResourceFolderType.getFolderType(
-                            folder.getName());
+                    ResourceFolderType type = ResourceFolderType.getFolderType(folder.getName());
 
                     context.startScanning(folder);
-                    ResourceFolder removedFolder = resources.removeFolder(type,
-                            new IFolderWrapper(folder), context);
+                    ResourceFolder removedFolder = resources.removeFolder(type, new IFolderWrapper(folder), context);
                     context.finishScanning(folder);
                     if (removedFolder != null) {
                         notifyListenerOnFolderChange(project, removedFolder, kind);
@@ -310,8 +304,7 @@ public final class ResourceManager {
      * @param context a context object with state for the current update, such
      *            as a place to stash errors encountered
      */
-    private void updateFile(IFile file, IMarkerDelta[] markerDeltas, int kind,
-            ScanningContext context) {
+    private void updateFile(IFile file, IMarkerDelta[] markerDeltas, int kind, ScanningContext context) {
         final IProject project = file.getProject();
 
         try {
@@ -341,15 +334,13 @@ public final class ResourceManager {
                 IContainer container = file.getParent();
                 if (container instanceof IFolder) {
 
-                    ResourceFolder folder = resources.getResourceFolder(
-                            (IFolder)container);
+                    ResourceFolder folder = resources.getResourceFolder((IFolder) container);
 
                     // folder can be null as when the whole folder is deleted, the
                     // REMOVED event for the folder comes first. In this case, the
                     // folder will have taken care of things.
                     if (folder != null) {
-                        ResourceFile resFile = folder.processFile(
-                                new IFileWrapper(file),
+                        ResourceFile resFile = folder.processFile(new IFileWrapper(file),
                                 ResourceHelper.getResourceDeltaKind(kind), context);
                         notifyListenerOnFileChange(project, resFile, kind);
                     }
@@ -430,8 +421,7 @@ public final class ResourceManager {
                         // only happens if the project is closed or doesn't exist.
                     }
 
-                    IdeScanningContext context =
-                            new IdeScanningContext(getProjectResources(project), project, true);
+                    IdeScanningContext context = new IdeScanningContext(getProjectResources(project), project, true);
 
                     processDelta(delta, context);
 
@@ -455,7 +445,7 @@ public final class ResourceManager {
     public ResourceFolder getResourceFolder(IFile file) {
         IContainer container = file.getParent();
         if (container.getType() == IResource.FOLDER) {
-            IFolder parent = (IFolder)container;
+            IFolder parent = (IFolder) container;
             IProject project = file.getProject();
 
             ProjectResources resources = getProjectResources(project);
@@ -516,7 +506,6 @@ public final class ResourceManager {
         }
     }
 
-
     /**
      * Returns true if the path is under /project/res/
      * @param path a workspace relative path
@@ -526,15 +515,13 @@ public final class ResourceManager {
         return SdkConstants.FD_RESOURCES.equalsIgnoreCase(path.segment(1));
     }
 
-    private void notifyListenerOnFolderChange(IProject project, ResourceFolder folder,
-            int eventType) {
+    private void notifyListenerOnFolderChange(IProject project, ResourceFolder folder, int eventType) {
         synchronized (mListeners) {
             for (IResourceListener listener : mListeners) {
                 try {
                     listener.folderChanged(project, folder, eventType);
                 } catch (Throwable t) {
-                    AndmoreAndroidPlugin.log(t,
-                            "Failed to execute ResourceManager.IResouceListener.folderChanged()"); //$NON-NLS-1$
+                    AndmoreAndroidPlugin.log(t, "Failed to execute ResourceManager.IResouceListener.folderChanged()"); //$NON-NLS-1$
                 }
             }
         }
@@ -546,8 +533,7 @@ public final class ResourceManager {
                 try {
                     listener.fileChanged(project, file, eventType);
                 } catch (Throwable t) {
-                    AndmoreAndroidPlugin.log(t,
-                            "Failed to execute ResourceManager.IResouceListener.fileChanged()"); //$NON-NLS-1$
+                    AndmoreAndroidPlugin.log(t, "Failed to execute ResourceManager.IResouceListener.fileChanged()"); //$NON-NLS-1$
                 }
             }
         }
@@ -556,17 +542,19 @@ public final class ResourceManager {
     /**
      * Private constructor to enforce singleton design.
      */
-    private ResourceManager() {
-    }
+    private ResourceManager() {}
 
     // debug only
     @SuppressWarnings("unused")
     private String getKindString(int kind) {
         if (DEBUG) {
             switch (kind) {
-                case IResourceDelta.ADDED: return "ADDED";
-                case IResourceDelta.REMOVED: return "REMOVED";
-                case IResourceDelta.CHANGED: return "CHANGED";
+                case IResourceDelta.ADDED:
+                    return "ADDED";
+                case IResourceDelta.REMOVED:
+                    return "REMOVED";
+                case IResourceDelta.CHANGED:
+                    return "CHANGED";
             }
         }
 
@@ -585,8 +573,7 @@ public final class ResourceManager {
     }
 
     /** Qualified name for the per-project persistent property "needs aapt" */
-    private final static QualifiedName NEED_AAPT = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID,
-            "aapt");//$NON-NLS-1$
+    private final static QualifiedName NEED_AAPT = new QualifiedName(AndmoreAndroidPlugin.PLUGIN_ID, "aapt");//$NON-NLS-1$
 
     /**
      * Mark the given project, and any projects which depend on it as a library
@@ -612,7 +599,7 @@ public final class ResourceManager {
                 }
             }
         } catch (CoreException e) {
-            AndmoreAndroidPlugin.log(e,  null);
+            AndmoreAndroidPlugin.log(e, null);
         }
     }
 
@@ -632,7 +619,7 @@ public final class ResourceManager {
             // on other dirty projects. When they are built, they will issue their
             // own clear flag requests.
         } catch (CoreException e) {
-            AndmoreAndroidPlugin.log(e,  null);
+            AndmoreAndroidPlugin.log(e, null);
         }
     }
 
@@ -647,7 +634,7 @@ public final class ResourceManager {
             String b = project.getPersistentProperty(NEED_AAPT);
             return b != null && Boolean.valueOf(b);
         } catch (CoreException e) {
-            AndmoreAndroidPlugin.log(e,  null);
+            AndmoreAndroidPlugin.log(e, null);
         }
 
         return false;

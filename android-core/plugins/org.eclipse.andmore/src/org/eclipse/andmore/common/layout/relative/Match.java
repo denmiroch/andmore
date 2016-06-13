@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +12,10 @@
  */
 package org.eclipse.andmore.common.layout.relative;
 
+import static com.android.SdkConstants.ANDROID_URI;
 import static com.android.SdkConstants.ATTR_ID;
 import static com.android.SdkConstants.VALUE_TRUE;
 
-
-import static com.android.SdkConstants.ANDROID_URI;
 import com.android.ide.common.api.Segment;
 
 /** A match is a potential pairing of two segments with a given {@link ConstraintType}. */
@@ -51,8 +47,7 @@ class Match {
      * @param type the type of constraint this is a match for
      * @param delta the signed distance between the matched edges
      */
-    public Match(GuidelineHandler handler, Segment edge, Segment with,
-            ConstraintType type, int delta) {
+    public Match(GuidelineHandler handler, Segment edge, Segment with, ConstraintType type, int delta) {
         mHandler = handler;
 
         this.edge = edge;
@@ -93,7 +88,6 @@ class Match {
 
     @Override
     public String toString() {
-        return "Match [type=" + type + ", delta=" + delta + ", edge=" + edge
-                + "]";
+        return "Match [type=" + type + ", delta=" + delta + ", edge=" + edge + "]";
     }
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -123,24 +120,14 @@ public class AndroidTargetData {
     /**
      * Creates an AndroidTargetData object.
      */
-    void setExtraData(
-            AndroidManifestDescriptors manifestDescriptors,
-            LayoutDescriptors layoutDescriptors,
-            MenuDescriptors menuDescriptors,
-            OtherXmlDescriptors otherXmlDescriptors,
-            DrawableDescriptors drawableDescriptors,
-            AnimatorDescriptors animatorDescriptors,
-            AnimDescriptors animDescriptors,
-            ColorDescriptors colorDescriptors,
-            Map<String, Map<String, Integer>> enumValueMap,
-            String[] permissionValues,
-            String[] activityIntentActionValues,
-            String[] broadcastIntentActionValues,
-            String[] serviceIntentActionValues,
-            String[] intentCategoryValues,
-            String[] platformLibraries,
-            List<OptionalLibrary> optionalLibraries,
-            ResourceRepository frameworkResources,
+    void setExtraData(AndroidManifestDescriptors manifestDescriptors, LayoutDescriptors layoutDescriptors,
+            MenuDescriptors menuDescriptors, OtherXmlDescriptors otherXmlDescriptors,
+            DrawableDescriptors drawableDescriptors, AnimatorDescriptors animatorDescriptors,
+            AnimDescriptors animDescriptors, ColorDescriptors colorDescriptors,
+            Map<String, Map<String, Integer>> enumValueMap, String[] permissionValues,
+            String[] activityIntentActionValues, String[] broadcastIntentActionValues,
+            String[] serviceIntentActionValues, String[] intentCategoryValues, String[] platformLibraries,
+            List<OptionalLibrary> optionalLibraries, ResourceRepository frameworkResources,
             LayoutLibrary layoutLibrary) {
 
         mManifestDescriptors = manifestDescriptors;
@@ -194,8 +181,8 @@ public class AndroidTargetData {
                 return mAnimDescriptors;
             case DESCRIPTOR_COLOR:
                 return mColorDescriptors;
-            default :
-                 throw new IllegalArgumentException();
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -285,8 +272,7 @@ public class AndroidTargetData {
      * @return an array of String with the possible values, or <code>null</code> if no values were
      * found.
      */
-    public String[] getAttributeValues(String elementName, String attributeName,
-            String greatGrandParentElementName) {
+    public String[] getAttributeValues(String elementName, String attributeName, String greatGrandParentElementName) {
         if (greatGrandParentElementName != null) {
             String key = String.format("(%1$s,%2$s,%3$s)", //$NON-NLS-1$
                     greatGrandParentElementName, elementName, attributeName);
@@ -325,15 +311,11 @@ public class AndroidTargetData {
      */
     public synchronized LayoutLibrary getLayoutLibrary() {
         if (mLayoutBridgeInit == false && mLayoutLibrary.getStatus() == LoadStatus.LOADED) {
-            boolean ok = mLayoutLibrary.init(
-                    mTarget.getProperties(),
-                    new File(mTarget.getPath(IAndroidTarget.FONTS)),
-                    getEnumValueMap(),
-                    new LayoutLog() {
+            boolean ok = mLayoutLibrary.init(mTarget.getProperties(), new File(mTarget.getPath(IAndroidTarget.FONTS)),
+                    getEnumValueMap(), new LayoutLog() {
 
                         @Override
-                        public void error(String tag, String message, Throwable throwable,
-                                Object data) {
+                        public void error(String tag, String message, Throwable throwable, Object data) {
                             AndmoreAndroidPlugin.log(throwable, message);
                         }
 
@@ -348,8 +330,7 @@ public class AndroidTargetData {
                         }
                     });
             if (!ok) {
-                AndmoreAndroidPlugin.log(IStatus.ERROR,
-                        "LayoutLibrary initialization failed");
+                AndmoreAndroidPlugin.log(IStatus.ERROR, "LayoutLibrary initialization failed");
             }
             mLayoutBridgeInit = true;
         }
@@ -362,25 +343,23 @@ public class AndroidTargetData {
      * @param permissionValues the list of permissions
      */
     private void setPermissions(String[] permissionValues) {
-        setValues("(uses-permission,android:name)", permissionValues);   //$NON-NLS-1$
+        setValues("(uses-permission,android:name)", permissionValues); //$NON-NLS-1$
         setValues("(application,android:permission)", permissionValues); //$NON-NLS-1$
-        setValues("(activity,android:permission)", permissionValues);    //$NON-NLS-1$
-        setValues("(receiver,android:permission)", permissionValues);    //$NON-NLS-1$
-        setValues("(service,android:permission)", permissionValues);     //$NON-NLS-1$
-        setValues("(provider,android:permission)", permissionValues);    //$NON-NLS-1$
+        setValues("(activity,android:permission)", permissionValues); //$NON-NLS-1$
+        setValues("(receiver,android:permission)", permissionValues); //$NON-NLS-1$
+        setValues("(service,android:permission)", permissionValues); //$NON-NLS-1$
+        setValues("(provider,android:permission)", permissionValues); //$NON-NLS-1$
     }
 
-    private void setIntentFilterActionsAndCategories(String[] activityIntentActions,
-            String[] broadcastIntentActions, String[] serviceIntentActions,
-            String[] intentCategoryValues) {
-        setValues("(activity,action,android:name)", activityIntentActions);  //$NON-NLS-1$
+    private void setIntentFilterActionsAndCategories(String[] activityIntentActions, String[] broadcastIntentActions,
+            String[] serviceIntentActions, String[] intentCategoryValues) {
+        setValues("(activity,action,android:name)", activityIntentActions); //$NON-NLS-1$
         setValues("(receiver,action,android:name)", broadcastIntentActions); //$NON-NLS-1$
-        setValues("(service,action,android:name)", serviceIntentActions);    //$NON-NLS-1$
-        setValues("(category,android:name)", intentCategoryValues);          //$NON-NLS-1$
+        setValues("(service,action,android:name)", serviceIntentActions); //$NON-NLS-1$
+        setValues("(category,android:name)", intentCategoryValues); //$NON-NLS-1$
     }
 
-    private void setOptionalLibraries(String[] platformLibraries,
-            List<OptionalLibrary> optionalLibraries) {
+    private void setOptionalLibraries(String[] platformLibraries, List<OptionalLibrary> optionalLibraries) {
 
         ArrayList<String> libs = new ArrayList<String>();
 
@@ -395,7 +374,7 @@ public class AndroidTargetData {
                 libs.add(optionalLibrary.getName());
             }
         }
-        setValues("(uses-library,android:name)",  libs.toArray(new String[libs.size()]));
+        setValues("(uses-library,android:name)", libs.toArray(new String[libs.size()]));
     }
 
     /**

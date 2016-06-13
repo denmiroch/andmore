@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,17 +12,6 @@
  */
 
 package org.eclipse.andmore.internal.launch;
-
-import com.android.ddmuilib.ImageLoader;
-import com.android.prefs.AndroidLocation.AndroidLocationException;
-import com.android.sdklib.AndroidVersion;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.internal.avd.AvdInfo;
-import com.android.sdklib.internal.avd.AvdManager;
-import com.android.sdkuilib.internal.widgets.AvdSelector;
-import com.android.sdkuilib.internal.widgets.AvdSelector.DisplayMode;
-import com.android.sdkuilib.internal.widgets.AvdSelector.IAvdFilter;
-import com.android.utils.NullLogger;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.manifest.ManifestInfo;
@@ -60,26 +46,35 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.android.ddmuilib.ImageLoader;
+import com.android.prefs.AndroidLocation.AndroidLocationException;
+import com.android.sdklib.AndroidVersion;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.internal.avd.AvdInfo;
+import com.android.sdklib.internal.avd.AvdManager;
+import com.android.sdkuilib.internal.widgets.AvdSelector;
+import com.android.sdkuilib.internal.widgets.AvdSelector.DisplayMode;
+import com.android.sdkuilib.internal.widgets.AvdSelector.IAvdFilter;
+import com.android.utils.NullLogger;
+
 /**
  * Launch configuration tab to control the parameters of the Emulator
  */
 public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
 
-    private final static String[][] NETWORK_SPEEDS = new String[][] {
-        { "Full", "full" }, //$NON-NLS-2$
-        { "GSM", "gsm" }, //$NON-NLS-2$
-        { "HSCSD", "hscsd" }, //$NON-NLS-2$
-        { "GPRS", "gprs" }, //$NON-NLS-2$
-        { "EDGE", "edge" }, //$NON-NLS-2$
-        { "UMTS", "umts" }, //$NON-NLS-2$
-        { "HSPDA", "hsdpa" }, //$NON-NLS-2$
+    private final static String[][] NETWORK_SPEEDS = new String[][] { { "Full", "full" }, //$NON-NLS-2$
+            { "GSM", "gsm" }, //$NON-NLS-2$
+            { "HSCSD", "hscsd" }, //$NON-NLS-2$
+            { "GPRS", "gprs" }, //$NON-NLS-2$
+            { "EDGE", "edge" }, //$NON-NLS-2$
+            { "UMTS", "umts" }, //$NON-NLS-2$
+            { "HSPDA", "hsdpa" }, //$NON-NLS-2$
     };
 
-    private final static String[][] NETWORK_LATENCIES = new String[][] {
-        { "None", "none" }, //$NON-NLS-2$
-        { "GPRS", "gprs" }, //$NON-NLS-2$
-        { "EDGE", "edge" }, //$NON-NLS-2$
-        { "UMTS", "umts" }, //$NON-NLS-2$
+    private final static String[][] NETWORK_LATENCIES = new String[][] { { "None", "none" }, //$NON-NLS-2$
+            { "GPRS", "gprs" }, //$NON-NLS-2$
+            { "EDGE", "edge" }, //$NON-NLS-2$
+            { "UMTS", "umts" }, //$NON-NLS-2$
     };
 
     private Button mAutoTargetButton;
@@ -193,18 +188,13 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
         deviceTypeOffsetComp.setLayout(layout);
 
         mDeviceTypeCombo = new Combo(deviceTypeOffsetComp, SWT.READ_ONLY);
-        mDeviceTypeCombo.setItems(new String[] {
-                DEVICES_AND_EMULATORS,
-                EMULATORS_ONLY,
-                DEVICES_ONLY,
-        });
+        mDeviceTypeCombo.setItems(new String[] { DEVICES_AND_EMULATORS, EMULATORS_ONLY, DEVICES_ONLY, });
         mDeviceTypeCombo.select(0);
         mDeviceTypeCombo.setEnabled(false);
 
         // add the radio button
         mAutoTargetButton = new Button(targetModeGroup, SWT.RADIO);
-        mAutoTargetButton.setText("Automatically pick compatible device: "
-                + "Always uses preferred AVD if set below, "
+        mAutoTargetButton.setText("Automatically pick compatible device: " + "Always uses preferred AVD if set below, "
                 + "launches on compatible device/AVD otherwise.");
         mAutoTargetButton.setSelection(true);
 
@@ -232,11 +222,8 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
         // create the selector with no manager, we'll reset the manager every time this is
         // displayed to ensure we have the latest one (dialog is reused but SDK could have
         // been changed in between.
-        mPreferredAvdSelector = new AvdSelector(avdOffsetComp,
-                Sdk.getCurrent().getSdkOsLocation(),
-                null /* avd manager */,
-                DisplayMode.SIMPLE_CHECK,
-                new AdtConsoleSdkLog());
+        mPreferredAvdSelector = new AvdSelector(avdOffsetComp, Sdk.getCurrent().getSdkOsLocation(),
+                null /* avd manager */, DisplayMode.SIMPLE_CHECK, new AdtConsoleSdkLog());
         mPreferredAvdSelector.setTableHeightHint(100);
         SelectionListener listener = new SelectionAdapter() {
             @Override
@@ -263,7 +250,7 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
         // Explanation
         Label l = new Label(mEmulatorOptionsGroup, SWT.NONE);
         l.setText("If no compatible and active devices or AVD's are found, then an AVD "
-                 + "might be launched. Provide options for the AVD launch below.");
+                + "might be launched. Provide options for the AVD launch below.");
         gd = new GridData();
         gd.horizontalSpan = 2;
         l.setLayoutData(gd);
@@ -291,7 +278,8 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
         // wipe data option
         mWipeDataButton = new Button(mEmulatorOptionsGroup, SWT.CHECK);
         mWipeDataButton.setText("Wipe User Data");
-        mWipeDataButton.setToolTipText("Check this if you want to wipe your user data each time you start the emulator. You will be prompted for confirmation when the emulator starts.");
+        mWipeDataButton.setToolTipText(
+                "Check this if you want to wipe your user data each time you start the emulator. You will be prompted for confirmation when the emulator starts.");
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         mWipeDataButton.setLayoutData(gd);
@@ -300,7 +288,8 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
         // no boot anim option
         mNoBootAnimButton = new Button(mEmulatorOptionsGroup, SWT.CHECK);
         mNoBootAnimButton.setText("Disable Boot Animation");
-        mNoBootAnimButton.setToolTipText("Check this if you want to disable the boot animation. This can help the emulator start faster on slow machines.");
+        mNoBootAnimButton.setToolTipText(
+                "Check this if you want to disable the boot animation. This can help the emulator start faster on slow machines.");
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         mNoBootAnimButton.setLayoutData(gd);
@@ -359,17 +348,14 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
 
         mPreferredAvdSelector.setFilter(new IAvdFilter() {
             @Override
-            public void prepare() {
-            }
+            public void prepare() {}
 
             @Override
-            public void cleanup() {
-            }
+            public void cleanup() {}
 
             @Override
             public boolean accept(AvdInfo avd) {
-                AvdCompatibility.Compatibility c =
-                        AvdCompatibility.canRun(avd, mProjectTarget, mProjectMinApiVersion);
+                AvdCompatibility.Compatibility c = AvdCompatibility.canRun(avd, mProjectTarget, mProjectMinApiVersion);
                 return (c == Compatibility.NO) ? false : true;
             }
         });
@@ -402,8 +388,7 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
 
         boolean reuseLastUsedDevice;
         try {
-            reuseLastUsedDevice = configuration.getAttribute(
-                    LaunchConfigDelegate.ATTR_REUSE_LAST_USED_DEVICE, false);
+            reuseLastUsedDevice = configuration.getAttribute(LaunchConfigDelegate.ATTR_REUSE_LAST_USED_DEVICE, false);
         } catch (CoreException ex) {
             reuseLastUsedDevice = false;
         }
@@ -423,8 +408,7 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
         // look for the project name to get its target.
         String stringValue = "";
         try {
-            stringValue = configuration.getAttribute(
-                    IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, stringValue);
+            stringValue = configuration.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, stringValue);
         } catch (CoreException ce) {
             // let's not do anything here, we'll use the default value
         }
@@ -457,8 +441,7 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
 
         stringValue = "";
         try {
-            stringValue = configuration.getAttribute(LaunchConfigDelegate.ATTR_AVD_NAME,
-                    stringValue);
+            stringValue = configuration.getAttribute(LaunchConfigDelegate.ATTR_AVD_NAME, stringValue);
         } catch (CoreException e) {
             // let's not do anything here, we'll use the default value
         }
@@ -490,8 +473,7 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
 
         index = LaunchConfigDelegate.DEFAULT_SPEED;
         try {
-            index = configuration.getAttribute(LaunchConfigDelegate.ATTR_SPEED,
-                    index);
+            index = configuration.getAttribute(LaunchConfigDelegate.ATTR_SPEED, index);
         } catch (CoreException e) {
             // let's not do anything here, we'll use the default value
         }
@@ -503,8 +485,7 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
 
         index = LaunchConfigDelegate.DEFAULT_DELAY;
         try {
-            index = configuration.getAttribute(LaunchConfigDelegate.ATTR_DELAY,
-                    index);
+            index = configuration.getAttribute(LaunchConfigDelegate.ATTR_DELAY, index);
         } catch (CoreException e) {
             // let's not do anything here, we'll put a proper value in
             // performApply anyway
@@ -517,8 +498,7 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
 
         String commandLine = null;
         try {
-            commandLine = configuration.getAttribute(
-                    LaunchConfigDelegate.ATTR_COMMANDLINE, ""); //$NON-NLS-1$
+            commandLine = configuration.getAttribute(LaunchConfigDelegate.ATTR_COMMANDLINE, ""); //$NON-NLS-1$
         } catch (CoreException e) {
             // let's not do anything here, we'll use the default value
         }
@@ -532,27 +512,21 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
      */
     @Override
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(LaunchConfigDelegate.ATTR_TARGET_MODE,
-                getCurrentTargetMode().toString());
+        configuration.setAttribute(LaunchConfigDelegate.ATTR_TARGET_MODE, getCurrentTargetMode().toString());
         configuration.setAttribute(LaunchConfigDelegate.ATTR_REUSE_LAST_USED_DEVICE,
                 mFutureLaunchesOnSameDevice.getSelection());
         AvdInfo avd = mPreferredAvdSelector.getSelected();
         if (avd != null) {
             configuration.setAttribute(LaunchConfigDelegate.ATTR_AVD_NAME, avd.getName());
         } else {
-            configuration.setAttribute(LaunchConfigDelegate.ATTR_AVD_NAME, (String)null);
+            configuration.setAttribute(LaunchConfigDelegate.ATTR_AVD_NAME, (String) null);
         }
-        configuration.setAttribute(LaunchConfigDelegate.ATTR_SPEED,
-                mSpeedCombo.getSelectionIndex());
-        configuration.setAttribute(LaunchConfigDelegate.ATTR_DELAY,
-                mDelayCombo.getSelectionIndex());
-        configuration.setAttribute(LaunchConfigDelegate.ATTR_COMMANDLINE,
-                mEmulatorCLOptions.getText());
-        configuration.setAttribute(LaunchConfigDelegate.ATTR_WIPE_DATA,
-                mWipeDataButton.getSelection());
-        configuration.setAttribute(LaunchConfigDelegate.ATTR_NO_BOOT_ANIM,
-                mNoBootAnimButton.getSelection());
-   }
+        configuration.setAttribute(LaunchConfigDelegate.ATTR_SPEED, mSpeedCombo.getSelectionIndex());
+        configuration.setAttribute(LaunchConfigDelegate.ATTR_DELAY, mDelayCombo.getSelectionIndex());
+        configuration.setAttribute(LaunchConfigDelegate.ATTR_COMMANDLINE, mEmulatorCLOptions.getText());
+        configuration.setAttribute(LaunchConfigDelegate.ATTR_WIPE_DATA, mWipeDataButton.getSelection());
+        configuration.setAttribute(LaunchConfigDelegate.ATTR_NO_BOOT_ANIM, mNoBootAnimButton.getSelection());
+    }
 
     private TargetMode getCurrentTargetMode() {
         if (mAutoTargetButton.getSelection()) {
@@ -580,17 +554,13 @@ public class EmulatorConfigTab extends AbstractLaunchConfigurationTab {
     public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
         configuration.setAttribute(LaunchConfigDelegate.ATTR_TARGET_MODE,
                 LaunchConfigDelegate.DEFAULT_TARGET_MODE.toString());
-        configuration.setAttribute(LaunchConfigDelegate.ATTR_SPEED,
-                LaunchConfigDelegate.DEFAULT_SPEED);
-        configuration.setAttribute(LaunchConfigDelegate.ATTR_DELAY,
-                LaunchConfigDelegate.DEFAULT_DELAY);
-        configuration.setAttribute(LaunchConfigDelegate.ATTR_WIPE_DATA,
-                LaunchConfigDelegate.DEFAULT_WIPE_DATA);
-        configuration.setAttribute(LaunchConfigDelegate.ATTR_NO_BOOT_ANIM,
-                LaunchConfigDelegate.DEFAULT_NO_BOOT_ANIM);
+        configuration.setAttribute(LaunchConfigDelegate.ATTR_SPEED, LaunchConfigDelegate.DEFAULT_SPEED);
+        configuration.setAttribute(LaunchConfigDelegate.ATTR_DELAY, LaunchConfigDelegate.DEFAULT_DELAY);
+        configuration.setAttribute(LaunchConfigDelegate.ATTR_WIPE_DATA, LaunchConfigDelegate.DEFAULT_WIPE_DATA);
+        configuration.setAttribute(LaunchConfigDelegate.ATTR_NO_BOOT_ANIM, LaunchConfigDelegate.DEFAULT_NO_BOOT_ANIM);
 
         IPreferenceStore store = AndmoreAndroidPlugin.getDefault().getPreferenceStore();
         String emuOptions = store.getString(AdtPrefs.PREFS_EMU_OPTIONS);
         configuration.setAttribute(LaunchConfigDelegate.ATTR_COMMANDLINE, emuOptions);
-   }
+    }
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +13,10 @@
 
 package org.eclipse.andmore.internal.editors.binaryxml;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
@@ -23,10 +24,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 
 /**
  * Implementation of storage for a local file
@@ -60,8 +57,9 @@ public class FileStorage implements IStorage {
         try {
             stream = new FileInputStream(mFile);
         } catch (Exception e) {
-            throw new CoreException(new Status(IStatus.ERROR, AndmoreAndroidPlugin.getDefault().getBundle()
-                    .getSymbolicName(), IStatus.ERROR, mFile.getAbsolutePath(), e));
+            throw new CoreException(
+                    new Status(IStatus.ERROR, AndmoreAndroidPlugin.getDefault().getBundle().getSymbolicName(),
+                            IStatus.ERROR, mFile.getAbsolutePath(), e));
         }
         return stream;
     }

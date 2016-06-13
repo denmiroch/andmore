@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,10 @@
 
 package org.eclipse.andmore.internal.launch.junit.runtime;
 
+import java.util.Map;
+
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.TestIdentifier;
-
-import java.util.Map;
 
 /**
  * Collects info about tests to be executed by listening to the results of an Android test run.
@@ -118,15 +115,15 @@ class TestCollector implements ITestRunListener {
         return mDeviceSuiteRef;
     }
 
-	@Override
-	public void testAssumptionFailure(TestIdentifier test, String trace) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void testAssumptionFailure(TestIdentifier test, String trace) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void testIgnored(TestIdentifier test) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
+    @Override
+    public void testIgnored(TestIdentifier test) {
+        // TODO Auto-generated method stub
+
+    }
 }

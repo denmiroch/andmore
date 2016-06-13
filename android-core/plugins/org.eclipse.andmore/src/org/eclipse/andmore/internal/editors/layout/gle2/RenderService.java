@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +13,39 @@
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
 import static com.android.SdkConstants.LAYOUT_RESOURCE_PREFIX;
+
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.internal.editors.layout.ContextPullParser;
+import org.eclipse.andmore.internal.editors.layout.ProjectCallback;
+import org.eclipse.andmore.internal.editors.layout.UiElementPullParser;
+import org.eclipse.andmore.internal.editors.layout.configuration.Configuration;
+import org.eclipse.andmore.internal.editors.layout.configuration.ConfigurationChooser;
+import org.eclipse.andmore.internal.editors.layout.configuration.Locale;
+import org.eclipse.andmore.internal.editors.layout.gle2.IncludeFinder.Reference;
+import org.eclipse.andmore.internal.editors.layout.gre.NodeFactory;
+import org.eclipse.andmore.internal.editors.layout.gre.NodeProxy;
+import org.eclipse.andmore.internal.editors.layout.uimodel.UiViewElementNode;
+import org.eclipse.andmore.internal.editors.manifest.ManifestInfo;
+import org.eclipse.andmore.internal.editors.manifest.ManifestInfo.ActivityAttributes;
+import org.eclipse.andmore.internal.editors.uimodel.UiDocumentNode;
+import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
+import org.eclipse.andmore.internal.sdk.AndroidTargetData;
+import org.eclipse.andmore.internal.sdk.Sdk;
+import org.eclipse.core.resources.IProject;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import com.android.annotations.NonNull;
 import com.android.ide.common.api.IClientRulesEngine;
@@ -42,39 +72,6 @@ import com.android.sdklib.IAndroidTarget;
 import com.android.sdklib.devices.Device;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-
-import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
-import org.eclipse.andmore.internal.editors.layout.ContextPullParser;
-import org.eclipse.andmore.internal.editors.layout.ProjectCallback;
-import org.eclipse.andmore.internal.editors.layout.UiElementPullParser;
-import org.eclipse.andmore.internal.editors.layout.configuration.Configuration;
-import org.eclipse.andmore.internal.editors.layout.configuration.ConfigurationChooser;
-import org.eclipse.andmore.internal.editors.layout.configuration.Locale;
-import org.eclipse.andmore.internal.editors.layout.gle2.IncludeFinder.Reference;
-import org.eclipse.andmore.internal.editors.layout.gre.NodeFactory;
-import org.eclipse.andmore.internal.editors.layout.gre.NodeProxy;
-import org.eclipse.andmore.internal.editors.layout.uimodel.UiViewElementNode;
-import org.eclipse.andmore.internal.editors.manifest.ManifestInfo;
-import org.eclipse.andmore.internal.editors.manifest.ManifestInfo.ActivityAttributes;
-import org.eclipse.andmore.internal.editors.uimodel.UiDocumentNode;
-import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
-import org.eclipse.andmore.internal.sdk.AndroidTargetData;
-import org.eclipse.andmore.internal.sdk.Sdk;
-import org.eclipse.core.resources.IProject;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The {@link RenderService} provides rendering and layout information for
@@ -108,7 +105,7 @@ public class RenderService {
     private LayoutLog mLogger;
     private Integer mOverrideBgColor;
     private boolean mShowDecorations = true;
-    private Set<UiElementNode> mExpandNodes = Collections.<UiElementNode>emptySet();
+    private Set<UiElementNode> mExpandNodes = Collections.<UiElementNode> emptySet();
     private final Object mCredential;
 
     /** Use the {@link #create} factory instead */
@@ -126,8 +123,7 @@ public class RenderService {
         Device device = config.getDevice();
         assert device != null; // Should only attempt render with configuration that has device
         mHardwareConfigHelper = new HardwareConfigHelper(device);
-        mHardwareConfigHelper.setOrientation(
-                folderConfig.getScreenOrientationQualifier().getValue());
+        mHardwareConfigHelper.setOrientation(folderConfig.getScreenOrientationQualifier().getValue());
 
         mLayoutLib = editor.getReadyLayoutLib(true /*displayError*/);
         mResourceResolver = editor.getResourceResolver();
@@ -137,8 +133,7 @@ public class RenderService {
         mLocale = config.getLocale();
     }
 
-    private RenderService(GraphicalEditorPart editor,
-            Configuration configuration, ResourceResolver resourceResolver,
+    private RenderService(GraphicalEditorPart editor, Configuration configuration, ResourceResolver resourceResolver,
             Object credential) {
         mEditor = editor;
         mCredential = credential;
@@ -151,11 +146,10 @@ public class RenderService {
         Device device = configuration.getDevice();
         assert device != null;
         mHardwareConfigHelper = new HardwareConfigHelper(device);
-        mHardwareConfigHelper.setOrientation(
-                folderConfig.getScreenOrientationQualifier().getValue());
+        mHardwareConfigHelper.setOrientation(folderConfig.getScreenOrientationQualifier().getValue());
 
         mLayoutLib = editor.getReadyLayoutLib(true /*displayError*/);
-        mResourceResolver =  resourceResolver != null ? resourceResolver : editor.getResourceResolver();
+        mResourceResolver = resourceResolver != null ? resourceResolver : editor.getResourceResolver();
         mProjectCallback = editor.getProjectCallback(true /*reset*/, mLayoutLib);
         mMinSdkVersion = editor.getMinSdkVersion();
         mTargetSdkVersion = editor.getTargetSdkVersion();
@@ -177,7 +171,7 @@ public class RenderService {
         Toolkit.getDefaultToolkit();
 
         return securityManager;
-      }
+    }
 
     /**
      * Returns true if this configuration supports the given rendering
@@ -187,9 +181,7 @@ public class RenderService {
      * @param capability the capability to check
      * @return true if the capability is supported
      */
-    public static boolean supports(
-            @NonNull IAndroidTarget target,
-            @NonNull Capability capability) {
+    public static boolean supports(@NonNull IAndroidTarget target, @NonNull Capability capability) {
         Sdk sdk = Sdk.getCurrent();
         if (sdk != null) {
             AndroidTargetData targetData = sdk.getTargetData(target);
@@ -235,8 +227,8 @@ public class RenderService {
      * @param resolver a resource resolver to use to look up resources
      * @return a {@link RenderService} which can perform rendering services
      */
-    public static RenderService create(GraphicalEditorPart editor,
-            Configuration configuration, ResourceResolver resolver) {
+    public static RenderService create(GraphicalEditorPart editor, Configuration configuration,
+            ResourceResolver resolver) {
         // Delegate to editor such that it can pass its credential to the service
         return editor.createRenderService(configuration, resolver);
     }
@@ -250,8 +242,8 @@ public class RenderService {
      * @param credential the sandbox credential
      * @return a {@link RenderService} which can perform rendering services
      */
-    public static RenderService create(GraphicalEditorPart editor,
-            Configuration configuration, ResourceResolver resolver, Object credential) {
+    public static RenderService create(GraphicalEditorPart editor, Configuration configuration,
+            ResourceResolver resolver, Object credential) {
         return new RenderService(editor, configuration, resolver, credential);
     }
 
@@ -416,8 +408,8 @@ public class RenderService {
 
         HardwareConfig hardwareConfig = mHardwareConfigHelper.getConfig();
 
-        UiElementPullParser modelParser = new UiElementPullParser(mModel,
-                false, mExpandNodes, hardwareConfig.getDensity(), mProject);
+        UiElementPullParser modelParser = new UiElementPullParser(mModel, false, mExpandNodes,
+                hardwareConfig.getDensity(), mProject);
         ILayoutPullParser topParser = modelParser;
 
         // Code to support editing included layout
@@ -429,8 +421,8 @@ public class RenderService {
             String contextLayoutName = mIncludedWithin.getName();
 
             // Find the layout file.
-            ResourceValue contextLayout = mResourceResolver.findResValue(
-                    LAYOUT_RESOURCE_PREFIX + contextLayoutName, false  /* forceFrameworkOnly*/);
+            ResourceValue contextLayout = mResourceResolver.findResValue(LAYOUT_RESOURCE_PREFIX + contextLayoutName,
+                    false /* forceFrameworkOnly*/);
             if (contextLayout != null) {
                 File layoutFile = new File(contextLayout.getValue());
                 if (layoutFile.isFile()) {
@@ -452,16 +444,8 @@ public class RenderService {
             }
         }
 
-        SessionParams params = new SessionParams(
-                topParser,
-                mRenderingMode,
-                mProject /* projectKey */,
-                hardwareConfig,
-                mResourceResolver,
-                mProjectCallback,
-                mMinSdkVersion,
-                mTargetSdkVersion,
-                mLogger);
+        SessionParams params = new SessionParams(topParser, mRenderingMode, mProject /* projectKey */, hardwareConfig,
+                mResourceResolver, mProjectCallback, mMinSdkVersion, mTargetSdkVersion, mLogger);
 
         // Request margin and baseline information.
         // TODO: Be smarter about setting this; start without it, and on the first request
@@ -543,9 +527,8 @@ public class RenderService {
 
         HardwareConfig hardwareConfig = mHardwareConfigHelper.getConfig();
 
-        DrawableParams params = new DrawableParams(drawableResourceValue, mProject, hardwareConfig,
-                mResourceResolver, mProjectCallback, mMinSdkVersion,
-                mTargetSdkVersion, mLogger);
+        DrawableParams params = new DrawableParams(drawableResourceValue, mProject, hardwareConfig, mResourceResolver,
+                mProjectCallback, mMinSdkVersion, mTargetSdkVersion, mLogger);
         params.setForceNoDecor();
         Result result = mLayoutLib.renderDrawable(params);
         if (result != null && result.isSuccess()) {
@@ -566,16 +549,14 @@ public class RenderService {
      * @param filter the filter to apply to the attribute values
      * @return a map from node children of the parent to new bounds of the nodes
      */
-    public Map<INode, Rect> measureChildren(INode parent,
-            final IClientRulesEngine.AttributeFilter filter) {
+    public Map<INode, Rect> measureChildren(INode parent, final IClientRulesEngine.AttributeFilter filter) {
         finishConfiguration();
         HardwareConfig hardwareConfig = mHardwareConfigHelper.getConfig();
 
         final NodeFactory mNodeFactory = mEditor.getCanvasControl().getNodeFactory();
         UiElementNode parentNode = ((NodeProxy) parent).getNode();
-        UiElementPullParser topParser = new UiElementPullParser(parentNode,
-                false, Collections.<UiElementNode>emptySet(), hardwareConfig.getDensity(),
-                mProject) {
+        UiElementPullParser topParser = new UiElementPullParser(parentNode, false,
+                Collections.<UiElementNode> emptySet(), hardwareConfig.getDensity(), mProject) {
             @Override
             public String getAttributeValue(String namespace, String localName) {
                 if (filter != null) {
@@ -607,16 +588,8 @@ public class RenderService {
             }
         };
 
-        SessionParams params = new SessionParams(
-                topParser,
-                RenderingMode.FULL_EXPAND,
-                mProject /* projectKey */,
-                hardwareConfig,
-                mResourceResolver,
-                mProjectCallback,
-                mMinSdkVersion,
-                mTargetSdkVersion,
-                mLogger);
+        SessionParams params = new SessionParams(topParser, RenderingMode.FULL_EXPAND, mProject /* projectKey */,
+                hardwareConfig, mResourceResolver, mProjectCallback, mMinSdkVersion, mTargetSdkVersion, mLogger);
         params.setLayoutOnly();
         params.setForceNoDecor();
 
@@ -638,8 +611,7 @@ public class RenderService {
                     if (info.getCookie() instanceof UiViewElementNode) {
                         UiViewElementNode uiNode = (UiViewElementNode) info.getCookie();
                         NodeProxy node = mNodeFactory.create(uiNode);
-                        map.put(node, new Rect(info.getLeft(), info.getTop(),
-                                info.getRight() - info.getLeft(),
+                        map.put(node, new Rect(info.getLeft(), info.getTop(), info.getRight() - info.getLeft(),
                                 info.getBottom() - info.getTop()));
                     }
                 }

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,8 +34,7 @@ import org.w3c.dom.Node;
 public class UiSeparatorAttributeNode extends UiAttributeNode {
 
     /** Creates a new {@link UiAttributeNode} linked to a specific {@link AttributeDescriptor} */
-    public UiSeparatorAttributeNode(SeparatorAttributeDescriptor attrDesc,
-            UiElementNode uiParent) {
+    public UiSeparatorAttributeNode(SeparatorAttributeDescriptor attrDesc, UiElementNode uiParent) {
         super(attrDesc, uiParent);
     }
 
@@ -60,7 +56,7 @@ public class UiSeparatorAttributeNode extends UiAttributeNode {
     public void setDirty(boolean isDirty) {
         // This is never dirty.
     }
-    
+
     /**
      * Called once by the parent user interface to creates the necessary
      * user interface to edit this attribute.
@@ -75,7 +71,7 @@ public class UiSeparatorAttributeNode extends UiAttributeNode {
     public void createUiControl(Composite parent, IManagedForm managedForm) {
         FormToolkit toolkit = managedForm.getToolkit();
         Composite row = toolkit.createComposite(parent);
-        
+
         TableWrapData twd = new TableWrapData(TableWrapData.FILL_GRAB);
         if (parent.getLayout() instanceof TableWrapLayout) {
             twd.colspan = ((TableWrapLayout) parent.getLayout()).numColumns;
@@ -94,7 +90,7 @@ public class UiSeparatorAttributeNode extends UiAttributeNode {
         sep = toolkit.createSeparator(row, SWT.HORIZONTAL);
         sep.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     }
-    
+
     /**
      * No completion values for this UI attribute.
      * 
@@ -104,7 +100,7 @@ public class UiSeparatorAttributeNode extends UiAttributeNode {
     public String[] getPossibleValues(String prefix) {
         return null;
     }
-    
+
     /**
      * Called when the XML is being loaded or has changed to
      * update the value held by this user interface attribute node.

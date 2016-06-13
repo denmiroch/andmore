@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,17 +12,19 @@
  */
 package org.eclipse.andmore.internal.lint;
 
-import com.android.tools.lint.client.api.Configuration;
-import com.android.tools.lint.client.api.IssueRegistry;
-import com.android.tools.lint.client.api.LintClient;
-import com.android.tools.lint.detector.api.Issue;
-import com.android.tools.lint.detector.api.Severity;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
-import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.gle2.GraphicalEditorPart;
 import org.eclipse.andmore.internal.editors.layout.gle2.LayoutActionBar;
@@ -79,15 +78,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 import org.eclipse.ui.progress.WorkbenchJob;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.tools.lint.client.api.Configuration;
+import com.android.tools.lint.client.api.IssueRegistry;
+import com.android.tools.lint.client.api.LintClient;
+import com.android.tools.lint.detector.api.Issue;
+import com.android.tools.lint.detector.api.Severity;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * A tree-table widget which shows a list of lint warnings for an underlying
@@ -118,15 +115,9 @@ class LintList extends Composite implements IResourceChangeListener, ControlList
     private final IMemento mMemento;
     private final LintColumn mMessageColumn = new LintColumn.MessageColumn(this);
     private final LintColumn mLineColumn = new LintColumn.LineColumn(this);
-    private final LintColumn[] mColumns = new LintColumn[] {
-            mMessageColumn,
-            new LintColumn.PriorityColumn(this),
-            new LintColumn.CategoryColumn(this),
-            new LintColumn.LocationColumn(this),
-            new LintColumn.FileColumn(this),
-            new LintColumn.PathColumn(this),
-            mLineColumn
-    };
+    private final LintColumn[] mColumns = new LintColumn[] { mMessageColumn, new LintColumn.PriorityColumn(this),
+            new LintColumn.CategoryColumn(this), new LintColumn.LocationColumn(this), new LintColumn.FileColumn(this),
+            new LintColumn.PathColumn(this), mLineColumn };
     private LintColumn[] mVisibleColumns;
 
     LintList(IWorkbenchPartSite site, Composite parent, IMemento memento, boolean singleFile) {
@@ -156,11 +147,8 @@ class LintList extends Composite implements IResourceChangeListener, ControlList
         mTree.setHeaderVisible(true);
         mTree.addControlListener(this);
 
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(
-                this,
-                IResourceChangeEvent.POST_CHANGE
-                        | IResourceChangeEvent.PRE_BUILD
-                        | IResourceChangeEvent.POST_BUILD);
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
+                IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_BUILD | IResourceChangeEvent.POST_BUILD);
 
         // Workaround for https://bugs.eclipse.org/341865
         mTree.addPaintListener(new PaintListener() {
@@ -350,7 +338,7 @@ class LintList extends Composite implements IResourceChangeListener, ControlList
             // marker of each type, and below we have all the duplicates of
             // each one of those errors. And for errors with multiple locations,
             // there is a third level.
-            Multimap<String, IMarker> types = ArrayListMultimap.<String, IMarker>create(100, 20);
+            Multimap<String, IMarker> types = ArrayListMultimap.<String, IMarker> create(100, 20);
             for (IMarker marker : list) {
                 String id = EclipseLintClient.getId(marker);
                 types.put(id, marker);
@@ -481,8 +469,7 @@ class LintList extends Composite implements IResourceChangeListener, ControlList
     // ---- Implements ControlListener ----
 
     @Override
-    public void controlMoved(ControlEvent e) {
-    }
+    public void controlMoved(ControlEvent e) {}
 
     @Override
     public void controlResized(ControlEvent e) {
@@ -520,8 +507,7 @@ class LintList extends Composite implements IResourceChangeListener, ControlList
             mTreeViewer.setInput(null);
             List<IMarker> markerList = getMarkers();
             if (markerList.size() == 0) {
-                LayoutEditorDelegate delegate =
-                    LayoutEditorDelegate.fromEditor(AdtUtils.getActiveEditor());
+                LayoutEditorDelegate delegate = LayoutEditorDelegate.fromEditor(AdtUtils.getActiveEditor());
                 if (delegate != null) {
                     GraphicalEditorPart g = delegate.getGraphicalEditor();
                     assert g != null;
@@ -702,8 +688,9 @@ class LintList extends Composite implements IResourceChangeListener, ControlList
             if (columnWidths != null) {
                 Integer value = columnWidths.getInteger(getKey(column));
                 // Make sure we get a useful value
-                if (value != null && value.intValue() >= 0)
+                if (value != null && value.intValue() >= 0) {
                     preferredWidth = value.intValue();
+                }
             }
         }
         if (preferredWidth <= 0) {
@@ -726,9 +713,7 @@ class LintList extends Composite implements IResourceChangeListener, ControlList
                 // Special mode where we show just lint warnings for a single file:
                 // use a hardcoded list of columns, not including path/location etc but
                 // including line numbers (which are normally not shown by default).
-                mVisibleColumns = new LintColumn[] {
-                        mMessageColumn, mLineColumn
-                };
+                mVisibleColumns = new LintColumn[] { mMessageColumn, mLineColumn };
             } else {
                 // Generate visible columns based on (a) previously saved window state,
                 // and (b) default window visible states provided by the columns themselves
@@ -806,8 +791,7 @@ class LintList extends Composite implements IResourceChangeListener, ControlList
                         BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
                             @Override
                             public void run() {
-                                resortTable(treeColumn, column,
-                                        new NullProgressMonitor());
+                                resortTable(treeColumn, column, new NullProgressMonitor());
                             }
                         });
                     } else {
@@ -825,8 +809,7 @@ class LintList extends Composite implements IResourceChangeListener, ControlList
                 }
             }
 
-            private void resortTable(final TreeColumn treeColumn, LintColumn column,
-                    IProgressMonitor monitor) {
+            private void resortTable(final TreeColumn treeColumn, LintColumn column, IProgressMonitor monitor) {
                 TableComparator sorter = getTableSorter();
                 monitor.beginTask("Sorting", 100);
                 monitor.worked(10);
@@ -899,10 +882,9 @@ class LintList extends Composite implements IResourceChangeListener, ControlList
             mDirections = directions;
 
             mDefaultPriorities = new int[defaultPriorities.length];
-            System.arraycopy(defaultPriorities, 0, this.mDefaultPriorities, 0,
-                    defaultPriorities.length);
+            System.arraycopy(defaultPriorities, 0, mDefaultPriorities, 0, defaultPriorities.length);
             mDefaultDirections = new boolean[directions.length];
-            System.arraycopy(directions, 0, this.mDefaultDirections, 0, directions.length);
+            System.arraycopy(directions, 0, mDefaultDirections, 0, directions.length);
         }
 
         private void resetState() {
@@ -962,8 +944,7 @@ class LintList extends Composite implements IResourceChangeListener, ControlList
             return compare((IMarker) e1, (IMarker) e2, 0, true);
         }
 
-        private int compare(IMarker marker1, IMarker marker2, int depth,
-                boolean continueSearching) {
+        private int compare(IMarker marker1, IMarker marker2, int depth, boolean continueSearching) {
             if (depth >= mPriorities.length) {
                 return 0;
             }

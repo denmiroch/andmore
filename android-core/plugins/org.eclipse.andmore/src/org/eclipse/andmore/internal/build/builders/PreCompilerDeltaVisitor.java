@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +13,8 @@
 
 package org.eclipse.andmore.internal.build.builders;
 
-import com.android.SdkConstants;
-import com.android.ide.common.xml.ManifestData;
-import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -40,8 +36,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
-import java.util.Arrays;
-import java.util.List;
+import com.android.SdkConstants;
+import com.android.ide.common.xml.ManifestData;
+import com.google.common.collect.Lists;
 
 /**
  * Resource Delta visitor for the pre-compiler.
@@ -98,8 +95,7 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
 
     private IFolder mAndroidOutputFolder;
 
-    public PreCompilerDeltaVisitor(BaseBuilder builder, List<IPath> sourceFolders,
-            SourceChangeHandler... handlers) {
+    public PreCompilerDeltaVisitor(BaseBuilder builder, List<IPath> sourceFolders, SourceChangeHandler... handlers) {
         super(builder);
         mSourceFolders = sourceFolders;
         mRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -205,18 +201,16 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
                 // class, so we don't need to check the delta kind
                 if (delta.getKind() != IResourceDelta.REMOVED) {
                     // clean the error markers on the file.
-                    IFile manifestFile = (IFile)resource;
+                    IFile manifestFile = (IFile) resource;
 
                     if (manifestFile.exists()) {
-                        manifestFile.deleteMarkers(AndmoreAndroidConstants.MARKER_XML, true,
-                                IResource.DEPTH_ZERO);
-                        manifestFile.deleteMarkers(AndmoreAndroidConstants.MARKER_ANDROID, true,
-                                IResource.DEPTH_ZERO);
+                        manifestFile.deleteMarkers(AndmoreAndroidConstants.MARKER_XML, true, IResource.DEPTH_ZERO);
+                        manifestFile.deleteMarkers(AndmoreAndroidConstants.MARKER_ANDROID, true, IResource.DEPTH_ZERO);
                     }
 
                     // parse the manifest for data and error
-                    ManifestData manifestData = AndroidManifestHelper.parse(
-                            new IFileWrapper(manifestFile), true /*gatherData*/, this);
+                    ManifestData manifestData = AndroidManifestHelper.parse(new IFileWrapper(manifestFile),
+                            true /*gatherData*/, this);
 
                     if (manifestData != null) {
                         mJavaPackage = manifestData.getPackage();
@@ -255,7 +249,7 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
             if (resource.getType() != IResource.FILE) {
                 return false;
             }
-            IFile file = (IFile)resource;
+            IFile file = (IFile) resource;
 
             // get the modification kind
             int kind = delta.getKind();
@@ -271,8 +265,8 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
                 String fileName = resource.getName();
 
                 // Special case of R.java/Manifest.java.
-                if (SdkConstants.FN_RESOURCE_CLASS.equals(fileName) ||
-                        SdkConstants.FN_MANIFEST_CLASS.equals(fileName)) {
+                if (SdkConstants.FN_RESOURCE_CLASS.equals(fileName)
+                        || SdkConstants.FN_MANIFEST_CLASS.equals(fileName)) {
                     // if it was removed, there's a possibility that it was removed due to a
                     // package change, or an aidl that was removed, but the only thing
                     // that will happen is that we'll have an extra build. Not much of a problem.
@@ -297,8 +291,7 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
                         AndmoreAndroidPlugin.printErrorToConsole(mBuilder.getProject(), msg);
                     } else if (kind == IResourceDelta.CHANGED) {
                         // the file was modified manually! we can't allow it.
-                        String msg = String.format(Messages.s_Modified_Manually_Recreating_s,
-                                fileName);
+                        String msg = String.format(Messages.s_Modified_Manually_Recreating_s, fileName);
                         AndmoreAndroidPlugin.printErrorToConsole(mBuilder.getProject(), msg);
                     }
                 }
@@ -336,18 +329,15 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
                     break;
                 case IResourceDelta.ADDED:
                     // display verbose message
-                    message = String.format(Messages.Added_s_s_Needs_Updating, p,
-                            SdkConstants.FN_RESOURCE_CLASS);
+                    message = String.format(Messages.Added_s_s_Needs_Updating, p, SdkConstants.FN_RESOURCE_CLASS);
                     break;
                 case IResourceDelta.REMOVED:
                     // display verbose message
-                    message = String.format(Messages.s_Removed_s_Needs_Updating, p,
-                            SdkConstants.FN_RESOURCE_CLASS);
+                    message = String.format(Messages.s_Removed_s_Needs_Updating, p, SdkConstants.FN_RESOURCE_CLASS);
                     break;
             }
             if (message != null) {
-                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE,
-                        mBuilder.getProject(), message);
+                AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, mBuilder.getProject(), message);
             }
 
             // If it's an XML resource, check the syntax
@@ -373,8 +363,8 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
                     // this is a source folder!
                     mInRes = false;
                     mSourceFolder = getFolder(sourceFolderPath); // all non null due to test above
-                    mIsGenSourceFolder = path.segmentCount() == 2 &&
-                            path.segment(1).equals(SdkConstants.FD_GEN_SOURCES);
+                    mIsGenSourceFolder = path.segmentCount() == 2
+                            && path.segment(1).equals(SdkConstants.FD_GEN_SOURCES);
                     return true;
                 }
 
@@ -408,7 +398,7 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
     private IFolder getFolder(IPath path) {
         IResource resource = mRoot.findMember(path);
         if (resource != null && resource.exists() && resource.getType() == IResource.FOLDER) {
-            return (IFolder)resource;
+            return (IFolder) resource;
         }
 
         return null;

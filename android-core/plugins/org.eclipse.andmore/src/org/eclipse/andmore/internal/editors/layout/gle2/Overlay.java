@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,8 +50,7 @@ public abstract class Overlay {
      * Releases resources held by the overlay. Called by the editor when an
      * overlay has been removed.
      */
-    public void dispose() {
-    }
+    public void dispose() {}
 
     /**
      * Paints the overlay.
@@ -62,8 +58,8 @@ public abstract class Overlay {
      * @param gc The SWT {@link GC} object to draw into.
      */
     public void paint(GC gc) {
-        throw new IllegalArgumentException("paint() not implemented, probably done "
-                + "with specialized paint signature");
+        throw new IllegalArgumentException(
+                "paint() not implemented, probably done " + "with specialized paint signature");
     }
 
     /** Returns the device associated with this overlay */

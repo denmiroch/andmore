@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,14 +13,14 @@
 
 package org.eclipse.andmore.internal.editors.layout.gle2;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.ide.common.api.IDragElement;
 import com.android.ide.common.api.INode;
 import com.android.ide.common.api.Rect;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents an XML element with a name, attributes and inner elements.
@@ -194,8 +191,8 @@ public class SimpleElement implements IDragElement {
             sb.append(String.format(",R=%d %d %d %d", mBounds.x, mBounds.y, mBounds.w, mBounds.h));
         }
         if (mParentBounds != null && mParentBounds.isValid()) {
-            sb.append(String.format(",Q=%d %d %d %d",
-                    mParentBounds.x, mParentBounds.y, mParentBounds.w, mParentBounds.h));
+            sb.append(String.format(",Q=%d %d %d %d", mParentBounds.x, mParentBounds.y, mParentBounds.w,
+                    mParentBounds.h));
         }
         sb.append('\n');
         for (IDragAttribute a : mAttributes) {
@@ -230,7 +227,7 @@ public class SimpleElement implements IDragElement {
         while (index < lines.length) {
             String line = lines[index++];
             String s = line.trim();
-            if (s.startsWith("{")) {                                //$NON-NLS-1$
+            if (s.startsWith("{")) { //$NON-NLS-1$
                 if (e == null) {
                     // This is the element's header, it should have
                     // the format "key=value,key=value,..."
@@ -240,7 +237,7 @@ public class SimpleElement implements IDragElement {
                     Rect bounds = null;
                     Rect pbounds = null;
 
-                    for (String s2 : s.substring(1).split(",")) {   //$NON-NLS-1$
+                    for (String s2 : s.substring(1).split(",")) { //$NON-NLS-1$
                         int pos = s2.indexOf('=');
                         if (pos <= 0 || pos == s2.length() - 1) {
                             continue;
@@ -248,7 +245,7 @@ public class SimpleElement implements IDragElement {
                         String key = s2.substring(0, pos).trim();
                         String value = s2.substring(pos + 1).trim();
 
-                        if (key.equals("V")) {                      //$NON-NLS-1$
+                        if (key.equals("V")) { //$NON-NLS-1$
                             version = value;
                             if (!value.equals(FORMAT_VERSION)) {
                                 // Wrong format version. Don't even try to process anything
@@ -257,15 +254,15 @@ public class SimpleElement implements IDragElement {
                                 return null;
                             }
 
-                        } else if (key.equals("N")) {               //$NON-NLS-1$
+                        } else if (key.equals("N")) { //$NON-NLS-1$
                             fqcn = value;
 
-                        } else if (key.equals("P")) {               //$NON-NLS-1$
+                        } else if (key.equals("P")) { //$NON-NLS-1$
                             parent = value;
 
                         } else if (key.equals("R") || key.equals("Q")) { //$NON-NLS-1$ //$NON-NLS-2$
                             // Parse the canvas bounds
-                            String[] sb = value.split(" +");        //$NON-NLS-1$
+                            String[] sb = value.split(" +"); //$NON-NLS-1$
                             if (sb != null && sb.length == 4) {
                                 Rect r = null;
                                 try {
@@ -280,8 +277,7 @@ public class SimpleElement implements IDragElement {
                                     } else {
                                         pbounds = r;
                                     }
-                                } catch (NumberFormatException ignore) {
-                                }
+                                } catch (NumberFormatException ignore) {}
                             }
                         }
                     }
@@ -300,13 +296,13 @@ public class SimpleElement implements IDragElement {
                     index = inOutIndex[0];
                 }
 
-            } else if (e != null && s.startsWith("@")) {    //$NON-NLS-1$
+            } else if (e != null && s.startsWith("@")) { //$NON-NLS-1$
                 SimpleAttribute a = SimpleAttribute.parseString(line);
                 if (a != null) {
                     e.addAttribute(a);
                 }
 
-            } else if (e != null && s.startsWith("}")) {     //$NON-NLS-1$
+            } else if (e != null && s.startsWith("}")) { //$NON-NLS-1$
                 // We're done with this element
                 inOutIndex[0] = index;
                 return e;
@@ -322,24 +318,21 @@ public class SimpleElement implements IDragElement {
             SimpleElement se = (SimpleElement) obj;
 
             // Bounds and parentFqcn must be null on both sides or equal.
-            if ((mBounds == null && se.mBounds != null) ||
-                    (mBounds != null && !mBounds.equals(se.mBounds))) {
+            if ((mBounds == null && se.mBounds != null) || (mBounds != null && !mBounds.equals(se.mBounds))) {
                 return false;
             }
-            if ((mParentFqcn == null && se.mParentFqcn != null) ||
-                    (mParentFqcn != null && !mParentFqcn.equals(se.mParentFqcn))) {
+            if ((mParentFqcn == null && se.mParentFqcn != null)
+                    || (mParentFqcn != null && !mParentFqcn.equals(se.mParentFqcn))) {
                 return false;
             }
-            if ((mParentBounds == null && se.mParentBounds != null) ||
-                    (mParentBounds != null && !mParentBounds.equals(se.mParentBounds))) {
+            if ((mParentBounds == null && se.mParentBounds != null)
+                    || (mParentBounds != null && !mParentBounds.equals(se.mParentBounds))) {
                 return false;
             }
 
-            return mFqcn.equals(se.mFqcn) &&
-                    mAttributes.size() == se.mAttributes.size() &&
-                    mElements.size() == se.mElements.size() &&
-                    mAttributes.equals(se.mAttributes) &&
-                    mElements.equals(se.mElements);
+            return mFqcn.equals(se.mFqcn) && mAttributes.size() == se.mAttributes.size()
+                    && mElements.size() == se.mElements.size() && mAttributes.equals(se.mAttributes)
+                    && mElements.equals(se.mElements);
         }
         return false;
     }
@@ -348,23 +341,22 @@ public class SimpleElement implements IDragElement {
     public int hashCode() {
         long c = mFqcn.hashCode();
         // uses the formula defined in java.util.List.hashCode()
-        c = 31*c + mAttributes.hashCode();
-        c = 31*c + mElements.hashCode();
+        c = 31 * c + mAttributes.hashCode();
+        c = 31 * c + mElements.hashCode();
         if (mParentFqcn != null) {
-            c = 31*c + mParentFqcn.hashCode();
+            c = 31 * c + mParentFqcn.hashCode();
         }
         if (mBounds != null && mBounds.isValid()) {
-            c = 31*c + mBounds.hashCode();
+            c = 31 * c + mBounds.hashCode();
         }
         if (mParentBounds != null && mParentBounds.isValid()) {
-            c = 31*c + mParentBounds.hashCode();
+            c = 31 * c + mParentBounds.hashCode();
         }
 
         if (c > 0x0FFFFFFFFL) {
             // wrap any overflow
             c = c ^ (c >> 32);
         }
-        return (int)(c & 0x0FFFFFFFFL);
+        return (int) (c & 0x0FFFFFFFFL);
     }
 }
-

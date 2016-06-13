@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,19 +13,8 @@
 
 package org.eclipse.andmore.internal.launch;
 
-import com.android.ddmlib.AndroidDebugBridge;
-import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
-import com.android.ddmlib.Client;
-import com.android.ddmlib.IDevice;
-import com.android.ddmlib.IDevice.DeviceState;
-import com.android.ddmuilib.ImageLoader;
-import com.android.ddmuilib.TableHelper;
-import com.android.sdklib.AndroidVersion;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.internal.avd.AvdInfo;
-import com.android.sdkuilib.internal.widgets.AvdSelector;
-import com.android.sdkuilib.internal.widgets.AvdSelector.DisplayMode;
-import com.android.sdkuilib.internal.widgets.AvdSelector.IAvdFilter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.andmore.ddms.DdmsPlugin;
 import org.eclipse.andmore.internal.editors.IconFactory;
@@ -57,8 +43,19 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.ddmlib.AndroidDebugBridge;
+import com.android.ddmlib.AndroidDebugBridge.IDeviceChangeListener;
+import com.android.ddmlib.Client;
+import com.android.ddmlib.IDevice;
+import com.android.ddmlib.IDevice.DeviceState;
+import com.android.ddmuilib.ImageLoader;
+import com.android.ddmuilib.TableHelper;
+import com.android.sdklib.AndroidVersion;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.internal.avd.AvdInfo;
+import com.android.sdkuilib.internal.widgets.AvdSelector;
+import com.android.sdkuilib.internal.widgets.AvdSelector.DisplayMode;
+import com.android.sdkuilib.internal.widgets.AvdSelector.IAvdFilter;
 
 /**
  * A dialog that lets the user choose a device to deploy an application.
@@ -100,7 +97,7 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
         @Override
         public Object[] getElements(Object inputElement) {
             if (inputElement instanceof AndroidDebugBridge) {
-                return findCompatibleDevices(((AndroidDebugBridge)inputElement).getDevices());
+                return findCompatibleDevices(((AndroidDebugBridge) inputElement).getDevices());
             }
 
             return new Object[0];
@@ -142,7 +139,7 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
         @Override
         public Image getColumnImage(Object element, int columnIndex) {
             if (element instanceof IDevice) {
-                IDevice device = (IDevice)element;
+                IDevice device = (IDevice) element;
                 switch (columnIndex) {
                     case 0:
                         return device.isEmulator() ? mEmulatorImage : mDeviceImage;
@@ -161,16 +158,13 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
 
                                 // if the project is compiling against an add-on,
                                 // the optional API may be missing from the device.
-                                return mProjectTarget.isPlatform() ?
-                                        mMatchImage : mWarningImage;
+                                return mProjectTarget.isPlatform() ? mMatchImage : mWarningImage;
                             }
                         } else {
                             // get the AvdInfo
-                            AvdInfo info = mSdk.getAvdManager().getAvd(device.getAvdName(),
-                                    true /*validAvdOnly*/);
-                            AvdCompatibility.Compatibility c =
-                                    AvdCompatibility.canRun(info, mProjectTarget,
-                                            mMinApiVersion);
+                            AvdInfo info = mSdk.getAvdManager().getAvd(device.getAvdName(), true /*validAvdOnly*/);
+                            AvdCompatibility.Compatibility c = AvdCompatibility.canRun(info, mProjectTarget,
+                                    mMinApiVersion);
                             switch (c) {
                                 case YES:
                                     return mMatchImage;
@@ -189,7 +183,7 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
         @Override
         public String getColumnText(Object element, int columnIndex) {
             if (element instanceof IDevice) {
-                IDevice device = (IDevice)element;
+                IDevice device = (IDevice) element;
                 switch (columnIndex) {
                     case 0:
                         return device.getName();
@@ -201,8 +195,7 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
                         }
                     case 2:
                         if (device.isEmulator()) {
-                            AvdInfo info = mSdk.getAvdManager().getAvd(device.getAvdName(),
-                                    true /*validAvdOnly*/);
+                            AvdInfo info = mSdk.getAvdManager().getAvd(device.getAvdName(), true /*validAvdOnly*/);
                             if (info == null) {
                                 return "?";
                             }
@@ -284,8 +277,7 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
     }
 
     public DeviceChooserDialog(Shell parent, DeviceChooserResponse response, String packageName,
-            IAndroidTarget projectTarget, AndroidVersion minApiVersion,
-            boolean useDeviceForFutureLaunches) {
+            IAndroidTarget projectTarget, AndroidVersion minApiVersion, boolean useDeviceForFutureLaunches) {
         super(parent);
 
         mResponse = response;
@@ -347,8 +339,7 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
         mUseDeviceForFutureLaunchesCheckbox.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                mUseDeviceForFutureLaunches =
-                        mUseDeviceForFutureLaunchesCheckbox.getSelection();
+                mUseDeviceForFutureLaunches = mUseDeviceForFutureLaunchesCheckbox.getSelection();
                 mResponse.setUseDeviceForFutureLaunches(mUseDeviceForFutureLaunches);
             }
         });
@@ -370,11 +361,9 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
 
         String msg;
         if (mProjectTarget.isPlatform()) {
-            msg = String.format("Select a device with min API level %s.",
-                    mMinApiVersion.getApiString());
+            msg = String.format("Select a device with min API level %s.", mMinApiVersion.getApiString());
         } else {
-            msg = String.format("Select a device compatible with target %s.",
-                    mProjectTarget.getFullName());
+            msg = String.format("Select a device compatible with target %s.", mProjectTarget.getFullName());
         }
         Label label = new Label(top, SWT.NONE);
         label.setText(msg);
@@ -400,7 +389,6 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
         });
         mDeviceRadioButton.setSelection(true);
 
-
         // offset the selector from the radio button
         Composite offsetComp = new Composite(top, SWT.NONE);
         offsetComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -417,24 +405,19 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
         mDeviceTable.setHeaderVisible(true);
         mDeviceTable.setLinesVisible(true);
 
-        TableHelper.createTableColumn(mDeviceTable, "Serial Number",
-                SWT.LEFT, "AAA+AAAAAAAAAAAAAAAAAAA", //$NON-NLS-1$
+        TableHelper.createTableColumn(mDeviceTable, "Serial Number", SWT.LEFT, "AAA+AAAAAAAAAAAAAAAAAAA", //$NON-NLS-2$
                 null /* prefs name */, null /* prefs store */);
 
-        TableHelper.createTableColumn(mDeviceTable, "AVD Name",
-                SWT.LEFT, "AAAAAAAAAAAAAAAAAAA", //$NON-NLS-1$
+        TableHelper.createTableColumn(mDeviceTable, "AVD Name", SWT.LEFT, "AAAAAAAAAAAAAAAAAAA", //$NON-NLS-2$
                 null /* prefs name */, null /* prefs store */);
 
-        TableHelper.createTableColumn(mDeviceTable, "Target",
-                SWT.LEFT, "AAA+Android 9.9.9", //$NON-NLS-1$
+        TableHelper.createTableColumn(mDeviceTable, "Target", SWT.LEFT, "AAA+Android 9.9.9", //$NON-NLS-2$
                 null /* prefs name */, null /* prefs store */);
 
-        TableHelper.createTableColumn(mDeviceTable, "Debug",
-                SWT.LEFT, "Debug", //$NON-NLS-1$
+        TableHelper.createTableColumn(mDeviceTable, "Debug", SWT.LEFT, "Debug", //$NON-NLS-2$
                 null /* prefs name */, null /* prefs store */);
 
-        TableHelper.createTableColumn(mDeviceTable, "State",
-                SWT.LEFT, "bootloader", //$NON-NLS-1$
+        TableHelper.createTableColumn(mDeviceTable, "State", SWT.LEFT, "bootloader", //$NON-NLS-2$
                 null /* prefs name */, null /* prefs store */);
 
         // create the viewer for it
@@ -478,12 +461,8 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
         layout.marginLeft = 30;
         offsetComp.setLayout(layout);
 
-        mPreferredAvdSelector = new AvdSelector(offsetComp,
-                mSdk.getSdkOsLocation(),
-                mSdk.getAvdManager(),
-                new NonRunningAvdFilter(),
-                DisplayMode.SIMPLE_SELECTION,
-                new AdtConsoleSdkLog());
+        mPreferredAvdSelector = new AvdSelector(offsetComp, mSdk.getSdkOsLocation(), mSdk.getAvdManager(),
+                new NonRunningAvdFilter(), DisplayMode.SIMPLE_SELECTION, new AdtConsoleSdkLog());
         mPreferredAvdSelector.setTableHeightHint(100);
         mPreferredAvdSelector.setEnabled(false);
         mPreferredAvdSelector.setSelectionListener(new SelectionAdapter() {
@@ -525,33 +504,27 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
         IconFactory factory = IconFactory.getInstance();
 
         if (mDeviceImage == null) {
-            mDeviceImage = ddmUiLibLoader.loadImage(display,
-                    "device.png", //$NON-NLS-1$
-                    ICON_WIDTH, ICON_WIDTH,
-                    display.getSystemColor(SWT.COLOR_RED));
+            mDeviceImage = ddmUiLibLoader.loadImage(display, "device.png", //$NON-NLS-1$
+                    ICON_WIDTH, ICON_WIDTH, display.getSystemColor(SWT.COLOR_RED));
         }
         if (mEmulatorImage == null) {
-            mEmulatorImage = ddmUiLibLoader.loadImage(display,
-                    "emulator.png", ICON_WIDTH, ICON_WIDTH, //$NON-NLS-1$
+            mEmulatorImage = ddmUiLibLoader.loadImage(display, "emulator.png", ICON_WIDTH, ICON_WIDTH, //$NON-NLS-1$
                     display.getSystemColor(SWT.COLOR_BLUE));
         }
 
         if (mMatchImage == null) {
             mMatchImage = factory.getIcon("match", //$NON-NLS-1$
-                    IconFactory.COLOR_GREEN,
-                    IconFactory.SHAPE_DEFAULT);
+                    IconFactory.COLOR_GREEN, IconFactory.SHAPE_DEFAULT);
         }
 
         if (mNoMatchImage == null) {
             mNoMatchImage = factory.getIcon("error", //$NON-NLS-1$
-                    IconFactory.COLOR_RED,
-                    IconFactory.SHAPE_DEFAULT);
+                    IconFactory.COLOR_RED, IconFactory.SHAPE_DEFAULT);
         }
 
         if (mWarningImage == null) {
             mWarningImage = factory.getIcon("warning", //$NON-NLS-1$
-                    SWT.COLOR_YELLOW,
-                    IconFactory.SHAPE_DEFAULT);
+                    SWT.COLOR_YELLOW, IconFactory.SHAPE_DEFAULT);
         }
 
     }
@@ -679,8 +652,7 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
         Button okButton = getButton(IDialogConstants.OK_ID);
 
         if (isDeviceMode()) {
-            okButton.setEnabled(mResponse.getDeviceToUse() != null &&
-                    mResponse.getDeviceToUse().isOnline());
+            okButton.setEnabled(mResponse.getDeviceToUse() != null && mResponse.getDeviceToUse().isOnline());
         } else {
             okButton.setEnabled(mResponse.getAvdToLaunch() != null);
         }
@@ -716,7 +688,7 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
             int index = mDeviceTable.getSelectionIndex();
             Object data = mViewer.getElementAt(index);
             if (data instanceof IDevice) {
-                handleSelection((IDevice)data);
+                handleSelection((IDevice) data);
             } else {
                 handleSelection(null);
             }
@@ -779,8 +751,7 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
                     }
 
                     // only accept avd's that can actually run the project
-                    AvdCompatibility.Compatibility c =
-                            AvdCompatibility.canRun(avd, mProjectTarget, mMinApiVersion);
+                    AvdCompatibility.Compatibility c = AvdCompatibility.canRun(avd, mProjectTarget, mMinApiVersion);
                     return (c == AvdCompatibility.Compatibility.NO) ? false : true;
                 }
             }
@@ -821,4 +792,3 @@ public class DeviceChooserDialog extends Dialog implements IDeviceChangeListener
         mDisableAvdSelectionChange = false;
     }
 }
-

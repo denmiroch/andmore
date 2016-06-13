@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +12,7 @@
  */
 package org.eclipse.andmore.internal.editors.formatting;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.annotations.VisibleForTesting;
-import com.android.ide.common.xml.XmlFormatPreferences;
-import com.android.ide.common.xml.XmlAttributeSortOrder;
+import java.util.Comparator;
 
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
 import org.eclipse.core.runtime.Preferences;
@@ -31,15 +24,18 @@ import org.eclipse.wst.xml.core.internal.XMLCorePlugin;
 import org.eclipse.wst.xml.core.internal.preferences.XMLCorePreferenceNames;
 import org.w3c.dom.Attr;
 
-import java.util.Comparator;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.annotations.VisibleForTesting;
+import com.android.ide.common.xml.XmlAttributeSortOrder;
+import com.android.ide.common.xml.XmlFormatPreferences;
 
 /**
  * Formatting preferences used by the Android XML formatter.
  */
 public class EclipseXmlFormatPreferences extends XmlFormatPreferences {
     @VisibleForTesting
-    protected EclipseXmlFormatPreferences() {
-    }
+    protected EclipseXmlFormatPreferences() {}
 
     /**
      * Creates a new {@link EclipseXmlFormatPreferences} based on the current settings
@@ -92,9 +88,7 @@ public class EclipseXmlFormatPreferences extends XmlFormatPreferences {
      * @return the string used to indent one indentation level
      */
     @Override
-    @SuppressWarnings({
-            "restriction", "deprecation"
-    })
+    @SuppressWarnings({ "restriction", "deprecation" })
     public String getOneIndentUnit() {
         if (useEclipseIndent) {
             // Look up Eclipse indent preferences

@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +13,13 @@
 
 package org.eclipse.andmore.internal.wizards.exportgradle;
 
-import com.android.annotations.NonNull;
-import com.google.common.collect.Lists;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaProject;
 
-import java.util.List;
+import com.android.annotations.NonNull;
+import com.google.common.collect.Lists;
 
 /**
  * A configured Gradle module for export. This includes gradle path, dependency, type, etc...
@@ -37,7 +34,9 @@ public class GradleModule {
 
     private final List<GradleModule> mDependencies = Lists.newArrayList();
 
-    public static enum Type { ANDROID, JAVA };
+    public static enum Type {
+        ANDROID, JAVA
+    };
 
     GradleModule(@NonNull IJavaProject javaProject) {
         mJavaProject = javaProject;
@@ -83,8 +82,7 @@ public class GradleModule {
 
     @Override
     public String toString() {
-        return "GradleModule [mJavaProject=" + mJavaProject + ", mPath=" + mPath + ", mType="
-                + mType + ", mDependencies=" + mDependencies + "]";
+        return "GradleModule [mJavaProject=" + mJavaProject + ", mPath=" + mPath + ", mType=" + mType
+                + ", mDependencies=" + mDependencies + "]";
     }
 }
-

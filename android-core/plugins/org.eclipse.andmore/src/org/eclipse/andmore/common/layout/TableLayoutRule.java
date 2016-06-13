@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +13,12 @@
 package org.eclipse.andmore.common.layout;
 
 import static com.android.SdkConstants.FQCN_TABLE_ROW;
+
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
@@ -29,12 +32,6 @@ import com.android.ide.common.api.InsertType;
 import com.android.ide.common.api.RuleAction;
 import com.android.ide.common.api.SegmentType;
 
-import java.net.URL;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * An {@link IViewRule} for android.widget.TableLayout.
  */
@@ -45,10 +42,8 @@ public class TableLayoutRule extends LinearLayoutRule {
 
     private static final String ACTION_ADD_ROW = "_addrow"; //$NON-NLS-1$
     private static final String ACTION_REMOVE_ROW = "_removerow"; //$NON-NLS-1$
-    private static final URL ICON_ADD_ROW =
-        TableLayoutRule.class.getResource("addrow.png"); //$NON-NLS-1$
-    private static final URL ICON_REMOVE_ROW =
-        TableLayoutRule.class.getResource("removerow.png"); //$NON-NLS-1$
+    private static final URL ICON_ADD_ROW = TableLayoutRule.class.getResource("addrow.png"); //$NON-NLS-1$
+    private static final URL ICON_REMOVE_ROW = TableLayoutRule.class.getResource("removerow.png"); //$NON-NLS-1$
 
     @Override
     protected boolean isVertical(INode node) {
@@ -62,8 +57,7 @@ public class TableLayoutRule extends LinearLayoutRule {
     }
 
     @Override
-    public void onChildInserted(@NonNull INode child, @NonNull INode parent,
-            @NonNull InsertType insertType) {
+    public void onChildInserted(@NonNull INode child, @NonNull INode parent, @NonNull InsertType insertType) {
         // Overridden to inhibit the setting of layout_width/layout_height since
         // it should always be match_parent
     }
@@ -72,17 +66,13 @@ public class TableLayoutRule extends LinearLayoutRule {
      * Add an explicit "Add Row" action to the context menu
      */
     @Override
-    public void addContextMenuActions(@NonNull List<RuleAction> actions,
-            final @NonNull INode selectedNode) {
+    public void addContextMenuActions(@NonNull List<RuleAction> actions, final @NonNull INode selectedNode) {
         super.addContextMenuActions(actions, selectedNode);
 
         IMenuCallback addTab = new IMenuCallback() {
             @Override
-            public void action(
-                    @NonNull RuleAction action,
-                    @NonNull List<? extends INode> selectedNodes,
-                    final @Nullable String valueId,
-                    @Nullable Boolean newValue) {
+            public void action(@NonNull RuleAction action, @NonNull List<? extends INode> selectedNodes,
+                    final @Nullable String valueId, @Nullable Boolean newValue) {
                 final INode node = selectedNode;
                 INode newRow = node.appendChild(FQCN_TABLE_ROW);
                 mRulesEngine.select(Collections.singletonList(newRow));
@@ -92,9 +82,7 @@ public class TableLayoutRule extends LinearLayoutRule {
     }
 
     @Override
-    public void addLayoutActions(
-            @NonNull List<RuleAction> actions,
-            final @NonNull INode parentNode,
+    public void addLayoutActions(@NonNull List<RuleAction> actions, final @NonNull INode parentNode,
             final @NonNull List<? extends INode> children) {
         super.addLayoutActions(actions, parentNode, children);
         addTableLayoutActions(mRulesEngine, actions, parentNode, children);
@@ -103,16 +91,12 @@ public class TableLayoutRule extends LinearLayoutRule {
     /**
      * Adds layout actions to add and remove toolbar items
      */
-    static void addTableLayoutActions(final IClientRulesEngine rulesEngine,
-            List<RuleAction> actions, final INode parentNode,
-            final List<? extends INode> children) {
+    static void addTableLayoutActions(final IClientRulesEngine rulesEngine, List<RuleAction> actions,
+            final INode parentNode, final List<? extends INode> children) {
         IMenuCallback actionCallback = new IMenuCallback() {
             @Override
-            public void action(
-                    final @NonNull RuleAction action,
-                    @NonNull List<? extends INode> selectedNodes,
-                    final @Nullable String valueId,
-                    final @Nullable Boolean newValue) {
+            public void action(final @NonNull RuleAction action, @NonNull List<? extends INode> selectedNodes,
+                    final @Nullable String valueId, final @Nullable Boolean newValue) {
                 parentNode.editXml("Add/Remove Table Row", new INodeHandler() {
                     @Override
                     public void handle(@NonNull INode n) {
@@ -172,19 +156,17 @@ public class TableLayoutRule extends LinearLayoutRule {
 
         // Add Row
         actions.add(RuleAction.createSeparator(150));
-        actions.add(RuleAction.createAction(ACTION_ADD_ROW, "Add Table Row", actionCallback,
-                ICON_ADD_ROW, 160, false));
+        actions.add(RuleAction.createAction(ACTION_ADD_ROW, "Add Table Row", actionCallback, ICON_ADD_ROW, 160, false));
 
         // Remove Row (if something is selected)
         if (children != null && children.size() > 0) {
-            actions.add(RuleAction.createAction(ACTION_REMOVE_ROW, "Remove Table Row",
-                    actionCallback, ICON_REMOVE_ROW, 170, false));
+            actions.add(RuleAction.createAction(ACTION_REMOVE_ROW, "Remove Table Row", actionCallback, ICON_REMOVE_ROW,
+                    170, false));
         }
     }
 
     @Override
-    public void onCreate(@NonNull INode node, @NonNull INode parent,
-            @NonNull InsertType insertType) {
+    public void onCreate(@NonNull INode node, @NonNull INode parent, @NonNull InsertType insertType) {
         super.onCreate(node, parent, insertType);
 
         if (insertType.isCreate()) {
@@ -196,9 +178,8 @@ public class TableLayoutRule extends LinearLayoutRule {
     }
 
     @Override
-    public DropFeedback onResizeBegin(@NonNull INode child, @NonNull INode parent,
-            @Nullable SegmentType horizontalEdge, @Nullable SegmentType verticalEdge,
-            @Nullable Object childView, @Nullable Object parentView) {
+    public DropFeedback onResizeBegin(@NonNull INode child, @NonNull INode parent, @Nullable SegmentType horizontalEdge,
+            @Nullable SegmentType verticalEdge, @Nullable Object childView, @Nullable Object parentView) {
         // Children of a table layout cannot set their widths (it is controlled by column
         // settings on the table). They can set their heights (though for TableRow, the
         // height is always wrap_content).
@@ -212,7 +193,6 @@ public class TableLayoutRule extends LinearLayoutRule {
         }
 
         // Allow resizing heights only
-        return super.onResizeBegin(child, parent, horizontalEdge, null /*verticalEdge*/,
-                childView, parentView);
+        return super.onResizeBegin(child, parent, horizontalEdge, null /*verticalEdge*/, childView, parentView);
     }
 }

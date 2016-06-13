@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +13,9 @@
 
 package org.eclipse.andmore.internal.editors;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.google.common.collect.Maps;
+import java.net.URL;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.ui.ErrorImageComposite;
@@ -36,9 +32,10 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
-import java.net.URL;
-import java.util.IdentityHashMap;
-import java.util.Map;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.google.common.collect.Maps;
 
 /**
  * Factory to generate icons for Android Editors.
@@ -46,13 +43,13 @@ import java.util.Map;
  * Icons are kept here and reused.
  */
 public class IconFactory {
-    public static final int COLOR_RED     = SWT.COLOR_DARK_RED;
-    public static final int COLOR_GREEN   = SWT.COLOR_DARK_GREEN;
-    public static final int COLOR_BLUE    = SWT.COLOR_DARK_BLUE;
+    public static final int COLOR_RED = SWT.COLOR_DARK_RED;
+    public static final int COLOR_GREEN = SWT.COLOR_DARK_GREEN;
+    public static final int COLOR_BLUE = SWT.COLOR_DARK_BLUE;
     public static final int COLOR_DEFAULT = SWT.COLOR_BLACK;
 
-    public static final int SHAPE_CIRCLE  = 'C';
-    public static final int SHAPE_RECT    = 'R';
+    public static final int SHAPE_CIRCLE = 'C';
+    public static final int SHAPE_RECT = 'R';
     public static final int SHAPE_DEFAULT = SHAPE_CIRCLE;
 
     private static IconFactory sInstance;
@@ -63,8 +60,7 @@ public class IconFactory {
     private Map<Image, Image> mErrorIcons;
     private Map<Image, Image> mWarningIcons;
 
-    private IconFactory() {
-    }
+    private IconFactory() {}
 
     public static synchronized IconFactory getInstance() {
         if (sInstance == null) {
@@ -180,8 +176,7 @@ public class IconFactory {
         String key = Character.toString((char) shape) + Integer.toString(color) + osName;
         ImageDescriptor id = mImageDescMap.get(key);
         if (id == null && !mImageDescMap.containsKey(key)) {
-            id = AbstractUIPlugin.imageDescriptorFromPlugin(
-                    AndmoreAndroidPlugin.PLUGIN_ID,
+            id = AbstractUIPlugin.imageDescriptorFromPlugin(AndmoreAndroidPlugin.PLUGIN_ID,
                     String.format("/icons/%1$s.png", osName)); //$NON-NLS-1$
 
             if (id == null) {
@@ -239,8 +234,7 @@ public class IconFactory {
     public ImageDescriptor getImageDescriptor(@NonNull String key, @Nullable String fallbackKey) {
         ImageDescriptor id = mImageDescMap.get(key);
         if (id == null && !mImageDescMap.containsKey(key)) {
-            id = AbstractUIPlugin.imageDescriptorFromPlugin(
-                    AndmoreAndroidPlugin.PLUGIN_ID,
+            id = AbstractUIPlugin.imageDescriptorFromPlugin(AndmoreAndroidPlugin.PLUGIN_ID,
                     String.format("/icons/%1$s.png", key)); //$NON-NLS-1$
             if (id == null) {
                 if (fallbackKey == null) {
@@ -399,7 +393,7 @@ public class IconFactory {
             // and convert it to "font points" (font points in SWT are hardcoded in an
             // arbitrary 72 dpi and then converted in real pixels using whatever is
             // indicated by getDPI -- at least that's how it works under Win32).
-            fds[0].setHeight((int) ((SY + 1) * 3./4. * 72./display.getDPI().y));
+            fds[0].setHeight((int) ((SY + 1) * 3. / 4. * 72. / display.getDPI().y));
             // Note: win32 implementation always uses fds[0] so we change just that one.
             // getFontData indicates that the array of fd is really an unusual thing for X11.
             font = new Font(display, fds);

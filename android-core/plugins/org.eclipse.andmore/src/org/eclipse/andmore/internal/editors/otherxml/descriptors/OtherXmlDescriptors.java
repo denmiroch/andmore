@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,8 +15,6 @@ package org.eclipse.andmore.internal.editors.otherxml.descriptors;
 
 import static com.android.SdkConstants.ANDROID_NS_NAME;
 import static com.android.SdkConstants.ANDROID_URI;
-
-import com.android.SdkConstants;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -36,6 +31,7 @@ import org.eclipse.andmore.internal.editors.descriptors.SeparatorAttributeDescri
 import org.eclipse.andmore.internal.editors.descriptors.XmlnsAttributeDescriptor;
 import org.eclipse.andmore.internal.editors.layout.descriptors.ViewElementDescriptor;
 
+import com.android.SdkConstants;
 
 /**
  * Description of the /res/xml structure.
@@ -138,29 +134,26 @@ public final class OtherXmlDescriptors implements IDescriptorProvider {
      * @param prefs The list of non-group preference descriptions
      * @param prefGroups The list of preference group descriptions
      */
-    public synchronized void updateDescriptors(
-            Map<String, DeclareStyleableInfo> searchableStyleMap,
-            Map<String, DeclareStyleableInfo> appWidgetStyleMap,
-            ViewClassInfo[] prefs, ViewClassInfo[] prefGroups) {
+    public synchronized void updateDescriptors(Map<String, DeclareStyleableInfo> searchableStyleMap,
+            Map<String, DeclareStyleableInfo> appWidgetStyleMap, ViewClassInfo[] prefs, ViewClassInfo[] prefGroups) {
 
-        XmlnsAttributeDescriptor xmlns = new XmlnsAttributeDescriptor(ANDROID_NS_NAME,
-                ANDROID_URI);
+        XmlnsAttributeDescriptor xmlns = new XmlnsAttributeDescriptor(ANDROID_NS_NAME, ANDROID_URI);
 
         ElementDescriptor searchable = createSearchable(searchableStyleMap, xmlns);
         ElementDescriptor appWidget = createAppWidgetProviderInfo(appWidgetStyleMap, xmlns);
         ElementDescriptor preferences = createPreference(prefs, prefGroups, xmlns);
-        ArrayList<ElementDescriptor> list =  new ArrayList<ElementDescriptor>();
+        ArrayList<ElementDescriptor> list = new ArrayList<ElementDescriptor>();
         if (searchable != null) {
             list.add(searchable);
-            mSearchDescriptor.setChildren(new ElementDescriptor[]{ searchable });
+            mSearchDescriptor.setChildren(new ElementDescriptor[] { searchable });
         }
         if (appWidget != null) {
             list.add(appWidget);
-            mAppWidgetDescriptor.setChildren(new ElementDescriptor[]{ appWidget });
+            mAppWidgetDescriptor.setChildren(new ElementDescriptor[] { appWidget });
         }
         if (preferences != null) {
             list.add(preferences);
-            mPrefDescriptor.setChildren(new ElementDescriptor[]{ preferences });
+            mPrefDescriptor.setChildren(new ElementDescriptor[] { preferences });
         }
 
         if (list.size() > 0) {
@@ -175,12 +168,10 @@ public final class OtherXmlDescriptors implements IDescriptorProvider {
     /**
      * Returns the new ElementDescriptor for <searchable>
      */
-    private ElementDescriptor createSearchable(
-            Map<String, DeclareStyleableInfo> searchableStyleMap,
+    private ElementDescriptor createSearchable(Map<String, DeclareStyleableInfo> searchableStyleMap,
             XmlnsAttributeDescriptor xmlns) {
 
-        ElementDescriptor action_key = createElement(searchableStyleMap,
-                "SearchableActionKey", //$NON-NLS-1$ styleName
+        ElementDescriptor action_key = createElement(searchableStyleMap, "SearchableActionKey", //$NON-NLS-1$ styleName
                 "actionkey", //$NON-NLS-1$ xmlName
                 "Action Key", // uiName
                 null, // sdk url
@@ -188,8 +179,7 @@ public final class OtherXmlDescriptors implements IDescriptorProvider {
                 null, // childrenElements
                 false /* mandatory */ );
 
-        ElementDescriptor searchable = createElement(searchableStyleMap,
-                "Searchable", //$NON-NLS-1$ styleName
+        ElementDescriptor searchable = createElement(searchableStyleMap, "Searchable", //$NON-NLS-1$ styleName
                 "searchable", //$NON-NLS-1$ xmlName
                 "Searchable", // uiName
                 null, // sdk url
@@ -202,16 +192,14 @@ public final class OtherXmlDescriptors implements IDescriptorProvider {
     /**
      * Returns the new ElementDescriptor for <appwidget-provider>
      */
-    private ElementDescriptor createAppWidgetProviderInfo(
-            Map<String, DeclareStyleableInfo> appWidgetStyleMap,
+    private ElementDescriptor createAppWidgetProviderInfo(Map<String, DeclareStyleableInfo> appWidgetStyleMap,
             XmlnsAttributeDescriptor xmlns) {
 
         if (appWidgetStyleMap == null) {
             return null;
         }
 
-        ElementDescriptor appWidget = createElement(appWidgetStyleMap,
-                "AppWidgetProviderInfo", //$NON-NLS-1$ styleName
+        ElementDescriptor appWidget = createElement(appWidgetStyleMap, "AppWidgetProviderInfo", //$NON-NLS-1$ styleName
                 "appwidget-provider", //$NON-NLS-1$ xmlName
                 "AppWidget Provider", // uiName
                 null, // sdk url
@@ -225,14 +213,12 @@ public final class OtherXmlDescriptors implements IDescriptorProvider {
      * Returns a new ElementDescriptor constructed from the information given here
      * and the javadoc & attributes extracted from the style map if any.
      */
-    private ElementDescriptor createElement(
-            Map<String, DeclareStyleableInfo> styleMap, String styleName,
-            String xmlName, String uiName, String sdkUrl,
-            AttributeDescriptor extraAttribute,
+    private ElementDescriptor createElement(Map<String, DeclareStyleableInfo> styleMap, String styleName,
+            String xmlName, String uiName, String sdkUrl, AttributeDescriptor extraAttribute,
             ElementDescriptor[] childrenElements, boolean mandatory) {
 
-        ElementDescriptor element = new ElementDescriptor(xmlName, uiName, null, sdkUrl,
-                null, childrenElements, mandatory);
+        ElementDescriptor element = new ElementDescriptor(xmlName, uiName, null, sdkUrl, null, childrenElements,
+                mandatory);
 
         return updateElement(element, styleMap, styleName, extraAttribute);
     }
@@ -241,20 +227,15 @@ public final class OtherXmlDescriptors implements IDescriptorProvider {
      * Updates an ElementDescriptor with the javadoc & attributes extracted from the style
      * map if any.
      */
-    private ElementDescriptor updateElement(ElementDescriptor element,
-            Map<String, DeclareStyleableInfo> styleMap,
-            String styleName,
-            AttributeDescriptor extraAttribute) {
+    private ElementDescriptor updateElement(ElementDescriptor element, Map<String, DeclareStyleableInfo> styleMap,
+            String styleName, AttributeDescriptor extraAttribute) {
         ArrayList<AttributeDescriptor> descs = new ArrayList<AttributeDescriptor>();
 
         DeclareStyleableInfo style = styleMap != null ? styleMap.get(styleName) : null;
         if (style != null) {
-            DescriptorsUtils.appendAttributes(descs,
-                    null,   // elementName
-                    SdkConstants.NS_RESOURCES,
-                    style.getAttributes(),
-                    null,   // requiredAttributes
-                    null);  // overrides
+            DescriptorsUtils.appendAttributes(descs, null, // elementName
+                    SdkConstants.NS_RESOURCES, style.getAttributes(), null, // requiredAttributes
+                    null); // overrides
             element.setTooltip(style.getJavaDoc());
         }
 
@@ -273,8 +254,8 @@ public final class OtherXmlDescriptors implements IDescriptorProvider {
     /**
      * Returns the new ElementDescriptor for <Preferences>
      */
-    private ElementDescriptor createPreference(ViewClassInfo[] prefs,
-            ViewClassInfo[] prefGroups, XmlnsAttributeDescriptor xmlns) {
+    private ElementDescriptor createPreference(ViewClassInfo[] prefs, ViewClassInfo[] prefGroups,
+            XmlnsAttributeDescriptor xmlns) {
 
         ArrayList<ElementDescriptor> newPrefs = new ArrayList<ElementDescriptor>();
         if (prefs != null) {
@@ -316,13 +297,8 @@ public final class OtherXmlDescriptors implements IDescriptorProvider {
             AttributeDescriptor[] newAttrs = new AttributeDescriptor[attrs.length + 1];
             System.arraycopy(attrs, 0, newAttrs, 0, attrs.length);
             newAttrs[attrs.length] = xmlns;
-            return new ElementDescriptor(
-                    topPreferences.getXmlName(),
-                    topPreferences.getUiName(),
-                    topPreferences.getTooltip(),
-                    topPreferences.getSdkUrl(),
-                    newAttrs,
-                    topPreferences.getChildren(),
+            return new ElementDescriptor(topPreferences.getXmlName(), topPreferences.getUiName(),
+                    topPreferences.getTooltip(), topPreferences.getSdkUrl(), newAttrs, topPreferences.getChildren(),
                     false /* mandatory */);
         } else {
             return null;
@@ -338,37 +314,24 @@ public final class OtherXmlDescriptors implements IDescriptorProvider {
 
         // Process all Preference attributes
         ArrayList<AttributeDescriptor> attributes = new ArrayList<AttributeDescriptor>();
-        DescriptorsUtils.appendAttributes(attributes,
-                null,   // elementName
-                SdkConstants.NS_RESOURCES,
-                info.getAttributes(),
-                null,   // requiredAttributes
-                null);  // overrides
+        DescriptorsUtils.appendAttributes(attributes, null, // elementName
+                SdkConstants.NS_RESOURCES, info.getAttributes(), null, // requiredAttributes
+                null); // overrides
 
-        for (ViewClassInfo link = info.getSuperClass();
-                link != null;
-                link = link.getSuperClass()) {
+        for (ViewClassInfo link = info.getSuperClass(); link != null; link = link.getSuperClass()) {
             AttributeInfo[] attrList = link.getAttributes();
             if (attrList.length > 0) {
                 attributes.add(new SeparatorAttributeDescriptor(
                         String.format("Attributes from %1$s", link.getShortClassName())));
-                DescriptorsUtils.appendAttributes(attributes,
-                        null,   // elementName
-                        SdkConstants.NS_RESOURCES,
-                        attrList,
-                        null,   // requiredAttributes
-                        null);  // overrides
+                DescriptorsUtils.appendAttributes(attributes, null, // elementName
+                        SdkConstants.NS_RESOURCES, attrList, null, // requiredAttributes
+                        null); // overrides
             }
         }
 
-        return new ViewElementDescriptor(xml_name,
-                xml_name, // ui_name
-                info.getFullClassName(),
-                tooltip,
-                null, // sdk_url
-                attributes.toArray(new AttributeDescriptor[attributes.size()]),
-                null,
-                null, // children
+        return new ViewElementDescriptor(xml_name, xml_name, // ui_name
+                info.getFullClassName(), tooltip, null, // sdk_url
+                attributes.toArray(new AttributeDescriptor[attributes.size()]), null, null, // children
                 false /* mandatory */);
     }
 }

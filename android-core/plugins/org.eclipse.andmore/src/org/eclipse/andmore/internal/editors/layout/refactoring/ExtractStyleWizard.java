@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,8 +16,14 @@ package org.eclipse.andmore.internal.editors.layout.refactoring;
 import static org.eclipse.jface.viewers.StyledString.DECORATIONS_STYLER;
 import static org.eclipse.jface.viewers.StyledString.QUALIFIER_STYLER;
 
-import com.android.resources.ResourceType;
-import com.android.utils.Pair;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.resources.ResourceNameValidator;
@@ -46,14 +49,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.w3c.dom.Attr;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.android.resources.ResourceType;
+import com.android.utils.Pair;
 
 class ExtractStyleWizard extends VisualRefactoringWizard {
     public ExtractStyleWizard(ExtractStyleRefactoring ref, LayoutEditorDelegate editor) {
@@ -149,8 +146,8 @@ class ExtractStyleWizard extends VisualRefactoringWizard {
             tableLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
             tableLabel.setText("Choose style attributes to extract:");
 
-            mCheckedView = CheckboxTableViewer.newCheckList(composite, SWT.BORDER
-                    | SWT.FULL_SELECTION | SWT.HIDE_SELECTION);
+            mCheckedView = CheckboxTableViewer.newCheckList(composite,
+                    SWT.BORDER | SWT.FULL_SELECTION | SWT.HIDE_SELECTION);
             mTable = mCheckedView.getTable();
             mTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 2));
             ((GridData) mTable.getLayoutData()).heightHint = 200;
@@ -237,15 +234,13 @@ class ExtractStyleWizard extends VisualRefactoringWizard {
             // The root data structure, which we set as the table root. The content provider
             // will produce children from it. This is the entry set of a map from
             // attribute name to list of attribute nodes for that attribute name.
-            mRoot = new ArrayList<Map.Entry<String, List<Attr>>>(
-                mAvailableAttributes.entrySet());
+            mRoot = new ArrayList<Map.Entry<String, List<Attr>>>(mAvailableAttributes.entrySet());
 
             // Sort the items by attribute name -- the attribute name is the key
             // in the entry set above.
             Collections.sort(mRoot, new Comparator<Map.Entry<String, List<Attr>>>() {
                 @Override
-                public int compare(Map.Entry<String, List<Attr>> e1,
-                        Map.Entry<String, List<Attr>> e2) {
+                public int compare(Map.Entry<String, List<Attr>> e1, Map.Entry<String, List<Attr>> e2) {
                     return e1.getKey().compareTo(e2.getKey());
                 }
             });
@@ -351,8 +346,7 @@ class ExtractStyleWizard extends VisualRefactoringWizard {
                 setErrorMessage("Provide a name for the new style");
                 ok = false;
             } else {
-                ResourceNameValidator validator = ResourceNameValidator.create(false, mProject,
-                        ResourceType.STYLE);
+                ResourceNameValidator validator = ResourceNameValidator.create(false, mProject, ResourceType.STYLE);
                 String message = validator.isValid(text);
                 if (message != null) {
                     setErrorMessage(message);
@@ -390,8 +384,7 @@ class ExtractStyleWizard extends VisualRefactoringWizard {
         }
 
         private class ArgumentLabelProvider extends StyledCellLabelProvider {
-            public ArgumentLabelProvider() {
-            }
+            public ArgumentLabelProvider() {}
 
             @Override
             public void update(ViewerCell cell) {
@@ -405,8 +398,7 @@ class ExtractStyleWizard extends VisualRefactoringWizard {
 
                 if (mElementCount > 1) {
                     Integer f = mFrequencyCount.get(attribute);
-                    String s = String.format(" (in %d/%d elements)",
-                            f != null ? f.intValue(): 1, mElementCount);
+                    String s = String.format(" (in %d/%d elements)", f != null ? f.intValue() : 1, mElementCount);
                     styledString.append(s, DECORATIONS_STYLER);
                 }
                 cell.setText(styledString.toString());
@@ -416,8 +408,7 @@ class ExtractStyleWizard extends VisualRefactoringWizard {
         }
 
         private class ArgumentContentProvider implements IStructuredContentProvider {
-            public ArgumentContentProvider() {
-            }
+            public ArgumentContentProvider() {}
 
             @Override
             public Object[] getElements(Object inputElement) {
@@ -429,12 +420,10 @@ class ExtractStyleWizard extends VisualRefactoringWizard {
             }
 
             @Override
-            public void dispose() {
-            }
+            public void dispose() {}
 
             @Override
-            public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-            }
+            public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
         }
     }
 }

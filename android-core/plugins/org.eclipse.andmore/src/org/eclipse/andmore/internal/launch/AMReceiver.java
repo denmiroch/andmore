@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,15 +12,14 @@
  */
 package org.eclipse.andmore.internal.launch;
 
-import com.android.ddmlib.IDevice;
-import com.android.ddmlib.MultiLineReceiver;
-
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 
+import com.android.ddmlib.IDevice;
+import com.android.ddmlib.MultiLineReceiver;
 
 /**
  * Output receiver for am process (Activity Manager)
@@ -46,8 +42,7 @@ public class AMReceiver extends MultiLineReceiver {
      * @param device the Android device on which the launch is done.
      * @param launchController the {@link ILaunchController} that is managing the launch
      */
-    public AMReceiver(DelayedLaunchInfo launchInfo, IDevice device,
-            ILaunchController launchController) {
+    public AMReceiver(DelayedLaunchInfo launchInfo, IDevice device, ILaunchController launchController) {
         mLaunchInfo = launchInfo;
         mDevice = device;
         mLaunchController = launchController;
@@ -75,8 +70,7 @@ public class AMReceiver extends MultiLineReceiver {
 
             // check for errors that output an error type, if the attempt count is still
             // valid. If not the whole text will be output in the console
-            if (mLaunchInfo.getAttemptCount() < MAX_ATTEMPT_COUNT &&
-                    mLaunchInfo.isCancelled() == false) {
+            if (mLaunchInfo.getAttemptCount() < MAX_ATTEMPT_COUNT && mLaunchInfo.isCancelled() == false) {
                 Matcher m = sAmErrorType.matcher(s);
                 if (m.matches()) {
                     // get the error type
@@ -89,8 +83,7 @@ public class AMReceiver extends MultiLineReceiver {
                         case 1:
                             /* Intended fall through */
                         case 2:
-                            msg = String.format(
-                                    "Device not ready. Waiting %1$d seconds before next attempt.",
+                            msg = String.format("Device not ready. Waiting %1$d seconds before next attempt.",
                                     waitTime);
                             break;
                         case 3:
@@ -99,10 +92,9 @@ public class AMReceiver extends MultiLineReceiver {
                                     waitTime);
                             break;
                         default:
-                            msg = String.format(
-                                    "Device not ready (%2$d). Waiting %1$d seconds before next attempt.",
+                            msg = String.format("Device not ready (%2$d). Waiting %1$d seconds before next attempt.",
                                     waitTime, type);
-                        break;
+                            break;
 
                     }
 

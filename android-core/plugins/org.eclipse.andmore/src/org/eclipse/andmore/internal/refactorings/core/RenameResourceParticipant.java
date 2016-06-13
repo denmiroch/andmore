@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,15 +29,12 @@ import static com.android.SdkConstants.R_CLASS;
 import static com.android.SdkConstants.TAG_ITEM;
 import static com.android.SdkConstants.TOOLS_URI;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.resources.ResourceFolderType;
-import com.android.resources.ResourceType;
-import com.android.utils.SdkUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AdtUtils;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.editors.manifest.ManifestInfo;
 import org.eclipse.andmore.internal.project.BaseProjectHelper;
 import org.eclipse.andmore.internal.resources.ResourceNameValidator;
@@ -83,9 +77,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.resources.ResourceFolderType;
+import com.android.resources.ResourceType;
+import com.android.utils.SdkUtils;
 
 /**
  * A rename participant handling renames of resources (such as R.id.foo and R.layout.bar).
@@ -159,8 +156,7 @@ public class RenameResourceParticipant extends RenameParticipant {
     /**
      * Creates a new {@linkplain RenameResourceParticipant}
      */
-    public RenameResourceParticipant() {
-    }
+    public RenameResourceParticipant() {}
 
     @Override
     public String getName() {
@@ -183,8 +179,7 @@ public class RenameResourceParticipant extends RenameParticipant {
                     if (mType != null) {
                         mUpdateReferences = getArguments().getUpdateReferences();
                         mFolderType = AdtUtils.getFolderTypeFor(mType);
-                        IJavaProject javaProject = (IJavaProject) field.getAncestor(
-                                IJavaElement.JAVA_PROJECT);
+                        IJavaProject javaProject = (IJavaProject) field.getAncestor(IJavaElement.JAVA_PROJECT);
                         mProject = javaProject.getProject();
                         mOldName = field.getElementName();
                         mNewName = getArguments().getNewName();
@@ -276,9 +271,7 @@ public class RenameResourceParticipant extends RenameParticipant {
      * @param updateReferences whether references should be updated
      * @return a new rename refactoring
      */
-    public static RenameRefactoring createFieldRefactoring(
-            @NonNull IField field,
-            @NonNull String newName,
+    public static RenameRefactoring createFieldRefactoring(@NonNull IField field, @NonNull String newName,
             boolean updateReferences) {
         RenameFieldProcessor processor = new RenameFieldProcessor(field);
         processor.setRenameGetter(false);
@@ -333,9 +326,8 @@ public class RenameResourceParticipant extends RenameParticipant {
             throws OperationCanceledException {
         if (mRenamedFile != null && getArguments().getNewName().indexOf('.') == -1
                 && mRenamedFile.getName().indexOf('.') != -1) {
-            return RefactoringStatus.createErrorStatus(
-                    String.format("You must include the file extension (%1$s?)",
-                           mRenamedFile.getName().substring(mRenamedFile.getName().indexOf('.'))));
+            return RefactoringStatus.createErrorStatus(String.format("You must include the file extension (%1$s?)",
+                    mRenamedFile.getName().substring(mRenamedFile.getName().indexOf('.'))));
         }
 
         // Ensure that the new name is valid
@@ -362,8 +354,7 @@ public class RenameResourceParticipant extends RenameParticipant {
     }
 
     @Override
-    public Change createChange(IProgressMonitor monitor) throws CoreException,
-            OperationCanceledException {
+    public Change createChange(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
         if (monitor.isCanceled()) {
             return null;
         }
@@ -415,10 +406,7 @@ public class RenameResourceParticipant extends RenameParticipant {
      * @param project the Android project
      * @param className the layout classes
      */
-    private void addResourceFileChanges(
-            CompositeChange change,
-            IProject project,
-            IProgressMonitor monitor)
+    private void addResourceFileChanges(CompositeChange change, IProject project, IProgressMonitor monitor)
             throws OperationCanceledException {
         if (monitor.isCanceled()) {
             return;
@@ -452,12 +440,9 @@ public class RenameResourceParticipant extends RenameParticipant {
                             addResourceXmlChanges(file, change, folderType);
                         }
 
-                        if ((mRenamedFile == null || !mRenamedFile.equals(file))
-                                && fileName.startsWith(mOldName)
-                                && fileName.length() > mOldName.length()
-                                && fileName.charAt(mOldName.length()) == '.'
-                                && mFolderType != ResourceFolderType.VALUES
-                                && mFolderType == folderType) {
+                        if ((mRenamedFile == null || !mRenamedFile.equals(file)) && fileName.startsWith(mOldName)
+                                && fileName.length() > mOldName.length() && fileName.charAt(mOldName.length()) == '.'
+                                && mFolderType != ResourceFolderType.VALUES && mFolderType == folderType) {
                             // Rename this file
                             String newFile = mNewName + fileName.substring(mOldName.length());
                             IPath path = file.getFullPath();
@@ -490,10 +475,7 @@ public class RenameResourceParticipant extends RenameParticipant {
         }
     }
 
-    private boolean addResourceXmlChanges(
-            IFile file,
-            CompositeChange changes,
-            ResourceFolderType folderType) {
+    private boolean addResourceXmlChanges(IFile file, CompositeChange changes, ResourceFolderType folderType) {
         IModelManager modelManager = StructuredModelManager.getModelManager();
         IStructuredModel model = null;
         try {
@@ -537,11 +519,8 @@ public class RenameResourceParticipant extends RenameParticipant {
         return false;
     }
 
-    private void addReplacements(
-            @NonNull List<TextEdit> edits,
-            @NonNull Element element,
-            @NonNull IStructuredDocument document,
-            @Nullable ResourceFolderType folderType) {
+    private void addReplacements(@NonNull List<TextEdit> edits, @NonNull Element element,
+            @NonNull IStructuredDocument document, @Nullable ResourceFolderType folderType) {
         String tag = element.getTagName();
         if (folderType == ResourceFolderType.VALUES) {
             // Look for
@@ -549,10 +528,8 @@ public class RenameResourceParticipant extends RenameParticipant {
             //   <item name="myid" type="id"/>
             //   <string name="mystring">...</string>
             // etc
-            if (tag.equals(mType.getName())
-                    || (tag.equals(TAG_ITEM)
-                            && (mType == ResourceType.ID
-                                || mType.getName().equals(element.getAttribute(ATTR_TYPE))))) {
+            if (tag.equals(mType.getName()) || (tag.equals(TAG_ITEM)
+                    && (mType == ResourceType.ID || mType.getName().equals(element.getAttribute(ATTR_TYPE))))) {
                 Attr nameNode = element.getAttributeNode(ATTR_NAME);
                 if (nameNode != null && nameNode.getValue().equals(mOldName)) {
                     int start = RefactoringUtil.getAttributeValueRangeStart(nameNode, document);
@@ -570,8 +547,8 @@ public class RenameResourceParticipant extends RenameParticipant {
             String value = attr.getValue();
 
             // If not updating references, only update XML matches that define the id
-            if (!mUpdateReferences && (!ATTR_ID.equals(attr.getLocalName()) ||
-                    !ANDROID_URI.equals(attr.getNamespaceURI()))) {
+            if (!mUpdateReferences
+                    && (!ATTR_ID.equals(attr.getLocalName()) || !ANDROID_URI.equals(attr.getNamespaceURI()))) {
 
                 if (TOOLS_URI.equals(attr.getNamespaceURI()) && value.equals(mXmlMatch1)) {
                     int start = RefactoringUtil.getAttributeValueRangeStart(attr, document);
@@ -604,8 +581,8 @@ public class RenameResourceParticipant extends RenameParticipant {
             }
 
             if (match != null) {
-                if (mNewName.isEmpty() && ATTR_ID.equals(attr.getLocalName()) &&
-                        ANDROID_URI.equals(attr.getNamespaceURI())) {
+                if (mNewName.isEmpty() && ATTR_ID.equals(attr.getLocalName())
+                        && ANDROID_URI.equals(attr.getNamespaceURI())) {
                     // Delete attribute
                     IndexedRegion region = (IndexedRegion) attr;
                     int start = region.getStartOffset();
@@ -635,16 +612,13 @@ public class RenameResourceParticipant extends RenameParticipant {
                 if (index != -1) {
                     String match = null;
                     String matchedValue = null;
-                    if (mXmlMatch1 != null
-                            && text.startsWith(mXmlMatch1) && text.trim().equals(mXmlMatch1)) {
+                    if (mXmlMatch1 != null && text.startsWith(mXmlMatch1) && text.trim().equals(mXmlMatch1)) {
                         match = mXmlMatch1;
                         matchedValue = mXmlNewValue1;
-                    } else if (mXmlMatch2 != null
-                            && text.startsWith(mXmlMatch2) && text.trim().equals(mXmlMatch2)) {
+                    } else if (mXmlMatch2 != null && text.startsWith(mXmlMatch2) && text.trim().equals(mXmlMatch2)) {
                         match = mXmlMatch2;
                         matchedValue = mXmlNewValue2;
-                    } else if (mXmlMatch3 != null
-                            && text.startsWith(mXmlMatch3) && text.trim().equals(mXmlMatch3)) {
+                    } else if (mXmlMatch3 != null && text.startsWith(mXmlMatch3) && text.trim().equals(mXmlMatch3)) {
                         match = mXmlMatch3;
                         matchedValue = mXmlNewValue3;
                     }
@@ -685,9 +659,7 @@ public class RenameResourceParticipant extends RenameParticipant {
      * @return false if initiating the rename failed
      */
     @Nullable
-    private static IField getResourceField(
-            @NonNull IProject project,
-            @NonNull ResourceType type,
+    private static IField getResourceField(@NonNull IProject project, @NonNull ResourceType type,
             @NonNull String name) {
         try {
             IJavaProject javaProject = BaseProjectHelper.getJavaProject(project);

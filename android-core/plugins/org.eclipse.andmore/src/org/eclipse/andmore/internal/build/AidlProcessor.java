@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,11 +13,15 @@
 
 package org.eclipse.andmore.internal.build;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.IAndroidTarget;
-import com.android.sdklib.io.FileOp;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -43,15 +44,11 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.IAndroidTarget;
+import com.android.sdklib.io.FileOp;
 
 /**
  * A {@link SourceProcessor} for aidl files.
@@ -76,12 +73,11 @@ public class AidlProcessor extends SourceProcessor {
     }
 
     // See comment in #getAidlType()
-//  private final static Pattern sParcelablePattern = Pattern.compile(
-//          "^\\s*parcelable\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*;\\s*$");
-//
-//  private final static Pattern sInterfacePattern = Pattern.compile(
-//          "^\\s*interface\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?:\\{.*)?$");
-
+    //  private final static Pattern sParcelablePattern = Pattern.compile(
+    //          "^\\s*parcelable\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*;\\s*$");
+    //
+    //  private final static Pattern sInterfacePattern = Pattern.compile(
+    //          "^\\s*interface\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?:\\{.*)?$");
 
     public AidlProcessor(@NonNull IJavaProject javaProject, @NonNull BuildToolInfo buildToolInfo,
             @NonNull IFolder genFolder) {
@@ -99,13 +95,11 @@ public class AidlProcessor extends SourceProcessor {
     }
 
     @Override
-    protected void doCompileFiles(List<IFile> sources, BaseBuilder builder,
-            IProject project, IAndroidTarget projectTarget,
-            List<IPath> sourceFolders, List<IFile> notCompiledOut, List<File> libraryProjectsOut,
-            IProgressMonitor monitor) throws CoreException {
+    protected void doCompileFiles(List<IFile> sources, BaseBuilder builder, IProject project,
+            IAndroidTarget projectTarget, List<IPath> sourceFolders, List<IFile> notCompiledOut,
+            List<File> libraryProjectsOut, IProgressMonitor monitor) throws CoreException {
         // create the command line
-        List<String> commandList = new ArrayList<String>(
-                4 + sourceFolders.size() + libraryProjectsOut.size());
+        List<String> commandList = new ArrayList<String>(4 + sourceFolders.size() + libraryProjectsOut.size());
         commandList.add(getBuildToolInfo().getPath(BuildToolInfo.PathId.AIDL));
         commandList.add(quote("-p" + projectTarget.getPath(IAndroidTarget.ANDROID_AIDL))); //$NON-NLS-1$
 
@@ -141,8 +135,7 @@ public class AidlProcessor extends SourceProcessor {
         IFolder projectOut = BaseProjectHelper.getAndroidOutputFolder(project);
         IFolder aidlOutFolder = projectOut.getFolder(SdkConstants.FD_AIDL);
         if (aidlOutFolder.exists() == false) {
-            aidlOutFolder.create(true /*force*/, true /*local*/,
-                    new SubProgressMonitor(monitor, 10));
+            aidlOutFolder.create(true /*force*/, true /*local*/, new SubProgressMonitor(monitor, 10));
         }
 
         boolean success = false;
@@ -176,8 +169,8 @@ public class AidlProcessor extends SourceProcessor {
 
             // if there's no output file yet, compute it.
             if (data.getOutput() == null) {
-                IFile javaFile = getAidlOutputFile(sourceFile, genFolder,
-                        true /*replaceExt*/, true /*createFolders*/, monitor);
+                IFile javaFile = getAidlOutputFile(sourceFile, genFolder, true /*replaceExt*/, true /*createFolders*/,
+                        monitor);
                 data.setOutputFile(javaFile);
             }
 
@@ -196,15 +189,13 @@ public class AidlProcessor extends SourceProcessor {
                 success = true;
 
                 // Also copy the file to the bin folder.
-                IFile aidlOutFile = getAidlOutputFile(sourceFile, aidlOutFolder,
-                        false /*replaceExt*/, true /*createFolders*/, monitor);
+                IFile aidlOutFile = getAidlOutputFile(sourceFile, aidlOutFolder, false /*replaceExt*/,
+                        true /*createFolders*/, monitor);
 
                 FileOp op = new FileOp();
                 try {
-                    op.copyFile(sourceFile.getLocation().toFile(),
-                            aidlOutFile.getLocation().toFile());
-                } catch (IOException e) {
-                }
+                    op.copyFile(sourceFile.getLocation().toFile(), aidlOutFile.getLocation().toFile());
+                } catch (IOException e) {}
             }
         }
 
@@ -221,8 +212,8 @@ public class AidlProcessor extends SourceProcessor {
         Collection<SourceFileData> dataList = getAllFileData();
         for (SourceFileData data : dataList) {
             try {
-                IFile javaFile = getAidlOutputFile(data.getSourceFile(), genFolder,
-                        true /*replaceExt*/, false /*createFolders*/, monitor);
+                IFile javaFile = getAidlOutputFile(data.getSourceFile(), genFolder, true /*replaceExt*/,
+                        false /*createFolders*/, monitor);
                 data.setOutputFile(javaFile);
             } catch (CoreException e) {
                 // ignore, we're not asking to create the folder so this won't happen anyway.
@@ -240,8 +231,7 @@ public class AidlProcessor extends SourceProcessor {
      * @param verbose the build verbosity
      * @return false if the exec failed, and build needs to be aborted.
      */
-    private boolean execAidl(BaseBuilder builder, IProject project, String[] command, IFile file,
-            boolean verbose) {
+    private boolean execAidl(BaseBuilder builder, IProject project, String[] command, IFile file, boolean verbose) {
         // do the exec
         try {
             if (verbose) {
@@ -288,22 +278,20 @@ public class AidlProcessor extends SourceProcessor {
                 // no stderr output but exec failed.
                 String msg = String.format(Messages.AIDL_Exec_Error_d, returnCode);
 
-                BaseProjectHelper.markResource(project, AndmoreAndroidConstants.MARKER_AIDL,
-                       msg, IMarker.SEVERITY_ERROR);
+                BaseProjectHelper.markResource(project, AndmoreAndroidConstants.MARKER_AIDL, msg,
+                        IMarker.SEVERITY_ERROR);
 
                 return false;
             }
         } catch (IOException e) {
             // mark the project and exit
             String msg = String.format(Messages.AIDL_Exec_Error_s, command[0]);
-            BaseProjectHelper.markResource(project, AndmoreAndroidConstants.MARKER_AIDL, msg,
-                    IMarker.SEVERITY_ERROR);
+            BaseProjectHelper.markResource(project, AndmoreAndroidConstants.MARKER_AIDL, msg, IMarker.SEVERITY_ERROR);
             return false;
         } catch (InterruptedException e) {
             // mark the project and exit
             String msg = String.format(Messages.AIDL_Exec_Error_s, command[0]);
-            BaseProjectHelper.markResource(project, AndmoreAndroidConstants.MARKER_AIDL, msg,
-                    IMarker.SEVERITY_ERROR);
+            BaseProjectHelper.markResource(project, AndmoreAndroidConstants.MARKER_AIDL, msg, IMarker.SEVERITY_ERROR);
             return false;
         }
 
@@ -370,8 +358,8 @@ public class AidlProcessor extends SourceProcessor {
      * @return the handle to the destination file.
      * @throws CoreException
      */
-    private IFile getAidlOutputFile(IFile sourceFile, IFolder outputFolder, boolean replaceExt,
-            boolean createFolders, IProgressMonitor monitor) throws CoreException {
+    private IFile getAidlOutputFile(IFile sourceFile, IFolder outputFolder, boolean replaceExt, boolean createFolders,
+            IProgressMonitor monitor) throws CoreException {
 
         IPath sourceFolderPath = getSourceFolderFor(sourceFile);
 
@@ -394,8 +382,7 @@ public class AidlProcessor extends SourceProcessor {
             // Build the Java file name from the aidl name.
             String javaName;
             if (replaceExt) {
-                javaName = sourceFile.getName().replaceAll(
-                        AndmoreAndroidConstants.RE_AIDL_EXT, SdkConstants.DOT_JAVA);
+                javaName = sourceFile.getName().replaceAll(AndmoreAndroidConstants.RE_AIDL_EXT, SdkConstants.DOT_JAVA);
             } else {
                 javaName = sourceFile.getName();
             }
@@ -417,18 +404,16 @@ public class AidlProcessor extends SourceProcessor {
      * @param monitor the {@link IProgressMonitor},
      * @throws CoreException
      */
-    private void createFolder(IFolder destinationFolder, IProgressMonitor monitor)
-            throws CoreException {
+    private void createFolder(IFolder destinationFolder, IProgressMonitor monitor) throws CoreException {
 
         // check the parent exist and create if necessary.
         IContainer parent = destinationFolder.getParent();
         if (parent.getType() == IResource.FOLDER && parent.exists() == false) {
-            createFolder((IFolder)parent, monitor);
+            createFolder((IFolder) parent, monitor);
         }
 
         // create the folder.
-        destinationFolder.create(true /*force*/, true /*local*/,
-                new SubProgressMonitor(monitor, 10));
+        destinationFolder.create(true /*force*/, true /*local*/, new SubProgressMonitor(monitor, 10));
     }
 
     /**
@@ -444,41 +429,41 @@ public class AidlProcessor extends SourceProcessor {
         return AidlType.UNKNOWN;
 
         // TODO: properly parse aidl file to determine type and generate dependency graphs.
-//
-//        String className = file.getName().substring(0,
-//                file.getName().length() - SdkConstants.DOT_AIDL.length());
-//
-//        InputStream input = file.getContents(true /* force*/);
-//        try {
-//            BufferedReader reader = new BufferedReader(new InputStreateader(input));
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                if (line.length() == 0) {
-//                    continue;
-//                }
-//
-//                Matcher m = sParcelablePattern.matcher(line);
-//                if (m.matches() && m.group(1).equals(className)) {
-//                    return AidlType.PARCELABLE;
-//                }
-//
-//                m = sInterfacePattern.matcher(line);
-//                if (m.matches() && m.group(1).equals(className)) {
-//                    return AidlType.INTERFACE;
-//                }
-//            }
-//        } catch (IOException e) {
-//            throw new CoreException(new Status(IStatus.ERROR, AdtPlugin.PLUGIN_ID,
-//                    "Error parsing aidl file", e));
-//        } finally {
-//            try {
-//                input.close();
-//            } catch (IOException e) {
-//                throw new CoreException(new Status(IStatus.ERROR, AdtPlugin.PLUGIN_ID,
-//                        "Error parsing aidl file", e));
-//            }
-//        }
-//
-//        return AidlType.UNKNOWN;
+        //
+        //        String className = file.getName().substring(0,
+        //                file.getName().length() - SdkConstants.DOT_AIDL.length());
+        //
+        //        InputStream input = file.getContents(true /* force*/);
+        //        try {
+        //            BufferedReader reader = new BufferedReader(new InputStreateader(input));
+        //            String line;
+        //            while ((line = reader.readLine()) != null) {
+        //                if (line.length() == 0) {
+        //                    continue;
+        //                }
+        //
+        //                Matcher m = sParcelablePattern.matcher(line);
+        //                if (m.matches() && m.group(1).equals(className)) {
+        //                    return AidlType.PARCELABLE;
+        //                }
+        //
+        //                m = sInterfacePattern.matcher(line);
+        //                if (m.matches() && m.group(1).equals(className)) {
+        //                    return AidlType.INTERFACE;
+        //                }
+        //            }
+        //        } catch (IOException e) {
+        //            throw new CoreException(new Status(IStatus.ERROR, AdtPlugin.PLUGIN_ID,
+        //                    "Error parsing aidl file", e));
+        //        } finally {
+        //            try {
+        //                input.close();
+        //            } catch (IOException e) {
+        //                throw new CoreException(new Status(IStatus.ERROR, AdtPlugin.PLUGIN_ID,
+        //                        "Error parsing aidl file", e));
+        //            }
+        //        }
+        //
+        //        return AidlType.UNKNOWN;
     }
 }

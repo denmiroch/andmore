@@ -1,12 +1,9 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- *
  * Licensed under the Eclipse Public License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.eclipse.org/org/documents/epl-v10.php
- *
+ * http://www.eclipse.org/org/documents/epl-v10.php
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,22 +16,6 @@ package org.eclipse.andmore.internal.editors.layout.gle2;
 import static com.android.SdkConstants.ATTR_ID;
 import static com.android.SdkConstants.VIEW_MERGE;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.ide.common.api.INode;
-import com.android.ide.common.rendering.api.RenderSession;
-import com.android.ide.common.rendering.api.ViewInfo;
-import com.android.utils.Pair;
-
-import org.eclipse.andmore.internal.editors.layout.gre.NodeProxy;
-import org.eclipse.andmore.internal.editors.layout.uimodel.UiViewElementNode;
-import org.eclipse.andmore.internal.editors.uimodel.UiDocumentNode;
-import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
-import org.eclipse.swt.graphics.Rectangle;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +26,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.RandomAccess;
 import java.util.Set;
+
+import org.eclipse.andmore.internal.editors.layout.gre.NodeProxy;
+import org.eclipse.andmore.internal.editors.layout.uimodel.UiViewElementNode;
+import org.eclipse.andmore.internal.editors.uimodel.UiDocumentNode;
+import org.eclipse.andmore.internal.editors.uimodel.UiElementNode;
+import org.eclipse.swt.graphics.Rectangle;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.api.INode;
+import com.android.ide.common.rendering.api.RenderSession;
+import com.android.ide.common.rendering.api.ViewInfo;
+import com.android.utils.Pair;
 
 /**
  * The view hierarchy class manages a set of view info objects and performs find
@@ -98,8 +95,7 @@ public class ViewHierarchy {
      * A read-only view of {@link #mInvisibleParents}; note that this is NOT a copy so it
      * reflects updates to the underlying {@link #mInvisibleParents} list.
      */
-    private final List<CanvasViewInfo> mInvisibleParentsReadOnly =
-        Collections.unmodifiableList(mInvisibleParents);
+    private final List<CanvasViewInfo> mInvisibleParentsReadOnly = Collections.unmodifiableList(mInvisibleParents);
 
     /**
      * Flag which records whether or not we have any exploded parent nodes in this
@@ -133,7 +129,6 @@ public class ViewHierarchy {
         }
     }
 
-
     /**
      * Sets the result of the layout rendering. The result object indicates if the layout
      * rendering succeeded. If it did, it contains a bitmap and the objects rectangles.
@@ -149,8 +144,7 @@ public class ViewHierarchy {
      *            {@link LayoutCanvas#showInvisibleViews}) where individual invisible
      *            nodes are padded during certain interactions.
      */
-    /* package */ void setSession(RenderSession session, Set<UiElementNode> explodedNodes,
-            boolean layoutlib5) {
+    /* package */ void setSession(RenderSession session, Set<UiElementNode> explodedNodes, boolean layoutlib5) {
         // replace the previous scene, so the previous scene must be disposed.
         if (mSession != null) {
             mSession.dispose();
@@ -163,7 +157,7 @@ public class ViewHierarchy {
         if (mIsResultValid && session != null) {
             List<ViewInfo> rootList = session.getRootViews();
 
-            Pair<CanvasViewInfo,List<Rectangle>> infos = null;
+            Pair<CanvasViewInfo, List<Rectangle>> infos = null;
 
             if (rootList == null || rootList.size() == 0) {
                 // Special case: Look to see if this is really an empty <merge> view,
@@ -198,8 +192,7 @@ public class ViewHierarchy {
                 mLastValidViewInfoRoot = infos.getFirst();
                 mIncludedBounds = infos.getSecond();
 
-                if (mLastValidViewInfoRoot.getUiViewNode() == null &&
-                        mLastValidViewInfoRoot.getChildren().isEmpty()) {
+                if (mLastValidViewInfoRoot.getUiViewNode() == null && mLastValidViewInfoRoot.getChildren().isEmpty()) {
                     GraphicalEditorPart editor = mCanvas.getEditorDelegate().getGraphicalEditor();
                     if (editor.getIncludedWithin() != null) {
                         // Somehow, this view was supposed to be rendered within another
@@ -388,11 +381,9 @@ public class ViewHierarchy {
      * @return A collection of {@link CanvasViewInfo} objects that overlap the
      *   rectangle.
      */
-    public Collection<CanvasViewInfo> findWithin(
-            LayoutPoint topLeft,
-            LayoutPoint bottomRight) {
-        Rectangle selectionRectangle = new Rectangle(topLeft.x, topLeft.y, bottomRight.x
-                - topLeft.x, bottomRight.y - topLeft.y);
+    public Collection<CanvasViewInfo> findWithin(LayoutPoint topLeft, LayoutPoint bottomRight) {
+        Rectangle selectionRectangle = new Rectangle(topLeft.x, topLeft.y, bottomRight.x - topLeft.x,
+                bottomRight.y - topLeft.y);
         List<CanvasViewInfo> infos = new ArrayList<CanvasViewInfo>();
         addWithin(mLastValidViewInfoRoot, selectionRectangle, infos);
         return infos;
@@ -406,10 +397,7 @@ public class ViewHierarchy {
      *
      * Returns null if not found.
      */
-    private void addWithin(
-            CanvasViewInfo canvasViewInfo,
-            Rectangle canvasRectangle,
-            List<CanvasViewInfo> infos) {
+    private void addWithin(CanvasViewInfo canvasViewInfo, Rectangle canvasRectangle, List<CanvasViewInfo> infos) {
         if (canvasViewInfo == null) {
             return;
         }
@@ -530,8 +518,8 @@ public class ViewHierarchy {
      * Internal recursive version of {@link #findAltViewInfoAt(int, int, CanvasViewInfo)}.
      * Please don't use directly.
      */
-    private List<CanvasViewInfo> findAltViewInfoAt_Recursive(
-            LayoutPoint p, CanvasViewInfo parent, List<CanvasViewInfo> outList) {
+    private List<CanvasViewInfo> findAltViewInfoAt_Recursive(LayoutPoint p, CanvasViewInfo parent,
+            List<CanvasViewInfo> outList) {
         Rectangle r;
 
         if (outList == null) {
@@ -627,8 +615,7 @@ public class ViewHierarchy {
         return infos;
     }
 
-    private void findAllViewInfos(List<CanvasViewInfo> result, CanvasViewInfo canvasViewInfo,
-            boolean includeRoot) {
+    private void findAllViewInfos(List<CanvasViewInfo> result, CanvasViewInfo canvasViewInfo, boolean includeRoot) {
         if (canvasViewInfo != null) {
             if (includeRoot || !canvasViewInfo.isRoot()) {
                 result.add(canvasViewInfo);
