@@ -1149,6 +1149,8 @@ public final class ProjectHelper {
     private static void processLibrariesRFiles(Collection<? extends AndroidLibrary> libraries,
             Set<Pair<File, File>> files) {
         for (AndroidLibrary androidLibrary : libraries) {
+
+            //TODO GRADROID return R.txt from bin folder of library project
             files.add(Pair.of(new File(androidLibrary.getFolder(), "R.txt"), androidLibrary.getManifest()));
 
             processLibrariesRFiles(androidLibrary.getLibraryDependencies(), files);

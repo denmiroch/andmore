@@ -993,6 +993,8 @@ public class PreCompilerBuilder extends BaseBuilder {
         // get the resource folder
         List<IFolder> resFolders = ProjectHelper.getResFolders(project, monitor);
 
+        //TODO GRADROID handle isLibrary
+
         // get the file system path
         IPath outputLocation = mGenFolder.getLocation();
         IPath manifestLocation = manifest == null ? null : manifest.getLocation();
