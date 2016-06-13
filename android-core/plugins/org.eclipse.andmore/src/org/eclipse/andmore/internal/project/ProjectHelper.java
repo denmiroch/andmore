@@ -18,6 +18,7 @@ import static org.eclipse.andmore.AndmoreAndroidConstants.COMPILER_COMPLIANCE_PR
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ import org.eclipse.jdt.launching.JavaRuntime;
 
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
-import com.android.builder.model.AndroidArtifact;
+import com.android.builder.model.AndroidArtifactOutput;
 import com.android.builder.model.AndroidProject;
 import com.android.builder.model.BuildTypeContainer;
 import com.android.builder.model.ProductFlavorContainer;
@@ -342,9 +343,6 @@ public final class ProjectHelper {
         IProject project = javaProject.getProject();
 
         if (Gradroid.get().isGradroidProject(project)) {
-            SourceProvider defaultSource;
-            SourceProvider buildTypeSource = null;
-            Collection<SourceProvider> flavorsSource = new ArrayList<SourceProvider>();
 
             AndroidProject androidProject;
             if (force) {
@@ -352,36 +350,12 @@ public final class ProjectHelper {
             } else {
                 androidProject = Gradroid.get().loadAndroidModel(project, monitor);
             }
-
-            Collection<BuildTypeContainer> buildTypes = androidProject.getBuildTypes();
-
-            defaultSource = androidProject.getDefaultConfig().getSourceProvider();
-            Collection<ProductFlavorContainer> flavors = androidProject.getProductFlavors();
-
             Variant variant = Gradroid.get().getProjectVariant(project);
 
-            String buildTypeName = variant.getBuildType();
-            List<String> variantFlavors = variant.getProductFlavors();
-
-            AndroidArtifact mainArtifact = variant.getMainArtifact();
-
-            for (BuildTypeContainer buildTypeContainer : buildTypes) {
-                if (buildTypeContainer.getBuildType().getName().equals(buildTypeName)) {
-                    buildTypeSource = buildTypeContainer.getSourceProvider();
-                    break;
-                }
-            }
-
-            for (ProductFlavorContainer productFlavorContainer : flavors) {
-                for (String flavorName : variantFlavors) {
-                    if (productFlavorContainer.getProductFlavor().getName().equals(flavorName)) {
-                        flavorsSource.add(productFlavorContainer.getSourceProvider());
-                        break;
-                    }
-                }
-            }
-
-            SourceProvider variantSourceProvider = mainArtifact.getVariantSourceProvider();
+            SourceProvider defaultSource = getDefaultSourceProvider(androidProject, variant);
+            SourceProvider buildTypeSource = getBuildTypeSourceProvider(androidProject, variant);
+            Collection<SourceProvider> flavorsSource = getFlavorsSourceProviders(androidProject, variant);
+            SourceProvider variantSourceProvider = getVariantSourceProvider(androidProject, variant);
 
             entries = addSourceEntry(project, entries, defaultSource.getJavaDirectories());
             for (SourceProvider sourceProvider : flavorsSource) {
@@ -391,7 +365,7 @@ public final class ProjectHelper {
             if (variantSourceProvider != null) {
                 entries = addSourceEntry(project, entries, variantSourceProvider.getJavaDirectories());
             }
-            entries = addSourceEntry(project, entries, mainArtifact.getGeneratedSourceFolders());
+            entries = addSourceEntry(project, entries, variant.getMainArtifact().getGeneratedSourceFolders());
 
             forceRewriteOfCPE = true;
         }
@@ -521,6 +495,14 @@ public final class ProjectHelper {
         IPath sourcePath = new Path(path);
         sourcePath = sourcePath.makeRelativeTo(projectPath);
         return project.findMember(sourcePath);
+    }
+
+    private static IFolder getProjectFolder(IProject project, File file) {
+        IPath projectPath = new Path(project.getLocation().toFile().getAbsolutePath());
+        String path = file.getAbsolutePath();
+        IPath sourcePath = new Path(path);
+        sourcePath = sourcePath.makeRelativeTo(projectPath);
+        return project.getFolder(sourcePath);
     }
 
     /**
@@ -1066,6 +1048,85 @@ public final class ProjectHelper {
         return null;
     }
 
+    private static SourceProvider getDefaultSourceProvider(AndroidProject androidProject, Variant variant) {
+        return androidProject.getDefaultConfig().getSourceProvider();
+    }
+
+    private static List<SourceProvider> getFlavorsSourceProviders(AndroidProject androidProject, Variant variant) {
+        List<SourceProvider> flavorsSource = new ArrayList<SourceProvider>();
+        Collection<ProductFlavorContainer> flavors = androidProject.getProductFlavors();
+
+        List<String> variantFlavors = variant.getProductFlavors();
+
+        for (ProductFlavorContainer productFlavorContainer : flavors) {
+            for (String flavorName : variantFlavors) {
+                if (productFlavorContainer.getProductFlavor().getName().equals(flavorName)) {
+                    flavorsSource.add(productFlavorContainer.getSourceProvider());
+                    break;
+                }
+            }
+        }
+
+        return flavorsSource;
+    }
+
+    private static SourceProvider getBuildTypeSourceProvider(AndroidProject androidProject, Variant variant) {
+        SourceProvider buildTypeSource = null;
+
+        Collection<BuildTypeContainer> buildTypes = androidProject.getBuildTypes();
+
+        String buildTypeName = variant.getBuildType();
+
+        for (BuildTypeContainer buildTypeContainer : buildTypes) {
+            if (buildTypeContainer.getBuildType().getName().equals(buildTypeName)) {
+                buildTypeSource = buildTypeContainer.getSourceProvider();
+                break;
+            }
+        }
+
+        return buildTypeSource;
+    }
+
+    private static SourceProvider getVariantSourceProvider(AndroidProject project, Variant variant) {
+        return variant.getMainArtifact().getVariantSourceProvider();
+    }
+
+    public static List<IFolder> getResFolders(IProject project, IProgressMonitor monitor) throws CoreException {
+        if (Gradroid.get().isGradroidProject(project)) {
+            AndroidProject androidProject = Gradroid.get().loadAndroidModel(project, monitor);
+            Variant variant = Gradroid.get().getProjectVariant(project);
+
+            List<File> folders = new ArrayList<File>();
+
+            folders.addAll(getDefaultSourceProvider(androidProject, variant).getResDirectories());
+            folders.addAll(getBuildTypeSourceProvider(androidProject, variant).getResDirectories());
+            Collection<SourceProvider> flavorsSource = getFlavorsSourceProviders(androidProject, variant);
+            for (SourceProvider sourceProvider : flavorsSource) {
+                folders.addAll(sourceProvider.getResDirectories());
+            }
+            SourceProvider sourceProvider = getVariantSourceProvider(androidProject, variant);
+            if (sourceProvider != null) {
+                folders.addAll(sourceProvider.getResDirectories());
+            }
+
+            List<IFolder> projectFolders = new ArrayList<IFolder>();
+
+            for (File file : folders) {
+                IFolder projectFolder = getProjectFolder(project, file);
+
+                if (!projectFolder.isAccessible()) {
+                    continue;
+                }
+
+                projectFolders.add(projectFolder);
+            }
+
+            return projectFolders;
+        } else {
+            return Collections.singletonList(project.getFolder(AndmoreAndroidConstants.WS_RESOURCES));
+        }
+    }
+
     /**
      * Returns an {@link IFile} object representing the manifest for the given project.
      *
@@ -1074,31 +1135,15 @@ public final class ProjectHelper {
      *         is missing.
      */
     public static IFile getManifest(IProject project) {
-
-        //TODO GRADROID fix it
-
         IResource r = null;
 
         try {
             if (Gradroid.get().isGradroidProject(project)) {
-                AndroidProject model = Gradroid.get().loadAndroidModel(project, new NullProgressMonitor());
+                Gradroid.get().loadAndroidModel(project, new NullProgressMonitor());
                 Variant variant = Gradroid.get().getProjectVariant(project);
 
-                SourceProvider sourceProvider = variant.getMainArtifact().getVariantSourceProvider();
-
-                if (sourceProvider == null) {
-                    String buildTypeName = variant.getBuildType();
-                    Collection<BuildTypeContainer> buildTypes = model.getBuildTypes();
-
-                    for (BuildTypeContainer buildTypeContainer : buildTypes) {
-                        if (buildTypeContainer.getBuildType().getName().equals(buildTypeName)) {
-                            sourceProvider = buildTypeContainer.getSourceProvider();
-                            break;
-                        }
-                    }
-                }
-
-                File manifestFile = sourceProvider.getManifestFile();
+                AndroidArtifactOutput next = variant.getMainArtifact().getOutputs().iterator().next();
+                File manifestFile = next.getGeneratedManifest();
                 r = getProjectResource(project, manifestFile);
             } else {
                 r = project.findMember(AndmoreAndroidConstants.WS_SEP + SdkConstants.FN_ANDROID_MANIFEST_XML);
@@ -1121,7 +1166,6 @@ public final class ProjectHelper {
      * @param monitor A eclipse runtime progress monitor to be updated by the builders.
      * @throws CoreException
      */
-    @SuppressWarnings("unchecked")
     public static void compileInReleaseMode(IProject project, IProgressMonitor monitor) throws CoreException {
         compileInReleaseMode(project, true /*includeDependencies*/, monitor);
     }

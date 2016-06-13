@@ -211,7 +211,7 @@ public class Gradroid {
         }
     }
 
-    private void setupProject(IProject project) throws CoreException {
+    public void setupProject(IProject project) throws CoreException {
         if (project.isOpen() && project.hasNature(ANDMORE_NATURE) && project.hasNature(BUILDSHIP_NATURE)) {
             new SetupProjectJob(project).schedule();
         }

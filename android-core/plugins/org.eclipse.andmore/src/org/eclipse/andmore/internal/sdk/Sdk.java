@@ -1343,7 +1343,7 @@ public final class Sdk {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     LibraryClasspathContainerInitializer
-                            .updateProjects(projectList.toArray(new IJavaProject[projectList.size()]));
+                    .updateProjects(projectList.toArray(new IJavaProject[projectList.size()]));
 
                     for (IJavaProject javaProject : projectList) {
                         try {

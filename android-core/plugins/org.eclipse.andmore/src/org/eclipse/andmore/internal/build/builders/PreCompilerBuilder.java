@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -616,13 +618,13 @@ public class PreCompilerBuilder extends BaseBuilder {
                 saveProjectBooleanProperty(PROPERTY_COMPILE_BUILDCONFIG, mMustCreateBuildConfig);
             }
 
-            try {
+            /*            try {
                 handleBuildConfig(args);
             } catch (IOException e) {
                 handleException(e, "Failed to create BuildConfig class");
                 return result;
             }
-
+            */
             // merge the manifest
             if (mMustMergeManifest) {
                 boolean enabled = MANIFEST_MERGER_ENABLED_DEFAULT;
@@ -680,7 +682,7 @@ public class PreCompilerBuilder extends BaseBuilder {
                 }
 
                 handleResources(project, javaPackage, projectTarget, manifestFile, resOutFolder, libProjects, isLibrary,
-                        proguardFile);
+                        proguardFile, monitor);
             }
 
             if (processorStatus == SourceProcessor.COMPILE_STATUS_NONE && compiledTheResources == false) {
@@ -893,7 +895,7 @@ public class PreCompilerBuilder extends BaseBuilder {
         }
 
         IFile outFile = androidOutFolder.getFile(SdkConstants.FN_ANDROID_MANIFEST_XML);
-        IFile manifest = getProject().getFile(SdkConstants.FN_ANDROID_MANIFEST_XML);
+        IFile manifest = ProjectHelper.getManifest(getProject());
 
         // remove existing markers from the manifest.
         // FIXME: only remove from manifest once the markers are put there.
@@ -979,29 +981,43 @@ public class PreCompilerBuilder extends BaseBuilder {
      * @param manifest the {@link IFile} representing the project manifest
      * @param libProjects the library dependencies
      * @param isLibrary if the project is a library project
+     * @param monitor
      * @throws CoreException
      * @throws AbortBuildException
      */
     private void handleResources(IProject project, String javaPackage, IAndroidTarget projectTarget, IFile manifest,
-            IFolder resOutFolder, List<IProject> libProjects, boolean isLibrary, IFile proguardFile)
-            throws CoreException, AbortBuildException {
+            IFolder resOutFolder, List<IProject> libProjects, boolean isLibrary, IFile proguardFile, IProgressMonitor monitor)
+                    throws CoreException, AbortBuildException {
         // get the resource folder
-        IFolder resFolder = project.getFolder(AndmoreAndroidConstants.WS_RESOURCES);
+        List<IFolder> resFolders = ProjectHelper.getResFolders(project, monitor);
 
         // get the file system path
         IPath outputLocation = mGenFolder.getLocation();
-        IPath resLocation = resFolder.getLocation();
         IPath manifestLocation = manifest == null ? null : manifest.getLocation();
+        List<IPath> resLocation = resFolders.stream().map(new Function<IFolder, IPath>() {
+            @Override
+            public IPath apply(IFolder f) {
+                return f.getLocation();
+            }
+        }).collect(Collectors.<IPath> toList());
+
 
         // those locations have to exist for us to do something!
-        if (outputLocation != null && resLocation != null && manifestLocation != null) {
+        if (outputLocation != null) {
             String osOutputPath = outputLocation.toOSString();
-            String osResPath = resLocation.toOSString();
+            List<String> osResPath = resLocation.stream().map(new Function<IPath, String>() {
+                @Override
+                public String apply(IPath f) {
+                    return f.toOSString();
+                }
+            }).collect(Collectors.<String> toList());
             String osManifestPath = manifestLocation.toOSString();
 
             // remove the aapt markers
             removeMarkersFromResource(manifest, AndmoreAndroidConstants.MARKER_AAPT_COMPILE);
-            removeMarkersFromContainer(resFolder, AndmoreAndroidConstants.MARKER_AAPT_COMPILE);
+            for (IFolder resFolder : resFolders) {
+                removeMarkersFromContainer(resFolder, AndmoreAndroidConstants.MARKER_AAPT_COMPILE);
+            }
 
             AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project,
                     Messages.Preparing_Generated_Files);
@@ -1041,6 +1057,7 @@ public class PreCompilerBuilder extends BaseBuilder {
             File resOutFile = resOutFolder.getLocation().toFile();
             String resOutPath = resOutFile.isDirectory() ? resOutFile.getAbsolutePath() : null;
 
+            //TODO GRADROID lib res folders
             execAapt(project, projectTarget, osOutputPath, resOutPath, osResPath, osManifestPath, mainPackageFolder,
                     libResFolders, libRFiles, isLibrary, proguardFilePath);
         }
@@ -1066,7 +1083,7 @@ public class PreCompilerBuilder extends BaseBuilder {
      */
     @SuppressWarnings("deprecation")
     private void execAapt(IProject project, IAndroidTarget projectTarget, String osOutputPath, String osBcOutPath,
-            String osResPath, String osManifestPath, IFolder packageFolder, ArrayList<IFolder> libResFolders,
+            List<String> osResPath, String osManifestPath, IFolder packageFolder, ArrayList<IFolder> libResFolders,
             List<Pair<File, String>> libRFiles, boolean isLibrary, String proguardFile) throws AbortBuildException {
 
         // We actually need to delete the manifest.java as it may become empty and
@@ -1111,8 +1128,10 @@ public class PreCompilerBuilder extends BaseBuilder {
             array.add("-S"); //$NON-NLS-1$
             array.add(osBcOutPath);
         }
-        array.add("-S"); //$NON-NLS-1$
-        array.add(osResPath);
+        for (String resPath : osResPath) {
+            array.add("-S"); //$NON-NLS-1$
+            array.add(resPath);
+        }
         for (IFolder libResFolder : libResFolders) {
             array.add("-S"); //$NON-NLS-1$
             array.add(libResFolder.getLocation().toOSString());
