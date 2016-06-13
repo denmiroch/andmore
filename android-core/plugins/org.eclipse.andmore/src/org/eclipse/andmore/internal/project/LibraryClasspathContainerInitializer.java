@@ -235,10 +235,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
     private static void processAndroidLibraries(Set<File> jars, Collection<? extends AndroidLibrary> libraries) {
         for (AndroidLibrary androidLibrary : libraries) {
             jars.add(androidLibrary.getJarFile());
-
             jars.addAll(androidLibrary.getLocalJars());
-
-            //TODO GRADROID check what  .getLocalJars() is
 
             //            processJavaLibraries(jars, androidLibrary.getgetJavaDependencies());
             processAndroidLibraries(jars, androidLibrary.getLibraryDependencies());

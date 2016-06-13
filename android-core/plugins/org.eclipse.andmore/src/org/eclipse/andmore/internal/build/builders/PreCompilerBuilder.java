@@ -26,6 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.android.gradle.Gradroid;
 import org.eclipse.andmore.internal.build.AaptParser;
 import org.eclipse.andmore.internal.build.AidlProcessor;
 import org.eclipse.andmore.internal.build.Messages;
@@ -618,13 +619,14 @@ public class PreCompilerBuilder extends BaseBuilder {
                 saveProjectBooleanProperty(PROPERTY_COMPILE_BUILDCONFIG, mMustCreateBuildConfig);
             }
 
-            /*            try {
-                handleBuildConfig(args);
-            } catch (IOException e) {
-                handleException(e, "Failed to create BuildConfig class");
-                return result;
+            if (!Gradroid.get().isGradroidProject(project)) {
+                try {
+                    handleBuildConfig(args);
+                } catch (IOException e) {
+                    handleException(e, "Failed to create BuildConfig class");
+                    return result;
+                }
             }
-            */
             // merge the manifest
             if (mMustMergeManifest) {
                 boolean enabled = MANIFEST_MERGER_ENABLED_DEFAULT;
@@ -1026,29 +1028,37 @@ public class PreCompilerBuilder extends BaseBuilder {
             // get the parent folder for R.java and update mManifestPackageSourceFolder
             IFolder mainPackageFolder = getGenManifestPackageFolder();
 
-            // handle libraries
-            ArrayList<IFolder> libResFolders = Lists.newArrayList();
-            ArrayList<Pair<File, String>> libRFiles = Lists.newArrayList();
-            if (libProjects != null) {
-                for (IProject lib : libProjects) {
-                    IFolder libResFolder = lib.getFolder(SdkConstants.FD_RES);
-                    if (libResFolder.exists()) {
-                        libResFolders.add(libResFolder);
-                    }
+            List<IFolder> libResFolders;
+            List<Pair<File, String>> libRFiles;
 
-                    try {
-                        // get the package of the library, and if it's different form the
-                        // main project, generate the R class for it too.
-                        String libJavaPackage = AndroidManifest.getPackage(new IFolderWrapper(lib));
-                        if (libJavaPackage.equals(javaPackage) == false) {
-
-                            IFolder libOutput = BaseProjectHelper.getAndroidOutputFolder(lib);
-                            File libOutputFolder = libOutput.getLocation().toFile();
-
-                            libRFiles.add(Pair.of(new File(libOutputFolder, "R.txt"), libJavaPackage));
-
+            if (Gradroid.get().isGradroidProject(project)) {
+                libResFolders = ProjectHelper.getDepenencyResFolders(project, monitor);
+                libRFiles = ProjectHelper.getDepenencyRFiles(project, monitor);
+            } else {
+                // handle libraries
+                libResFolders = Lists.newArrayList();
+                libRFiles = Lists.newArrayList();
+                if (libProjects != null) {
+                    for (IProject lib : libProjects) {
+                        IFolder libResFolder = lib.getFolder(SdkConstants.FD_RES);
+                        if (libResFolder.exists()) {
+                            libResFolders.add(libResFolder);
                         }
-                    } catch (Exception e) {}
+
+                        try {
+                            // get the package of the library, and if it's different form the
+                            // main project, generate the R class for it too.
+                            String libJavaPackage = AndroidManifest.getPackage(new IFolderWrapper(lib));
+                            if (libJavaPackage.equals(javaPackage) == false) {
+
+                                IFolder libOutput = BaseProjectHelper.getAndroidOutputFolder(lib);
+                                File libOutputFolder = libOutput.getLocation().toFile();
+
+                                libRFiles.add(Pair.of(new File(libOutputFolder, "R.txt"), libJavaPackage));
+
+                            }
+                        } catch (Exception e) {}
+                    }
                 }
             }
 
@@ -1083,7 +1093,7 @@ public class PreCompilerBuilder extends BaseBuilder {
      */
     @SuppressWarnings("deprecation")
     private void execAapt(IProject project, IAndroidTarget projectTarget, String osOutputPath, String osBcOutPath,
-            List<String> osResPath, String osManifestPath, IFolder packageFolder, ArrayList<IFolder> libResFolders,
+            List<String> osResPath, String osManifestPath, IFolder packageFolder, List<IFolder> libResFolders,
             List<Pair<File, String>> libRFiles, boolean isLibrary, String proguardFile) throws AbortBuildException {
 
         // We actually need to delete the manifest.java as it may become empty and

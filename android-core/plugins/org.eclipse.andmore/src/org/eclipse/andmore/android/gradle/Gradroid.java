@@ -291,6 +291,7 @@ public class Gradroid {
                 try {
                     model = modelRequest.executeAndWait();
                 } catch (Exception e) {
+                    AndmoreAndroidPlugin.log(e, "");
                     model = null;
                 }
 
