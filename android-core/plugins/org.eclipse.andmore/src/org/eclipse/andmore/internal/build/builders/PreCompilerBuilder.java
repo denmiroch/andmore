@@ -1067,7 +1067,6 @@ public class PreCompilerBuilder extends BaseBuilder {
             File resOutFile = resOutFolder.getLocation().toFile();
             String resOutPath = resOutFile.isDirectory() ? resOutFile.getAbsolutePath() : null;
 
-            //TODO GRADROID lib res folders
             execAapt(project, projectTarget, osOutputPath, resOutPath, osResPath, osManifestPath, mainPackageFolder,
                     libResFolders, libRFiles, isLibrary, proguardFilePath);
         }

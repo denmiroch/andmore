@@ -344,8 +344,6 @@ public final class ProjectHelper {
     public static void fixProjectClasspathEntries(IJavaProject javaProject, IProgressMonitor monitor, boolean force)
             throws CoreException {
 
-        //TODO GRADROID configure gradle provided things
-
         IClasspathEntry[] entries = javaProject.getRawClasspath();
         IClasspathEntry[] oldEntries = entries;
         boolean forceRewriteOfCPE = false;
@@ -1249,8 +1247,6 @@ public final class ProjectHelper {
                 r = project.findMember(AndmoreAndroidConstants.WS_SEP + SdkConstants.FN_ANDROID_MANIFEST_XML);
             }
         } catch (CoreException e) {}
-
-        //TODO GRADROID return manifest from gradle
 
         if (r == null || r.exists() == false || (r instanceof IFile) == false) {
             return null;

@@ -91,8 +91,6 @@ public class FixProjectAction implements IObjectActionDelegate {
     public static Job createFixProjectJob(@NonNull final IProject project) {
         return new Job("Fix Project Properties") {
 
-            //TODO GRADROID make gradle things here too
-
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {

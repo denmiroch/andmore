@@ -99,8 +99,6 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         }
     }
 
-    //TODO GRADROID configure dependencies from gradle
-
     public LibraryClasspathContainerInitializer() {}
 
     /**

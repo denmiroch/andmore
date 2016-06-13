@@ -59,7 +59,6 @@ public class AndroidNature implements IProjectNature {
      */
     @Override
     public void configure() throws CoreException {
-        //TODO GRADROID configure gradle specific things if needed
         configureResourceManagerBuilder(mProject);
         configurePreBuilder(mProject);
         configureApkBuilder(mProject);
