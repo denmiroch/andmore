@@ -366,8 +366,6 @@ public final class ProjectHelper {
 
         if (Gradroid.get().isGradroidProject(project)) {
 
-            project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-
             entries = removeSourceEntriesExceptGen(entries);
 
             AndroidProject androidProject;
@@ -376,6 +374,9 @@ public final class ProjectHelper {
             } else {
                 androidProject = Gradroid.get().loadAndroidModel(project, monitor);
             }
+
+            project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+
             Variant variant = Gradroid.get().getProjectVariant(project);
 
             SourceProvider defaultSource = getDefaultSourceProvider(androidProject, variant);
