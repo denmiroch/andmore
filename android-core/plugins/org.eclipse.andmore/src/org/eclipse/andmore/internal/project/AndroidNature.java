@@ -14,7 +14,7 @@
 package org.eclipse.andmore.internal.project;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
-import org.eclipse.andmore.android.common.log.AndmoreLogger;
+import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.android.gradle.Gradroid;
 import org.eclipse.andmore.internal.build.builders.PostCompilerBuilder;
 import org.eclipse.andmore.internal.build.builders.PreCompilerBuilder;
@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.JavaCore;
@@ -142,8 +143,8 @@ public class AndroidNature implements IProjectNature {
             try {
                 Sdk.getCurrent().initProject(project, androidTarget);
             } catch (Exception e) {
-                AndmoreLogger.error(AndroidNature.class, "Error associating project " + project.getName() //$NON-NLS-1$
-                        + " with target " + androidTarget.getName()); //$NON-NLS-1$
+                AndmoreAndroidPlugin.log(IStatus.ERROR, "Error associating project " + project.getName() //$NON-NLS-1$
+                + " with target " + androidTarget.getName()); //$NON-NLS-1$
             }
         }
 
