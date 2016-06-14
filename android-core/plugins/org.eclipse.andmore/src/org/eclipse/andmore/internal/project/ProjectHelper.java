@@ -168,6 +168,19 @@ public final class ProjectHelper {
         return false;
     }
 
+    public static IClasspathEntry[] removeSourceEntriesExceptGen(IClasspathEntry[] entries) {
+        for (int i = 0; i < entries.length; ) {
+            IClasspathEntry entry = entries[i];
+
+            if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE && !entry.getPath().lastSegment().equals("gen")) {
+                entries = removeEntryFromClasspath(entries, i);
+            } else {
+                i++;
+            }
+        }
+        return entries;
+    }
+
     /**
      * Remove a classpath entry from the array.
      * @param entries The class path entries to read. A copy will be returned
@@ -326,6 +339,7 @@ public final class ProjectHelper {
         // get a java project
         IJavaProject javaProject = JavaCore.create(project);
         fixProjectClasspathEntries(javaProject, monitor, force);
+        LibraryClasspathContainerInitializer.calculateDependencies(javaProject, monitor);
     }
 
     /**
@@ -351,6 +365,10 @@ public final class ProjectHelper {
         IProject project = javaProject.getProject();
 
         if (Gradroid.get().isGradroidProject(project)) {
+
+            project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+
+            entries = removeSourceEntriesExceptGen(entries);
 
             AndroidProject androidProject;
             if (force) {
@@ -483,6 +501,8 @@ public final class ProjectHelper {
             Collection<File> javaSources) {
 
         IPath projectPath = new Path(project.getLocation().toFile().getAbsolutePath());
+
+        System.out.println(javaSources);
 
         for (File file : javaSources) {
 

@@ -1,6 +1,8 @@
 package org.eclipse.andmore.android.gradle.ui;
 
-import org.eclipse.andmore.android.gradle.ui.VariantsView.ProjectVariants;
+import java.util.Arrays;
+
+import org.eclipse.andmore.android.gradle.ui.VariantsView.ProjectData;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
@@ -14,17 +16,19 @@ import org.eclipse.jface.viewers.TableViewer;
 public class VariantEditingSupport extends EditingSupport {
 
     private TableViewer viewer;
+    private VariantsView mView;
 
-    public VariantEditingSupport(TableViewer viewer) {
+    public VariantEditingSupport(VariantsView view, TableViewer viewer) {
         super(viewer);
+        mView = view;
 
         this.viewer = viewer;
     }
 
     @Override
     protected CellEditor getCellEditor(Object element) {
-        ProjectVariants variants = (ProjectVariants) element;
-        return new ComboBoxCellEditor(viewer.getTable(), variants.variants);
+        ProjectData data = (ProjectData) element;
+        return new ComboBoxCellEditor(viewer.getTable(), data.variants);
     }
 
     @Override
@@ -34,14 +38,17 @@ public class VariantEditingSupport extends EditingSupport {
 
     @Override
     protected Object getValue(Object element) {
-        ProjectVariants variants = (ProjectVariants) element;
-        return variants.selected;
+        ProjectData data = (ProjectData) element;
+        return Arrays.binarySearch(data.variants, data.selectedVariant);
     }
 
     @Override
     protected void setValue(Object element, Object value) {
-        ProjectVariants variants = (ProjectVariants) element;
-        variants.selected = (Integer) value;
+        int index = (Integer) value;
+        ProjectData data = (ProjectData) element;
+        data.selectedVariant = data.variants[index];
         viewer.update(element, null);
+
+        mView.setProjectVariant(data.project, data.selectedVariant);
     }
 }

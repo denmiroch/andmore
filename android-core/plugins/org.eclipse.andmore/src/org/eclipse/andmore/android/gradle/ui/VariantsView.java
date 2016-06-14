@@ -1,26 +1,29 @@
 package org.eclipse.andmore.android.gradle.ui;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.MessageDialog;
+import java.util.Collection;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.android.gradle.Gradroid;
+import org.eclipse.andmore.android.gradle.Gradroid.OnProjectModelChanged;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+
+import com.android.builder.model.AndroidProject;
+import com.android.builder.model.Variant;
 
 /**
  * This sample class demonstrates how to plug-in a new
@@ -40,7 +43,7 @@ import org.eclipse.ui.part.ViewPart;
  * <p>
  */
 
-public class VariantsView extends ViewPart {
+public class VariantsView extends ViewPart implements OnProjectModelChanged {
 
     /**
      * The ID of the view as specified by the extension.
@@ -48,42 +51,30 @@ public class VariantsView extends ViewPart {
     public static final String ID = "org.eclipse.andmore.android.gradle.VariantsView";
 
     private TableViewer viewer;
-    private Action action1;
-    private Action action2;
 
-    public static class ProjectVariants {
-        public String name;
-        public String[] variants;
-        public int selected = 0;
+    static class ProjectData {
+        public final IProject project;
+        public final String[] variants;
+        public String selectedVariant;
 
-        @Override
-        public String toString() {
-            return name;
+        public ProjectData(IProject project, String[] variants, String selectedVariant) {
+            this.project = project;
+            this.variants = variants;
+            this.selectedVariant = selectedVariant;
         }
-    }
-
-    private ProjectVariants[] mData;
-
-    {
-        mData = new ProjectVariants[2];
-
-        ProjectVariants variants;
-
-        variants = new ProjectVariants();
-        variants.name = "ProjectOne";
-        variants.variants = new String[] { "VariantOne", "VarianteTwo" };
-        mData[0] = variants;
-
-        variants = new ProjectVariants();
-        variants.name = "ProjectTwo";
-        variants.variants = new String[] { "VariantOne", "VarianteTwo" };
-        mData[1] = variants;
     }
 
     /**
      * The constructor.
      */
     public VariantsView() {}
+
+    @Override
+    public void init(IViewSite site) throws PartInitException {
+        super.init(site);
+
+        Gradroid.get().addOnProjectModelChangedListener(this);
+    }
 
     /**
      * This is a callback that will allow us
@@ -104,7 +95,13 @@ public class VariantsView extends ViewPart {
         projectColumn.setWidth(100);
         projectColumn.setResizable(true);
         projectColumn.setMoveable(false);
-        projectViewerColumn.setLabelProvider(new ColumnLabelProvider());
+        projectViewerColumn.setLabelProvider(new ColumnLabelProvider() {
+            @Override
+            public String getText(Object element) {
+                ProjectData data = (ProjectData) element;
+                return data.project.getName();
+            }
+        });
 
         TableViewerColumn variantViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
         TableColumn variantColumn = variantViewerColumn.getColumn();
@@ -115,93 +112,17 @@ public class VariantsView extends ViewPart {
         variantViewerColumn.setLabelProvider(new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {
-                ProjectVariants variants = (ProjectVariants) element;
-                return super.getText(variants.variants[variants.selected]);
+                ProjectData data = (ProjectData) element;
+                return data.selectedVariant;
             }
         });
-        variantViewerColumn.setEditingSupport(new VariantEditingSupport(viewer));
+        variantViewerColumn.setEditingSupport(new VariantEditingSupport(this, viewer));
 
         viewer.setContentProvider(ArrayContentProvider.getInstance());
-        viewer.setInput(mData);
+
+        update();
 
         getSite().setSelectionProvider(viewer);
-
-        makeActions();
-        hookContextMenu();
-
-        contributeToActionBars();
-    }
-
-    private void hookContextMenu() {
-        MenuManager menuMgr = new MenuManager("#PopupMenu");
-
-        menuMgr.setRemoveAllWhenShown(true);
-        menuMgr.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(IMenuManager manager) {
-                VariantsView.this.fillContextMenu(manager);
-            }
-        });
-
-        Menu menu = menuMgr.createContextMenu(viewer.getControl());
-
-        viewer.getControl().setMenu(menu);
-
-        getSite().registerContextMenu(menuMgr, viewer);
-    }
-
-    private void contributeToActionBars() {
-
-        IActionBars bars = getViewSite().getActionBars();
-
-        fillLocalPullDown(bars.getMenuManager());
-        fillLocalToolBar(bars.getToolBarManager());
-    }
-
-    private void fillLocalPullDown(IMenuManager manager) {
-        manager.add(action1);
-        manager.add(new Separator());
-        manager.add(action2);
-    }
-
-    private void fillContextMenu(IMenuManager manager) {
-        manager.add(action1);
-        manager.add(action2);
-        // Other plug-ins can contribute there actions here
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-    }
-
-    private void fillLocalToolBar(IToolBarManager manager) {
-        manager.add(action1);
-        manager.add(action2);
-    }
-
-    private void makeActions() {
-        action1 = new Action() {
-            @Override
-            public void run() {
-                showMessage("Action 1 executed");
-            }
-        };
-        action1.setText("Action 1");
-        action1.setToolTipText("Action 1 tooltip");
-        action1.setImageDescriptor(
-                PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-
-        action2 = new Action() {
-            @Override
-            public void run() {
-                showMessage("Action 2 executed");
-            }
-        };
-        action2.setText("Action 2");
-        action2.setToolTipText("Action 2 tooltip");
-        action2.setImageDescriptor(
-                PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-    }
-
-    private void showMessage(String message) {
-        MessageDialog.openInformation(viewer.getControl().getShell(), "Variants", message);
     }
 
     /**
@@ -211,4 +132,52 @@ public class VariantsView extends ViewPart {
     public void setFocus() {
         viewer.getControl().setFocus();
     }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        Gradroid.get().removeOnProjectModelChangedListener(this);
+    }
+
+    void setProjectVariant(IProject project, String variantName) {
+        Gradroid.get().setProjectVariant(project, variantName);
+    }
+
+    private void update() {
+
+        Set<IProject> projects = Gradroid.get().getProjects();
+        final ProjectData[] data = new ProjectData[projects.size()];
+
+        int i = 0;
+        for (IProject project : projects) {
+            AndroidProject model = Gradroid.get().loadAndroidModel(project, new NullProgressMonitor());
+            Variant projectVariant = Gradroid.get().getProjectVariant(project);
+            Collection<Variant> variants = model.getVariants();
+
+            Set<String> variantsNamesSet = variants.stream().map(new Function<Variant, String>() {
+                @Override
+                public String apply(Variant v) {
+                    return v.getName();
+                }
+            }).collect(Collectors.<String> toSet());
+
+            String[] names = variantsNamesSet.toArray(new String[variantsNamesSet.size()]);
+            data[i++] = new ProjectData(project, names, projectVariant.getName());
+        }
+
+        AndmoreAndroidPlugin.getDisplay().syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                viewer.setInput(data);
+            }
+        });
+    }
+
+    @Override
+    public void onProjectModelChanged(IProject project, AndroidProject model) {
+        update();
+    }
+
 }

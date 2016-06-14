@@ -83,23 +83,26 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
         @Override
         protected IStatus run(IProgressMonitor monitor) {
-
-            IClasspathContainer dependencies = allocateGradleDependencyContainer(mJavaProject, monitor);
-
-            if (dependencies != null) {
-                try {
-                    JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
-                            new IJavaProject[] { mJavaProject }, new IClasspathContainer[] { dependencies }, monitor);
-                } catch (JavaModelException e) {
-                    AndmoreAndroidPlugin.log(e, "");
-                }
-            }
-
+            calculateDependencies(mJavaProject, monitor);
             return Status.OK_STATUS;
         }
+
     }
 
     public LibraryClasspathContainerInitializer() {}
+
+    public static void calculateDependencies(IJavaProject project, IProgressMonitor monitor) {
+        IClasspathContainer dependencies = allocateGradleDependencyContainer(project, monitor);
+
+        if (dependencies != null) {
+            try {
+                JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
+                        new IJavaProject[] { project }, new IClasspathContainer[] { dependencies }, monitor);
+            } catch (JavaModelException e) {
+                AndmoreAndroidPlugin.log(e, "");
+            }
+        }
+    }
 
     /**
      * Updates the {@link IJavaProject} objects with new library.
@@ -130,32 +133,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         }
 
         return true;
-
-        /*        try {
-            // Allocate a new AndroidClasspathContainer, and associate it to the library
-            // container id for each projects.
-            int projectCount = androidProjects.length;
-        
-            IClasspathContainer[] libraryContainers = new IClasspathContainer[projectCount];
-            IClasspathContainer[] dependencyContainers = new IClasspathContainer[projectCount];
-            for (int i = 0 ; i < projectCount; i++) {
-                libraryContainers[i] = allocateLibraryContainer(androidProjects[i]);
-                dependencyContainers[i] = allocateDependencyContainer(androidProjects[i]);
-            }
-        
-            // give each project their new container in one call.
-            JavaCore.setClasspathContainer(
-                    new Path(AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES),
-                    androidProjects, libraryContainers, new NullProgressMonitor());
-        
-            JavaCore.setClasspathContainer(
-                    new Path(AndmoreAndroidConstants.CONTAINER_DEPENDENCIES),
-                    androidProjects, dependencyContainers, new NullProgressMonitor());
-            return true;
-        } catch (JavaModelException e) {
-            return false;
-        }
-         */ }
+    }
 
     /**
      * Updates the {@link IJavaProject} objects with new library.
@@ -185,8 +163,8 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES
                     .equals(containerPath.toString())) {} else if (AndmoreAndroidConstants.CONTAINER_DEPENDENCIES
                             .equals(containerPath.toString())) {
-                new SetupDependenciesJob(javaProject).schedule();
-            }
+                        new SetupDependenciesJob(javaProject).schedule();
+                    }
         } else {
             if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES.equals(containerPath.toString())) {
                 IClasspathContainer libraries = allocateLibraryContainer(javaProject);

@@ -10,23 +10,19 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.internal.project.AndroidNature;
+import org.eclipse.andmore.internal.project.LibraryClasspathContainerInitializer;
 import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.buildship.core.CorePlugin;
 import org.eclipse.buildship.core.configuration.GradleProjectNature;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.JavaCore;
 
 import com.android.builder.model.AndroidProject;
 import com.android.builder.model.Variant;
@@ -45,6 +41,7 @@ public class Gradroid {
     //TODO check project.properties and vice versa
     //TODO update on .gradle change
     //TODO provide Total Update button
+    //TODO variant decoration?
 
     public static final String BUILDSHIP_NATURE = GradleProjectNature.ID;
     public static final String ANDMORE_NATURE = AndmoreAndroidConstants.NATURE_DEFAULT;
@@ -59,115 +56,47 @@ public class Gradroid {
     private HashMap<IProject, AndroidProject> mModels = new HashMap<IProject, AndroidProject>();
     private HashMap<IProject, String> mVariants = new HashMap<IProject, String>();
 
-    private static class SetupProjectJob extends Job {
+    private ListenerList<OnProjectModelChanged> mOnProjectModelChangedListeners = new ListenerList<Gradroid.OnProjectModelChanged>();
 
-        private IProject mProject;
-
-        public SetupProjectJob(IProject project) {
-            super("Setup Gradroid project");
-
-            mProject = project;
-        }
-
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-
-            monitor.beginTask("Setup Gradroid project", 1);
-
-            AndroidProject androidProject = Gradroid.get().loadAndroidModel(mProject, monitor);
-
-            String variantName = null;
-
-            try {
-                variantName = mProject
-                        .getPersistentProperty(new QualifiedName(PROPERTY_VARIANT_QUALIFIER, PROPERTY_VARIANT_NAME));
-            } catch (CoreException e) {}
-
-            boolean found = false;
-
-            if (variantName != null) {
-                Collection<Variant> projectVariatns = androidProject.getVariants();
-
-                for (Variant variant : projectVariatns) {
-                    if (variant.getName().equals(variantName)) {
-                        Gradroid.get().setProjectVariant(mProject, variantName);
-                        found = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!found) {
-                Gradroid.get().setProjectVariant(mProject, androidProject.getVariants().iterator().next().getName());
-            }
-
-            monitor.worked(1);
-            monitor.done();
-
-            return Status.OK_STATUS;
-        }
-    }
-
-    private static class ProjectOpenListener implements IResourceChangeListener, IResourceDeltaVisitor {
-
-        @Override
-        public void resourceChanged(IResourceChangeEvent event) {
-            if (event == null || event.getDelta() == null) {
-                return;
-            }
-
-            try {
-                event.getDelta().accept(this);
-            } catch (CoreException e) {
-                // TODO log or smthing
-            }
-        }
-
-        @Override
-        public boolean visit(IResourceDelta delta) throws CoreException {
-            if (delta.getKind() == IResourceDelta.OPEN) {
-                IResource resource = delta.getResource();
-                if (resource instanceof IProject) {
-                    Gradroid.get().setupProject((IProject) resource);
-                }
-            }
-            return false;
-        }
+    public interface OnProjectModelChanged {
+        void onProjectModelChanged(IProject project, AndroidProject model);
     }
 
     public static Gradroid get() {
         return sInstance;
     }
 
+    public void addOnProjectModelChangedListener(OnProjectModelChanged listener) {
+        mOnProjectModelChangedListeners.add(listener);
+    }
+
+    public void removeOnProjectModelChangedListener(OnProjectModelChanged listener) {
+        mOnProjectModelChangedListeners.remove(listener);
+    }
+
+    public Set<IProject> getProjects() {
+        synchronized (LOCK) {
+            return Collections.unmodifiableSet(mModels.keySet());
+        }
+    }
+
     public boolean isGradroidProject(IProject project) throws CoreException {
         return project.hasNature(BUILDSHIP_NATURE) && project.hasNature(ANDMORE_NATURE);
     }
 
-    public void setup() {
-        // TODO setup Gradroid (load projects' models, populate views, start
-        // builds?)
-
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-
-        workspace.addResourceChangeListener(new ProjectOpenListener());
-
-        IProject[] projects = workspace.getRoot().getProjects();
-
-        for (IProject project : projects) {
-            try {
-                setupProject(project);
-            } catch (CoreException e) {
-                AndmoreAndroidPlugin.log(e, "");
-                // goto next project
-                // TODO log or smthing
-            }
-        }
-    }
-
+    //TODO cache Variant isntance in map
     public Variant getProjectVariant(IProject project) {
         synchronized (LOCK) {
             AndroidProject androidProject = mModels.get(project);
             String variantName = mVariants.get(project);
+
+            if (variantName == null) {
+                try {
+                    variantName = project.getPersistentProperty(
+                            new QualifiedName(PROPERTY_VARIANT_QUALIFIER, PROPERTY_VARIANT_NAME));
+                } catch (CoreException e) {}
+            }
+
             Collection<Variant> variants = androidProject.getVariants();
 
             if (variantName == null) {
@@ -187,14 +116,29 @@ public class Gradroid {
     }
 
     public String getProjectVariantName(IProject project) {
-        return mVariants.get(project);
+        return getProjectVariant(project).getName();
+    }
+
+    private String getProjectVariantNameForModelRequest(IProject project) {
+        synchronized (LOCK) {
+            String variantName = mVariants.get(project);
+
+            if (variantName == null) {
+                try {
+                    variantName = project.getPersistentProperty(
+                            new QualifiedName(PROPERTY_VARIANT_QUALIFIER, PROPERTY_VARIANT_NAME));
+                } catch (CoreException e) {}
+            }
+
+            return variantName;
+        }
     }
 
     public void setProjectVariant(IProject project, Variant variant) {
         setProjectVariant(project, variant.getName());
     }
 
-    public void setProjectVariant(IProject project, String variantName) {
+    public void setProjectVariant(final IProject project, String variantName) {
         synchronized (LOCK) {
             String was = mVariants.put(project, variantName);
 
@@ -205,15 +149,31 @@ public class Gradroid {
                 AndmoreAndroidPlugin.log(e, "");
             }
 
+            class ChangeVariantProjectJob extends Job {
+
+                public ChangeVariantProjectJob() {
+                    super("Changing variant");
+                }
+
+                @Override
+                protected IStatus run(IProgressMonitor monitor) {
+                    try {
+                        ProjectHelper.fixProject(project, monitor, true);
+                    } catch (CoreException e) {
+                        AndmoreAndroidPlugin.log(e, "");
+                    }
+
+                    LibraryClasspathContainerInitializer.calculateDependencies(JavaCore.create(project), monitor);
+                    return Status.OK_STATUS;
+                }
+            }
+
+            new ChangeVariantProjectJob().schedule();
+
             if (!variantName.equals(was)) {
                 //TODO notify variant changed
+                //TODO call fix project?
             }
-        }
-    }
-
-    public void setupProject(IProject project) throws CoreException {
-        if (project.isOpen() && project.hasNature(ANDMORE_NATURE) && project.hasNature(BUILDSHIP_NATURE)) {
-            new SetupProjectJob(project).schedule();
         }
     }
 
@@ -229,6 +189,8 @@ public class Gradroid {
 
         // TODO classpath containers and other things (builders?)
     }
+
+    //TODO make simple method to get model from map without load
 
     public AndroidProject loadAndroidModel(IProject project, IProgressMonitor monitor) {
 
@@ -247,18 +209,18 @@ public class Gradroid {
         AndroidProject model = requestAndroidModel(project, monitor);
 
         synchronized (LOCK) {
-            AndroidProject was = mModels.put(project, model);
+            mModels.put(project, model);
 
-            if (was != null) {
-                // TODO notify changes
-            } else {
-                // TODO notify setup complete
+            for (OnProjectModelChanged listener : mOnProjectModelChangedListeners) {
+                listener.onProjectModelChanged(project, model);
             }
         }
 
         return model;
     }
 
+    //TODO EXCEPTION HANDLING!111
+    //TODO request only current cariant
     private AndroidProject requestAndroidModel(IProject project, IProgressMonitor monitor) {
 
         AndroidProject model;
@@ -276,8 +238,6 @@ public class Gradroid {
         if (lock.tryLock()) {
             try {
                 monitor.beginTask("Requesting model", 1);
-
-                // TODO lock multiple requesting
 
                 ModelRequest<AndroidProject> modelRequest = CorePlugin.toolingClient()
                         .newModelRequest(AndroidProject.class);
@@ -302,13 +262,21 @@ public class Gradroid {
                     return null;
                 }
 
+                String variantName = getProjectVariantNameForModelRequest(project);
                 Collection<Variant> projectVariants = model.getVariants();
 
                 monitor.beginTask("Building sources for IDE", projectVariants.size());
 
                 for (Variant variant : projectVariants) {
-                    Set<String> tasks = Collections.singleton(variant.getMainArtifact().getCompileTaskName());
-                    //                    Set<String> tasks = variant.getMainArtifact().getIdeSetupTaskNames();
+
+                    if (variantName != null) {
+                        if (!variant.getName().equals(variantName)){
+                            continue;
+                        }
+                    }
+
+                    //                    Set<String> tasks = Collections.singleton(variant.getMainArtifact().getCompileTaskName());
+                    Set<String> tasks = variant.getMainArtifact().getIdeSetupTaskNames();
 
                     System.out.println(tasks);
 

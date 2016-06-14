@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.eclipse.andmore.android.common.IAndroidConstants;
 import org.eclipse.andmore.android.common.log.AndmoreLogger;
-import org.eclipse.andmore.android.gradle.Gradroid;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
@@ -189,8 +188,6 @@ public class AndroidPlugin extends AbstractUIPlugin {
             }
         });
         t.start();
-
-        Gradroid.get().setup();
 
         AndmoreLogger.debug(AndroidPlugin.class, "Andmore Plugin started.");
     }
