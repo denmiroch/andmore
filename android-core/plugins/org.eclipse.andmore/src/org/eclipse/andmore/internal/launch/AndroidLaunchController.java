@@ -45,6 +45,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -92,7 +93,7 @@ import com.android.utils.NullLogger;
  * it.
  */
 public final class AndroidLaunchController
-        implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListener, ILaunchController {
+implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListener, ILaunchController {
 
     private static final String FLAG_AVD = "-avd"; //$NON-NLS-1$
     private static final String FLAG_NETDELAY = "-netdelay"; //$NON-NLS-1$
@@ -280,17 +281,21 @@ public final class AndroidLaunchController
      * @param launchAction the action to perform after app sync
      * @param config the launch configuration
      * @param launch the launch object
+     * @param gradroidLaunch
+     * @throws CoreException
      */
     public void launch(final IProject project, String mode, IFile apk, String packageName, String debugPackageName,
             Boolean debuggable, String requiredApiVersionNumber, final IAndroidLaunchAction launchAction,
-            final AndroidLaunchConfiguration config, final AndroidLaunch launch, IProgressMonitor monitor) {
+            final AndroidLaunchConfiguration config, final AndroidLaunch launch, IProgressMonitor monitor,
+            boolean gradroidLaunch)
+                    throws CoreException {
 
         String message = String.format("Performing %1$s", launchAction.getLaunchDescription());
         AndmoreAndroidPlugin.printToConsole(project, message);
 
         // create the launch info
         final DelayedLaunchInfo launchInfo = new DelayedLaunchInfo(project, packageName, debugPackageName, launchAction,
-                apk, debuggable, requiredApiVersionNumber, launch, monitor);
+                apk, debuggable, requiredApiVersionNumber, launch, monitor, gradroidLaunch);
 
         // set the debug mode
         launchInfo.setDebugMode(mode.equals(ILaunchManager.DEBUG_MODE));
@@ -446,9 +451,9 @@ public final class AndroidLaunchController
 
             HashMap<IDevice, AvdInfo> compatibleRunningAvds = new HashMap<IDevice, AvdInfo>();
             boolean hasDevice = false; // if there's 1+ device running, we may force manual mode,
-                                       // as we cannot always detect proper compatibility with
-                                       // devices. This is the case if the project target is not
-                                       // a standard platform
+            // as we cannot always detect proper compatibility with
+            // devices. This is the case if the project target is not
+            // a standard platform
             for (IDevice d : devices) {
                 String deviceAvd = d.getAvdName();
                 if (deviceAvd != null) { // physical devices return null.
@@ -459,7 +464,7 @@ public final class AndroidLaunchController
                     }
                 } else {
                     if (projectTarget.isPlatform()) { // means this can run on any device as long
-                                                          // as api level is high enough
+                        // as api level is high enough
                         AndroidVersion deviceVersion = Sdk.getDeviceVersion(d);
                         // the deviceVersion may be null if it wasn't yet queried (device just
                         // plugged in or emulator just booting up.
@@ -575,7 +580,7 @@ public final class AndroidLaunchController
                         + "Relaunch this configuration after connecting a device or starting an AVD.");
                 stopLaunch(launchInfo);
             } else {
-                multiLaunch(launchInfo, compatibleDevices);
+                multiLaunch(launchInfo, compatibleDevices, gradroidLaunch);
             }
             return;
         }
@@ -692,9 +697,12 @@ public final class AndroidLaunchController
      * @param launch The eclipse launch info
      * @param launchInfo The {@link DelayedLaunchInfo}
      * @param config The config needed to start a new emulator.
+     * @param gradroidLaunch
+     * @throws CoreException
      */
     private void continueLaunch(final DeviceChooserResponse response, final IProject project,
-            final AndroidLaunch launch, final DelayedLaunchInfo launchInfo, final AndroidLaunchConfiguration config) {
+            final AndroidLaunch launch, final DelayedLaunchInfo launchInfo, final AndroidLaunchConfiguration config)
+                    throws CoreException {
         if (response.getAvdToLaunch() != null) {
             // there was no selected device, we start a new emulator.
             synchronized (sListLock) {
@@ -866,9 +874,12 @@ public final class AndroidLaunchController
      * stop the current AndroidLaunch and return false;
      * @param launchInfo
      * @param device
+     * @param gradroidLaunch
      * @return true if succeed
+     * @throws CoreException
      */
-    private boolean simpleLaunch(DelayedLaunchInfo launchInfo, IDevice device) {
+    private boolean simpleLaunch(DelayedLaunchInfo launchInfo, IDevice device)
+            throws CoreException {
         if (!doPreLaunchActions(launchInfo, device)) {
             AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(), "Launch canceled!");
             stopLaunch(launchInfo);
@@ -881,7 +892,8 @@ public final class AndroidLaunchController
         return true;
     }
 
-    private boolean doPreLaunchActions(DelayedLaunchInfo launchInfo, IDevice device) {
+    private boolean doPreLaunchActions(DelayedLaunchInfo launchInfo, IDevice device)
+            throws CoreException {
         // API level check
         if (!checkBuildInfo(launchInfo, device)) {
             return false;
@@ -895,7 +907,8 @@ public final class AndroidLaunchController
         return true;
     }
 
-    private void multiLaunch(DelayedLaunchInfo launchInfo, Collection<IDevice> devices) {
+    private void multiLaunch(DelayedLaunchInfo launchInfo, Collection<IDevice> devices, boolean gradroidLaunch)
+            throws CoreException {
         for (IDevice d : devices) {
             boolean success = doPreLaunchActions(launchInfo, d);
             if (!success) {
@@ -918,9 +931,11 @@ public final class AndroidLaunchController
      *
      * @param launchInfo The Launch information object.
      * @param device the device on which to sync the application
+     * @param gradroidLaunch
      * @return true if the install succeeded.
+     * @throws CoreException
      */
-    private boolean syncApp(DelayedLaunchInfo launchInfo, IDevice device) {
+    private boolean syncApp(DelayedLaunchInfo launchInfo, IDevice device) throws CoreException {
         boolean alreadyInstalled = ApkInstallManager.getInstance().isApplicationInstalled(launchInfo.getProject(),
                 launchInfo.getPackageName(), device);
 
@@ -933,13 +948,15 @@ public final class AndroidLaunchController
             }
         }
 
-        // The app is now installed, now try the dependent projects
-        for (DelayedLaunchInfo dependentLaunchInfo : getDependenciesLaunchInfo(launchInfo)) {
-            String msg = String.format("Project dependency found, installing: %s",
-                    dependentLaunchInfo.getProject().getName());
-            AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(), msg);
-            if (syncApp(dependentLaunchInfo, device) == false) {
-                return false;
+        if (!launchInfo.isGradroidLaunch()) {
+            // The app is now installed, now try the dependent projects
+            for (DelayedLaunchInfo dependentLaunchInfo : getDependenciesLaunchInfo(launchInfo)) {
+                String msg = String.format("Project dependency found, installing: %s",
+                        dependentLaunchInfo.getProject().getName());
+                AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(), msg);
+                if (syncApp(dependentLaunchInfo, device) == false) {
+                    return false;
+                }
             }
         }
 
@@ -1003,8 +1020,9 @@ public final class AndroidLaunchController
      *
      * @param launchInfo the original launch info that we want to find the
      * @return a list of DelayedLaunchInfo (may be empty if no dependencies were found or error)
+     * @throws CoreException
      */
-    public List<DelayedLaunchInfo> getDependenciesLaunchInfo(DelayedLaunchInfo launchInfo) {
+    public List<DelayedLaunchInfo> getDependenciesLaunchInfo(DelayedLaunchInfo launchInfo) throws CoreException {
         List<DelayedLaunchInfo> dependencies = new ArrayList<DelayedLaunchInfo>();
 
         // Convert to equivalent JavaProject
@@ -1039,7 +1057,7 @@ public final class AndroidLaunchController
             }
 
             // Get the APK location (can return null)
-            IFile apk = ProjectHelper.getApplicationPackage(androidProject.getProject());
+            IFile apk = ProjectHelper.getApplicationPackage(androidProject.getProject(), new NullProgressMonitor());
             if (apk == null) {
                 // getApplicationPackage will have logged an error message
                 continue;
@@ -1049,7 +1067,7 @@ public final class AndroidLaunchController
             DelayedLaunchInfo delayedLaunchInfo = new DelayedLaunchInfo(androidProject.getProject(),
                     manifestData.getPackage(), manifestData.getPackage(), launchInfo.getLaunchAction(), apk,
                     manifestData.getDebuggable(), manifestData.getMinSdkVersionString(), launchInfo.getLaunch(),
-                    launchInfo.getMonitor());
+                    launchInfo.getMonitor(), false);
 
             // Add to the list
             dependencies.add(delayedLaunchInfo);
@@ -1131,7 +1149,7 @@ public final class AndroidLaunchController
                             String.format("Failed to uninstall: %1$s", res));
                     return false;
                 }
-                */
+                 */
 
                 AndmoreAndroidPlugin.printToConsole(launchInfo.getProject(),
                         "Application already exists. Attempting to re-install instead...");
@@ -1148,10 +1166,10 @@ public final class AndroidLaunchController
                     "Please check logcat output for more details.");
         } else if (result.equals("INSTALL_FAILED_COULDNT_COPY")) { //$NON-NLS-1$
             AndmoreAndroidPlugin
-                    .printErrorToConsole(launchInfo.getProject(),
-                            String.format("Installation failed: Could not copy %1$s to its final location!",
-                                    launchInfo.getPackageFile().getName()),
-                            "Please check logcat output for more details.");
+            .printErrorToConsole(launchInfo.getProject(),
+                    String.format("Installation failed: Could not copy %1$s to its final location!",
+                            launchInfo.getPackageFile().getName()),
+                    "Please check logcat output for more details.");
         } else if (result.equals("INSTALL_PARSE_FAILED_INCONSISTENT_CERTIFICATES")) { //$NON-NLS-1$
             if (retryMode != InstallRetryMode.NEVER) {
                 boolean prompt = AndmoreAndroidPlugin.displayPrompt("Application Install",
@@ -1575,14 +1593,18 @@ public final class AndroidLaunchController
                                         String.format("HOME is up on device '%1$s'", device.getSerialNumber()));
 
                                 // attempt to sync the new package onto the device.
-                                if (syncApp(launchInfo, device)) {
-                                    // application package is sync'ed, lets attempt to launch it.
-                                    launchApp(launchInfo, device);
-                                } else {
-                                    // failure! Cancel and return
-                                    AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
-                                            "Launch canceled!");
-                                    stopLaunch(launchInfo);
+                                try {
+                                    if (syncApp(launchInfo, device)) {
+                                        // application package is sync'ed, lets attempt to launch it.
+                                        launchApp(launchInfo, device);
+                                    } else {
+                                        // failure! Cancel and return
+                                        AndmoreAndroidPlugin.printErrorToConsole(launchInfo.getProject(),
+                                                "Launch canceled!");
+                                        stopLaunch(launchInfo);
+                                    }
+                                } catch (CoreException e) {
+                                    AndmoreAndroidPlugin.log(e, "");
                                 }
 
                                 break;

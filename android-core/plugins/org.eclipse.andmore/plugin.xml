@@ -351,6 +351,19 @@
             sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
         </launchConfigurationType>
     </extension>
+    <extension point="org.eclipse.debug.core.launchConfigurationTypes">
+        <launchConfigurationType
+            delegate="org.eclipse.andmore.android.gradle.GradroidLaunchConfigDelegate"
+            delegateDescription="The Android Application Launcher supports running and debugging remote Android applications on devices or emulators."
+            delegateName="Gradroid Launcher"
+            id="org.eclipse.andmore.debug.GradroidLaunchConfigType"
+            modes="debug, run"
+            name="Gradroid Application"
+            public="true"
+            sourceLocatorId="org.eclipse.andmore.internal.sourcelookup.AdtSourceLookupDirector"
+            sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
+        </launchConfigurationType>
+    </extension>
     <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
         <launchConfigurationTypeImage
             configTypeID="org.eclipse.andmore.debug.LaunchConfigType"
@@ -409,6 +422,74 @@
             </description>
             <description
                 description="Debugs an Android Application"
+                mode="debug">
+            </description>
+        </shortcut>
+    </extension>
+    <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+        <launchConfigurationTypeImage
+            configTypeID="org.eclipse.andmore.debug.GradroidLaunchConfigType"
+            icon="icons/android_app.png"
+            id="org.eclipse.andmore.debug.GradroidLaunchConfigTypeImage" />
+    </extension>
+    <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+        <launchConfigurationTabGroup
+            class="org.eclipse.andmore.internal.launch.LaunchConfigTabGroup"
+            description="Gradroid Application"
+            id="org.eclipse.andmore.debug.GradroidLaunchConfigTabGroup"
+            type="org.eclipse.andmore.debug.GradroidLaunchConfigType" />
+    </extension>
+    <extension point="org.eclipse.debug.ui.launchShortcuts">
+        <shortcut
+            class="org.eclipse.andmore.android.gradle.GradroidLaunchShortcut"
+            icon="icons/android_app.png"
+            id="org.eclipse.andmore.debug.launching.GradroidLaunchShortcut"
+            label="Gradroid Application"
+            modes="run, debug">
+            <contextualLaunch>
+                <enablement>
+                    <with variable="selection">
+                        <count value="1" />
+                        <iterate>
+                            <or>
+                                <adapt type="org.eclipse.core.resources.IFile">
+                                    <and>
+                                        <test
+                                            property="org.eclipse.core.resources.contentTypeId"
+                                            value="org.eclipse.core.runtime.xml" />
+                                        <test
+                                            property="org.eclipse.core.resources.projectNature"
+                                            value="org.eclipse.andmore.AndroidNature" />
+                                        <test
+                                            property="org.eclipse.core.resources.projectNature"
+                                            value="org.eclipse.buildship.core.gradleprojectnature" />
+                                    </and>
+                                </adapt>
+                                <and>
+                                    <test property="org.eclipse.jdt.launching.isContainer" />
+                                    <test
+                                        property="org.eclipse.jdt.launching.hasProjectNature"
+                                        args="org.eclipse.andmore.AndroidNature" />
+                                    <test
+                                        property="org.eclipse.jdt.launching.hasProjectNature"
+                                        args="org.eclipse.buildship.core.gradleprojectnature" />
+                                </and>
+                            </or>
+                        </iterate>
+                    </with>
+                </enablement>
+            </contextualLaunch>
+            <perspective id="org.eclipse.jdt.ui.JavaPerspective" />
+            <perspective id="org.eclipse.andmore.android.perspective"/>
+            <perspective id="org.eclipse.debug.ui.DebugPerspective" />
+            <configurationType id="org.eclipse.andmore.debug.LaunchConfigType">
+            </configurationType>
+            <description
+                description="Runs an Gradroid Application"
+                mode="run">
+            </description>
+            <description
+                description="Debugs an Gradroid Application"
                 mode="debug">
             </description>
         </shortcut>

@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.JavaCore;
 
+import com.android.builder.model.AndroidArtifact;
 import com.android.builder.model.AndroidProject;
 import com.android.builder.model.Variant;
 import com.gradleware.tooling.toolingclient.BuildLaunchRequest;
@@ -304,6 +305,17 @@ public class Gradroid {
         }
 
         return model;
+    }
+
+    public void assemble(IProject project, IProgressMonitor monitor) {
+        Variant variant = getProjectVariant(project);
+        AndroidArtifact mainArtifact = variant.getMainArtifact();
+        String assembleTaskName = mainArtifact.getAssembleTaskName();
+        BuildLaunchRequest buildRequest = CorePlugin.toolingClient()
+                .newBuildLaunchRequest(LaunchableConfig.forTasks(assembleTaskName));
+
+        buildRequest.projectDir(project.getLocation().toFile());
+        buildRequest.executeAndWait();
     }
 
     private Gradroid() {}

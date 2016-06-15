@@ -97,18 +97,27 @@ public class AndroidJUnitLaunchConfigDelegate extends LaunchConfigDelegate {
             Job job = new Job("Junit Launch") { //$NON-NLS-1$
                 @Override
                 protected IStatus run(IProgressMonitor m) {
-                    controller.launch(project, mode, applicationPackage, testAppPackage, targetAppPackage,
-                            manifestData.getDebuggable(), manifestData.getMinSdkVersionString(), junitLaunch, config,
-                            androidLaunch, monitor);
+                    try {
+                        controller.launch(project, mode, applicationPackage, testAppPackage, targetAppPackage,
+                                manifestData.getDebuggable(), manifestData.getMinSdkVersionString(), junitLaunch, config,
+                                androidLaunch, monitor, false);
+                    } catch (CoreException e) {
+                        AndmoreAndroidPlugin.log(e, "");
+                    }
+
                     return Status.OK_STATUS;
                 }
             };
             job.setPriority(Job.INTERACTIVE);
             job.schedule();
         } else {
-            controller.launch(project, mode, applicationPackage, testAppPackage, targetAppPackage,
-                    manifestData.getDebuggable(), manifestData.getMinSdkVersionString(), junitLaunch, config,
-                    androidLaunch, monitor);
+            try {
+                controller.launch(project, mode, applicationPackage, testAppPackage, targetAppPackage,
+                        manifestData.getDebuggable(), manifestData.getMinSdkVersionString(), junitLaunch, config,
+                        androidLaunch, monitor, false);
+            } catch (CoreException e) {
+                AndmoreAndroidPlugin.log(e, "");
+            }
         }
     }
 

@@ -32,6 +32,8 @@ public final class DelayedLaunchInfo {
         NEVER, ALWAYS, PROMPT;
     }
 
+    private final boolean mGradroidLaunch;
+
     /** The device on which to launch the app */
     private IDevice mDevice = null;
 
@@ -88,7 +90,7 @@ public final class DelayedLaunchInfo {
      */
     public DelayedLaunchInfo(IProject project, String packageName, String debugPackageName,
             IAndroidLaunchAction launchAction, IFile pack, Boolean debuggable, String requiredApiVersionNumber,
-            AndroidLaunch launch, IProgressMonitor monitor) {
+            AndroidLaunch launch, IProgressMonitor monitor, boolean gradroidLaunch) {
         mProject = project;
         mPackageName = packageName;
         mDebugPackageName = debugPackageName;
@@ -98,6 +100,11 @@ public final class DelayedLaunchInfo {
         mMonitor = monitor;
         mDebuggable = debuggable;
         mRequiredApiVersionNumber = requiredApiVersionNumber;
+        mGradroidLaunch = gradroidLaunch;
+    }
+
+    public boolean isGradroidLaunch() {
+        return mGradroidLaunch;
     }
 
     /**

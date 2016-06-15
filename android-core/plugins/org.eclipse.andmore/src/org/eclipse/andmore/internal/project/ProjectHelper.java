@@ -1071,8 +1071,19 @@ public final class ProjectHelper {
      * project.
      * @param project The project
      * @return The android package as an IFile object or null if not found.
+     * @throws CoreException
      */
-    public static IFile getApplicationPackage(IProject project) {
+    public static IFile getApplicationPackage(IProject project, IProgressMonitor monitor) throws CoreException {
+
+        if (Gradroid.get().isGradroidProject(project)) {
+            Gradroid.get().loadAndroidModel(project, monitor);
+
+            Variant variant = Gradroid.get().getProjectVariant(project);
+            File file = variant.getMainArtifact().getOutputs().iterator().next().getMainOutputFile().getOutputFile();
+
+            return getProjectFile(project, file);
+        }
+
         // get the output folder
         IFolder outputLocation = BaseProjectHelper.getAndroidOutputFolder(project);
 

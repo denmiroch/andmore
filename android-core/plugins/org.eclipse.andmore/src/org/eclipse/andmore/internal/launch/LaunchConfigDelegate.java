@@ -15,6 +15,7 @@ package org.eclipse.andmore.internal.launch;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.android.gradle.Gradroid;
 import org.eclipse.andmore.internal.launch.AndroidLaunchConfiguration.TargetMode;
 import org.eclipse.andmore.internal.project.AndroidManifestHelper;
 import org.eclipse.andmore.internal.project.ProjectHelper;
@@ -141,11 +142,15 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
             return;
         }
 
-        // make sure the project and its dependencies are built
-        // and PostCompilerBuilder runs.
-        // This is a synchronous call which returns when the
-        // build is done.
-        ProjectHelper.doFullIncrementalDebugBuild(project, monitor);
+        if (isGradroidLaunch()) {
+            Gradroid.get().assemble(project, monitor);
+        } else {
+            // make sure the project and its dependencies are built
+            // and PostCompilerBuilder runs.
+            // This is a synchronous call which returns when the
+            // build is done.
+            ProjectHelper.doFullIncrementalDebugBuild(project, monitor);
+        }
 
         // check if the project has errors, and abort in this case.
         if (ProjectHelper.hasError(project, true)) {
@@ -219,7 +224,7 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
         AndroidLaunchController controller = AndroidLaunchController.getInstance();
 
         // get the application package
-        IFile applicationPackage = ProjectHelper.getApplicationPackage(project);
+        IFile applicationPackage = ProjectHelper.getApplicationPackage(project, monitor);
         if (applicationPackage == null) {
             androidLaunch.stopLaunch();
             return;
@@ -316,9 +321,13 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
 
         // everything seems fine, we ask the launch controller to handle
         // the rest
-        controller.launch(project, mode, applicationPackage, manifestData.getPackage(), manifestData.getPackage(),
-                manifestData.getDebuggable(), manifestData.getMinSdkVersionString(), launchAction, config,
-                androidLaunch, monitor);
+        try {
+            controller.launch(project, mode, applicationPackage, manifestData.getPackage(), manifestData.getPackage(),
+                    manifestData.getDebuggable(), manifestData.getMinSdkVersionString(), launchAction, config,
+                    androidLaunch, monitor, isGradroidLaunch());
+        } catch (CoreException e) {
+            AndmoreAndroidPlugin.log(e, "");
+        }
     }
 
     @Override
@@ -404,5 +413,9 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
         AndmoreAndroidPlugin.printErrorToConsole(project, "No Launcher activity found!",
                 "The launch will only sync the application package on the device!");
         config.mLaunchAction = ACTION_DO_NOTHING;
+    }
+
+    protected boolean isGradroidLaunch() {
+        return false;
     }
 }
