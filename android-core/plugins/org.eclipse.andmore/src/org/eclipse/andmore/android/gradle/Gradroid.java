@@ -57,7 +57,7 @@ public class Gradroid {
     private HashMap<IProject, AndroidProject> mModels = new HashMap<IProject, AndroidProject>();
     private HashMap<IProject, String> mVariants = new HashMap<IProject, String>();
 
-    private ListenerList<OnProjectModelChanged> mOnProjectModelChangedListeners = new ListenerList<Gradroid.OnProjectModelChanged>();
+    private ListenerList mOnProjectModelChangedListeners = new ListenerList();
 
     public interface OnProjectModelChanged {
         void onProjectModelChanged(IProject project, AndroidProject model);
@@ -212,7 +212,10 @@ public class Gradroid {
         synchronized (LOCK) {
             mModels.put(project, model);
 
-            for (OnProjectModelChanged listener : mOnProjectModelChangedListeners) {
+            Object[] listeners = mOnProjectModelChangedListeners.getListeners();
+
+            for (Object object : listeners) {
+                OnProjectModelChanged listener = (OnProjectModelChanged) object;
                 listener.onProjectModelChanged(project, model);
             }
         }

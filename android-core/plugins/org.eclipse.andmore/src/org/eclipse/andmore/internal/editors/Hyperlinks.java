@@ -1388,7 +1388,7 @@ public class Hyperlinks {
             // Most of this is identical to the builtin JavaElementHyperlinkDetector --
             // everything down to the Android R filtering below
 
-            ITextEditor textEditor = getAdapter(ITextEditor.class);
+            ITextEditor textEditor = (ITextEditor)getAdapter(ITextEditor.class);
             if (region == null || !(textEditor instanceof JavaEditor)) {
                 return null;
             }

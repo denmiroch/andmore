@@ -38,6 +38,9 @@
 
 	<properties>
 		<tycho-version>0.24.0</tycho-version>
+		<buildship-site>http://builds.gradle.org:8000/eclipse/update-site/mirror/orbit-mars/</buildship-site>
+		<buildship_other-site>http://builds.gradle.org:8000/eclipse/update-site/mirror/swtbot/release/</buildship_other-site>
+		<gradletool-site>jar:https://repo.gradle.org/gradle/tooling-libs-snapshots-local/com/gradleware/tooling/p2-repository/0.12.0-20160413230024/p2-repository-0.12.0-20160413230024.zip!/</gradletool-site>
 		<eclipse-site>http://download.eclipse.org/releases/mars/</eclipse-site>
 		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20140114142710/repository</orbit-site>
 		<sequoyah-site>http://download.eclipse.org/sequoyah/updates/2.1/</sequoyah-site>
@@ -45,6 +48,21 @@
 	</properties>
 
 	<repositories>
+		<repository>
+			<id>buildship</id>
+			<layout>p2</layout>
+			<url>${buildship-site}</url>
+		</repository>
+		<repository>
+			<id>gradletool</id>
+			<layout>p2</layout>
+			<url>${gradletool-site}</url>
+		</repository>
+		<repository>
+			<id>buildship_other</id>
+			<layout>p2</layout>
+			<url>${buildship_other-site}</url>
+		</repository>
 		<repository>
 			<id>sequoyah</id>
 			<layout>p2</layout>
