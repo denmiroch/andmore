@@ -14,6 +14,7 @@ import org.eclipse.andmore.internal.project.LibraryClasspathContainerInitializer
 import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.buildship.core.CorePlugin;
 import org.eclipse.buildship.core.configuration.GradleProjectNature;
+import org.eclipse.buildship.core.console.ProcessStreams;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -246,6 +247,11 @@ public class Gradroid {
                 ModelRequest<AndroidProject> modelRequest = CorePlugin.toolingClient()
                         .newModelRequest(AndroidProject.class);
 
+                ProcessStreams processStreams = CorePlugin.processStreamsProvider().getBackgroundJobProcessStreams();
+                modelRequest.standardOutput(processStreams.getOutput());
+                modelRequest.standardError(processStreams.getError());
+                modelRequest.standardInput(processStreams.getInput());
+
                 modelRequest.projectDir(project.getLocation().toFile());
                 modelRequest.arguments(AndroidProject.PROPERTY_BUILD_MODEL_ONLY_VERSIONED + "="
                         + AndroidProject.MODEL_LEVEL_2_DEP_GRAPH);
@@ -311,14 +317,25 @@ public class Gradroid {
     }
 
     public void assemble(IProject project, IProgressMonitor monitor) {
+
+        monitor.beginTask("Assemble", 1);
+
         Variant variant = getProjectVariant(project);
         AndroidArtifact mainArtifact = variant.getMainArtifact();
         String assembleTaskName = mainArtifact.getAssembleTaskName();
         BuildLaunchRequest buildRequest = CorePlugin.toolingClient()
                 .newBuildLaunchRequest(LaunchableConfig.forTasks(assembleTaskName));
 
+        ProcessStreams processStreams = CorePlugin.processStreamsProvider().getBackgroundJobProcessStreams();
+        buildRequest.standardOutput(processStreams.getOutput());
+        buildRequest.standardError(processStreams.getError());
+        buildRequest.standardInput(processStreams.getInput());
+
         buildRequest.projectDir(project.getLocation().toFile());
         buildRequest.executeAndWait();
+
+        monitor.worked(1);
+        monitor.done();
     }
 
     private Gradroid() {}
