@@ -499,6 +499,10 @@ public final class ProjectHelper {
     }
 
     private static void makeDerived(IFolder folder, IProgressMonitor monitor) throws CoreException {
+        if (!folder.isAccessible()) {
+            return;
+        }
+
         IResource[] list = folder.members();
         for (IResource member : list) {
             if (member.exists()) {
@@ -570,7 +574,7 @@ public final class ProjectHelper {
         return project.getFolder(sourcePath);
     }
 
-    private static IFile getProjectFile(IProject project, File file) {
+    public static IFile getProjectFile(IProject project, File file) {
         IPath projectPath = new Path(project.getLocation().toFile().getAbsolutePath());
         String path = file.getAbsolutePath();
         IPath sourcePath = new Path(path);

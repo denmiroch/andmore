@@ -23,6 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -622,6 +623,12 @@ public class PreCompilerBuilder extends BaseBuilder {
                 } catch (IOException e) {
                     handleException(e, "Failed to create BuildConfig class");
                     return result;
+                } catch (XPathExpressionException e) {
+                    handleException(e, "Failed to create BuildConfig class");
+                    return result;
+                } catch (StreamException e) {
+                    handleException(e, "Failed to create BuildConfig class");
+                    return result;
                 }
             }
             // merge the manifest
@@ -680,8 +687,14 @@ public class PreCompilerBuilder extends BaseBuilder {
                     proguardFile = androidOutputFolder.getFile(AndmoreAndroidConstants.FN_AAPT_PROGUARD);
                 }
 
-                handleResources(project, javaPackage, projectTarget, manifestFile, resOutFolder, libProjects, isLibrary,
-                        proguardFile, monitor);
+                try {
+                    handleResources(project, javaPackage, projectTarget, manifestFile, resOutFolder, libProjects, isLibrary,
+                            proguardFile, monitor);
+                } catch (XPathExpressionException e) {
+                    AndmoreAndroidPlugin.log(e, "");
+                } catch (StreamException e) {
+                    AndmoreAndroidPlugin.log(e, "");
+                }
             }
 
             if (processorStatus == SourceProcessor.COMPILE_STATUS_NONE && compiledTheResources == false) {
@@ -852,7 +865,7 @@ public class PreCompilerBuilder extends BaseBuilder {
 
     @SuppressWarnings("deprecation")
     private void handleBuildConfig(@SuppressWarnings("rawtypes") Map args, IProject project, IProgressMonitor monitor)
-            throws IOException, CoreException {
+            throws IOException, CoreException, XPathExpressionException, StreamException {
         boolean debugMode = !args.containsKey(RELEASE_REQUESTED);
 
         BuildConfigGenerator generator = new BuildConfigGenerator(mGenFolder.getLocation().toOSString(),
@@ -984,10 +997,12 @@ public class PreCompilerBuilder extends BaseBuilder {
      * @param monitor
      * @throws CoreException
      * @throws AbortBuildException
+     * @throws StreamException
+     * @throws XPathExpressionException
      */
     private void handleResources(IProject project, String javaPackage, IAndroidTarget projectTarget, IFile manifest,
             IFolder resOutFolder, List<IProject> libProjects, boolean isLibrary, IFile proguardFile, IProgressMonitor monitor)
-                    throws CoreException, AbortBuildException {
+                    throws CoreException, AbortBuildException, XPathExpressionException, StreamException {
         // get the resource folder
         List<IFolder> resFolders = ProjectHelper.getResFolders(project, monitor);
 
@@ -1090,12 +1105,14 @@ public class PreCompilerBuilder extends BaseBuilder {
      * @param proguardFile an optional path to store proguard information
      * @throws AbortBuildException
      * @throws CoreException
+     * @throws StreamException
+     * @throws XPathExpressionException
      */
     @SuppressWarnings("deprecation")
     private void execAapt(IProject project, IAndroidTarget projectTarget, String osOutputPath, String osBcOutPath,
             List<String> osResPath, String osManifestPath, IFolder packageFolder, List<IFolder> libResFolders,
             List<Pair<File, String>> libRFiles, boolean isLibrary, String proguardFile, IProgressMonitor monitor)
-            throws AbortBuildException, CoreException {
+                    throws AbortBuildException, CoreException, XPathExpressionException, StreamException {
 
         // We actually need to delete the manifest.java as it may become empty and
         // in this case aapt doesn't generate an empty one, but instead doesn't
@@ -1333,8 +1350,11 @@ public class PreCompilerBuilder extends BaseBuilder {
      * @return the {@link IFolder} that will contain the R class or null if
      * the folder was not found.
      * @throws CoreException
+     * @throws StreamException
+     * @throws XPathExpressionException
      */
-    private IFolder getGenManifestPackageFolder(IProject project, IProgressMonitor monitor) throws CoreException {
+    private IFolder getGenManifestPackageFolder(IProject project, IProgressMonitor monitor)
+            throws CoreException, XPathExpressionException, StreamException {
         String javaPackage = getMainPackage(project, monitor);
 
         // get the path for the package
@@ -1345,15 +1365,16 @@ public class PreCompilerBuilder extends BaseBuilder {
         return mGenFolder.getFolder(packagePath);
     }
 
-    private String getMainPackage(IProject project, IProgressMonitor monitor) throws CoreException {
+    private String getMainPackage(IProject project, IProgressMonitor monitor)
+            throws CoreException, XPathExpressionException, StreamException {
         String javaPackage = mManifestPackage;
 
         if (Gradroid.get().isGradroidProject(project)) {
             AndroidProject model = Gradroid.get().loadAndroidModel(project, monitor);
-            if (!model.isLibrary()) {
-                javaPackage = model.getDefaultConfig().getProductFlavor().getApplicationId();
-            }
+            File file = model.getDefaultConfig().getSourceProvider().getManifestFile();
+            javaPackage = AndroidManifest.getPackage(new IFileWrapper(ProjectHelper.getProjectFile(project, file)));
         }
+
         return javaPackage;
     }
 }
