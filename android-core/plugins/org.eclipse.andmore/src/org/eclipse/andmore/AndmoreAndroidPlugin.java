@@ -56,7 +56,6 @@ import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IProj
 import org.eclipse.andmore.internal.resources.manager.ResourceManager;
 import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.andmore.internal.sdk.Sdk.ITargetChangeListener;
-import org.eclipse.andmore.internal.ui.EclipseUiHelper;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -99,7 +98,6 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IConsoleConstants;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.dialogs.PreferencesUtil;
@@ -1084,13 +1082,13 @@ public class AndmoreAndroidPlugin extends AbstractUIPlugin implements ILogger {
 
     /** Force the display of the android console */
     public static void showAndroidConsole() {
-        // first make sure the console is in the workbench
+        /*        // first make sure the console is in the workbench
         EclipseUiHelper.showView(IConsoleConstants.ID_CONSOLE_VIEW, true);
-
+        
         // now make sure it's not docked.
         ConsolePlugin.getDefault().getConsoleManager()
                 .showConsoleView(AndmoreAndroidPlugin.getDefault().getAndroidConsole());
-    }
+        */ }
 
     /**
      * Returns whether the {@link IAndroidTarget}s have been loaded from the SDK.

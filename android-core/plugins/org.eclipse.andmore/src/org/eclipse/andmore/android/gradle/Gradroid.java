@@ -293,6 +293,11 @@ public class Gradroid {
                     BuildLaunchRequest launchRequest = CorePlugin.toolingClient()
                             .newBuildLaunchRequest(LaunchableConfig.forTasks(tasks));
 
+                    processStreams = CorePlugin.processStreamsProvider().getBackgroundJobProcessStreams();
+                    launchRequest.standardOutput(processStreams.getOutput());
+                    launchRequest.standardError(processStreams.getError());
+                    launchRequest.standardInput(processStreams.getInput());
+
                     // TODO progress, cancelation
                     launchRequest.projectDir(project.getLocation().toFile());
                     launchRequest.executeAndWait();

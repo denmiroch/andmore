@@ -547,7 +547,13 @@
                 class="org.eclipse.andmore.internal.actions.FixProjectAction"
                 enablesFor="1"
                 id="org.eclipse.andmore.project.FixProjectAction"
-                label="Fix Project Properties"
+                label="Reconfigure Project"
+                menubarPath="org.eclipse.andmore.AndroidTools/group3" />
+            <action
+                class="org.eclipse.andmore.internal.actions.RefreshProject"
+                enablesFor="1"
+                id="org.eclipse.andmore.project.FixProjectAction"
+                label="Refresh Project"
                 menubarPath="org.eclipse.andmore.AndroidTools/group3" />
             <action
                 class="org.eclipse.andmore.internal.actions.AddSupportJarAction"

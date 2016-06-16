@@ -28,10 +28,7 @@ import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.android.gradle.Gradroid;
 import org.eclipse.andmore.internal.build.AaptParser;
-import org.eclipse.andmore.internal.build.AidlProcessor;
 import org.eclipse.andmore.internal.build.Messages;
-import org.eclipse.andmore.internal.build.RenderScriptLauncher;
-import org.eclipse.andmore.internal.build.RsSourceChangeHandler;
 import org.eclipse.andmore.internal.build.SourceProcessor;
 import org.eclipse.andmore.internal.lint.EclipseLintClient;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
@@ -70,6 +67,7 @@ import org.xml.sax.SAXException;
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
+import com.android.builder.model.AndroidProject;
 import com.android.ide.common.xml.ManifestData;
 import com.android.io.StreamException;
 import com.android.manifmerger.ManifestMerger;
@@ -78,7 +76,6 @@ import com.android.sdklib.AndroidVersion;
 import com.android.sdklib.BuildToolInfo;
 import com.android.sdklib.IAndroidTarget;
 import com.android.sdklib.build.RenderScriptChecker;
-import com.android.sdklib.build.RenderScriptProcessor;
 import com.android.sdklib.internal.build.BuildConfigGenerator;
 import com.android.sdklib.internal.build.SymbolLoader;
 import com.android.sdklib.internal.build.SymbolWriter;
@@ -148,8 +145,8 @@ public class PreCompilerBuilder extends BaseBuilder {
      */
     private DerivedProgressMonitor mDerivedProgressMonitor;
 
-    private AidlProcessor mAidlProcessor;
-    private RsSourceChangeHandler mRenderScriptSourceChangeHandler;
+    //    private AidlProcessor mAidlProcessor;
+    //    private RsSourceChangeHandler mRenderScriptSourceChangeHandler;
 
     /**
      * Progress monitor waiting the end of the process to set a persistent value
@@ -305,8 +302,8 @@ public class PreCompilerBuilder extends BaseBuilder {
                 mMustCompileResources = true;
                 mMustCreateBuildConfig = true;
 
-                mAidlProcessor.prepareFullBuild(project);
-                mRenderScriptSourceChangeHandler.prepareFullBuild();
+                //                mAidlProcessor.prepareFullBuild(project);
+                //                mRenderScriptSourceChangeHandler.prepareFullBuild();
             } else {
                 AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, project,
                         Messages.Start_Inc_Pre_Compiler);
@@ -319,11 +316,11 @@ public class PreCompilerBuilder extends BaseBuilder {
                 if (delta == null) {
                     mMustCompileResources = true;
 
-                    mAidlProcessor.prepareFullBuild(project);
-                    mRenderScriptSourceChangeHandler.prepareFullBuild();
+                    //                    mAidlProcessor.prepareFullBuild(project);
+                    //                    mRenderScriptSourceChangeHandler.prepareFullBuild();
                 } else {
-                    dv = new PreCompilerDeltaVisitor(this, sourceFolderPathList, mAidlProcessor.getChangeHandler(),
-                            mRenderScriptSourceChangeHandler);
+                    dv = new PreCompilerDeltaVisitor(this, sourceFolderPathList/*, mAidlProcessor.getChangeHandler(),
+                                                                               mRenderScriptSourceChangeHandler*/);
                     delta.accept(dv);
 
                     // Check to see if Manifest.xml, Manifest.java, or R.java have changed:
@@ -361,7 +358,7 @@ public class PreCompilerBuilder extends BaseBuilder {
                         }
                     } // else: already processed the deltas in ResourceManager's IRawDeltaListener
 
-                    mAidlProcessor.doneVisiting(project);
+                    //                    mAidlProcessor.doneVisiting(project);
 
                     // get the java package from the visitor
                     javaPackage = dv.getManifestPackage();
@@ -611,8 +608,8 @@ public class PreCompilerBuilder extends BaseBuilder {
                 mMustMergeManifest = true;
                 mMustCompileResources = true;
                 mMustCreateBuildConfig = true;
-                mAidlProcessor.prepareFullBuild(project);
-                mRenderScriptSourceChangeHandler.prepareFullBuild();
+                //                mAidlProcessor.prepareFullBuild(project);
+                //                mRenderScriptSourceChangeHandler.prepareFullBuild();
 
                 saveProjectBooleanProperty(PROPERTY_MERGE_MANIFEST, mMustMergeManifest);
                 saveProjectBooleanProperty(PROPERTY_COMPILE_RESOURCES, mMustCompileResources);
@@ -621,7 +618,7 @@ public class PreCompilerBuilder extends BaseBuilder {
 
             if (!Gradroid.get().isGradroidProject(project)) {
                 try {
-                    handleBuildConfig(args);
+                    handleBuildConfig(args, project, monitor);
                 } catch (IOException e) {
                     handleException(e, "Failed to create BuildConfig class");
                     return result;
@@ -648,21 +645,21 @@ public class PreCompilerBuilder extends BaseBuilder {
             // run the source processors
             int processorStatus = SourceProcessor.COMPILE_STATUS_NONE;
 
-            try {
+            /*            try {
                 processorStatus |= mAidlProcessor.compileFiles(this, project, projectTarget, sourceFolderPathList,
                         libProjectsOut, monitor);
             } catch (Throwable t) {
                 handleException(t, "Failed to run aidl. Check workspace log for detail.");
                 return result;
             }
-
-            try {
+             */
+            /*            try {
                 processorStatus |= compileRs(minSdkValue, projectState, androidOutputFolder, resOutFolder, monitor);
             } catch (Throwable t) {
                 handleException(t, "Failed to run renderscript. Check workspace log for detail.");
                 return result;
             }
-
+             */
             // if a processor created some resources file, force recompilation of the resources.
             if ((processorStatus & SourceProcessor.COMPILE_STATUS_RES) != 0) {
                 mMustCompileResources = true;
@@ -783,12 +780,12 @@ public class PreCompilerBuilder extends BaseBuilder {
 
     private void setupSourceProcessors(@NonNull IJavaProject javaProject, @NonNull ProjectState projectState,
             @NonNull List<IPath> sourceFolderPathList, @NonNull IFolder androidOutputFolder) {
-        if (mAidlProcessor == null) {
+        /*        if (mAidlProcessor == null) {
             mAidlProcessor = new AidlProcessor(javaProject, mBuildToolInfo, mGenFolder);
         } else {
             mAidlProcessor.setBuildToolInfo(mBuildToolInfo);
         }
-
+         */
         List<File> sourceFolders = Lists.newArrayListWithCapacity(sourceFolderPathList.size());
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
@@ -804,10 +801,10 @@ public class PreCompilerBuilder extends BaseBuilder {
 
         RenderScriptChecker checker = new RenderScriptChecker(sourceFolders,
                 androidOutputFolder.getLocation().toFile());
-        mRenderScriptSourceChangeHandler = new RsSourceChangeHandler(checker);
+        //        mRenderScriptSourceChangeHandler = new RsSourceChangeHandler(checker);
     }
 
-    private int compileRs(int minSdkValue, @NonNull ProjectState projectState, @NonNull IFolder androidOutputFolder,
+    /*private int compileRs(int minSdkValue, @NonNull ProjectState projectState, @NonNull IFolder androidOutputFolder,
             @NonNull IFolder resOutFolder, @NonNull IProgressMonitor monitor) throws IOException, InterruptedException {
         if (!mRenderScriptSourceChangeHandler.mustCompile()) {
             return SourceProcessor.COMPILE_STATUS_NONE;
@@ -835,7 +832,7 @@ public class PreCompilerBuilder extends BaseBuilder {
         RenderScriptProcessor processor = new RenderScriptProcessor(inputs, importFolders, buildFolder,
                 mGenFolder.getLocation().toFile(), resOutFolder.getLocation().toFile(),
                 new File(buildFolder, SdkConstants.FD_RS_OBJ), new File(buildFolder, SdkConstants.FD_RS_LIBS),
-                mBuildToolInfo, rsTarget, false /*debugBuild, always false for now*/, 3,
+                mBuildToolInfo, rsTarget, false debugBuild, always false for now, 3,
                 projectState.getRenderScriptSupportMode());
 
         // clean old dependency files fiest
@@ -845,16 +842,17 @@ public class PreCompilerBuilder extends BaseBuilder {
         processor.cleanOldOutput(checker.getOldOutputs());
 
         RenderScriptLauncher launcher = new RenderScriptLauncher(getProject(), mGenFolder, resOutFolder, monitor,
-                AdtPrefs.getPrefs().getBuildVerbosity() == BuildVerbosity.VERBOSE /*verbose*/);
+                AdtPrefs.getPrefs().getBuildVerbosity() == BuildVerbosity.VERBOSE verbose);
 
         // and run the build
         processor.build(launcher);
 
         return SourceProcessor.COMPILE_STATUS_CODE | SourceProcessor.COMPILE_STATUS_RES;
-    }
+    }*/
 
     @SuppressWarnings("deprecation")
-    private void handleBuildConfig(@SuppressWarnings("rawtypes") Map args) throws IOException, CoreException {
+    private void handleBuildConfig(@SuppressWarnings("rawtypes") Map args, IProject project, IProgressMonitor monitor)
+            throws IOException, CoreException {
         boolean debugMode = !args.containsKey(RELEASE_REQUESTED);
 
         BuildConfigGenerator generator = new BuildConfigGenerator(mGenFolder.getLocation().toOSString(),
@@ -862,7 +860,7 @@ public class PreCompilerBuilder extends BaseBuilder {
 
         if (mMustCreateBuildConfig == false) {
             // check the file is present.
-            IFolder folder = getGenManifestPackageFolder();
+            IFolder folder = getGenManifestPackageFolder(project, monitor);
             if (folder.exists(new Path(BuildConfigGenerator.BUILD_CONFIG_NAME)) == false) {
                 mMustCreateBuildConfig = true;
                 AndmoreAndroidPlugin.printBuildToConsole(BuildVerbosity.VERBOSE, getProject(),
@@ -1028,7 +1026,7 @@ public class PreCompilerBuilder extends BaseBuilder {
 
             // we need to figure out where to store the R class.
             // get the parent folder for R.java and update mManifestPackageSourceFolder
-            IFolder mainPackageFolder = getGenManifestPackageFolder();
+            IFolder mainPackageFolder = getGenManifestPackageFolder(project, monitor);
 
             List<IFolder> libResFolders;
             List<Pair<File, String>> libRFiles;
@@ -1331,9 +1329,16 @@ public class PreCompilerBuilder extends BaseBuilder {
      * the folder was not found.
      * @throws CoreException
      */
-    private IFolder getGenManifestPackageFolder() throws CoreException {
+    private IFolder getGenManifestPackageFolder(IProject project, IProgressMonitor monitor) throws CoreException {
+        String javaPackage = mManifestPackage;
+
+        if (Gradroid.get().isGradroidProject(project)) {
+            AndroidProject model = Gradroid.get().loadAndroidModel(project, monitor);
+            javaPackage = model.getDefaultConfig().getProductFlavor().getApplicationId();
+        }
+
         // get the path for the package
-        IPath packagePath = getJavaPackagePath(mManifestPackage);
+        IPath packagePath = getJavaPackagePath(javaPackage);
 
         // get a folder for this path under the 'gen' source folder, and return it.
         // This IFolder may not reference an actual existing folder.

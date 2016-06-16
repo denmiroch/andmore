@@ -43,7 +43,7 @@ import com.android.annotations.NonNull;
  * doc</li>
  * </ul>
  */
-public class FixProjectAction implements IObjectActionDelegate {
+public class RefreshProjectAction implements IObjectActionDelegate {
 
     private ISelection mSelection;
 
@@ -98,7 +98,7 @@ public class FixProjectAction implements IObjectActionDelegate {
                         monitor.beginTask("Fix Project Properties", 6);
                     }
 
-                    ProjectHelper.fixProject(project, monitor, true);
+                    ProjectHelper.fixProject(project, monitor, false);
                     if (monitor != null) {
                         monitor.worked(1);
                     }
