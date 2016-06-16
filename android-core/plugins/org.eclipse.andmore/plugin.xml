@@ -547,12 +547,12 @@
                 class="org.eclipse.andmore.internal.actions.FixProjectAction"
                 enablesFor="1"
                 id="org.eclipse.andmore.project.FixProjectAction"
-                label="Reconfigure Project"
+                label="Reload Project"
                 menubarPath="org.eclipse.andmore.AndroidTools/group3" />
             <action
-                class="org.eclipse.andmore.internal.actions.RefreshProject"
+                class="org.eclipse.andmore.internal.actions.RefreshProjectAction"
                 enablesFor="1"
-                id="org.eclipse.andmore.project.FixProjectAction"
+                id="org.eclipse.andmore.project.RefreshProjectAction"
                 label="Refresh Project"
                 menubarPath="org.eclipse.andmore.AndroidTools/group3" />
             <action

@@ -1068,7 +1068,7 @@ public class PreCompilerBuilder extends BaseBuilder {
             String resOutPath = resOutFile.isDirectory() ? resOutFile.getAbsolutePath() : null;
 
             execAapt(project, projectTarget, osOutputPath, resOutPath, osResPath, osManifestPath, mainPackageFolder,
-                    libResFolders, libRFiles, isLibrary, proguardFilePath);
+                    libResFolders, libRFiles, isLibrary, proguardFilePath, monitor);
         }
     }
 
@@ -1089,11 +1089,13 @@ public class PreCompilerBuilder extends BaseBuilder {
      * @param isLibrary if the project is a library project
      * @param proguardFile an optional path to store proguard information
      * @throws AbortBuildException
+     * @throws CoreException
      */
     @SuppressWarnings("deprecation")
     private void execAapt(IProject project, IAndroidTarget projectTarget, String osOutputPath, String osBcOutPath,
             List<String> osResPath, String osManifestPath, IFolder packageFolder, List<IFolder> libResFolders,
-            List<Pair<File, String>> libRFiles, boolean isLibrary, String proguardFile) throws AbortBuildException {
+            List<Pair<File, String>> libRFiles, boolean isLibrary, String proguardFile, IProgressMonitor monitor)
+            throws AbortBuildException, CoreException {
 
         // We actually need to delete the manifest.java as it may become empty and
         // in this case aapt doesn't generate an empty one, but instead doesn't
@@ -1128,6 +1130,9 @@ public class PreCompilerBuilder extends BaseBuilder {
             array.add("--output-text-symbols"); //$NON-NLS-1$
             array.add(outputFolder.getAbsolutePath());
         }
+
+        array.add("--custom-package");
+        array.add(getMainPackage(project, monitor));
 
         array.add("-J"); //$NON-NLS-1$
         array.add(osOutputPath);
@@ -1330,12 +1335,7 @@ public class PreCompilerBuilder extends BaseBuilder {
      * @throws CoreException
      */
     private IFolder getGenManifestPackageFolder(IProject project, IProgressMonitor monitor) throws CoreException {
-        String javaPackage = mManifestPackage;
-
-        if (Gradroid.get().isGradroidProject(project)) {
-            AndroidProject model = Gradroid.get().loadAndroidModel(project, monitor);
-            javaPackage = model.getDefaultConfig().getProductFlavor().getApplicationId();
-        }
+        String javaPackage = getMainPackage(project, monitor);
 
         // get the path for the package
         IPath packagePath = getJavaPackagePath(javaPackage);
@@ -1343,5 +1343,17 @@ public class PreCompilerBuilder extends BaseBuilder {
         // get a folder for this path under the 'gen' source folder, and return it.
         // This IFolder may not reference an actual existing folder.
         return mGenFolder.getFolder(packagePath);
+    }
+
+    private String getMainPackage(IProject project, IProgressMonitor monitor) throws CoreException {
+        String javaPackage = mManifestPackage;
+
+        if (Gradroid.get().isGradroidProject(project)) {
+            AndroidProject model = Gradroid.get().loadAndroidModel(project, monitor);
+            if (!model.isLibrary()) {
+                javaPackage = model.getDefaultConfig().getProductFlavor().getApplicationId();
+            }
+        }
+        return javaPackage;
     }
 }

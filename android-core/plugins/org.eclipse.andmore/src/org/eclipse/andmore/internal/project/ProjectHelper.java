@@ -498,6 +498,25 @@ public final class ProjectHelper {
         ProjectHelper.checkAndFixCompilerCompliance(javaProject);
     }
 
+    private static void makeDerived(IFolder folder, IProgressMonitor monitor) throws CoreException {
+        IResource[] list = folder.members();
+        for (IResource member : list) {
+            if (member.exists()) {
+                if (member.getType() == IResource.FOLDER) {
+                    makeDerived((IFolder) member, monitor);
+                }
+
+                try {
+                    member.setDerived(true, monitor);
+                } catch (CoreException e) {
+                    // This really shouldn't happen since we check that the resource
+                    // exist.
+                    // Worst case scenario, the resource isn't marked as derived.
+                }
+            }
+        }
+    }
+
     private static IClasspathEntry[] addSourceEntry(IProject project, IClasspathEntry[] entries,
             Collection<File> javaSources, boolean derived, IProgressMonitor monitor) throws CoreException {
 
@@ -514,7 +533,7 @@ public final class ProjectHelper {
             IFolder sourceFolder = project.getFolder(sourcePath);
 
             if (derived) {
-                sourceFolder.setDerived(derived, monitor);
+                makeDerived(sourceFolder, monitor);
             }
 
             IPath fullPath = sourceFolder.getFullPath();
