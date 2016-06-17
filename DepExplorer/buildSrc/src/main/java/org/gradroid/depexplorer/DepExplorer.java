@@ -48,9 +48,6 @@ public class DepExplorer implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-
-        System.out.println("IAMHEREEEEEEEEEEE!!!!!!!!!!!!!!!!!");
-
         mRegistry.register(new DepModelBuilder(mRegistry));
     }
 

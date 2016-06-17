@@ -54,8 +54,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
 import org.eclipse.jdt.apt.core.util.AptConfig;
+import org.eclipse.jdt.apt.core.util.IFactoryPath;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
@@ -66,7 +66,7 @@ import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMInstall2;
 import org.eclipse.jdt.launching.IVMInstallType;
 import org.eclipse.jdt.launching.JavaRuntime;
-import org.home.gradroid.aptexplorer.model.AptModel;
+import org.gradroid.depexplorer.model.DepModel;
 
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
@@ -414,12 +414,12 @@ public final class ProjectHelper {
 
             forceRewriteOfCPE = true;
 
-            AptModel aptModel = Gradroid.get().getAptModel(project);
+            DepModel aptModel = Gradroid.get().getDepModel(project);
 
             if (aptModel != null) {
-                FactoryPath factoryPath = new FactoryPath();
+                IFactoryPath factoryPath = AptConfig.getDefaultFactoryPath(javaProject);
 
-                List<String> aptJars = aptModel.getAptJars();
+                Collection<String> aptJars = aptModel.getAptJars();
 
                 for (String jar : aptJars) {
                     factoryPath.addExternalJar(new File(jar));
@@ -427,7 +427,7 @@ public final class ProjectHelper {
 
                 AptConfig.setFactoryPath(javaProject, factoryPath);
             } else {
-                AptConfig.setFactoryPath(javaProject, null);
+                AptConfig.setFactoryPath(javaProject, AptConfig.getDefaultFactoryPath(javaProject));
             }
         }
         // get the project classpath

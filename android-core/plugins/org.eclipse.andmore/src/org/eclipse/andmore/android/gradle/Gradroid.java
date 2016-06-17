@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.JavaCore;
-import org.home.gradroid.aptexplorer.model.AptModel;
+import org.gradroid.depexplorer.model.DepModel;
 
 import com.android.builder.model.AndroidArtifact;
 import com.android.builder.model.AndroidProject;
@@ -57,7 +57,7 @@ public class Gradroid {
 
     private HashMap<IProject, Lock> mRequestLocks = new HashMap<IProject, Lock>();
     private HashMap<IProject, AndroidProject> mModels = new HashMap<IProject, AndroidProject>();
-    private HashMap<IProject, AptModel> mAptModels = new HashMap<IProject, AptModel>();
+    private HashMap<IProject, DepModel> mAptModels = new HashMap<IProject, DepModel>();
     private HashMap<IProject, String> mVariants = new HashMap<IProject, String>();
 
     private ListenerList mOnProjectModelChangedListeners = new ListenerList();
@@ -194,7 +194,7 @@ public class Gradroid {
         // TODO classpath containers and other things (builders?)
     }
 
-    public AptModel getAptModel(IProject project) {
+    public DepModel getDepModel(IProject project) {
         synchronized (LOCK) {
             return mAptModels.get(project);
         }
@@ -237,7 +237,7 @@ public class Gradroid {
     private AndroidProject requestAndroidModel(IProject project, IProgressMonitor monitor) {
 
         AndroidProject model;
-        AptModel aptModel = null;
+        DepModel aptModel = null;
         Lock lock;
 
         synchronized (LOCK) {
@@ -277,7 +277,7 @@ public class Gradroid {
 
                 monitor.worked(1);
 
-                ModelRequest<AptModel> aptModelRequest = CorePlugin.toolingClient().newModelRequest(AptModel.class);
+                ModelRequest<DepModel> aptModelRequest = CorePlugin.toolingClient().newModelRequest(DepModel.class);
 
                 processStreams = CorePlugin.processStreamsProvider().getBackgroundJobProcessStreams();
                 aptModelRequest.standardOutput(processStreams.getOutput());

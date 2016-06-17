@@ -55,16 +55,21 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.gradroid.depexplorer.model.DepModel;
+import org.gradroid.depexplorer.model.DepVariant;
 
 import com.android.SdkConstants;
 import com.android.builder.model.AndroidLibrary;
 import com.android.builder.model.Dependencies;
 import com.android.builder.model.JavaLibrary;
+import com.android.builder.model.Library;
+import com.android.builder.model.MavenCoordinates;
 import com.android.builder.model.Variant;
 import com.android.ide.common.sdk.LoadStatus;
 import com.android.sdklib.BuildToolInfo;
 import com.android.sdklib.build.JarListSanitizer;
 import com.android.sdklib.build.RenderScriptProcessor;
+import com.android.utils.Pair;
 
 public class LibraryClasspathContainerInitializer extends BaseClasspathContainerInitializer {
 
@@ -192,36 +197,88 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         IProject project = javaProject.getProject();
 
         Gradroid.get().loadAndroidModel(project, monitor);
+        DepModel depModel = Gradroid.get().getDepModel(project);
+
         Variant variant = Gradroid.get().getProjectVariant(project);
+        DepVariant depVariant = null;
+
+        if (depModel != null) {
+            Collection<DepVariant> depVariants = depModel.getDepVariants();
+
+            for (DepVariant dv : depVariants) {
+                if (dv.getName().contentEquals(variant.getName())) {
+                    depVariant = dv;
+                    break;
+                }
+            }
+        }
 
         Dependencies dependencies = variant.getMainArtifact().getDependencies();
 
-        Set<File> jars = new HashSet<File>();
+        Set<Pair<File, File>> jars = new HashSet<Pair<File, File>>();
 
-        processJavaLibraries(jars, dependencies.getJavaLibraries());
-        processAndroidLibraries(jars, dependencies.getLibraries());
+        processJavaLibraries(jars, dependencies.getJavaLibraries(), depVariant);
+        processAndroidLibraries(jars, dependencies.getLibraries(), depVariant);
 
         System.out.println(project.getName() + "\n" + jars);
 
-        List<IClasspathEntry> entries = convertJarsToClasspathEntries(project, jars);
+        List<IClasspathEntry> entries = convertGradroidJarsToClasspathEntries(project, jars);
 
         return allocateContainer(javaProject, entries, new Path(CONTAINER_DEPENDENCIES), "Android Dependencies");
     }
 
-    private static void processAndroidLibraries(Set<File> jars, Collection<? extends AndroidLibrary> libraries) {
+    private static void processAndroidLibraries(Set<Pair<File, File>> jars,
+            Collection<? extends AndroidLibrary> libraries,
+            DepVariant depVariant) {
         for (AndroidLibrary androidLibrary : libraries) {
-            jars.add(androidLibrary.getJarFile());
-            jars.addAll(androidLibrary.getLocalJars());
+
+            appendLibrary(jars, depVariant, androidLibrary);
+
+            Collection<File> localJars = androidLibrary.getLocalJars();
+            for (File file : localJars) {
+                jars.add(Pair.of(file, (File) null));
+            }
 
             //            processJavaLibraries(jars, androidLibrary.getgetJavaDependencies());
-            processAndroidLibraries(jars, androidLibrary.getLibraryDependencies());
+            processAndroidLibraries(jars, androidLibrary.getLibraryDependencies(), depVariant);
         }
     }
 
-    private static void processJavaLibraries(Set<File> jars, Collection<? extends JavaLibrary> javaLibraries) {
+    private static void processJavaLibraries(Set<Pair<File, File>> jars,
+            Collection<? extends JavaLibrary> javaLibraries,
+            DepVariant depVariant) {
         for (JavaLibrary javaLibrary : javaLibraries) {
-            jars.add(javaLibrary.getJarFile());
+            appendLibrary(jars, depVariant, javaLibrary);
         }
+    }
+
+    private static void appendLibrary(Set<Pair<File, File>> jars, DepVariant depVariant, Library javaLibrary) {
+        MavenCoordinates coordinates = javaLibrary.getResolvedCoordinates();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(coordinates.getGroupId());
+        builder.append(':');
+        builder.append(coordinates.getArtifactId());
+        builder.append(':');
+        builder.append(coordinates.getVersion());
+
+        String string = depVariant.getSources().get(builder.toString());
+
+        if (string != null) {
+            jars.add(Pair.of(getJar(javaLibrary), new File(string)));
+        } else {
+            jars.add(Pair.of(getJar(javaLibrary), (File) null));
+        }
+    }
+
+    private static File getJar(Library library) {
+        if (library instanceof JavaLibrary) {
+            return ((JavaLibrary) library).getJarFile();
+        } else if (library instanceof AndroidLibrary) {
+            return ((AndroidLibrary) library).getJarFile();
+        }
+
+        return null;
     }
 
     private static IClasspathContainer allocateLibraryContainer(IJavaProject javaProject) {
@@ -278,6 +335,32 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
                 "Android Private Libraries");
     }
 
+    private static List<IClasspathEntry> convertGradroidJarsToClasspathEntries(final IProject iProject,
+            Set<Pair<File, File>> jarFiles) {
+        List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>(jarFiles.size());
+
+        String errorMessage = null;
+
+        List<Pair<File, File>> sanitizedList = new ArrayList<Pair<File, File>>(jarFiles);
+        //            List<File> sanitizedList = sanitizer.sanitize(jarFiles);
+
+        for (Pair<File, File> jarFile : sanitizedList) {
+
+            String jarPath = jarFile.getFirst().getAbsolutePath();
+            File second = jarFile.getSecond();
+
+            IPath sourceAttachmentPath = second == null ? null : new Path(second.getAbsolutePath());
+
+
+            entries.add(JavaCore.newLibraryEntry(new Path(jarPath), sourceAttachmentPath,
+                    null /*sourceAttachmentRootPath*/, true /*isExported*/));
+        }
+
+        processError(iProject, errorMessage, AndmoreAndroidConstants.MARKER_DEPENDENCY, true /*outputToConsole*/);
+
+        return entries;
+    }
+
     private static List<IClasspathEntry> convertJarsToClasspathEntries(final IProject iProject, Set<File> jarFiles) {
         List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>(jarFiles.size());
 
@@ -289,7 +372,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         String errorMessage = null;
 
         List<File> sanitizedList = new ArrayList<File>(jarFiles);
-        //            List<File> sanitizedList = sanitizer.sanitize(jarFiles);
+        //        List<File> sanitizedList = sanitizer.sanitize(jarFiles);
 
         for (File jarFile : sanitizedList) {
             if (jarFile instanceof CPEFile) {
