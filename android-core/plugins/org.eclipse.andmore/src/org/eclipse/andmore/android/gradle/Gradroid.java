@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.JavaCore;
+import org.home.gradroid.aptexplorer.model.AptModel;
 
 import com.android.builder.model.AndroidArtifact;
 import com.android.builder.model.AndroidProject;
@@ -56,6 +57,7 @@ public class Gradroid {
 
     private HashMap<IProject, Lock> mRequestLocks = new HashMap<IProject, Lock>();
     private HashMap<IProject, AndroidProject> mModels = new HashMap<IProject, AndroidProject>();
+    private HashMap<IProject, AptModel> mAptModels = new HashMap<IProject, AptModel>();
     private HashMap<IProject, String> mVariants = new HashMap<IProject, String>();
 
     private ListenerList mOnProjectModelChangedListeners = new ListenerList();
@@ -192,6 +194,12 @@ public class Gradroid {
         // TODO classpath containers and other things (builders?)
     }
 
+    public AptModel getAptModel(IProject project) {
+        synchronized (LOCK) {
+            return mAptModels.get(project);
+        }
+    }
+
     //TODO make simple method to get model from map without load
 
     public AndroidProject loadAndroidModel(IProject project, IProgressMonitor monitor) {
@@ -229,6 +237,7 @@ public class Gradroid {
     private AndroidProject requestAndroidModel(IProject project, IProgressMonitor monitor) {
 
         AndroidProject model;
+        AptModel aptModel = null;
         Lock lock;
 
         synchronized (LOCK) {
@@ -242,7 +251,7 @@ public class Gradroid {
 
         if (lock.tryLock()) {
             try {
-                monitor.beginTask("Requesting model", 1);
+                monitor.beginTask("Requesting model", 2);
 
                 ModelRequest<AndroidProject> modelRequest = CorePlugin.toolingClient()
                         .newModelRequest(AndroidProject.class);
@@ -263,6 +272,25 @@ public class Gradroid {
                 } catch (Exception e) {
                     AndmoreAndroidPlugin.log(e, "");
                     model = null;
+                }
+
+                monitor.worked(1);
+
+                ModelRequest<AptModel> aptModelRequest = CorePlugin.toolingClient().newModelRequest(AptModel.class);
+
+                processStreams = CorePlugin.processStreamsProvider().getBackgroundJobProcessStreams();
+                aptModelRequest.standardOutput(processStreams.getOutput());
+                aptModelRequest.standardError(processStreams.getError());
+                aptModelRequest.standardInput(processStreams.getInput());
+                aptModelRequest.projectDir(project.getLocation().toFile());
+
+                // TODO progress, cancelation
+
+                try {
+                    aptModel = aptModelRequest.executeAndWait();
+                } catch (Exception e) {
+                    AndmoreAndroidPlugin.log(e, "");
+                    aptModel = null;
                 }
 
                 monitor.worked(1);
@@ -316,6 +344,10 @@ public class Gradroid {
             synchronized (LOCK) {
                 model = mModels.get(project);
             }
+        }
+
+        synchronized (LOCK) {
+            mAptModels.put(project, aptModel);
         }
 
         return model;
