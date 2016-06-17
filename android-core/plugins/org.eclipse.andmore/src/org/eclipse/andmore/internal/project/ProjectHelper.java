@@ -375,7 +375,7 @@ public final class ProjectHelper {
             if (force) {
                 androidProject = Gradroid.get().reloadAndroidModel(project, monitor);
             } else {
-                androidProject = Gradroid.get().loadAndroidModel(project, monitor);
+                androidProject = Gradroid.get().reloadAndroidModelOnly(project, monitor);
             }
 
             project.refreshLocal(IResource.DEPTH_INFINITE, monitor);

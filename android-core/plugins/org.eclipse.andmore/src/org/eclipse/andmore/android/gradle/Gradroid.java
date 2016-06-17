@@ -216,7 +216,24 @@ public class Gradroid {
     }
 
     public AndroidProject reloadAndroidModel(IProject project, IProgressMonitor monitor) {
-        AndroidProject model = requestAndroidModel(project, monitor);
+        AndroidProject model = requestAndroidModel(project, monitor, false);
+
+        synchronized (LOCK) {
+            mModels.put(project, model);
+
+            Object[] listeners = mOnProjectModelChangedListeners.getListeners();
+
+            for (Object object : listeners) {
+                OnProjectModelChanged listener = (OnProjectModelChanged) object;
+                listener.onProjectModelChanged(project, model);
+            }
+        }
+
+        return model;
+    }
+
+    public AndroidProject reloadAndroidModelOnly(IProject project, IProgressMonitor monitor) {
+        AndroidProject model = requestAndroidModel(project, monitor, true);
 
         synchronized (LOCK) {
             mModels.put(project, model);
@@ -234,7 +251,7 @@ public class Gradroid {
 
     //TODO EXCEPTION HANDLING!111
     //TODO request only current cariant
-    private AndroidProject requestAndroidModel(IProject project, IProgressMonitor monitor) {
+    private AndroidProject requestAndroidModel(IProject project, IProgressMonitor monitor, boolean modelOnly) {
 
         AndroidProject model;
         DepModel aptModel = null;
@@ -302,41 +319,43 @@ public class Gradroid {
                     return null;
                 }
 
-                String variantName = getProjectVariantNameForModelRequest(project);
-                Collection<Variant> projectVariants = model.getVariants();
+                if (!modelOnly) {
+                    String variantName = getProjectVariantNameForModelRequest(project);
+                    Collection<Variant> projectVariants = model.getVariants();
 
-                monitor.beginTask("Building sources for IDE", projectVariants.size());
+                    monitor.beginTask("Building sources for IDE", projectVariants.size());
 
-                for (Variant variant : projectVariants) {
+                    for (Variant variant : projectVariants) {
 
-                    if (variantName != null) {
-                        if (!variant.getName().equals(variantName)){
-                            continue;
+                        if (variantName != null) {
+                            if (!variant.getName().equals(variantName)){
+                                continue;
+                            }
                         }
+
+                        //                    Set<String> tasks = Collections.singleton(variant.getMainArtifact().getCompileTaskName());
+                        Set<String> tasks = variant.getMainArtifact().getIdeSetupTaskNames();
+
+                        System.out.println(tasks);
+
+                        BuildLaunchRequest launchRequest = CorePlugin.toolingClient()
+                                .newBuildLaunchRequest(LaunchableConfig.forTasks(tasks));
+
+                        processStreams = CorePlugin.processStreamsProvider().getBackgroundJobProcessStreams();
+                        launchRequest.standardOutput(processStreams.getOutput());
+                        launchRequest.standardError(processStreams.getError());
+                        launchRequest.standardInput(processStreams.getInput());
+                        launchRequest.arguments("-Pgradroid");
+
+                        // TODO progress, cancelation
+                        launchRequest.projectDir(project.getLocation().toFile());
+                        launchRequest.executeAndWait();
+
+                        monitor.worked(1);
                     }
 
-                    //                    Set<String> tasks = Collections.singleton(variant.getMainArtifact().getCompileTaskName());
-                    Set<String> tasks = variant.getMainArtifact().getIdeSetupTaskNames();
-
-                    System.out.println(tasks);
-
-                    BuildLaunchRequest launchRequest = CorePlugin.toolingClient()
-                            .newBuildLaunchRequest(LaunchableConfig.forTasks(tasks));
-
-                    processStreams = CorePlugin.processStreamsProvider().getBackgroundJobProcessStreams();
-                    launchRequest.standardOutput(processStreams.getOutput());
-                    launchRequest.standardError(processStreams.getError());
-                    launchRequest.standardInput(processStreams.getInput());
-                    launchRequest.arguments("-Pgradroid");
-
-                    // TODO progress, cancelation
-                    launchRequest.projectDir(project.getLocation().toFile());
-                    launchRequest.executeAndWait();
-
-                    monitor.worked(1);
+                    monitor.done();
                 }
-
-                monitor.done();
             } finally {
                 lock.unlock();
             }
