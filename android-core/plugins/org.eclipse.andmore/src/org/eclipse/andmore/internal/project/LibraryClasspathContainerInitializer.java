@@ -255,17 +255,23 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
     private static void appendLibrary(Set<Pair<File, File>> jars, DepVariant depVariant, Library javaLibrary) {
         MavenCoordinates coordinates = javaLibrary.getResolvedCoordinates();
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(coordinates.getGroupId());
-        builder.append(':');
-        builder.append(coordinates.getArtifactId());
-        builder.append(':');
-        builder.append(coordinates.getVersion());
+        String sourceFilePath = null;
 
-        String string = depVariant.getSources().get(builder.toString());
+        if (coordinates != null) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(coordinates.getGroupId());
+            builder.append(':');
+            builder.append(coordinates.getArtifactId());
+            builder.append(':');
+            builder.append(coordinates.getVersion());
 
-        if (string != null) {
-            jars.add(Pair.of(getJar(javaLibrary), new File(string)));
+            if (depVariant != null) {
+                sourceFilePath = depVariant.getSources().get(builder.toString());
+            }
+        }
+
+        if (sourceFilePath != null) {
+            jars.add(Pair.of(getJar(javaLibrary), new File(sourceFilePath)));
         } else {
             jars.add(Pair.of(getJar(javaLibrary), (File) null));
         }

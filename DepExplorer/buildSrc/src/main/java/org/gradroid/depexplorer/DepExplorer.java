@@ -98,6 +98,11 @@ public class DepExplorer implements Plugin<Project> {
 
             for (Library library : libraries) {
                 MavenCoordinates coordinates = library.getResolvedCoordinates();
+
+                if (coordinates == null) {
+                    continue;
+                }
+
                 ModuleComponentIdentifier componentIdentifier = DefaultModuleComponentIdentifier
                         .newId(coordinates.getGroupId(), coordinates.getArtifactId(), coordinates.getVersion());
 
@@ -120,6 +125,10 @@ public class DepExplorer implements Plugin<Project> {
             Set<ComponentArtifactsResult> resolvedComponents = dependencyHandler.createArtifactResolutionQuery()
                     .withArtifacts(JvmLibrary.class, SourcesArtifact.class).forComponents(identifier).execute()
                     .getResolvedComponents();
+
+            if (resolvedComponents.isEmpty()) {
+                return null;
+            }
 
             ComponentArtifactsResult next = resolvedComponents.iterator().next();
             ArtifactResult result = next.getArtifacts(SourcesArtifact.class).iterator().next();

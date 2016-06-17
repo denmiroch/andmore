@@ -277,19 +277,19 @@ public class Gradroid {
 
                 monitor.worked(1);
 
-                ModelRequest<DepModel> aptModelRequest = CorePlugin.toolingClient().newModelRequest(DepModel.class);
+                ModelRequest<DepModel> depModelRequest = CorePlugin.toolingClient().newModelRequest(DepModel.class);
 
                 processStreams = CorePlugin.processStreamsProvider().getBackgroundJobProcessStreams();
-                aptModelRequest.standardOutput(processStreams.getOutput());
-                aptModelRequest.standardError(processStreams.getError());
-                aptModelRequest.standardInput(processStreams.getInput());
-                aptModelRequest.projectDir(project.getLocation().toFile());
-                aptModelRequest.arguments("-Pgradroid");
+                depModelRequest.standardOutput(processStreams.getOutput());
+                depModelRequest.standardError(processStreams.getError());
+                depModelRequest.standardInput(processStreams.getInput());
+                depModelRequest.projectDir(project.getLocation().toFile());
+                depModelRequest.arguments("-Pgradroid");
 
                 // TODO progress, cancelation
 
                 try {
-                    aptModel = aptModelRequest.executeAndWait();
+                    aptModel = depModelRequest.executeAndWait();
                 } catch (Exception e) {
                     AndmoreAndroidPlugin.log(e, "");
                     aptModel = null;
