@@ -1,0 +1,58 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath('com.android.tools.build:gradle:2.1.0') {
+            exclude group: 'org.apache.httpcomponents'
+        }
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+    }
+}
+
+if (hasProperty('gradroid')) {
+	apply plugin: org.gradroid.depexplorer.DepExplorer
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+}
+
+def versions = [
+        rxJava                  : '1.1.5',
+        rxAndroid               : '1.2.0',
+        jsr250                  : '1.0',
+        dagger                  : '2.5',
+        inject					: '1'
+]
+
+ext.libraries = [
+        rxJava                  : "io.reactivex:rxjava:${versions.rxJava}",
+        rxAndroid               : "io.reactivex:rxandroid:${versions.rxAndroid}",
+        dagger					: "com.google.dagger:dagger:${versions.dagger}",
+        daggerCompiler			: "com.google.dagger:dagger-compiler:${versions.dagger}",
+        inject					: "javax.inject:javax.inject:${versions.inject}",
+        jsr250                  : "javax.annotation:jsr250-api:${versions.jsr250}"
+]
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compile libraries.rxJava
+    compile libraries.rxAndroid
+    
+	compile libraries.dagger
+	apt 	libraries.daggerCompiler
+	provided libraries.inject
+    provided libraries.jsr250
+}
+

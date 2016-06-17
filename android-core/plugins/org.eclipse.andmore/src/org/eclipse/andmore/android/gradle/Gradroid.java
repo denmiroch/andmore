@@ -260,6 +260,7 @@ public class Gradroid {
                 modelRequest.standardOutput(processStreams.getOutput());
                 modelRequest.standardError(processStreams.getError());
                 modelRequest.standardInput(processStreams.getInput());
+                modelRequest.arguments("-Pgradroid");
 
                 modelRequest.projectDir(project.getLocation().toFile());
                 modelRequest.arguments(AndroidProject.PROPERTY_BUILD_MODEL_ONLY_VERSIONED + "="
@@ -283,6 +284,7 @@ public class Gradroid {
                 aptModelRequest.standardError(processStreams.getError());
                 aptModelRequest.standardInput(processStreams.getInput());
                 aptModelRequest.projectDir(project.getLocation().toFile());
+                aptModelRequest.arguments("-Pgradroid");
 
                 // TODO progress, cancelation
 
@@ -325,6 +327,7 @@ public class Gradroid {
                     launchRequest.standardOutput(processStreams.getOutput());
                     launchRequest.standardError(processStreams.getError());
                     launchRequest.standardInput(processStreams.getInput());
+                    launchRequest.arguments("-Pgradroid");
 
                     // TODO progress, cancelation
                     launchRequest.projectDir(project.getLocation().toFile());
@@ -367,6 +370,7 @@ public class Gradroid {
         buildRequest.standardOutput(processStreams.getOutput());
         buildRequest.standardError(processStreams.getError());
         buildRequest.standardInput(processStreams.getInput());
+        buildRequest.arguments("-Pgradroid");
 
         buildRequest.projectDir(project.getLocation().toFile());
         buildRequest.executeAndWait();
