@@ -11,4 +11,6 @@ public interface DepVariant {
     String getName();
 
     Map<String, String> getSources();
+
+    Map<String, String> getJavadocs();
 }

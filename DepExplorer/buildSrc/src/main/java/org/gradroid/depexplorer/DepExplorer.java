@@ -3,7 +3,7 @@ package org.gradroid.depexplorer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -20,6 +20,7 @@ import org.gradle.api.artifacts.result.ResolvedArtifactResult;
 import org.gradle.internal.component.external.model.DefaultModuleComponentIdentifier;
 import org.gradle.jvm.JvmLibrary;
 import org.gradle.language.base.artifact.SourcesArtifact;
+import org.gradle.language.java.artifact.JavadocArtifact;
 import org.gradle.tooling.provider.model.ToolingModelBuilder;
 import org.gradle.tooling.provider.model.ToolingModelBuilderRegistry;
 import org.gradroid.depexplorer.model.DepModel;
@@ -67,18 +68,20 @@ public class DepExplorer implements Plugin<Project> {
             ToolingModelBuilder builder = mRegistry.getBuilder(AndroidProject.class.getName());
             AndroidProject androidProject = (AndroidProject) builder.buildAll(AndroidProject.class.getName(), project);
 
-            HashMap<String, String> variantDeps;
+            HashMap<String, String> variantSources;
+            HashMap<String, String> variantJavadocs;
             ArrayList<DepVariant> variants = new ArrayList<>();
 
             for (Variant variant : androidProject.getVariants()) {
                 Dependencies dependencies = variant.getMainArtifact().getDependencies();
 
-                variantDeps = new HashMap<>();
+                variantSources = new HashMap<>();
+                variantJavadocs = new HashMap<>();
 
-                variantDeps.putAll(process(dependencyHandler, dependencies.getJavaLibraries()));
-                variantDeps.putAll(process(dependencyHandler, dependencies.getLibraries()));
+                process(dependencyHandler, variantSources, variantJavadocs, dependencies.getJavaLibraries());
+                process(dependencyHandler, variantSources, variantJavadocs, dependencies.getLibraries());
 
-                variants.add(new DepVariantImpl(variantDeps, variant.getName()));
+                variants.add(new DepVariantImpl(variantSources, variantJavadocs, variant.getName()));
             }
 
             ArrayList<String> jars = new ArrayList<>();
@@ -91,10 +94,8 @@ public class DepExplorer implements Plugin<Project> {
             return new DepModelImpl(jars, variants);
         }
 
-        private Map<String, String> process(DependencyHandler dependencyHandler,
-                Collection<? extends Library> libraries) {
-
-            HashMap<String, String> deps = new HashMap<>();
+        private void process(DependencyHandler dependencyHandler,
+                HashMap<String, String> variantSources, HashMap<String, String> variantJavadocs, Collection<? extends Library> libraries) {
 
             for (Library library : libraries) {
                 MavenCoordinates coordinates = library.getResolvedCoordinates();
@@ -106,38 +107,66 @@ public class DepExplorer implements Plugin<Project> {
                 ModuleComponentIdentifier componentIdentifier = DefaultModuleComponentIdentifier
                         .newId(coordinates.getGroupId(), coordinates.getArtifactId(), coordinates.getVersion());
 
-                String file = query(dependencyHandler, componentIdentifier);
+                Para<String, String> files = query(dependencyHandler, componentIdentifier);
 
-                if (file != null) {
-                    deps.put(componentIdentifier.getDisplayName(), file);
+                String source = files.getLeft();
+                String javadoc = files.getRight();
+
+                if (source != null) {
+                    variantSources.put(componentIdentifier.getDisplayName(), source);
+                }
+
+                if (javadoc != null) {
+                    variantJavadocs.put(componentIdentifier.getDisplayName(), javadoc);
                 }
 
                 if (library instanceof AndroidLibrary) {
-                    deps.putAll(process(dependencyHandler, ((AndroidLibrary) library).getLibraryDependencies()));
+                    process(dependencyHandler, variantSources, variantJavadocs,
+                            ((AndroidLibrary) library).getLibraryDependencies());
                 }
             }
-
-            return deps;
         }
 
         @SuppressWarnings("unchecked")
-        private String query(DependencyHandler dependencyHandler, ModuleComponentIdentifier identifier) {
+        private Para<String, String> query(DependencyHandler dependencyHandler, ModuleComponentIdentifier identifier) {
             Set<ComponentArtifactsResult> resolvedComponents = dependencyHandler.createArtifactResolutionQuery()
-                    .withArtifacts(JvmLibrary.class, SourcesArtifact.class).forComponents(identifier).execute()
+                    .withArtifacts(JvmLibrary.class, SourcesArtifact.class, JavadocArtifact.class)
+                    .forComponents(identifier).execute()
                     .getResolvedComponents();
 
             if (resolvedComponents.isEmpty()) {
-                return null;
+                return Para.of(null, null);
             }
 
-            ComponentArtifactsResult next = resolvedComponents.iterator().next();
-            ArtifactResult result = next.getArtifacts(SourcesArtifact.class).iterator().next();
+            String source = null;
+            String javadoc = null;
 
-            if (result instanceof ResolvedArtifactResult) {
-                return ((ResolvedArtifactResult) result).getFile().getAbsolutePath();
+            for (ComponentArtifactsResult componentArtifactsResult : resolvedComponents) {
+
+                Iterator<ArtifactResult> iter;
+
+                iter = componentArtifactsResult.getArtifacts(SourcesArtifact.class).iterator();
+                if (iter.hasNext()) {
+                    ArtifactResult result = iter.next();
+                    if (result instanceof ResolvedArtifactResult) {
+                        source = ((ResolvedArtifactResult) result).getFile().getAbsolutePath();
+                    }
+                }
+
+                iter = componentArtifactsResult.getArtifacts(JavadocArtifact.class).iterator();
+                if (iter.hasNext()) {
+                    ArtifactResult result = iter.next();
+                    if (result instanceof ResolvedArtifactResult) {
+                        javadoc = ((ResolvedArtifactResult) result).getFile().getAbsolutePath();
+                    }
+                }
+
+                if (source != null && javadoc != null) {
+                    break;
+                }
             }
 
-            return null;
+            return Para.of(source, javadoc);
         }
 
         @Override

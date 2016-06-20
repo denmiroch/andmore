@@ -53,7 +53,7 @@ Require-Bundle: org.eclipse.andmore.base,
  org.objectweb.asm;bundle-version="[4.0.0,5.0.0)",
  org.eclipse.buildship.core,
  com.gradleware.tooling.client,
- org.eclipse.jdt.apt.core;bundle-version="3.4.100"
+ org.eclipse.jdt.apt.core
 Bundle-ActivationPolicy: lazy
 Export-Package: com.android.build,
  com.android.builder.model,

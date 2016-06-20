@@ -380,6 +380,22 @@ public final class ProjectHelper {
 
             project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
+            DepModel aptModel = Gradroid.get().getDepModel(project);
+
+            if (aptModel != null) {
+                IFactoryPath factoryPath = AptConfig.getDefaultFactoryPath(javaProject);
+
+                Collection<String> aptJars = aptModel.getAptJars();
+
+                for (String jar : aptJars) {
+                    factoryPath.addExternalJar(new File(jar));
+                }
+
+                AptConfig.setFactoryPath(javaProject, factoryPath);
+            } else {
+                AptConfig.setFactoryPath(javaProject, AptConfig.getDefaultFactoryPath(javaProject));
+            }
+
             Variant variant = Gradroid.get().getProjectVariant(project);
 
             SourceProvider defaultSource = getDefaultSourceProvider(androidProject, variant);
@@ -405,30 +421,16 @@ public final class ProjectHelper {
                     iterator.remove();
                 }
 
-                if (file.getAbsolutePath().contains(File.separator + "apt" + File.separator)) {
-                    iterator.remove();
+                if (aptModel != null) {
+                    if (file.getAbsolutePath().contains(File.separator + "apt" + File.separator)) {
+                        iterator.remove();
+                    }
                 }
             }
 
             entries = addSourceEntry(project, entries, generatedSourceFolders, true, monitor);
 
             forceRewriteOfCPE = true;
-
-            DepModel aptModel = Gradroid.get().getDepModel(project);
-
-            if (aptModel != null) {
-                IFactoryPath factoryPath = AptConfig.getDefaultFactoryPath(javaProject);
-
-                Collection<String> aptJars = aptModel.getAptJars();
-
-                for (String jar : aptJars) {
-                    factoryPath.addExternalJar(new File(jar));
-                }
-
-                AptConfig.setFactoryPath(javaProject, factoryPath);
-            } else {
-                AptConfig.setFactoryPath(javaProject, AptConfig.getDefaultFactoryPath(javaProject));
-            }
         }
         // get the project classpath
 
@@ -513,7 +515,9 @@ public final class ProjectHelper {
 
         // set the new list of entries to the project
         if (entries != oldEntries || forceRewriteOfCPE) {
+            //TODO sort
             javaProject.setRawClasspath(entries, monitor);
+            project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
         }
 
         // If needed, check and fix compiler compliance and source compatibility

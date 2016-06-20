@@ -32,6 +32,7 @@ import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
 import org.eclipse.andmore.AndroidPrintStream;
 import org.eclipse.andmore.android.gradle.Gradroid;
+import org.eclipse.andmore.android.gradle.Triple;
 import org.eclipse.andmore.internal.sdk.ProjectState;
 import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.core.resources.IFile;
@@ -69,7 +70,6 @@ import com.android.ide.common.sdk.LoadStatus;
 import com.android.sdklib.BuildToolInfo;
 import com.android.sdklib.build.JarListSanitizer;
 import com.android.sdklib.build.RenderScriptProcessor;
-import com.android.utils.Pair;
 
 public class LibraryClasspathContainerInitializer extends BaseClasspathContainerInitializer {
 
@@ -215,7 +215,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
         Dependencies dependencies = variant.getMainArtifact().getDependencies();
 
-        Set<Pair<File, File>> jars = new HashSet<Pair<File, File>>();
+        Set<Triple<File, File, File>> jars = new HashSet<Triple<File, File, File>>();
 
         processJavaLibraries(jars, dependencies.getJavaLibraries(), depVariant);
         processAndroidLibraries(jars, dependencies.getLibraries(), depVariant);
@@ -227,16 +227,15 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         return allocateContainer(javaProject, entries, new Path(CONTAINER_DEPENDENCIES), "Android Dependencies");
     }
 
-    private static void processAndroidLibraries(Set<Pair<File, File>> jars,
-            Collection<? extends AndroidLibrary> libraries,
-            DepVariant depVariant) {
+    private static void processAndroidLibraries(Set<Triple<File, File, File>> jars,
+            Collection<? extends AndroidLibrary> libraries, DepVariant depVariant) {
         for (AndroidLibrary androidLibrary : libraries) {
 
             appendLibrary(jars, depVariant, androidLibrary);
 
             Collection<File> localJars = androidLibrary.getLocalJars();
             for (File file : localJars) {
-                jars.add(Pair.of(file, (File) null));
+                jars.add(Triple.<File, File, File> of(file, null, null));
             }
 
             //            processJavaLibraries(jars, androidLibrary.getgetJavaDependencies());
@@ -244,20 +243,20 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         }
     }
 
-    private static void processJavaLibraries(Set<Pair<File, File>> jars,
-            Collection<? extends JavaLibrary> javaLibraries,
-            DepVariant depVariant) {
+    private static void processJavaLibraries(Set<Triple<File, File, File>> jars,
+            Collection<? extends JavaLibrary> javaLibraries, DepVariant depVariant) {
         for (JavaLibrary javaLibrary : javaLibraries) {
             appendLibrary(jars, depVariant, javaLibrary);
         }
     }
 
-    private static void appendLibrary(Set<Pair<File, File>> jars, DepVariant depVariant, Library javaLibrary) {
+    private static void appendLibrary(Set<Triple<File, File, File>> jars, DepVariant depVariant, Library javaLibrary) {
         MavenCoordinates coordinates = javaLibrary.getResolvedCoordinates();
 
-        String sourceFilePath = null;
+        File sourceFile = null;
+        File javadocFile = null;
 
-        if (coordinates != null) {
+        if (coordinates != null && depVariant != null) {
             StringBuilder builder = new StringBuilder();
             builder.append(coordinates.getGroupId());
             builder.append(':');
@@ -265,16 +264,18 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             builder.append(':');
             builder.append(coordinates.getVersion());
 
-            if (depVariant != null) {
-                sourceFilePath = depVariant.getSources().get(builder.toString());
+            String source = depVariant.getSources().get(builder.toString());
+            if (source != null) {
+                sourceFile = new File(source);
+            }
+
+            String javadoc = depVariant.getJavadocs().get(builder.toString());
+            if (javadoc != null) {
+                javadocFile = new File(javadoc);
             }
         }
 
-        if (sourceFilePath != null) {
-            jars.add(Pair.of(getJar(javaLibrary), new File(sourceFilePath)));
-        } else {
-            jars.add(Pair.of(getJar(javaLibrary), (File) null));
-        }
+        jars.add(Triple.of(getJar(javaLibrary), sourceFile, javadocFile));
     }
 
     private static File getJar(Library library) {
@@ -342,27 +343,37 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
     }
 
     private static List<IClasspathEntry> convertGradroidJarsToClasspathEntries(final IProject iProject,
-            Set<Pair<File, File>> jarFiles) {
+            Set<Triple<File, File, File>> jarFiles) {
         List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>(jarFiles.size());
 
         String errorMessage = null;
 
-        List<Pair<File, File>> sanitizedList = new ArrayList<Pair<File, File>>(jarFiles);
-        //            List<File> sanitizedList = sanitizer.sanitize(jarFiles);
-
-        for (Pair<File, File> jarFile : sanitizedList) {
+        for (Triple<File, File, File> jarFile : jarFiles) {
 
             String jarPath = jarFile.getFirst().getAbsolutePath();
-            File second = jarFile.getSecond();
+            File sourceFile = jarFile.getSecond();
+            File javadocFile = jarFile.getThird();
 
-            IPath sourceAttachmentPath = second == null ? null : new Path(second.getAbsolutePath());
+            IPath sourceAttachmentPath = sourceFile == null ? null : new Path(sourceFile.getAbsolutePath());
+            IClasspathAttribute javaDocAttribute = null;
 
+            if (javadocFile != null) {
+                try {
+                    javaDocAttribute = JavaCore.newClasspathAttribute(
+                            IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME,
+                            javadocFile.toURI().toURL().toString());
+                } catch (MalformedURLException e) {}
+            }
 
-            entries.add(JavaCore.newLibraryEntry(new Path(jarPath), sourceAttachmentPath,
-                    null /*sourceAttachmentRootPath*/, true /*isExported*/));
+            if (javaDocAttribute == null) {
+                entries.add(JavaCore.newLibraryEntry(new Path(jarPath), sourceAttachmentPath, null, true));
+            } else {
+                entries.add(JavaCore.newLibraryEntry(new Path(jarPath), sourceAttachmentPath, null, new IAccessRule[0],
+                        new IClasspathAttribute[] { javaDocAttribute }, true));
+            }
         }
 
-        processError(iProject, errorMessage, AndmoreAndroidConstants.MARKER_DEPENDENCY, true /*outputToConsole*/);
+        processError(iProject, errorMessage, AndmoreAndroidConstants.MARKER_DEPENDENCY, true);
 
         return entries;
     }
