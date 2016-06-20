@@ -21,9 +21,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -215,12 +219,10 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
         Dependencies dependencies = variant.getMainArtifact().getDependencies();
 
-        Set<Triple<File, File, File>> jars = new HashSet<Triple<File, File, File>>();
+        Set<Triple<File, File, File>> jars = new LinkedHashSet<Triple<File, File, File>>();
 
         processJavaLibraries(jars, dependencies.getJavaLibraries(), depVariant);
         processAndroidLibraries(jars, dependencies.getLibraries(), depVariant);
-
-        System.out.println(project.getName() + "\n" + jars);
 
         List<IClasspathEntry> entries = convertGradroidJarsToClasspathEntries(project, jars);
 
@@ -343,7 +345,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
     }
 
     private static List<IClasspathEntry> convertGradroidJarsToClasspathEntries(final IProject iProject,
-            Set<Triple<File, File, File>> jarFiles) {
+            Collection<Triple<File, File, File>> jarFiles) {
         List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>(jarFiles.size());
 
         String errorMessage = null;
@@ -361,8 +363,9 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
                 try {
                     javaDocAttribute = JavaCore.newClasspathAttribute(
                             IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME,
-                            javadocFile.toURI().toURL().toString());
-                } catch (MalformedURLException e) {}
+                            getArchiveURL(javadocFile).toExternalForm());
+                    //                    javadocFile.toURI().toURL().toString());
+                } catch (Exception e) {}
             }
 
             if (javaDocAttribute == null) {
@@ -376,6 +379,35 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         processError(iProject, errorMessage, AndmoreAndroidConstants.MARKER_DEPENDENCY, true);
 
         return entries;
+    }
+
+    private static URL getArchiveURL(File javadocFile) throws MalformedURLException {
+        try {
+            URI baseUri = javadocFile.toURI();
+
+            String innerPath = "/";
+
+            String encodedInnerPath = new URI(null, null, innerPath, null, null).getRawSchemeSpecificPart();
+
+            return new URI("jar:" + encodeExclamationMarks(baseUri.toString()) + '!' //$NON-NLS-1$
+                    + encodeExclamationMarks(encodedInnerPath)).toURL();
+
+        } catch (URISyntaxException e) {
+            throw new MalformedURLException(e.getMessage());
+        }
+    }
+
+    private static String encodeExclamationMarks(String str) {
+        StringBuffer buf = new StringBuffer(str.length());
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            if (ch == '!') {
+                buf.append("%21"); //$NON-NLS-1$
+            } else {
+                buf.append(ch);
+            }
+        }
+        return buf.toString();
     }
 
     private static List<IClasspathEntry> convertJarsToClasspathEntries(final IProject iProject, Set<File> jarFiles) {
