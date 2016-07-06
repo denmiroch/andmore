@@ -56,15 +56,15 @@ public class FolderDecorator implements ILightweightLabelDecorator {
                     if (folder.getParent().getType() == IResource.PROJECT) {
                         String name = folder.getName();
                         if (name.equals(SdkConstants.FD_ASSETS)) {
-                            doDecoration(decoration, null);
+//                            doDecoration(decoration, null);
                         } else if (name.equals(SdkConstants.FD_RESOURCES)) {
-                            doDecoration(decoration, null);
+//                            doDecoration(decoration, null);
                         } else if (name.equals(SdkConstants.FD_GEN_SOURCES)) {
                             doDecoration(decoration, " [Generated Java Files]");
                         } else if (name.equals(SdkConstants.FD_NATIVE_LIBS)) {
-                            doDecoration(decoration, null);
+//                            doDecoration(decoration, null);
                         } else if (name.equals(SdkConstants.FD_OUTPUT)) {
-                            doDecoration(decoration, null);
+//                            doDecoration(decoration, null);
                         }
                     }
                 }

@@ -355,7 +355,7 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
      * @param configuration
      * @return The IProject object or null
      */
-    private IProject getProject(ILaunchConfiguration configuration) {
+    protected IProject getProject(ILaunchConfiguration configuration) {
         // get the project name from the config
         String projectName;
         try {
