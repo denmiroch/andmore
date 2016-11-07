@@ -18,13 +18,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.andmore.internal.sdk.ProjectState;
 import org.eclipse.andmore.internal.sdk.Sdk;
 import org.eclipse.andmore.io.IFolderWrapper;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
-import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.android.ide.common.rendering.api.ResourceValue;
 import com.android.ide.common.resources.IntArrayWrapper;
@@ -66,10 +68,14 @@ public class ProjectResources extends ResourceRepository {
     private final IProject mProject;
 
     public static ProjectResources create(IProject project) {
-        //TODO GRADROID get proper res folder from gradle
-        IFolder resFolder = project.getFolder(SdkConstants.FD_RESOURCES);
+        List<IFolder> list;
+        try {
+            list = ProjectHelper.getResFolders(project, new NullProgressMonitor());
+        } catch (CoreException e) {
+            throw new RuntimeException(e);
+        }
 
-        return new ProjectResources(project, new IFolderWrapper(resFolder));
+        return new ProjectResources(project, new IFolderWrapper(list.get(0)));
     }
 
     /**

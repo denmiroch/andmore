@@ -153,7 +153,7 @@ public class LaunchConfigDelegate extends LaunchConfigurationDelegate {
         }
 
         // check if the project has errors, and abort in this case.
-        if (ProjectHelper.hasError(project, true)) {
+        if (!isGradroidLaunch() && ProjectHelper.hasError(project, true)) {
             AndmoreAndroidPlugin.displayError("Android Launch",
                     "Your project contains error(s), please fix them before running your application.");
             return;

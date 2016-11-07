@@ -88,6 +88,7 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
 
     /** List of source folders. */
     private final List<IPath> mSourceFolders;
+    private final List<IFolder> mResourceFolders;
     private boolean mIsGenSourceFolder = false;
 
     private final List<SourceChangeHandler> mSourceChangeHandlers = Lists.newArrayList();
@@ -95,9 +96,11 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
 
     private IFolder mAndroidOutputFolder;
 
-    public PreCompilerDeltaVisitor(BaseBuilder builder, List<IPath> sourceFolders, SourceChangeHandler... handlers) {
+    public PreCompilerDeltaVisitor(BaseBuilder builder, List<IPath> sourceFolders, List<IFolder> resourceFolders,
+            SourceChangeHandler... handlers) {
         super(builder);
         mSourceFolders = sourceFolders;
+        mResourceFolders = resourceFolders;
         mRoot = ResourcesPlugin.getWorkspace().getRoot();
 
         mSourceChangeHandlers.addAll(Arrays.asList(handlers));
@@ -187,16 +190,7 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
             mInRes = false;
             mSourceFolder = null;
 
-            if (SdkConstants.FD_RESOURCES.equalsIgnoreCase(segments[1])) {
-                // this is the resource folder that was modified. we want to
-                // see its content.
-
-                // since we're going to visit its children next, we set the
-                // flag
-                mInRes = true;
-                mSourceFolder = null;
-                return true;
-            } else if (SdkConstants.FN_ANDROID_MANIFEST_XML.equalsIgnoreCase(segments[1])) {
+            if (SdkConstants.FN_ANDROID_MANIFEST_XML.equalsIgnoreCase(segments[1])) {
                 // any change in the manifest could trigger a new R.java
                 // class, so we don't need to check the delta kind
                 if (delta.getKind() != IResourceDelta.REMOVED) {
@@ -370,6 +364,24 @@ class PreCompilerDeltaVisitor extends BaseDeltaVisitor implements IResourceDelta
 
                 // check if we are on the way to a source folder.
                 int count = sourceFolderPath.matchingFirstSegments(path);
+                if (count == path.segmentCount()) {
+                    mInRes = false;
+                    return true;
+                }
+            }
+
+            for (IFolder resourceFolder : mResourceFolders) {
+                IPath resourceFolderPath = resourceFolder.getFullPath();
+                // first check if they match exactly.
+                if (resourceFolderPath.equals(path)) {
+                    // this is a resource folder!
+                    mInRes = true;
+                    mSourceFolder = null;
+                    return true;
+                }
+
+                // check if we are on the way to a source folder.
+                int count = resourceFolderPath.matchingFirstSegments(path);
                 if (count == path.segmentCount()) {
                     mInRes = false;
                     return true;

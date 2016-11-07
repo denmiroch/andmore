@@ -17,6 +17,7 @@ import static org.eclipse.andmore.AndmoreAndroidConstants.COMPILER_COMPLIANCE_PR
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.apt.core.util.IFactoryPath;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
@@ -171,11 +173,14 @@ public final class ProjectHelper {
         return false;
     }
 
-    public static IClasspathEntry[] removeSourceEntriesExceptGen(IClasspathEntry[] entries) {
+    public static IClasspathEntry[] removeSourceEntriesExceptGen(IJavaProject javaProject, IClasspathEntry[] entries) {
         for (int i = 0; i < entries.length; ) {
             IClasspathEntry entry = entries[i];
 
-            if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE && !entry.getPath().lastSegment().equals("gen")) {
+            List<String> exclude = Arrays.asList("gen", AptConfig.getGenSrcDir(javaProject));
+
+            if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE
+                    && !exclude.contains(entry.getPath().lastSegment())) {
                 entries = removeEntryFromClasspath(entries, i);
             } else {
                 i++;
@@ -369,7 +374,7 @@ public final class ProjectHelper {
 
         if (Gradroid.get().isGradroidProject(project)) {
 
-            entries = removeSourceEntriesExceptGen(entries);
+            entries = removeSourceEntriesExceptGen(javaProject, entries);
 
             AndroidProject androidProject;
             if (force) {
@@ -403,13 +408,14 @@ public final class ProjectHelper {
             Collection<SourceProvider> flavorsSource = getFlavorsSourceProviders(androidProject, variant);
             SourceProvider variantSourceProvider = getVariantSourceProvider(androidProject, variant);
 
-            entries = addSourceEntry(project, entries, defaultSource.getJavaDirectories(), false, monitor);
+            entries = addSourceEntry(project, entries, defaultSource.getJavaDirectories(), false, false, monitor);
             for (SourceProvider sourceProvider : flavorsSource) {
-                entries = addSourceEntry(project, entries, sourceProvider.getJavaDirectories(), false, monitor);
+                entries = addSourceEntry(project, entries, sourceProvider.getJavaDirectories(), false, false, monitor);
             }
-            entries = addSourceEntry(project, entries, buildTypeSource.getJavaDirectories(), false, monitor);
+            entries = addSourceEntry(project, entries, buildTypeSource.getJavaDirectories(), false, false, monitor);
             if (variantSourceProvider != null) {
-                entries = addSourceEntry(project, entries, variantSourceProvider.getJavaDirectories(), false, monitor);
+                entries = addSourceEntry(project, entries, variantSourceProvider.getJavaDirectories(), false, false,
+                        monitor);
             }
 
             Collection<File> generatedSourceFolders = variant.getMainArtifact().getGeneratedSourceFolders();
@@ -428,7 +434,7 @@ public final class ProjectHelper {
                 }
             }
 
-            entries = addSourceEntry(project, entries, generatedSourceFolders, true, monitor);
+            entries = addSourceEntry(project, entries, generatedSourceFolders, true, true, monitor);
 
             forceRewriteOfCPE = true;
         }
@@ -548,7 +554,8 @@ public final class ProjectHelper {
     }
 
     private static IClasspathEntry[] addSourceEntry(IProject project, IClasspathEntry[] entries,
-            Collection<File> javaSources, boolean derived, IProgressMonitor monitor) throws CoreException {
+            Collection<File> javaSources, boolean derived, boolean ignoreWarnings, IProgressMonitor monitor)
+                    throws CoreException {
 
         IPath projectPath = new Path(project.getLocation().toFile().getAbsolutePath());
 
@@ -578,7 +585,14 @@ public final class ProjectHelper {
             }
 
             if (found == -1) {
-                entries = ProjectHelper.addEntryToClasspath(entries, JavaCore.newSourceEntry(fullPath));
+                if (ignoreWarnings) {
+                    entries = ProjectHelper.addEntryToClasspath(entries, JavaCore.newSourceEntry(fullPath,
+                            new Path[] {}, new Path[] {}, null,
+                            new IClasspathAttribute[] { JavaCore
+                                    .newClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true") }));
+                } else {
+                    entries = ProjectHelper.addEntryToClasspath(entries, JavaCore.newSourceEntry(fullPath));
+                }
             }
         }
         return entries;

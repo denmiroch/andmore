@@ -320,8 +320,9 @@ public class PreCompilerBuilder extends BaseBuilder {
                     //                    mAidlProcessor.prepareFullBuild(project);
                     //                    mRenderScriptSourceChangeHandler.prepareFullBuild();
                 } else {
-                    dv = new PreCompilerDeltaVisitor(this, sourceFolderPathList/*, mAidlProcessor.getChangeHandler(),
-                                                                               mRenderScriptSourceChangeHandler*/);
+                    dv = new PreCompilerDeltaVisitor(this, sourceFolderPathList,
+                            ProjectHelper.getResFolders(project, monitor)/*, mAidlProcessor.getChangeHandler(),
+                                                                         mRenderScriptSourceChangeHandler*/);
                     delta.accept(dv);
 
                     // Check to see if Manifest.xml, Manifest.java, or R.java have changed:

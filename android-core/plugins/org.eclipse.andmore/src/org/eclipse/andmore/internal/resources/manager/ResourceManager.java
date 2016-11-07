@@ -16,10 +16,12 @@ package org.eclipse.andmore.internal.resources.manager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.andmore.internal.resources.ResourceHelper;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IProjectListener;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IRawDeltaListener;
@@ -39,9 +41,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 
-import com.android.SdkConstants;
 import com.android.ide.common.resources.FrameworkResources;
 import com.android.ide.common.resources.ResourceFile;
 import com.android.ide.common.resources.ResourceFolder;
@@ -148,6 +150,7 @@ public final class ResourceManager {
      * Returns the resources of a project.
      * @param project The project
      * @return a ProjectResources object
+     * @throws CoreException
      */
     public ProjectResources getProjectResources(IProject project) {
         synchronized (mMap) {
@@ -168,6 +171,7 @@ public final class ResourceManager {
      * @param delta the resource changed delta to process.
      * @param context a context object with state for the current update, such
      *            as a place to stash errors encountered
+     * @throws CoreException
      */
     public void processDelta(IResourceDelta delta, IdeScanningContext context) {
         doProcessDelta(delta, context);
@@ -186,6 +190,7 @@ public final class ResourceManager {
      * @param delta the resource changed delta to process.
      * @param context a context object with state for the current update, such
      *            as a place to stash errors encountered
+     * @throws CoreException
      */
     private void doProcessDelta(IResourceDelta delta, IdeScanningContext context) {
         // Skip over deltas that don't fit our mask
@@ -207,7 +212,7 @@ public final class ResourceManager {
         } else if (type == IResource.FOLDER) {
             updateFolder((IFolder) r, kind, context);
         } // We only care about files and folders.
-          // Project deltas are handled by our project listener
+        // Project deltas are handled by our project listener
 
         // Now, process children recursively
         IResourceDelta[] children = delta.getAffectedChildren();
@@ -220,6 +225,7 @@ public final class ResourceManager {
      * Update a resource folder that we know about
      * @param folder the folder that was updated
      * @param kind the delta type (added/removed/updated)
+     * @throws CoreException
      */
     private void updateFolder(IFolder folder, int kind, IdeScanningContext context) {
         ProjectResources resources;
@@ -240,24 +246,21 @@ public final class ResourceManager {
                 // checks if the folder is under res.
                 IPath path = folder.getFullPath();
 
-                // the path will be project/res/<something>
-                if (path.segmentCount() == 3) {
-                    if (isInResFolder(path)) {
-                        // get the project and its resource object.
-                        synchronized (mMap) {
-                            resources = mMap.get(project);
+                if (isInResFolder(project, path)) {
+                    // get the project and its resource object.
+                    synchronized (mMap) {
+                        resources = mMap.get(project);
 
-                            // if it doesn't exist, we create it.
-                            if (resources == null) {
-                                resources = ProjectResources.create(project);
-                                mMap.put(project, resources);
-                            }
+                        // if it doesn't exist, we create it.
+                        if (resources == null) {
+                            resources = ProjectResources.create(project);
+                            mMap.put(project, resources);
                         }
+                    }
 
-                        ResourceFolder newFolder = resources.processFolder(new IFolderWrapper(folder));
-                        if (newFolder != null) {
-                            notifyListenerOnFolderChange(project, newFolder, kind);
-                        }
+                    ResourceFolder newFolder = resources.processFolder(new IFolderWrapper(folder));
+                    if (newFolder != null) {
+                        notifyListenerOnFolderChange(project, newFolder, kind);
                     }
                 }
                 break;
@@ -303,6 +306,7 @@ public final class ResourceManager {
      *            {@link IResourceDelta#accept(IResourceDeltaVisitor)}
      * @param context a context object with state for the current update, such
      *            as a place to stash errors encountered
+     * @throws CoreException
      */
     private void updateFile(IFile file, IMarkerDelta[] markerDeltas, int kind, ScanningContext context) {
         final IProject project = file.getProject();
@@ -329,21 +333,19 @@ public final class ResourceManager {
         // checks if the file is under res/something or bin/res/something
         IPath path = file.getFullPath();
 
-        if (path.segmentCount() == 4 || path.segmentCount() == 5) {
-            if (isInResFolder(path)) {
-                IContainer container = file.getParent();
-                if (container instanceof IFolder) {
+        if (isInResFolder(project, path)) {
+            IContainer container = file.getParent();
+            if (container instanceof IFolder) {
 
-                    ResourceFolder folder = resources.getResourceFolder((IFolder) container);
+                ResourceFolder folder = resources.getResourceFolder((IFolder) container);
 
-                    // folder can be null as when the whole folder is deleted, the
-                    // REMOVED event for the folder comes first. In this case, the
-                    // folder will have taken care of things.
-                    if (folder != null) {
-                        ResourceFile resFile = folder.processFile(new IFileWrapper(file),
-                                ResourceHelper.getResourceDeltaKind(kind), context);
-                        notifyListenerOnFileChange(project, resFile, kind);
-                    }
+                // folder can be null as when the whole folder is deleted, the
+                // REMOVED event for the folder comes first. In this case, the
+                // folder will have taken care of things.
+                if (folder != null) {
+                    ResourceFile resFile = folder.processFile(new IFileWrapper(file),
+                            ResourceHelper.getResourceDeltaKind(kind), context);
+                    notifyListenerOnFileChange(project, resFile, kind);
                 }
             }
         }
@@ -422,7 +424,6 @@ public final class ResourceManager {
                     }
 
                     IdeScanningContext context = new IdeScanningContext(getProjectResources(project), project, true);
-
                     processDelta(delta, context);
 
                     Collection<IProject> projects = context.getAaptRequestedProjects();
@@ -441,6 +442,7 @@ public final class ResourceManager {
 
     /**
      * Returns the {@link ResourceFolder} for the given file or <code>null</code> if none exists.
+     * @throws CoreException
      */
     public ResourceFolder getResourceFolder(IFile file) {
         IContainer container = file.getParent();
@@ -459,6 +461,7 @@ public final class ResourceManager {
 
     /**
      * Returns the {@link ResourceFolder} for the given folder or <code>null</code> if none exists.
+     * @throws CoreException
      */
     public ResourceFolder getResourceFolder(IFolder folder) {
         IProject project = folder.getProject();
@@ -493,6 +496,7 @@ public final class ResourceManager {
     /**
      * Initial project parsing to gather resource info.
      * @param project
+     * @throws CoreException
      */
     private void createProject(IProject project) {
         if (project.isOpen()) {
@@ -510,9 +514,21 @@ public final class ResourceManager {
      * Returns true if the path is under /project/res/
      * @param path a workspace relative path
      * @return true if the path is under /project res/
+     * @throws CoreException
      */
-    private boolean isInResFolder(IPath path) {
-        return SdkConstants.FD_RESOURCES.equalsIgnoreCase(path.segment(1));
+    private boolean isInResFolder(IProject project, IPath path) {
+        try {
+            List<IFolder> resFolders = ProjectHelper.getResFolders(project, new NullProgressMonitor());
+            for (IFolder folder : resFolders) {
+                IPath folderPath = folder.getFullPath();
+                if (folderPath.isPrefixOf(path)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (CoreException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void notifyListenerOnFolderChange(IProject project, ResourceFolder folder, int eventType) {

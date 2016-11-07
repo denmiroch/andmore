@@ -878,7 +878,8 @@ public class EclipseLintClient extends LintClient {
                 libraries = super.getClassPath(project).getLibraries();
             }
 
-            info = new ClassPathInfo(sources, classes, libraries, null);
+            //TODO test folders
+            info = new ClassPathInfo(sources, classes, libraries, Collections.<File> emptyList());
             mProjectInfo.put(project, info);
         }
 
@@ -1182,9 +1183,9 @@ public class EclipseLintClient extends LintClient {
                                 IssueRegistry.PARSER_ERROR, location,
                                 message,
                                 null);
-                    
+
                     }
-                    */
+                     */
                     return null;
                 }
 
