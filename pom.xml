@@ -37,7 +37,7 @@
 	</ciManagement>
 
 	<properties>
-		<tycho-version>0.24.0</tycho-version>
+		<tycho-version>0.25.0</tycho-version>
 		<buildship_core-site>http://download.eclipse.org/buildship/updates/e45/releases/1.0/1.0.15.v20160425-1638/</buildship_core-site>
 		<buildship-site>http://builds.gradle.org:8000/eclipse/update-site/mirror/orbit-mars/</buildship-site>
 		<buildship_other-site>http://builds.gradle.org:8000/eclipse/update-site/mirror/swtbot/release/</buildship_other-site>
