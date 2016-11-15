@@ -656,6 +656,10 @@
             class="org.eclipse.andmore.internal.project.LibraryClasspathContainerInitializer"
             id="org.eclipse.andmore.DEPENDENCIES">
         </classpathContainerInitializer>
+        <classpathContainerInitializer
+            class="org.eclipse.andmore.internal.project.LibraryClasspathContainerInitializer"
+            id="org.eclipse.andmore.TEST_DEPENDENCIES">
+        </classpathContainerInitializer>
     </extension>
     <extension point="org.eclipse.jdt.ui.classpathContainerPage">
         <classpathContainerPage

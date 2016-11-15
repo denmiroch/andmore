@@ -13,24 +13,19 @@
 
 package org.eclipse.andmore.internal.project;
 
-import static org.eclipse.andmore.AndmoreAndroidConstants.CONTAINER_DEPENDENCIES;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import com.android.SdkConstants;
+import com.android.builder.model.AndroidArtifact;
+import com.android.builder.model.AndroidLibrary;
+import com.android.builder.model.AndroidProject;
+import com.android.builder.model.Dependencies;
+import com.android.builder.model.JavaLibrary;
+import com.android.builder.model.Library;
+import com.android.builder.model.MavenCoordinates;
+import com.android.builder.model.Variant;
+import com.android.ide.common.sdk.LoadStatus;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.build.JarListSanitizer;
+import com.android.sdklib.build.RenderScriptProcessor;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -63,17 +58,25 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.gradroid.depexplorer.model.DepModel;
 import org.gradroid.depexplorer.model.DepVariant;
 
-import com.android.SdkConstants;
-import com.android.builder.model.AndroidLibrary;
-import com.android.builder.model.Dependencies;
-import com.android.builder.model.JavaLibrary;
-import com.android.builder.model.Library;
-import com.android.builder.model.MavenCoordinates;
-import com.android.builder.model.Variant;
-import com.android.ide.common.sdk.LoadStatus;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.build.JarListSanitizer;
-import com.android.sdklib.build.RenderScriptProcessor;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
+import static org.eclipse.andmore.AndmoreAndroidConstants.CONTAINER_DEPENDENCIES;
 
 public class LibraryClasspathContainerInitializer extends BaseClasspathContainerInitializer {
 
@@ -83,16 +86,26 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
     private static class SetupDependenciesJob extends Job {
 
-        private IJavaProject mJavaProject;
+        private final IJavaProject mJavaProject;
+        private final String mContainer;
 
-        public SetupDependenciesJob(IJavaProject javaProject) {
+        public SetupDependenciesJob(IJavaProject javaProject, String container) {
             super("Setup dependencies");
             mJavaProject = javaProject;
+            mContainer = container;
         }
 
         @Override
         protected IStatus run(IProgressMonitor monitor) {
-            calculateDependencies(mJavaProject, monitor);
+            if (mContainer == null) {
+                calculateDependencies(mJavaProject, monitor);
+                calculateTestDependencies(mJavaProject, monitor);
+            } else if (AndmoreAndroidConstants.CONTAINER_DEPENDENCIES.equals(mContainer)) {
+                calculateDependencies(mJavaProject, monitor);
+            }
+            else if (AndmoreAndroidConstants.CONTAINER_TEST_DEPENDENCIES.equals(mContainer)) {
+                calculateTestDependencies(mJavaProject, monitor);
+            }
             return Status.OK_STATUS;
         }
 
@@ -113,6 +126,21 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         }
     }
 
+    public static void calculateTestDependencies(IJavaProject project, IProgressMonitor monitor) {
+        IClasspathContainer dependencies = allocateGradleTestDependencyContainer(project, monitor);
+
+        if (dependencies != null) {
+            try {
+                JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_TEST_DEPENDENCIES),
+                        new IJavaProject[] { project },
+                        new IClasspathContainer[] { dependencies },
+                        monitor);
+            } catch (JavaModelException e) {
+                AndmoreAndroidPlugin.log(e, "");
+            }
+        }
+    }
+
     /**
      * Updates the {@link IJavaProject} objects with new library.
      * @param androidProjects the projects to update.
@@ -124,7 +152,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
             try {
                 if (Gradroid.get().isGradroidProject(project)) {
-                    new SetupDependenciesJob(javaProject).schedule();
+                    new SetupDependenciesJob(javaProject, null).schedule();
                 } else {
                     IClasspathContainer[] libraryContainers = new IClasspathContainer[1];
                     IClasspathContainer[] dependencyContainers = new IClasspathContainer[1];
@@ -150,7 +178,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
      * @return <code>true</code> if success, <code>false</code> otherwise.
      */
     public static boolean updateProject(List<ProjectState> projects) {
-        List<IJavaProject> javaProjectList = new ArrayList<IJavaProject>(projects.size());
+        List<IJavaProject> javaProjectList = new ArrayList<>(projects.size());
         for (ProjectState p : projects) {
             IJavaProject javaProject = JavaCore.create(p.getProject());
             if (javaProject != null) {
@@ -169,11 +197,13 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         IProject project = javaProject.getProject();
 
         if (Gradroid.get().isGradroidProject(project)) {
-            if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES
-                    .equals(containerPath.toString())) {} else if (AndmoreAndroidConstants.CONTAINER_DEPENDENCIES
-                            .equals(containerPath.toString())) {
-                        new SetupDependenciesJob(javaProject).schedule();
-                    }
+            if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES.equals(containerPath.toString())) {
+            } else if (AndmoreAndroidConstants.CONTAINER_DEPENDENCIES.equals(containerPath.toString())) {
+                new SetupDependenciesJob(javaProject, AndmoreAndroidConstants.CONTAINER_DEPENDENCIES).schedule();
+            }
+            else if (AndmoreAndroidConstants.CONTAINER_TEST_DEPENDENCIES.equals(containerPath.toString())) {
+                new SetupDependenciesJob(javaProject, AndmoreAndroidConstants.CONTAINER_TEST_DEPENDENCIES).schedule();
+            }
         } else {
             if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES.equals(containerPath.toString())) {
                 IClasspathContainer libraries = allocateLibraryContainer(javaProject);
@@ -219,7 +249,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
         Dependencies dependencies = variant.getMainArtifact().getDependencies();
 
-        Set<Triple<File, File, File>> jars = new LinkedHashSet<Triple<File, File, File>>();
+        Set<Triple<File, File, File>> jars = new LinkedHashSet<>();
 
         processJavaLibraries(jars, dependencies.getJavaLibraries(), depVariant);
         processAndroidLibraries(jars, dependencies.getLibraries(), depVariant);
@@ -227,6 +257,56 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         List<IClasspathEntry> entries = convertGradroidJarsToClasspathEntries(project, jars);
 
         return allocateContainer(javaProject, entries, new Path(CONTAINER_DEPENDENCIES), "Android Dependencies");
+    }
+
+    @SuppressWarnings("deprecation")
+    private static IClasspathContainer allocateGradleTestDependencyContainer(IJavaProject javaProject,
+                                                                             IProgressMonitor monitor) {
+
+        IProject project = javaProject.getProject();
+
+        Gradroid.get().loadAndroidModel(project, monitor);
+        DepModel depModel = Gradroid.get().getDepModel(project);
+
+        Variant variant = Gradroid.get().getProjectVariant(project);
+        DepVariant depVariant = null;
+
+        if (depModel != null) {
+            Collection<DepVariant> depVariants = depModel.getDepVariants();
+
+            for (DepVariant dv : depVariants) {
+                if (dv.getName().contentEquals(variant.getName())) {
+                    depVariant = dv;
+                    break;
+                }
+            }
+        }
+
+        ArrayList<AndroidArtifact> artifacts = new ArrayList<>(variant.getExtraAndroidArtifacts());
+        for (Iterator<AndroidArtifact> iterator = artifacts.iterator(); iterator.hasNext();) {
+            AndroidArtifact androidArtifact = iterator.next();
+            String name = androidArtifact.getName();
+            if (AndroidProject.ARTIFACT_UNIT_TEST.equals(name) || AndroidProject.ARTIFACT_ANDROID_TEST.equals(name)) {
+                continue;
+            }
+            iterator.remove();
+        }
+
+        Set<Triple<File, File, File>> jars = new LinkedHashSet<>();
+
+        for (AndroidArtifact artifact : artifacts) {
+            Dependencies dependencies = artifact.getDependencies();
+
+            processJavaLibraries(jars, dependencies.getJavaLibraries(), depVariant);
+            processAndroidLibraries(jars, dependencies.getLibraries(), depVariant);
+        }
+
+        List<IClasspathEntry> entries = convertGradroidJarsToClasspathEntries(project, jars);
+
+        return allocateContainer(javaProject,
+                entries,
+                new Path(AndmoreAndroidConstants.CONTAINER_TEST_DEPENDENCIES),
+                "Android Test Dependencies");
     }
 
     private static void processAndroidLibraries(Set<Triple<File, File, File>> jars,
@@ -311,12 +391,12 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
          *    + inside the library projects' libs/
          *    + inside the referenced Java projects' classpath
          */
-        List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+        List<IClasspathEntry> entries = new ArrayList<>();
 
         // list of java project dependencies and jar files that will be built while
         // going through the library projects.
-        Set<File> jarFiles = new HashSet<File>();
-        Set<IProject> refProjects = new HashSet<IProject>();
+        Set<File> jarFiles = new HashSet<>();
+        Set<IProject> refProjects = new HashSet<>();
 
         // process all the libraries
 
@@ -346,7 +426,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
     private static List<IClasspathEntry> convertGradroidJarsToClasspathEntries(final IProject iProject,
             Collection<Triple<File, File, File>> jarFiles) {
-        List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>(jarFiles.size());
+        List<IClasspathEntry> entries = new ArrayList<>(jarFiles.size());
 
         String errorMessage = null;
 
@@ -411,7 +491,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
     }
 
     private static List<IClasspathEntry> convertJarsToClasspathEntries(final IProject iProject, Set<File> jarFiles) {
-        List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>(jarFiles.size());
+        List<IClasspathEntry> entries = new ArrayList<>(jarFiles.size());
 
         // and process the jar files list, but first sanitize it to remove dups.
         JarListSanitizer sanitizer = new JarListSanitizer(
@@ -420,7 +500,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
         String errorMessage = null;
 
-        List<File> sanitizedList = new ArrayList<File>(jarFiles);
+        List<File> sanitizedList = new ArrayList<>(jarFiles);
         //        List<File> sanitizedList = sanitizer.sanitize(jarFiles);
 
         for (File jarFile : sanitizedList) {
@@ -501,8 +581,8 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
     private static IClasspathContainer allocateDependencyContainer(IJavaProject javaProject) {
         final IProject iProject = javaProject.getProject();
-        final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
-        final Set<File> jarFiles = new HashSet<File>();
+        final List<IClasspathEntry> entries = new ArrayList<>();
+        final Set<File> jarFiles = new HashSet<>();
         final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
         AndmoreAndroidPlugin plugin = AndmoreAndroidPlugin.getDefault();

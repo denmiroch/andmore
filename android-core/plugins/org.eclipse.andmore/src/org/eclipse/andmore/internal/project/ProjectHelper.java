@@ -13,22 +13,24 @@
 
 package org.eclipse.andmore.internal.project;
 
-import static org.eclipse.andmore.AndmoreAndroidConstants.COMPILER_COMPLIANCE_PREFERRED;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
-import javax.xml.xpath.XPathExpressionException;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.builder.model.AndroidArtifact;
+import com.android.builder.model.AndroidArtifactOutput;
+import com.android.builder.model.AndroidLibrary;
+import com.android.builder.model.AndroidProject;
+import com.android.builder.model.BuildTypeContainer;
+import com.android.builder.model.Dependencies;
+import com.android.builder.model.ProductFlavorContainer;
+import com.android.builder.model.SourceProvider;
+import com.android.builder.model.SourceProviderContainer;
+import com.android.builder.model.Variant;
+import com.android.ide.common.xml.ManifestData;
+import com.android.io.StreamException;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
+import com.android.xml.AndroidManifest;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -70,22 +72,23 @@ import org.eclipse.jdt.launching.IVMInstallType;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.gradroid.depexplorer.model.DepModel;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.builder.model.AndroidArtifactOutput;
-import com.android.builder.model.AndroidLibrary;
-import com.android.builder.model.AndroidProject;
-import com.android.builder.model.BuildTypeContainer;
-import com.android.builder.model.Dependencies;
-import com.android.builder.model.ProductFlavorContainer;
-import com.android.builder.model.SourceProvider;
-import com.android.builder.model.Variant;
-import com.android.ide.common.xml.ManifestData;
-import com.android.io.StreamException;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
-import com.android.xml.AndroidManifest;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.function.Function;
+
+import javax.xml.xpath.XPathExpressionException;
+
+import static org.eclipse.andmore.AndmoreAndroidConstants.COMPILER_COMPLIANCE_PREFERRED;
 
 /**
  * Utility class to manipulate Project parameters/properties.
@@ -406,17 +409,35 @@ public final class ProjectHelper {
             SourceProvider defaultSource = getDefaultSourceProvider(androidProject, variant);
             SourceProvider buildTypeSource = getBuildTypeSourceProvider(androidProject, variant);
             Collection<SourceProvider> flavorsSource = getFlavorsSourceProviders(androidProject, variant);
-            SourceProvider variantSourceProvider = getVariantSourceProvider(androidProject, variant);
+            SourceProvider variantSource = getVariantSourceProvider(androidProject, variant);
 
             entries = addSourceEntry(project, entries, defaultSource.getJavaDirectories(), false, false, monitor);
             for (SourceProvider sourceProvider : flavorsSource) {
                 entries = addSourceEntry(project, entries, sourceProvider.getJavaDirectories(), false, false, monitor);
             }
             entries = addSourceEntry(project, entries, buildTypeSource.getJavaDirectories(), false, false, monitor);
-            if (variantSourceProvider != null) {
-                entries = addSourceEntry(project, entries, variantSourceProvider.getJavaDirectories(), false, false,
+            if (variantSource != null) {
+                entries = addSourceEntry(project,
+                        entries,
+                        variantSource.getJavaDirectories(),
+                        false,
+                        false,
                         monitor);
             }
+
+            entries = addTestSources(monitor,
+                    entries,
+                    project,
+                    androidProject,
+                    variant,
+                    AndroidProject.ARTIFACT_UNIT_TEST);
+
+            entries = addTestSources(monitor,
+                    entries,
+                    project,
+                    androidProject,
+                    variant,
+                    AndroidProject.ARTIFACT_ANDROID_TEST);
 
             Collection<File> generatedSourceFolders = variant.getMainArtifact().getGeneratedSourceFolders();
 
@@ -528,6 +549,35 @@ public final class ProjectHelper {
 
         // If needed, check and fix compiler compliance and source compatibility
         ProjectHelper.checkAndFixCompilerCompliance(javaProject);
+    }
+
+    private static IClasspathEntry[] addTestSources(IProgressMonitor monitor,
+                                                    IClasspathEntry[] entries,
+                                                    IProject project,
+                                                    AndroidProject androidProject,
+                                                    Variant variant,
+                                                    String testName)
+            throws CoreException {
+        SourceProvider defaultTestSource = getDefaultTestSourceProvider(androidProject, variant, testName);
+        SourceProvider buildTypeTestSource = getBuildTypeTestSourceProvider(androidProject, variant, testName);
+        Collection<SourceProvider> flavorsTestSource = getFlavorsTestSourceProviders(androidProject, variant, testName);
+        SourceProvider variantTestSource = getVariantTestSourceProvider(androidProject, variant, testName);
+
+        if (defaultTestSource != null) {
+            entries = addSourceEntry(project, entries, defaultTestSource.getJavaDirectories(), false, false, monitor);
+        }
+        for (SourceProvider sourceProvider : flavorsTestSource) {
+            if (sourceProvider != null) {
+                entries = addSourceEntry(project, entries, sourceProvider.getJavaDirectories(), false, false, monitor);
+            }
+        }
+        if (buildTypeTestSource != null) {
+            entries = addSourceEntry(project, entries, buildTypeTestSource.getJavaDirectories(), false, false, monitor);
+        }
+        if (variantTestSource != null) {
+            entries = addSourceEntry(project, entries, variantTestSource.getJavaDirectories(), false, false, monitor);
+        }
+        return entries;
     }
 
     private static void makeDerived(IFolder folder, IProgressMonitor monitor) throws CoreException {
@@ -1037,7 +1087,7 @@ public final class ProjectHelper {
     public static List<IProject> getReferencedProjects(IProject project) throws CoreException {
         IProject[] projects = project.getReferencedProjects();
 
-        ArrayList<IProject> list = new ArrayList<IProject>();
+        ArrayList<IProject> list = new ArrayList<>();
 
         for (IProject p : projects) {
             if (p.isOpen() && p.hasNature(JavaCore.NATURE_ID)) {
@@ -1115,7 +1165,7 @@ public final class ProjectHelper {
         IJavaModel javaModel = javaProject.getJavaModel();
 
         // loop through all dependent projects and keep only those that are Android projects
-        List<IJavaProject> projectList = new ArrayList<IJavaProject>(requiredProjectNames.length);
+        List<IJavaProject> projectList = new ArrayList<>(requiredProjectNames.length);
         for (String javaProjectName : requiredProjectNames) {
             IJavaProject androidJavaProject = javaModel.getJavaProject(javaProjectName);
 
@@ -1176,12 +1226,41 @@ public final class ProjectHelper {
         return null;
     }
 
+    private static <T, R> R find(Iterable<? extends T> items,
+                                 String name,
+                                 Function<T, String> namer,
+                                 Function<T, R> returner) {
+        if (items == null) {
+            return null;
+        }
+
+        for (T t : items) {
+            if (name.equals(namer.apply(t))) {
+                return returner.apply(t);
+            }
+        }
+
+        return null;
+    }
+
     private static SourceProvider getDefaultSourceProvider(AndroidProject androidProject, Variant variant) {
         return androidProject.getDefaultConfig().getSourceProvider();
     }
 
+    private static SourceProvider getDefaultTestSourceProvider(AndroidProject androidProject,
+                                                               Variant variant,
+                                                               String testName) {
+        Collection<SourceProviderContainer> extraSourceProviders = androidProject.getDefaultConfig()
+                .getExtraSourceProviders();
+
+        return find(extraSourceProviders,
+                testName,
+                container -> container.getArtifactName(),
+                container -> container.getSourceProvider());
+    }
+
     private static List<SourceProvider> getFlavorsSourceProviders(AndroidProject androidProject, Variant variant) {
-        List<SourceProvider> flavorsSource = new ArrayList<SourceProvider>();
+        List<SourceProvider> flavorsSource = new ArrayList<>();
         Collection<ProductFlavorContainer> flavors = androidProject.getProductFlavors();
 
         List<String> variantFlavors = variant.getProductFlavors();
@@ -1198,25 +1277,80 @@ public final class ProjectHelper {
         return flavorsSource;
     }
 
-    private static SourceProvider getBuildTypeSourceProvider(AndroidProject androidProject, Variant variant) {
-        SourceProvider buildTypeSource = null;
+    private static List<SourceProvider> getFlavorsTestSourceProviders(AndroidProject androidProject,
+                                                                      Variant variant,
+                                                                      String testName) {
+        List<SourceProvider> flavorsSource = new ArrayList<>();
+        Collection<ProductFlavorContainer> flavors = androidProject.getProductFlavors();
 
+        List<String> variantFlavors = variant.getProductFlavors();
+
+        for (ProductFlavorContainer productFlavorContainer : flavors) {
+            for (String flavorName : variantFlavors) {
+                if (productFlavorContainer.getProductFlavor().getName().equals(flavorName)) {
+                    Collection<SourceProviderContainer> extraSourceProviders = productFlavorContainer
+                            .getExtraSourceProviders();
+                    ProjectHelper.find(extraSourceProviders,
+                            testName,
+                            container -> container.getArtifactName(),
+                            container -> {
+                                flavorsSource.add(container.getSourceProvider());
+                                return null;
+                            });
+                    break;
+                }
+            }
+        }
+
+        return flavorsSource;
+    }
+
+    private static SourceProvider getBuildTypeSourceProvider(AndroidProject androidProject, Variant variant) {
         Collection<BuildTypeContainer> buildTypes = androidProject.getBuildTypes();
 
         String buildTypeName = variant.getBuildType();
 
         for (BuildTypeContainer buildTypeContainer : buildTypes) {
             if (buildTypeContainer.getBuildType().getName().equals(buildTypeName)) {
-                buildTypeSource = buildTypeContainer.getSourceProvider();
-                break;
+                return buildTypeContainer.getSourceProvider();
             }
         }
 
-        return buildTypeSource;
+        return null;
+    }
+
+    private static SourceProvider getBuildTypeTestSourceProvider(AndroidProject androidProject,
+                                                                 Variant variant,
+                                                                 String testName) {
+        Collection<BuildTypeContainer> buildTypes = androidProject.getBuildTypes();
+
+        String buildTypeName = variant.getBuildType();
+
+        for (BuildTypeContainer buildTypeContainer : buildTypes) {
+            if (buildTypeContainer.getBuildType().getName().equals(buildTypeName)) {
+                Collection<SourceProviderContainer> extraSourceProviders = buildTypeContainer.getExtraSourceProviders();
+                return find(extraSourceProviders,
+                        testName,
+                        container -> container.getArtifactName(),
+                        container -> container.getSourceProvider());
+            }
+        }
+
+        return null;
     }
 
     private static SourceProvider getVariantSourceProvider(AndroidProject project, Variant variant) {
         return variant.getMainArtifact().getVariantSourceProvider();
+    }
+
+    private static SourceProvider getVariantTestSourceProvider(AndroidProject project,
+                                                               Variant variant,
+                                                               String testName) {
+        Collection<AndroidArtifact> extraAndroidArtifacts = variant.getExtraAndroidArtifacts();
+        return find(extraAndroidArtifacts,
+                testName,
+                artifact -> artifact.getName(),
+                artifact -> artifact.getVariantSourceProvider());
     }
 
     public static List<Pair<File, String>> getDepenencyRFiles(IProject project, IProgressMonitor monitor) {
@@ -1226,11 +1360,11 @@ public final class ProjectHelper {
 
         Dependencies dependencies = variant.getMainArtifact().getDependencies();
 
-        Set<Pair<File, File>> files = new HashSet<Pair<File, File>>();
+        Set<Pair<File, File>> files = new HashSet<>();
 
         processLibrariesRFiles(dependencies.getLibraries(), files);
 
-        List<Pair<File, String>> projectFolders = new ArrayList<Pair<File, String>>();
+        List<Pair<File, String>> projectFolders = new ArrayList<>();
 
         for (Pair<File,File> pair : files) {
             try {
@@ -1264,11 +1398,11 @@ public final class ProjectHelper {
 
         Dependencies dependencies = variant.getMainArtifact().getDependencies();
 
-        Set<File> folders = new HashSet<File>();
+        Set<File> folders = new HashSet<>();
 
         processLibrariesResFolders(dependencies.getLibraries(), folders);
 
-        List<IFolder> projectFolders = new ArrayList<IFolder>();
+        List<IFolder> projectFolders = new ArrayList<>();
 
         for (File file : folders) {
             IFolder projectFolder = getProjectFolder(project, file);
@@ -1296,7 +1430,7 @@ public final class ProjectHelper {
             AndroidProject androidProject = Gradroid.get().loadAndroidModel(project, monitor);
             Variant variant = Gradroid.get().getProjectVariant(project);
 
-            List<File> folders = new ArrayList<File>();
+            List<File> folders = new ArrayList<>();
 
             folders.addAll(getDefaultSourceProvider(androidProject, variant).getResDirectories());
             folders.addAll(getBuildTypeSourceProvider(androidProject, variant).getResDirectories());
@@ -1309,7 +1443,7 @@ public final class ProjectHelper {
                 folders.addAll(sourceProvider.getResDirectories());
             }
 
-            List<IFolder> projectFolders = new ArrayList<IFolder>();
+            List<IFolder> projectFolders = new ArrayList<>();
 
             for (File file : folders) {
                 IFolder projectFolder = getProjectFolder(project, file);
@@ -1462,7 +1596,7 @@ public final class ProjectHelper {
      */
     public static void doFullIncrementalDebugBuild(IProject project, IProgressMonitor monitor) throws CoreException {
         // Get list of projects that we depend on
-        List<IJavaProject> androidProjectList = new ArrayList<IJavaProject>();
+        List<IJavaProject> androidProjectList = new ArrayList<>();
         try {
             androidProjectList = getAndroidProjectDependencies(BaseProjectHelper.getJavaProject(project));
         } catch (JavaModelException e) {
@@ -1481,7 +1615,7 @@ public final class ProjectHelper {
         // we have to run the final builder manually (if requested).
         if (AdtPrefs.getPrefs().getBuildSkipPostCompileOnFileSave()) {
             // Create the map to pass to the PostC builder
-            Map<String, String> args = new TreeMap<String, String>();
+            Map<String, String> args = new TreeMap<>();
             args.put(PostCompilerBuilder.POST_C_REQUESTED, ""); //$NON-NLS-1$
 
             // call the post compiler manually, forcing FULL_BUILD otherwise Eclipse won't

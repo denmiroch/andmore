@@ -1,11 +1,11 @@
 package org.eclipse.andmore.android.gradle;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import com.android.builder.model.AndroidArtifact;
+import com.android.builder.model.AndroidProject;
+import com.android.builder.model.Variant;
+import com.gradleware.tooling.toolingclient.BuildLaunchRequest;
+import com.gradleware.tooling.toolingclient.LaunchableConfig;
+import com.gradleware.tooling.toolingclient.ModelRequest;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -26,12 +26,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.JavaCore;
 import org.gradroid.depexplorer.model.DepModel;
 
-import com.android.builder.model.AndroidArtifact;
-import com.android.builder.model.AndroidProject;
-import com.android.builder.model.Variant;
-import com.gradleware.tooling.toolingclient.BuildLaunchRequest;
-import com.gradleware.tooling.toolingclient.LaunchableConfig;
-import com.gradleware.tooling.toolingclient.ModelRequest;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 11 июн. 2016 г.
@@ -43,7 +43,6 @@ public class Gradroid {
 
     //TODO check project.properties and vice versa
     //TODO update on .gradle change
-    //TODO provide Total Update button
     //TODO variant decoration?
 
     public static final String BUILDSHIP_NATURE = GradleProjectNature.ID;
@@ -55,12 +54,12 @@ public class Gradroid {
     private static final String PROPERTY_VARIANT_QUALIFIER = "org.eclipse.andmore.gradle.property";
     private static final String PROPERTY_VARIANT_NAME = "variant";
 
-    private HashMap<IProject, Lock> mRequestLocks = new HashMap<IProject, Lock>();
-    private HashMap<IProject, AndroidProject> mModels = new HashMap<IProject, AndroidProject>();
-    private HashMap<IProject, DepModel> mAptModels = new HashMap<IProject, DepModel>();
-    private HashMap<IProject, String> mVariants = new HashMap<IProject, String>();
+    private final HashMap<IProject, Lock> mRequestLocks = new HashMap<>();
+    private final HashMap<IProject, AndroidProject> mModels = new HashMap<>();
+    private final HashMap<IProject, DepModel> mAptModels = new HashMap<>();
+    private final HashMap<IProject, String> mVariants = new HashMap<>();
 
-    private ListenerList mOnProjectModelChangedListeners = new ListenerList();
+    private final ListenerList mOnProjectModelChangedListeners = new ListenerList();
 
     public interface OnProjectModelChanged {
         void onProjectModelChanged(IProject project, AndroidProject model);
@@ -200,8 +199,6 @@ public class Gradroid {
         }
     }
 
-    //TODO make simple method to get model from map without load
-
     public AndroidProject loadAndroidModel(IProject project, IProgressMonitor monitor) {
 
         synchronized (LOCK) {
@@ -250,7 +247,6 @@ public class Gradroid {
     }
 
     //TODO EXCEPTION HANDLING!111
-    //TODO request only current cariant
     private AndroidProject requestAndroidModel(IProject project, IProgressMonitor monitor, boolean modelOnly) {
 
         AndroidProject model;
@@ -335,6 +331,13 @@ public class Gradroid {
 
                         //                    Set<String> tasks = Collections.singleton(variant.getMainArtifact().getCompileTaskName());
                         Set<String> tasks = variant.getMainArtifact().getIdeSetupTaskNames();
+                        Collection<AndroidArtifact> artifacts = variant.getExtraAndroidArtifacts();
+                        for (AndroidArtifact artifact : artifacts) {
+                            String name = artifact.getName();
+                            if (AndroidProject.ARTIFACT_ANDROID_TEST.equals(name) || AndroidProject.ARTIFACT_UNIT_TEST.equals(name)) {
+                                tasks.addAll(artifact.getIdeSetupTaskNames());
+                            }
+                        }
 
                         System.out.println(tasks);
 

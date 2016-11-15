@@ -20,20 +20,20 @@
 
 package org.eclipse.andmore;
 
-import static com.android.SdkConstants.DOT_AIDL;
-import static com.android.SdkConstants.DOT_DEP;
-import static com.android.SdkConstants.DOT_FS;
-import static com.android.SdkConstants.DOT_JAVA;
-import static com.android.SdkConstants.DOT_RS;
-
-import java.io.File;
+import com.android.SdkConstants;
 
 import org.eclipse.andmore.internal.build.builders.PostCompilerBuilder;
 import org.eclipse.andmore.internal.build.builders.PreCompilerBuilder;
 import org.eclipse.andmore.internal.build.builders.ResourceManagerBuilder;
 import org.eclipse.jdt.core.JavaCore;
 
-import com.android.SdkConstants;
+import java.io.File;
+
+import static com.android.SdkConstants.DOT_AIDL;
+import static com.android.SdkConstants.DOT_DEP;
+import static com.android.SdkConstants.DOT_FS;
+import static com.android.SdkConstants.DOT_JAVA;
+import static com.android.SdkConstants.DOT_RS;
 
 /**
  * Constant definition class.<br>
@@ -88,6 +88,8 @@ public class AndmoreAndroidConstants {
     public final static String CONTAINER_DEPENDENCIES = "org.eclipse.andmore.DEPENDENCIES";
 
     public final static String ADT_CONTAINER_DEPENDENCIES = "com.android.ide.eclipse.adt.DEPENDENCIES";
+
+    public final static String CONTAINER_TEST_DEPENDENCIES = "org.eclipse.andmore.TEST_DEPENDENCIES";
 
     /** Separator for workspace path, i.e. "/". */
     public final static String WS_SEP = "/"; //$NON-NLS-1$
