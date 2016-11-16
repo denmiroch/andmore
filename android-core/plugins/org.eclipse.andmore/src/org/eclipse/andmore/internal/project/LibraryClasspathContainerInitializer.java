@@ -14,9 +14,9 @@
 package org.eclipse.andmore.internal.project;
 
 import com.android.SdkConstants;
-import com.android.builder.model.AndroidArtifact;
 import com.android.builder.model.AndroidLibrary;
 import com.android.builder.model.AndroidProject;
+import com.android.builder.model.BaseArtifact;
 import com.android.builder.model.Dependencies;
 import com.android.builder.model.JavaLibrary;
 import com.android.builder.model.Library;
@@ -282,9 +282,11 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             }
         }
 
-        ArrayList<AndroidArtifact> artifacts = new ArrayList<>(variant.getExtraAndroidArtifacts());
-        for (Iterator<AndroidArtifact> iterator = artifacts.iterator(); iterator.hasNext();) {
-            AndroidArtifact androidArtifact = iterator.next();
+        ArrayList<BaseArtifact> artifacts = new ArrayList<>();
+        artifacts.addAll(variant.getExtraAndroidArtifacts());
+        artifacts.addAll(variant.getExtraJavaArtifacts());
+        for (Iterator<BaseArtifact> iterator = artifacts.iterator(); iterator.hasNext();) {
+            BaseArtifact androidArtifact = iterator.next();
             String name = androidArtifact.getName();
             if (AndroidProject.ARTIFACT_UNIT_TEST.equals(name) || AndroidProject.ARTIFACT_ANDROID_TEST.equals(name)) {
                 continue;
@@ -294,7 +296,7 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
 
         Set<Triple<File, File, File>> jars = new LinkedHashSet<>();
 
-        for (AndroidArtifact artifact : artifacts) {
+        for (BaseArtifact artifact : artifacts) {
             Dependencies dependencies = artifact.getDependencies();
 
             processJavaLibraries(jars, dependencies.getJavaLibraries(), depVariant);

@@ -15,10 +15,10 @@ package org.eclipse.andmore.internal.project;
 
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
-import com.android.builder.model.AndroidArtifact;
 import com.android.builder.model.AndroidArtifactOutput;
 import com.android.builder.model.AndroidLibrary;
 import com.android.builder.model.AndroidProject;
+import com.android.builder.model.BaseArtifact;
 import com.android.builder.model.BuildTypeContainer;
 import com.android.builder.model.Dependencies;
 import com.android.builder.model.ProductFlavorContainer;
@@ -351,6 +351,7 @@ public final class ProjectHelper {
         IJavaProject javaProject = JavaCore.create(project);
         fixProjectClasspathEntries(javaProject, monitor, force);
         LibraryClasspathContainerInitializer.calculateDependencies(javaProject, monitor);
+        LibraryClasspathContainerInitializer.calculateTestDependencies(javaProject, monitor);
     }
 
     /**
@@ -561,7 +562,7 @@ public final class ProjectHelper {
         SourceProvider defaultTestSource = getDefaultTestSourceProvider(androidProject, variant, testName);
         SourceProvider buildTypeTestSource = getBuildTypeTestSourceProvider(androidProject, variant, testName);
         Collection<SourceProvider> flavorsTestSource = getFlavorsTestSourceProviders(androidProject, variant, testName);
-        SourceProvider variantTestSource = getVariantTestSourceProvider(androidProject, variant, testName);
+        Collection<SourceProvider> variantTestSource = getVariantTestSourceProvider(androidProject, variant, testName);
 
         if (defaultTestSource != null) {
             entries = addSourceEntry(project, entries, defaultTestSource.getJavaDirectories(), false, false, monitor);
@@ -574,8 +575,10 @@ public final class ProjectHelper {
         if (buildTypeTestSource != null) {
             entries = addSourceEntry(project, entries, buildTypeTestSource.getJavaDirectories(), false, false, monitor);
         }
-        if (variantTestSource != null) {
-            entries = addSourceEntry(project, entries, variantTestSource.getJavaDirectories(), false, false, monitor);
+        for (SourceProvider sourceProvider : variantTestSource) {
+            if (sourceProvider != null) {
+                entries = addSourceEntry(project, entries, sourceProvider.getJavaDirectories(), false, false, monitor);
+            }
         }
         return entries;
     }
@@ -1343,14 +1346,26 @@ public final class ProjectHelper {
         return variant.getMainArtifact().getVariantSourceProvider();
     }
 
-    private static SourceProvider getVariantTestSourceProvider(AndroidProject project,
-                                                               Variant variant,
-                                                               String testName) {
-        Collection<AndroidArtifact> extraAndroidArtifacts = variant.getExtraAndroidArtifacts();
-        return find(extraAndroidArtifacts,
-                testName,
-                artifact -> artifact.getName(),
-                artifact -> artifact.getVariantSourceProvider());
+    private static Collection<SourceProvider> getVariantTestSourceProvider(AndroidProject project,
+                                                                           Variant variant,
+                                                                           String testName) {
+        ArrayList<SourceProvider> providers = new ArrayList<>();
+
+        Collection<? extends BaseArtifact> extraArtifacts;
+
+        extraArtifacts = variant.getExtraAndroidArtifacts();
+        find(extraArtifacts, testName, artifact -> artifact.getName(), artifact -> {
+            providers.add(artifact.getVariantSourceProvider());
+            return null;
+        });
+
+        extraArtifacts = variant.getExtraJavaArtifacts();
+        find(extraArtifacts, testName, artifact -> artifact.getName(), artifact -> {
+            providers.add(artifact.getVariantSourceProvider());
+            return null;
+        });
+
+        return providers;
     }
 
     public static List<Pair<File, String>> getDepenencyRFiles(IProject project, IProgressMonitor monitor) {

@@ -2,6 +2,7 @@ package org.eclipse.andmore.android.gradle;
 
 import com.android.builder.model.AndroidArtifact;
 import com.android.builder.model.AndroidProject;
+import com.android.builder.model.BaseArtifact;
 import com.android.builder.model.Variant;
 import com.gradleware.tooling.toolingclient.BuildLaunchRequest;
 import com.gradleware.tooling.toolingclient.LaunchableConfig;
@@ -167,6 +168,7 @@ public class Gradroid {
                     }
 
                     LibraryClasspathContainerInitializer.calculateDependencies(JavaCore.create(project), monitor);
+                    LibraryClasspathContainerInitializer.calculateTestDependencies(JavaCore.create(project), monitor);
                     return Status.OK_STATUS;
                 }
             }
@@ -331,10 +333,21 @@ public class Gradroid {
 
                         //                    Set<String> tasks = Collections.singleton(variant.getMainArtifact().getCompileTaskName());
                         Set<String> tasks = variant.getMainArtifact().getIdeSetupTaskNames();
-                        Collection<AndroidArtifact> artifacts = variant.getExtraAndroidArtifacts();
-                        for (AndroidArtifact artifact : artifacts) {
+                        Collection<? extends BaseArtifact> artifacts;
+
+                        artifacts = variant.getExtraAndroidArtifacts();
+                        for (BaseArtifact artifact : artifacts) {
                             String name = artifact.getName();
                             if (AndroidProject.ARTIFACT_ANDROID_TEST.equals(name) || AndroidProject.ARTIFACT_UNIT_TEST.equals(name)) {
+                                tasks.addAll(artifact.getIdeSetupTaskNames());
+                            }
+                        }
+
+                        artifacts = variant.getExtraJavaArtifacts();
+                        for (BaseArtifact artifact : artifacts) {
+                            String name = artifact.getName();
+                            if (AndroidProject.ARTIFACT_ANDROID_TEST.equals(name)
+                                    || AndroidProject.ARTIFACT_UNIT_TEST.equals(name)) {
                                 tasks.addAll(artifact.getIdeSetupTaskNames());
                             }
                         }
