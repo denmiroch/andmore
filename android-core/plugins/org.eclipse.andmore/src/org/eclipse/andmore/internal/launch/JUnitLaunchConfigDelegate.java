@@ -13,19 +13,27 @@
 
 package org.eclipse.andmore.internal.launch;
 
-import java.io.IOException;
-import java.net.URL;
+import com.android.SdkConstants;
+import com.android.builder.model.AndroidProject;
+import com.android.builder.model.JavaArtifact;
+import com.android.builder.model.Variant;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.android.gradle.Gradroid;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate;
 import org.osgi.framework.Bundle;
 
-import com.android.SdkConstants;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collection;
 
 /**
  * <p>
@@ -65,7 +73,33 @@ public class JUnitLaunchConfigDelegate extends JUnitLaunchConfigurationDelegate 
     @Override
     public String[] getClasspath(ILaunchConfiguration configuration) throws CoreException {
         String[] classpath = super.getClasspath(configuration);
+
+        IProject project = getJavaProject(configuration).getProject();
+
+        if (Gradroid.get().isGradroidProject(project)) {
+            return fixGradroidClasspath(project, classpath);
+        }
+
         return fixClasspath(classpath, getJavaProjectName(configuration));
+    }
+
+    private String[] fixGradroidClasspath(IProject project, String[] classpath) {
+
+        Variant variant = Gradroid.get().getProjectVariant(project);
+        Collection<JavaArtifact> artifacts = variant.getExtraJavaArtifacts();
+
+        for (JavaArtifact javaArtifact : artifacts) {
+            if (AndroidProject.ARTIFACT_UNIT_TEST.equals(javaArtifact.getName())) {
+                File platformJar = javaArtifact.getMockablePlatformJar();
+
+                String[] newClasspath = new String[classpath.length + 1];
+                System.arraycopy(classpath, 0, newClasspath, 0, classpath.length);
+                newClasspath[newClasspath.length - 1] = platformJar.getAbsolutePath();
+                return newClasspath;
+            }
+        }
+
+        return classpath;
     }
 
     /**
