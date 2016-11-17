@@ -336,6 +336,9 @@ public final class ProjectHelper {
         return false;
     }
 
+    public static void fixProject(IProject project) throws CoreException {
+        fixProject(project, new NullProgressMonitor(), false);
+    }
     /**
      * Fix the project. This checks the SDK location.
      * @param project The project to fix.
@@ -350,8 +353,11 @@ public final class ProjectHelper {
         // get a java project
         IJavaProject javaProject = JavaCore.create(project);
         fixProjectClasspathEntries(javaProject, monitor, force);
-        LibraryClasspathContainerInitializer.calculateDependencies(javaProject, monitor);
-        LibraryClasspathContainerInitializer.calculateTestDependencies(javaProject, monitor);
+
+        if (Gradroid.get().isGradroidProject(project)) {
+            LibraryClasspathContainerInitializer.calculateDependencies(javaProject, monitor);
+            LibraryClasspathContainerInitializer.calculateTestDependencies(javaProject, monitor);
+        }
     }
 
     /**
