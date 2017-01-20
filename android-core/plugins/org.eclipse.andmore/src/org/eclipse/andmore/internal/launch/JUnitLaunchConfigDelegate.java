@@ -26,14 +26,27 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.internal.junit.launcher.ITestKind;
+import org.eclipse.jdt.internal.launching.DefaultProjectClasspathEntry;
 import org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate;
+import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
+import org.eclipse.jdt.launching.IRuntimeClasspathEntry2;
+import org.eclipse.jdt.launching.JavaRuntime;
 import org.osgi.framework.Bundle;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -70,21 +83,101 @@ public class JUnitLaunchConfigDelegate extends JUnitLaunchConfigurationDelegate 
         return fixBootpathExt(bootpath);
     }
 
+    @SuppressWarnings("restriction")
+    private String[] modifiedCopypastedGetClasspath(ILaunchConfiguration configuration) throws CoreException {
+        List<IRuntimeClasspathEntry> entries = new ArrayList<>(Arrays
+                .asList(JavaRuntime.computeUnresolvedRuntimeClasspath(configuration)));
+        List<IRuntimeClasspathEntry> entries2 = new ArrayList<>();
+
+        for (Iterator<IRuntimeClasspathEntry> iterator = entries.iterator(); iterator.hasNext();) {
+            IRuntimeClasspathEntry entry = iterator.next();
+            if (!(entry instanceof IRuntimeClasspathEntry2)) {
+                continue;
+            }
+            IRuntimeClasspathEntry2 entry2 = (IRuntimeClasspathEntry2)entry;
+            if (entry2.getTypeId().equals(DefaultProjectClasspathEntry.TYPE_ID)) {
+                iterator.remove();
+                entries2 = new ArrayList<>(Arrays
+                        .asList(entry2.getRuntimeClasspathEntries(configuration)));
+                for (Iterator<IRuntimeClasspathEntry> iterator2 = entries2.iterator(); iterator2.hasNext();) {
+                    IRuntimeClasspathEntry entry3 = iterator2.next();
+                    if (entry3.getPath()
+                            .toString()
+                            .equals(AndmoreAndroidConstants.CONTAINER_ANDROID_TEST_DEPENDENCIES))
+                    {
+                        iterator2.remove();
+                    }
+                }
+            }
+        }
+
+        entries = new ArrayList<>(Arrays.asList(JavaRuntime.resolveRuntimeClasspath(entries.toArray(new IRuntimeClasspathEntry[entries.size()]), configuration)));
+        entries.addAll(Arrays.asList(JavaRuntime
+                .resolveRuntimeClasspath(entries2.toArray(new IRuntimeClasspathEntry[entries2.size()]),
+                                         configuration)));
+        List<String> userEntries = new ArrayList<>(entries.size());
+        Set<String> set = new HashSet<>(entries.size());
+        for (int i = 0; i < entries.size(); i++) {
+            if (entries.get(i).getClasspathProperty() == IRuntimeClasspathEntry.USER_CLASSES) {
+                String location = entries.get(i).getLocation();
+                if (location != null) {
+                    if (!set.contains(location)) {
+                        userEntries.add(location);
+                        set.add(location);
+                    }
+                }
+            }
+        }
+
+        String[] cp = userEntries.toArray(new String[userEntries.size()]);
+
+        try {
+            Method getTestRunnerKind = JUnitLaunchConfigurationDelegate.class
+                    .getDeclaredMethod("getTestRunnerKind", ILaunchConfiguration.class);
+            getTestRunnerKind.setAccessible(true);
+
+            ITestKind kind = (ITestKind) getTestRunnerKind.invoke(this, configuration);
+            // ITestKind kind = getTestRunnerKind(configuration);
+
+            Class<?> klass = Class
+                    .forName("org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate$ClasspathLocalizer");
+            Constructor<?> constructor = klass.getDeclaredConstructor(boolean.class);
+            constructor.setAccessible(true);
+            Object localizer = constructor.newInstance(Platform.inDevelopmentMode());
+
+            Method localizeClasspath = klass.getDeclaredMethod("localizeClasspath", ITestKind.class);
+            localizeClasspath.setAccessible(true);
+
+            @SuppressWarnings("unchecked")
+            List<String> junitEntries = (List<String>) localizeClasspath.invoke(localizer, kind);
+            // List<String> junitEntries = new
+            // ClasspathLocalizer(Platform.inDevelopmentMode()).localizeClasspath(kind);
+
+            String[] classPath = new String[cp.length + junitEntries.size()];
+            Object[] jea = junitEntries.toArray();
+            System.arraycopy(cp, 0, classPath, 0, cp.length);
+            System.arraycopy(jea, 0, classPath, cp.length, jea.length);
+            return classPath;
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException | ClassNotFoundException | InstantiationException e) {
+            return cp;
+        }
+    }
+
     @Override
     public String[] getClasspath(ILaunchConfiguration configuration) throws CoreException {
-        String[] classpath = super.getClasspath(configuration);
-
         IProject project = getJavaProject(configuration).getProject();
 
         if (Gradroid.get().isGradroidProject(project)) {
+            String[] classpath = modifiedCopypastedGetClasspath(configuration);
             return fixGradroidClasspath(project, classpath);
         }
 
+        String[] classpath = super.getClasspath(configuration);
         return fixClasspath(classpath, getJavaProjectName(configuration));
     }
 
     private String[] fixGradroidClasspath(IProject project, String[] classpath) {
-
         Variant variant = Gradroid.get().getProjectVariant(project);
         Collection<JavaArtifact> artifacts = variant.getExtraJavaArtifacts();
 

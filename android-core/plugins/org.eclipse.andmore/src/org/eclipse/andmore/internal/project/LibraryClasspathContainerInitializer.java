@@ -100,11 +100,15 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             if (mContainer == null) {
                 calculateDependencies(mJavaProject, monitor);
                 calculateTestDependencies(mJavaProject, monitor);
+                calculateAndroidTestDependencies(mJavaProject, monitor);
             } else if (AndmoreAndroidConstants.CONTAINER_DEPENDENCIES.equals(mContainer)) {
                 calculateDependencies(mJavaProject, monitor);
             }
             else if (AndmoreAndroidConstants.CONTAINER_TEST_DEPENDENCIES.equals(mContainer)) {
                 calculateTestDependencies(mJavaProject, monitor);
+            }
+            else if (AndmoreAndroidConstants.CONTAINER_ANDROID_TEST_DEPENDENCIES.equals(mContainer)) {
+                calculateAndroidTestDependencies(mJavaProject, monitor);
             }
             return Status.OK_STATUS;
         }
@@ -135,6 +139,21 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
                         new IJavaProject[] { project },
                         new IClasspathContainer[] { dependencies },
                         monitor);
+            } catch (JavaModelException e) {
+                AndmoreAndroidPlugin.log(e, "");
+            }
+        }
+    }
+
+    public static void calculateAndroidTestDependencies(IJavaProject project, IProgressMonitor monitor) {
+        IClasspathContainer dependencies = allocateGradleAndroidTestDependencyContainer(project, monitor);
+
+        if (dependencies != null) {
+            try {
+                JavaCore.setClasspathContainer(new Path(AndmoreAndroidConstants.CONTAINER_ANDROID_TEST_DEPENDENCIES),
+                                               new IJavaProject[] { project },
+                                               new IClasspathContainer[] { dependencies },
+                                               monitor);
             } catch (JavaModelException e) {
                 AndmoreAndroidPlugin.log(e, "");
             }
@@ -203,6 +222,10 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
             }
             else if (AndmoreAndroidConstants.CONTAINER_TEST_DEPENDENCIES.equals(containerPath.toString())) {
                 new SetupDependenciesJob(javaProject, AndmoreAndroidConstants.CONTAINER_TEST_DEPENDENCIES).schedule();
+            }
+            else if (AndmoreAndroidConstants.CONTAINER_ANDROID_TEST_DEPENDENCIES.equals(containerPath.toString())) {
+                new SetupDependenciesJob(javaProject, AndmoreAndroidConstants.CONTAINER_ANDROID_TEST_DEPENDENCIES)
+                        .schedule();
             }
         } else {
             if (AndmoreAndroidConstants.CONTAINER_PRIVATE_LIBRARIES.equals(containerPath.toString())) {
@@ -283,12 +306,11 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
         }
 
         ArrayList<BaseArtifact> artifacts = new ArrayList<>();
-        artifacts.addAll(variant.getExtraAndroidArtifacts());
         artifacts.addAll(variant.getExtraJavaArtifacts());
         for (Iterator<BaseArtifact> iterator = artifacts.iterator(); iterator.hasNext();) {
             BaseArtifact androidArtifact = iterator.next();
             String name = androidArtifact.getName();
-            if (AndroidProject.ARTIFACT_UNIT_TEST.equals(name) || AndroidProject.ARTIFACT_ANDROID_TEST.equals(name)) {
+            if (AndroidProject.ARTIFACT_UNIT_TEST.equals(name)) {
                 continue;
             }
             iterator.remove();
@@ -309,6 +331,57 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
                 entries,
                 new Path(AndmoreAndroidConstants.CONTAINER_TEST_DEPENDENCIES),
                 "Android Test Dependencies");
+    }
+
+    @SuppressWarnings("deprecation")
+    private static IClasspathContainer allocateGradleAndroidTestDependencyContainer(IJavaProject javaProject,
+                                                                                    IProgressMonitor monitor) {
+
+        IProject project = javaProject.getProject();
+
+        Gradroid.get().loadAndroidModel(project, monitor);
+        DepModel depModel = Gradroid.get().getDepModel(project);
+
+        Variant variant = Gradroid.get().getProjectVariant(project);
+        DepVariant depVariant = null;
+
+        if (depModel != null) {
+            Collection<DepVariant> depVariants = depModel.getDepVariants();
+
+            for (DepVariant dv : depVariants) {
+                if (dv.getName().contentEquals(variant.getName())) {
+                    depVariant = dv;
+                    break;
+                }
+            }
+        }
+
+        ArrayList<BaseArtifact> artifacts = new ArrayList<>();
+        artifacts.addAll(variant.getExtraAndroidArtifacts());
+        for (Iterator<BaseArtifact> iterator = artifacts.iterator(); iterator.hasNext();) {
+            BaseArtifact androidArtifact = iterator.next();
+            String name = androidArtifact.getName();
+            if (AndroidProject.ARTIFACT_ANDROID_TEST.equals(name)) {
+                continue;
+            }
+            iterator.remove();
+        }
+
+        Set<Triple<File, File, File>> jars = new LinkedHashSet<>();
+
+        for (BaseArtifact artifact : artifacts) {
+            Dependencies dependencies = artifact.getDependencies();
+
+            processJavaLibraries(jars, dependencies.getJavaLibraries(), depVariant);
+            processAndroidLibraries(jars, dependencies.getLibraries(), depVariant);
+        }
+
+        List<IClasspathEntry> entries = convertGradroidJarsToClasspathEntries(project, jars);
+
+        return allocateContainer(javaProject,
+                                 entries,
+                                 new Path(AndmoreAndroidConstants.CONTAINER_ANDROID_TEST_DEPENDENCIES),
+                                 "Android Instrumentation Dependencies");
     }
 
     private static void processAndroidLibraries(Set<Triple<File, File, File>> jars,

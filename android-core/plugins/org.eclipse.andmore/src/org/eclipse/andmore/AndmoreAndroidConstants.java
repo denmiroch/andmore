@@ -91,6 +91,8 @@ public class AndmoreAndroidConstants {
 
     public final static String CONTAINER_TEST_DEPENDENCIES = "org.eclipse.andmore.TEST_DEPENDENCIES";
 
+    public final static String CONTAINER_ANDROID_TEST_DEPENDENCIES = "org.eclipse.andmore.ANDROID_TEST_DEPENDENCIES";
+
     /** Separator for workspace path, i.e. "/". */
     public final static String WS_SEP = "/"; //$NON-NLS-1$
     /** Separator character for workspace path, i.e. '/'. */
