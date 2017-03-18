@@ -5,7 +5,8 @@
 <unit id="org.eclipse.wb.core.xml.feature.feature.group" version="0.0.0"/>
 <repository location="http://download.eclipse.org/windowbuilder/WB/release/R201506241200-1/4.5"/>
 </location>
-<location includeAllPlatforms="true" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+<!-- type="InstallableUnit" -->
+<location path="C:\Users\bimeg\eclipse\committers-neon\eclipse\seq" includeAllPlatforms="true" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="Directory">
 <unit id="org.eclipse.sequoyah.vnc.feature.feature.group" version="2.1.0.N20120718-0509"/>
 <unit id="org.eclipse.sequoyah.vnc.protocol.feature.feature.group" version="2.1.0.N20120718-0509"/>
 <unit id="org.eclipse.sequoyah.vnc.vncviewer.feature.feature.group" version="2.1.0.N20120718-0509"/>
@@ -13,7 +14,7 @@
 <unit id="org.eclipse.sequoyah.device.common.feature.feature.group" version="2.1.0.N20120718-0509"/>
 <unit id="org.eclipse.sequoyah.localization.tools.feature.feature.group" version="2.1.0.N20120718-0509"/>
 <unit id="org.eclipse.sequoyah.localization.android.feature.feature.group" version="2.1.1.N20120718-0509"/>
-<repository location="http://download.eclipse.org/sequoyah/updates/2.1/"/>
+<!--<repository location="http://download.eclipse.org/sequoyah/updates/2.1/"/>-->
 </location>
 <location includeAllPlatforms="true" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.m2e.feature.feature.group" version="1.7.0.20160603-1933"/>
@@ -80,6 +81,7 @@
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20150124073747/repository/"/>
 </location>
 <location path="C:\Users\dmirochnik\eclipse\java-neon\eclipse\dropins\plugins" type="Directory"/>
+<location path="C:\Users\bimeg\eclipse\committers-neon\eclipse\dropins\plugins" type="Directory"/>
 </locations>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 <launcherArgs>
