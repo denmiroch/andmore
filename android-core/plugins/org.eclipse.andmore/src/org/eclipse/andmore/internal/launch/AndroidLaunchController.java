@@ -27,6 +27,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.android.gradle.Gradroid;
+import org.eclipse.andmore.android.gradle.GradroidLaunchConfigDelegate;
 import org.eclipse.andmore.ddms.DdmsPlugin;
 import org.eclipse.andmore.internal.actions.AvdManagerAction;
 import org.eclipse.andmore.internal.editors.manifest.ManifestInfo;
@@ -106,7 +108,7 @@ implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListe
      * to running application. The integer is the port on which to connect.
      * <b>ALL ACCESS MUST BE INSIDE A <code>synchronized (sListLock)</code> block!</b>
      */
-    private static final HashMap<ILaunchConfiguration, Integer> sRunningAppMap = new HashMap<ILaunchConfiguration, Integer>();
+    private static final HashMap<ILaunchConfiguration, Integer> sRunningAppMap = new HashMap<>();
 
     private static final Object sListLock = sRunningAppMap;
 
@@ -117,25 +119,25 @@ implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListe
      * {@link AndroidLaunchController#mWaitingForReadyEmulatorList}.
      * <b>ALL ACCESS MUST BE INSIDE A <code>synchronized (sListLock)</code> block!</b>
      */
-    private final ArrayList<DelayedLaunchInfo> mWaitingForEmulatorLaunches = new ArrayList<DelayedLaunchInfo>();
+    private final ArrayList<DelayedLaunchInfo> mWaitingForEmulatorLaunches = new ArrayList<>();
 
     /**
      * List of application waiting to be launched on a device/emulator.<br>
      * <b>ALL ACCESS MUST BE INSIDE A <code>synchronized (sListLock)</code> block!</b>
      * */
-    private final ArrayList<DelayedLaunchInfo> mWaitingForReadyEmulatorList = new ArrayList<DelayedLaunchInfo>();
+    private final ArrayList<DelayedLaunchInfo> mWaitingForReadyEmulatorList = new ArrayList<>();
 
     /**
      * Application waiting to show up as waiting for debugger.
      * <b>ALL ACCESS MUST BE INSIDE A <code>synchronized (sListLock)</code> block!</b>
      */
-    private final ArrayList<DelayedLaunchInfo> mWaitingForDebuggerApplications = new ArrayList<DelayedLaunchInfo>();
+    private final ArrayList<DelayedLaunchInfo> mWaitingForDebuggerApplications = new ArrayList<>();
 
     /**
      * List of clients that have appeared as waiting for debugger before their name was available.
      * <b>ALL ACCESS MUST BE INSIDE A <code>synchronized (sListLock)</code> block!</b>
      */
-    private final ArrayList<Client> mUnknownClientsWaitingForDebugger = new ArrayList<Client>();
+    private final ArrayList<Client> mUnknownClientsWaitingForDebugger = new ArrayList<>();
 
     /** static instance for singleton */
     private static AndroidLaunchController sThis = new AndroidLaunchController();
@@ -155,15 +157,22 @@ implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListe
     }
 
     /**
-     * Launches a remote java debugging session on an already running application
-     * @param project The project of the application to debug.
-     * @param debugPort The port to connect the debugger to.
+     * Launches a remote java debugging session on an already running
+     * application
+     *
+     * @param project
+     *            The project of the application to debug.
+     * @param debugPort
+     *            The port to connect the debugger to.
+     * @throws CoreException
      */
-    public static void debugRunningApp(IProject project, int debugPort) {
+    public static void debugRunningApp(IProject project, int debugPort) throws CoreException {
         // get an existing or new launch configuration
+        boolean gradroid = Gradroid.get().isGradroidProject(project);
+        String launchTypeId = gradroid ? GradroidLaunchConfigDelegate.GRADROID_LAUNCH_TYPE_ID
+                : LaunchConfigDelegate.ANDROID_LAUNCH_TYPE_ID;
         ILaunchConfiguration config = AndroidLaunchController.getLaunchConfig(project,
-                LaunchConfigDelegate.ANDROID_LAUNCH_TYPE_ID);
-
+                                                                              launchTypeId);
         if (config != null) {
             setPortLaunchConfigAssociation(config, debugPort);
 
@@ -255,7 +264,7 @@ implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListe
      * @param project the project associated to the launch configuration.
      */
     public static IResource[] getResourcesToMap(IProject project) {
-        ArrayList<IResource> array = new ArrayList<IResource>(2);
+        ArrayList<IResource> array = new ArrayList<>(2);
         array.add(project);
 
         IFile manifest = ProjectHelper.getManifest(project);
@@ -449,7 +458,7 @@ implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListe
                 }
             }
 
-            HashMap<IDevice, AvdInfo> compatibleRunningAvds = new HashMap<IDevice, AvdInfo>();
+            HashMap<IDevice, AvdInfo> compatibleRunningAvds = new HashMap<>();
             boolean hasDevice = false; // if there's 1+ device running, we may force manual mode,
             // as we cannot always detect proper compatibility with
             // devices. This is the case if the project target is not
@@ -635,7 +644,7 @@ implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListe
      */
     private Collection<IDevice> findCompatibleDevices(IDevice[] devices, AndroidVersion requiredVersion,
             boolean includeDevices, boolean includeAvds) {
-        Set<IDevice> compatibleDevices = new HashSet<IDevice>(devices.length);
+        Set<IDevice> compatibleDevices = new HashSet<>(devices.length);
         AvdManager avdManager = Sdk.getCurrent().getAvdManager();
         for (IDevice d : devices) {
             boolean isEmulator = d.isEmulator();
@@ -1023,7 +1032,7 @@ implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListe
      * @throws CoreException
      */
     public List<DelayedLaunchInfo> getDependenciesLaunchInfo(DelayedLaunchInfo launchInfo) throws CoreException {
-        List<DelayedLaunchInfo> dependencies = new ArrayList<DelayedLaunchInfo>();
+        List<DelayedLaunchInfo> dependencies = new ArrayList<>();
 
         // Convert to equivalent JavaProject
         IJavaProject javaProject;
@@ -1273,7 +1282,7 @@ implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListe
     private boolean launchEmulator(AndroidLaunchConfiguration config, AvdInfo avdToLaunch) {
 
         // split the custom command line in segments
-        ArrayList<String> customArgs = new ArrayList<String>();
+        ArrayList<String> customArgs = new ArrayList<>();
         boolean hasWipeData = false;
         if (config.mEmulatorCommandLine != null && config.mEmulatorCommandLine.length() > 0) {
             String[] segments = config.mEmulatorCommandLine.split("\\s+"); //$NON-NLS-1$
@@ -1298,7 +1307,7 @@ implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListe
         }
 
         // build the command line based on the available parameters.
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
 
         String path = AndmoreAndroidPlugin.getOsAbsoluteEmulator();
 
@@ -1382,7 +1391,7 @@ implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListe
         // get some default parameters.
         int connectTimeout = JavaRuntime.getPreferences().getInt(JavaRuntime.PREF_CONNECT_TIMEOUT);
 
-        HashMap<String, String> newMap = new HashMap<String, String>();
+        HashMap<String, String> newMap = new HashMap<>();
 
         newMap.put("hostname", "localhost"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1703,7 +1712,11 @@ implements IDebugBridgeChangeListener, IDeviceChangeListener, IClientChangeListe
             IProject project = ProjectHelper.findAndroidProjectByAppName(applicationName);
 
             if (project != null) {
-                debugRunningApp(project, client.getDebuggerListenPort());
+                try {
+                    debugRunningApp(project, client.getDebuggerListenPort());
+                } catch (CoreException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

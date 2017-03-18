@@ -1,7 +1,6 @@
 package org.eclipse.andmore.android.gradle;
 
 import org.eclipse.andmore.internal.launch.LaunchConfigDelegate;
-import org.eclipse.andmore.internal.project.ApkInstallManager;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -18,7 +17,7 @@ public class GradroidLaunchConfigDelegate extends LaunchConfigDelegate {
     @Override
     public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
             throws CoreException {
-        ApkInstallManager.getInstance().resetInstallationFor(getProject(configuration));
+        // ApkInstallManager.getInstance().resetInstallationFor(getProject(configuration));
         super.launch(configuration, mode, launch, monitor);
     }
 

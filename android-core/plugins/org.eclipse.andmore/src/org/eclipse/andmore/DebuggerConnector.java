@@ -25,6 +25,7 @@ import org.eclipse.andmore.internal.project.ProjectHelper;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor;
 import org.eclipse.andmore.internal.resources.manager.GlobalProjectMonitor.IProjectListener;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 /**
@@ -43,7 +44,12 @@ public class DebuggerConnector implements IDebuggerConnector {
         // search for an android project matching the process name
         IProject project = ProjectHelper.findAndroidProjectByAppName(appName);
         if (project != null) {
-            AndroidLaunchController.debugRunningApp(project, appPort);
+            try {
+                AndroidLaunchController.debugRunningApp(project, appPort);
+            } catch (CoreException e) {
+                e.printStackTrace();
+                return false;
+            }
             return true;
         }
 
@@ -78,8 +84,8 @@ public class DebuggerConnector implements IDebuggerConnector {
         private Map<String, String> mAppsInWorkspace;
 
         public WorkspaceAppCache() {
-            mAppsNotInWorkspace = new HashSet<String>();
-            mAppsInWorkspace = new HashMap<String, String>();
+            mAppsNotInWorkspace = new HashSet<>();
+            mAppsInWorkspace = new HashMap<>();
         }
 
         public boolean isWorkspaceApp(String appName) {
@@ -140,7 +146,7 @@ public class DebuggerConnector implements IDebuggerConnector {
         @Override
         public void projectClosed(IProject project) {
             // When a project is closed, remove all mappings contributed by the project.
-            Map<String, String> updatedCache = new HashMap<String, String>();
+            Map<String, String> updatedCache = new HashMap<>();
 
             String name = project.getName();
             for (Entry<String, String> e : mAppsInWorkspace.entrySet()) {
