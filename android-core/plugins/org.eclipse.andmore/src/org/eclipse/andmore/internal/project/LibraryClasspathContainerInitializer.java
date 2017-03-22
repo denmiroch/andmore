@@ -13,19 +13,25 @@
 
 package org.eclipse.andmore.internal.project;
 
-import com.android.SdkConstants;
-import com.android.builder.model.AndroidLibrary;
-import com.android.builder.model.AndroidProject;
-import com.android.builder.model.BaseArtifact;
-import com.android.builder.model.Dependencies;
-import com.android.builder.model.JavaLibrary;
-import com.android.builder.model.Library;
-import com.android.builder.model.MavenCoordinates;
-import com.android.builder.model.Variant;
-import com.android.ide.common.sdk.LoadStatus;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.build.JarListSanitizer;
-import com.android.sdklib.build.RenderScriptProcessor;
+import static org.eclipse.andmore.AndmoreAndroidConstants.CONTAINER_DEPENDENCIES;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -58,25 +64,19 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.gradroid.depexplorer.model.DepModel;
 import org.gradroid.depexplorer.model.DepVariant;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import static org.eclipse.andmore.AndmoreAndroidConstants.CONTAINER_DEPENDENCIES;
+import com.android.SdkConstants;
+import com.android.builder.model.AndroidLibrary;
+import com.android.builder.model.AndroidProject;
+import com.android.builder.model.BaseArtifact;
+import com.android.builder.model.Dependencies;
+import com.android.builder.model.JavaLibrary;
+import com.android.builder.model.Library;
+import com.android.builder.model.MavenCoordinates;
+import com.android.builder.model.Variant;
+import com.android.ide.common.sdk.LoadStatus;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.build.JarListSanitizer;
+import com.android.sdklib.build.RenderScriptProcessor;
 
 public class LibraryClasspathContainerInitializer extends BaseClasspathContainerInitializer {
 
@@ -116,6 +116,11 @@ public class LibraryClasspathContainerInitializer extends BaseClasspathContainer
     }
 
     public LibraryClasspathContainerInitializer() {}
+
+    @Override
+    public boolean canUpdateClasspathContainer(IPath containerPath, IJavaProject project) {
+        return true;
+    }
 
     public static void calculateDependencies(IJavaProject project, IProgressMonitor monitor) {
         IClasspathContainer dependencies = allocateGradleDependencyContainer(project, monitor);
