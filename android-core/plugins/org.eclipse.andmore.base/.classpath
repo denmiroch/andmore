@@ -14,5 +14,6 @@
 	<classpathentry exported="true" kind="lib" path="libs/dvlib.jar" sourcepath="/dvlib"/>
 	<classpathentry exported="true" kind="lib" path="libs/sdk-common.jar" sourcepath="C:/Users/bimeg/workspace/base/sdk-common/src/main/java"/>
 	<classpathentry exported="true" kind="lib" path="libs/gson-2.2.4.jar"/>
+	<classpathentry kind="lib" path="libs/builder-model-2.3.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

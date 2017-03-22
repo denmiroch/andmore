@@ -13,6 +13,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: Eclipse Andmore
 Bundle-ClassPath: .,
+ libs/builder-model-2.3.0.jar,
  libs/annotations.jar,
  libs/common.jar,
  libs/guava-17.0.jar,
@@ -28,6 +29,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.android,
  com.android.annotations,
  com.android.annotations.concurrency,
+ com.android.build,
+ com.android.builder.model,
  com.android.dvlib,
  com.android.ide.common.internal,
  com.android.ide.common.packaging,

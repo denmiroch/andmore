@@ -289,7 +289,7 @@ public class Gradroid {
 
                 modelRequest.projectDir(project.getLocation().toFile());
                 modelRequest.arguments(AndroidProject.PROPERTY_BUILD_MODEL_ONLY_VERSIONED + "="
-                        + AndroidProject.MODEL_LEVEL_2_DEP_GRAPH);
+                        + AndroidProject.MODEL_LEVEL_2_DONT_USE);
 
                 // TODO progress, cancelation
 

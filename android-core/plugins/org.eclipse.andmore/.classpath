@@ -15,6 +15,6 @@
 	<classpathentry exported="true" kind="lib" path="libs/ant-glob.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/swtmenubar.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/manifest-merger.jar" sourcepath="/ManifestMerger"/>
-	<classpathentry exported="true" kind="lib" path="libs/builder-model-2.2.2.jar"/>
+	<classpathentry kind="lib" path="libs/builder-model-2.3.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

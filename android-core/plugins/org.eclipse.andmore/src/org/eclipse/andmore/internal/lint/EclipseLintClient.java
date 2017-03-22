@@ -29,6 +29,7 @@ import java.util.WeakHashMap;
 
 import org.eclipse.andmore.AdtUtils;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
+import org.eclipse.andmore.android.gradle.Gradroid;
 import org.eclipse.andmore.internal.editors.layout.LayoutEditorDelegate;
 import org.eclipse.andmore.internal.editors.layout.uimodel.UiViewElementNode;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
@@ -357,6 +358,34 @@ public class EclipseLintClient extends LintClient {
         return super.getProjectName(project);
     }
 
+    @Override
+    protected Project createProject(File dir, File referenceDir) {
+        LintProject lintProject = new LintProject(this, dir, referenceDir);
+        lintProject.setProject(getProject(lintProject));
+        return lintProject;
+    }
+
+    @Override
+    public boolean isProjectDirectory(File dir) {
+        for (IResource resource : mResources) {
+            IProject p = resource.getProject();
+            if (dir.equals(AdtUtils.getAbsolutePath(p).toFile())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean isGradleProject(Project arg0) {
+        try {
+            return Gradroid.get().isGradroidProject(getProject(arg0));
+        } catch (CoreException e) {
+            return false;
+        }
+    }
+
     /**
      * Same as {@link #getConfiguration(Project)}, but {@code project} can be
      * null in which case the global configuration is returned.
@@ -393,7 +422,7 @@ public class EclipseLintClient extends LintClient {
             } else {
                 Position endPosition = location.getEnd();
                 int line = startPosition.getLine() + 1; // Marker API is 1-based
-                IFile file = AdtUtils.fileToIFile(location.getFile());
+                IFile file = AdtUtils.fileToIFile(getProject(context.getProject()), location.getFile());
                 if (file != null && file.isAccessible()) {
                     Pair<Integer, Integer> r = getRange(file, mDocument, startPosition, endPosition);
                     int startOffset = r.getFirst();
@@ -431,7 +460,7 @@ public class EclipseLintClient extends LintClient {
                         node = ((Attr) node).getOwnerElement();
                     }
                     if (mNodeMap == null) {
-                        mNodeMap = new WeakHashMap<Node, IMarker>();
+                        mNodeMap = new WeakHashMap<>();
                     }
                     IMarker prev = mNodeMap.get(node);
                     if (prev != null) {
@@ -805,8 +834,8 @@ public class EclipseLintClient extends LintClient {
 
                     // Source path
                     IClasspathEntry[] entries = javaProject.getRawClasspath();
-                    sources = new ArrayList<File>(entries.length);
-                    libraries = new ArrayList<File>(entries.length);
+                    sources = new ArrayList<>(entries.length);
+                    libraries = new ArrayList<>(entries.length);
                     for (int i = 0; i < entries.length; i++) {
                         IClasspathEntry entry = entries[i];
                         int kind = entry.getEntryKind();

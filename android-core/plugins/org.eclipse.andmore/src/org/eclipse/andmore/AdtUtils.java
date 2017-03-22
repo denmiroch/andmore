@@ -101,6 +101,23 @@ import com.google.common.io.Closeables;
 /** Utility methods for ADT */
 @SuppressWarnings("restriction") // WST API
 public class AdtUtils {
+
+    public static AndroidVersion getAndroidVersionForApi(int api) {
+        Sdk sdk = Sdk.getCurrent();
+        if (sdk != null) {
+            for (IAndroidTarget target : sdk.getTargets()) {
+                if (target.isPlatform()) {
+                    AndroidVersion version = target.getVersion();
+                    if (version.getApiLevel() == api) {
+                        return target.getVersion();
+                    }
+                }
+            }
+        }
+
+        return new AndroidVersion(api, null);
+    }
+
     /**
      * Creates a Java class name out of the given string, if possible. For
      * example, "My Project" becomes "MyProject", "hello" becomes "Hello",
@@ -385,7 +402,7 @@ public class AdtUtils {
                         IEditorPart editor = reference.getEditor(restore);
                         if (editor != null) {
                             if (result == null) {
-                                result = new ArrayList<IEditorPart>();
+                                result = new ArrayList<>();
                             }
                             result.add(editor);
                         }
@@ -476,6 +493,22 @@ public class AdtUtils {
         }
 
         return path.toFile();
+    }
+
+    public static IFile fileToIFile(IProject project, File file) {
+        if (!file.isAbsolute()) {
+            file = file.getAbsoluteFile();
+        }
+
+        IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
+        IFile[] files = workspace.findFilesForLocationURI(file.toURI());
+        for (IFile ifile : files) {
+            if (ifile.getProject().equals(project)) {
+                return ifile;
+            }
+        }
+
+        return fileToIFile(file);
     }
 
     /**
@@ -585,7 +618,7 @@ public class AdtUtils {
     @NonNull
     public static List<IMarker> findMarkersOnLine(@NonNull String markerType, @NonNull IResource file,
             @NonNull IDocument document, int offset) {
-        List<IMarker> matchingMarkers = new ArrayList<IMarker>(2);
+        List<IMarker> matchingMarkers = new ArrayList<>(2);
         try {
             IMarker[] markers = file.findMarkers(markerType, true, IResource.DEPTH_ZERO);
 
@@ -980,7 +1013,7 @@ public class AdtUtils {
      */
     @NonNull
     public static List<IProject> getSelectedProjects(@Nullable ISelection selection) {
-        List<IProject> projects = new ArrayList<IProject>();
+        List<IProject> projects = new ArrayList<>();
 
         if (selection instanceof IStructuredSelection) {
             IStructuredSelection structuredSelection = (IStructuredSelection) selection;
@@ -1034,7 +1067,7 @@ public class AdtUtils {
             return projects;
         } else {
             // Make sure all the projects are Android projects
-            List<IProject> androidProjects = new ArrayList<IProject>(projects.size());
+            List<IProject> androidProjects = new ArrayList<>(projects.size());
             for (IProject project : projects) {
                 if (BaseProjectHelper.isAndroidProject(project)) {
                     androidProjects.add(project);
@@ -1216,7 +1249,7 @@ public class AdtUtils {
                     }
                     if (close) {
                         if (matching == null) {
-                            matching = new ArrayList<IEditorReference>(2);
+                            matching = new ArrayList<>(2);
                         }
                         matching.add(ref);
                     }
@@ -1276,7 +1309,7 @@ public class AdtUtils {
                     if (close) {
                         // Found
                         if (matching == null) {
-                            matching = new ArrayList<IEditorReference>(2);
+                            matching = new ArrayList<>(2);
                         }
                         matching.add(ref);
                         // We don't break here in case the file is
@@ -1333,7 +1366,7 @@ public class AdtUtils {
         }
 
         // Compute the set of layout files defining this layout resource
-        List<IFile> variations = new ArrayList<IFile>();
+        List<IFile> variations = new ArrayList<>();
         String name = file.getName();
         IContainer parent = file.getParent();
         if (parent != null) {

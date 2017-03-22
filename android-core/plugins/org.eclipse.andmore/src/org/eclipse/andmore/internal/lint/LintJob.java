@@ -38,7 +38,9 @@ import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.tools.lint.client.api.IssueRegistry;
 import com.android.tools.lint.client.api.LintDriver;
+import com.android.tools.lint.client.api.LintListener;
 import com.android.tools.lint.client.api.LintRequest;
+import com.android.tools.lint.detector.api.Context;
 import com.android.tools.lint.detector.api.Issue;
 import com.android.tools.lint.detector.api.Scope;
 import com.android.utils.SdkUtils;
@@ -87,7 +89,7 @@ public final class LintJob extends Job {
         try {
             monitor.beginTask("Looking for errors", IProgressMonitor.UNKNOWN);
             EnumSet<Scope> scope = null;
-            List<File> files = new ArrayList<File>(mResources.size());
+            List<File> files = new ArrayList<>(mResources.size());
             for (IResource resource : mResources) {
                 File file = AdtUtils.getAbsolutePath(resource).toFile();
                 files.add(file);
@@ -152,7 +154,16 @@ public final class LintJob extends Job {
             }
 
             mLint = new LintDriver(mRegistry, mClient);
+            LintListener lintListener = new LintListener() {
+
+                @Override
+                public void update(LintDriver arg0, EventType arg1, Context arg2) {
+//                    System.out.println(arg1);
+                }
+            };
+            mLint.addLintListener(lintListener);
             mLint.analyze(new LintRequest(mClient, files).setScope(scope));
+            mLint.removeLintListener(lintListener);
             mFatal = mClient.hasFatalErrors();
             return Status.OK_STATUS;
         } catch (Exception e) {
