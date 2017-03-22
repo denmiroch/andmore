@@ -1,12 +1,11 @@
 package org.eclipse.andmore.android.gradle;
 
-import com.android.builder.model.AndroidArtifact;
-import com.android.builder.model.AndroidProject;
-import com.android.builder.model.BaseArtifact;
-import com.android.builder.model.Variant;
-import com.gradleware.tooling.toolingclient.BuildLaunchRequest;
-import com.gradleware.tooling.toolingclient.LaunchableConfig;
-import com.gradleware.tooling.toolingclient.ModelRequest;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -27,12 +26,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.JavaCore;
 import org.gradroid.depexplorer.model.DepModel;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import com.android.builder.model.AndroidArtifact;
+import com.android.builder.model.AndroidProject;
+import com.android.builder.model.BaseArtifact;
+import com.android.builder.model.Variant;
+import com.gradleware.tooling.toolingclient.BuildLaunchRequest;
+import com.gradleware.tooling.toolingclient.LaunchableConfig;
+import com.gradleware.tooling.toolingclient.ModelRequest;
 
 /**
  * 11 июн. 2016 г.
@@ -215,7 +215,7 @@ public class Gradroid {
     }
 
     public AndroidProject reloadAndroidModel(IProject project, IProgressMonitor monitor) {
-        AndroidProject model = requestAndroidModel(project, monitor, false);
+        AndroidProject model = requestAndroidModelGuarded(project, monitor, false);
 
         synchronized (LOCK) {
             mModels.put(project, model);
@@ -232,7 +232,7 @@ public class Gradroid {
     }
 
     public AndroidProject reloadAndroidModelOnly(IProject project, IProgressMonitor monitor) {
-        AndroidProject model = requestAndroidModel(project, monitor, true);
+        AndroidProject model = requestAndroidModelGuarded(project, monitor, true);
 
         synchronized (LOCK) {
             mModels.put(project, model);
@@ -246,6 +246,16 @@ public class Gradroid {
         }
 
         return model;
+    }
+
+    private AndroidProject requestAndroidModelGuarded(IProject project, IProgressMonitor monitor, boolean modelOnly) {
+        try {
+            return requestAndroidModel(project, monitor, modelOnly);
+        } catch (Throwable e) {
+            AndmoreAndroidPlugin.log(e, "");
+        }
+
+        return null;
     }
 
     //TODO EXCEPTION HANDLING!111
