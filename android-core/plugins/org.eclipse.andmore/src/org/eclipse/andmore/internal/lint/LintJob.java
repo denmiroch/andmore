@@ -162,7 +162,8 @@ public final class LintJob extends Job {
                 }
             };
             mLint.addLintListener(lintListener);
-            mLint.analyze(new LintRequest(mClient, files).setScope(scope));
+            // FIXME GRADROID temp disable lint
+            //            mLint.analyze(new LintRequest(mClient, files).setScope(scope));
             mLint.removeLintListener(lintListener);
             mFatal = mClient.hasFatalErrors();
             return Status.OK_STATUS;
