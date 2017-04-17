@@ -73,7 +73,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.andmore.ddms"; //$NON-NLS-1$
-	
+
 	public static final String NEWLINE = System.getProperty("line.separator");
 
 	/** The singleton instance */
@@ -112,7 +112,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 
 		/**
 		 * Sent when a new {@link Client} is selected.
-		 * 
+		 *
 		 * @param selectedClient
 		 *            The selected client. If null, no clients are selected.
 		 */
@@ -120,7 +120,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 
 		/**
 		 * Sent when a new {@link IDevice} is selected.
-		 * 
+		 *
 		 * @param selectedDevice
 		 *            the selected device. If null, no devices are selected.
 		 */
@@ -136,7 +136,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
 	 * )
@@ -278,12 +278,12 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 		 * the IConfigurationElement representing the implementations. The 2nd
 		 * step is to use these objects to instantiate the implementation
 		 * classes.
-		 * 
+		 *
 		 * Because the 2nd step will trigger loading the plug-ins providing the
 		 * implementations, and those plug-ins could access DDMS classes (like
 		 * ADT), this 2nd step should be done in a Job to ensure that DDMS is
 		 * loaded, so that the other plug-ins can load.
-		 * 
+		 *
 		 * Both steps could be done in the 2nd step but some of DDMS UI rely on
 		 * knowing if there is an implementation or not (DeviceView), so we do
 		 * the first steps in start() and, in some case, record it.
@@ -338,7 +338,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 					return e.getStatus();
 				}
 			}
-		}.schedule();
+        }.schedule();
 	}
 
 	private void showConsoleView(MessageConsole console) {
@@ -439,7 +439,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 	/**
 	 * Returns the classes that implement {@link IClientAction} in each of the
 	 * extensions that extend clientAction extension point.
-	 * 
+	 *
 	 * @throws CoreException
 	 */
 	private List<IClientAction> instantiateClientSpecificActions(IConfigurationElement[] elements) throws CoreException {
@@ -469,7 +469,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
 	 * )
@@ -551,7 +551,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 
 	/**
 	 * Set the location of the adb executable and optionally starts adb
-	 * 
+	 *
 	 * @param adb
 	 *            location of adb
 	 * @param startAdb
@@ -625,7 +625,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 	 * Sent when the a device is connected to the {@link AndroidDebugBridge}.
 	 * <p/>
 	 * This is sent from a non UI thread.
-	 * 
+	 *
 	 * @param device
 	 *            the new device.
 	 *
@@ -650,7 +650,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 	 * Sent when the a device is disconnected to the {@link AndroidDebugBridge}.
 	 * <p/>
 	 * This is sent from a non UI thread.
-	 * 
+	 *
 	 * @param device
 	 *            the new device.
 	 *
@@ -691,7 +691,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 	 * on the device.
 	 * <p/>
 	 * This is sent from a non UI thread.
-	 * 
+	 *
 	 * @param device
 	 *            the device that was updated.
 	 * @param changeMask
@@ -736,7 +736,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 
 	/**
 	 * Sent when a new {@link IDevice} and {@link Client} are selected.
-	 * 
+	 *
 	 * @param selectedDevice
 	 *            the selected device. If null, no devices are selected.
 	 * @param selectedClient
@@ -765,7 +765,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 
 	/**
 	 * Handles a default selection of a {@link IDevice} and {@link Client}.
-	 * 
+	 *
 	 * @param device
 	 *            the selected device
 	 */
@@ -827,7 +827,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 
 	/**
 	 * Prints a message, associated with a project to the specified stream
-	 * 
+	 *
 	 * @param stream
 	 *            The stream to write to
 	 * @param tag
@@ -847,7 +847,7 @@ public final class DdmsPlugin extends AbstractUIPlugin implements IDeviceChangeL
 
 	/**
 	 * Creates a string containing the current date/time, and the tag
-	 * 
+	 *
 	 * @param tag
 	 *            The tag associated to the message. Can be null
 	 * @return The dateTag
