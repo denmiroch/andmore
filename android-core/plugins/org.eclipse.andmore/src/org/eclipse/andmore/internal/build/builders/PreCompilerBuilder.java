@@ -1140,7 +1140,7 @@ public class PreCompilerBuilder extends BaseBuilder {
             array.add("--non-constant-id"); //$NON-NLS-1$
         }
 
-        if (libResFolders.size() > 0) {
+        if (libResFolders.size() > 0 || osResPath.size() > 1) {
             array.add("--auto-add-overlay"); //$NON-NLS-1$
         }
 
