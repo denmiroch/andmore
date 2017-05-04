@@ -6,7 +6,7 @@
 <repository location="http://download.eclipse.org/windowbuilder/WB/release/R201506241200-1/4.5"/>
 </location>
 <!-- type="InstallableUnit" -->
-<location path="C:\Users\dmirochnik\eclipse\java-neon\eclipse\seq" includeAllPlatforms="true" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="Directory">
+<location path="C:\Users\bimeg\eclipse\committers-neon\eclipse\seq" includeAllPlatforms="true" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="Directory">
 <unit id="org.eclipse.sequoyah.vnc.feature.feature.group" version="2.1.0.N20120718-0509"/>
 <unit id="org.eclipse.sequoyah.vnc.protocol.feature.feature.group" version="2.1.0.N20120718-0509"/>
 <unit id="org.eclipse.sequoyah.vnc.vncviewer.feature.feature.group" version="2.1.0.N20120718-0509"/>

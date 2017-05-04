@@ -1047,7 +1047,7 @@ public class PreCompilerBuilder extends BaseBuilder {
             // get the parent folder for R.java and update mManifestPackageSourceFolder
             IFolder mainPackageFolder = getGenManifestPackageFolder(project, monitor);
 
-            List<IFolder> libResFolders;
+            List<File> libResFolders;
             List<Pair<File, String>> libRFiles;
 
             if (Gradroid.get().isGradroidProject(project)) {
@@ -1061,7 +1061,7 @@ public class PreCompilerBuilder extends BaseBuilder {
                     for (IProject lib : libProjects) {
                         IFolder libResFolder = lib.getFolder(SdkConstants.FD_RES);
                         if (libResFolder.exists()) {
-                            libResFolders.add(libResFolder);
+                            libResFolders.add(new File(libResFolder.getLocation().makeAbsolute().toOSString()));
                         }
 
                         try {
@@ -1114,7 +1114,7 @@ public class PreCompilerBuilder extends BaseBuilder {
      */
     @SuppressWarnings("deprecation")
     private void execAapt(IProject project, IAndroidTarget projectTarget, String osOutputPath, String osBcOutPath,
-            List<String> osResPath, String osManifestPath, IFolder packageFolder, List<IFolder> libResFolders,
+            List<String> osResPath, String osManifestPath, IFolder packageFolder, List<File> libResFolders,
             List<Pair<File, String>> libRFiles, boolean isLibrary, String proguardFile, IProgressMonitor monitor)
                     throws AbortBuildException, CoreException, XPathExpressionException, StreamException {
 
@@ -1167,9 +1167,9 @@ public class PreCompilerBuilder extends BaseBuilder {
             array.add("-S"); //$NON-NLS-1$
             array.add(resPath);
         }
-        for (IFolder libResFolder : libResFolders) {
+        for (File libResFolder : libResFolders) {
             array.add("-S"); //$NON-NLS-1$
-            array.add(libResFolder.getLocation().toOSString());
+            array.add(libResFolder.getAbsolutePath());
         }
 
         array.add("-I"); //$NON-NLS-1$

@@ -13,24 +13,23 @@
 
 package org.eclipse.andmore.internal.project;
 
-import com.android.SdkConstants;
-import com.android.annotations.NonNull;
-import com.android.builder.model.AndroidArtifactOutput;
-import com.android.builder.model.AndroidLibrary;
-import com.android.builder.model.AndroidProject;
-import com.android.builder.model.BaseArtifact;
-import com.android.builder.model.BuildTypeContainer;
-import com.android.builder.model.Dependencies;
-import com.android.builder.model.ProductFlavorContainer;
-import com.android.builder.model.SourceProvider;
-import com.android.builder.model.SourceProviderContainer;
-import com.android.builder.model.Variant;
-import com.android.ide.common.xml.ManifestData;
-import com.android.io.StreamException;
-import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.IAndroidTarget;
-import com.android.utils.Pair;
-import com.android.xml.AndroidManifest;
+import static org.eclipse.andmore.AndmoreAndroidConstants.COMPILER_COMPLIANCE_PREFERRED;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.function.Function;
+
+import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.andmore.AndmoreAndroidConstants;
 import org.eclipse.andmore.AndmoreAndroidPlugin;
@@ -40,7 +39,6 @@ import org.eclipse.andmore.internal.build.builders.PreCompilerBuilder;
 import org.eclipse.andmore.internal.preferences.AdtPrefs;
 import org.eclipse.andmore.internal.sdk.ProjectState;
 import org.eclipse.andmore.internal.sdk.Sdk;
-import org.eclipse.andmore.io.IFileWrapper;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -72,23 +70,25 @@ import org.eclipse.jdt.launching.IVMInstallType;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.gradroid.depexplorer.model.DepModel;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.function.Function;
-
-import javax.xml.xpath.XPathExpressionException;
-
-import static org.eclipse.andmore.AndmoreAndroidConstants.COMPILER_COMPLIANCE_PREFERRED;
+import com.android.SdkConstants;
+import com.android.annotations.NonNull;
+import com.android.builder.model.AndroidArtifactOutput;
+import com.android.builder.model.AndroidLibrary;
+import com.android.builder.model.AndroidProject;
+import com.android.builder.model.BaseArtifact;
+import com.android.builder.model.BuildTypeContainer;
+import com.android.builder.model.Dependencies;
+import com.android.builder.model.ProductFlavorContainer;
+import com.android.builder.model.SourceProvider;
+import com.android.builder.model.SourceProviderContainer;
+import com.android.builder.model.Variant;
+import com.android.ide.common.xml.ManifestData;
+import com.android.io.FileWrapper;
+import com.android.io.StreamException;
+import com.android.sdklib.BuildToolInfo;
+import com.android.sdklib.IAndroidTarget;
+import com.android.utils.Pair;
+import com.android.xml.AndroidManifest;
 
 /**
  * Utility class to manipulate Project parameters/properties.
@@ -1398,7 +1398,7 @@ public final class ProjectHelper {
         for (Pair<File,File> pair : files) {
             try {
                 projectFolders.add(Pair.of(pair.getFirst(),
-                        AndroidManifest.getPackage(new IFileWrapper(getProjectFile(project, pair.getSecond())))));
+                        AndroidManifest.getPackage(new FileWrapper(pair.getSecond()))));
             } catch (XPathExpressionException e) {
                 AndmoreAndroidPlugin.log(e, "");
             } catch (StreamException e) {
@@ -1420,7 +1420,7 @@ public final class ProjectHelper {
         }
     }
 
-    public static List<IFolder> getDepenencyResFolders(IProject project, IProgressMonitor monitor) {
+    public static List<File> getDepenencyResFolders(IProject project, IProgressMonitor monitor) {
 
         Gradroid.get().loadAndroidModel(project, monitor);
         Variant variant = Gradroid.get().getProjectVariant(project);
@@ -1431,19 +1431,14 @@ public final class ProjectHelper {
 
         processLibrariesResFolders(dependencies.getLibraries(), folders);
 
-        List<IFolder> projectFolders = new ArrayList<>();
-
-        for (File file : folders) {
-            IFolder projectFolder = getProjectFolder(project, file);
-
-            if (!projectFolder.isAccessible()) {
-                continue;
+        for (Iterator<File> iterator = folders.iterator(); iterator.hasNext();) {
+            File file = iterator.next();
+            if (!file.exists()) {
+                iterator.remove();
             }
-
-            projectFolders.add(projectFolder);
         }
 
-        return projectFolders;
+        return new ArrayList<>(folders);
     }
 
     private static void processLibrariesResFolders(Collection<? extends AndroidLibrary> libraries, Set<File> folders) {
