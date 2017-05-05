@@ -406,6 +406,11 @@ public final class ProjectHelper {
                     factoryPath.addExternalJar(new File(jar));
                 }
 
+                File toolsJar = new File(System.getenv("JAVA_HOME"), "lib/tools.jar");
+                if (toolsJar.exists()) {
+                    factoryPath.addExternalJar(toolsJar);
+                }
+
                 AptConfig.setFactoryPath(javaProject, factoryPath);
             } else {
                 AptConfig.setFactoryPath(javaProject, AptConfig.getDefaultFactoryPath(javaProject));
@@ -467,6 +472,18 @@ public final class ProjectHelper {
             }
 
             entries = addSourceEntry(project, entries, generatedSourceFolders, true, true, monitor);
+
+            for (int i = 0; i < entries.length; i++) {
+                IClasspathEntry entry = entries[i];
+                if (entry.getPath().lastSegment().equals("gen")) {
+                    entries[i] = JavaCore.newSourceEntry(entry.getPath(),
+                            new Path[] {}, new Path[] {}, null,
+                            new IClasspathAttribute[] { JavaCore
+                                    .newClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true") });
+
+                    break;
+                }
+            }
 
             forceRewriteOfCPE = true;
         }
